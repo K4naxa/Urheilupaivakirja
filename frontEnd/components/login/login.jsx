@@ -2,7 +2,6 @@ import "./login.css";
 import { useState } from "react";
 
 function LoginContainer() {
-  const [attemptCounter, setAttemptCounter] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,6 +15,7 @@ function LoginContainer() {
   return (
     <div className="loginContainer">
       <h1 className="loginTitle">Login</h1>
+
       <form onSubmit={handleLoginSubmit}>
         <div className=" loginInputContainer">
           <label>Email</label>
