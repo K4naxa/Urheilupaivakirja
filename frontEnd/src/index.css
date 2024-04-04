@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+:root {
+  font-family: roboto, sans-serif;
+  font-weight: 400;
+
+  background-color: #070707;
+  color: white;
+
+  --primary-backgroundcolor: #070707;
+  --secondary-backgroundcolor: #202020;
+  --primary-textcolor: #ffffff;
+  --secondary-textcolor: #ffffff;
+  --primary-inputtextcolor: #ffffff;
+  --primary-bordercolor: #EEEEEE;
+
+  --secondary-buttoncolor: #676767;
+}
+html
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: var(--primary-backgroundcolor);
+
+}
