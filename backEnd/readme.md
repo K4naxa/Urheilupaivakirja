@@ -1,1 +1,1 @@
-Start with nodemon: npm start
+Start with nodemon: npm run start
