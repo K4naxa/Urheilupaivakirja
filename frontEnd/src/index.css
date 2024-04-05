@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 
 :root {
   font-family: roboto, sans-serif;
@@ -12,16 +12,26 @@
   --primary-textcolor: #ffffff;
   --secondary-textcolor: #ffffff;
   --primary-inputtextcolor: #ffffff;
-  --primary-bordercolor: #EEEEEE;
-
+  --primary-bordercolor: #eeeeee;
+  --primary-fillerlinecolor: #676767;
   --secondary-buttoncolor: #676767;
 }
-html
-{
+html {
   display: flex;
   justify-content: center;
-  align-items: center;
   height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   background-color: var(--primary-backgroundcolor);
+}
 
+body {
+  width: 90%;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary-textcolor);
 }
