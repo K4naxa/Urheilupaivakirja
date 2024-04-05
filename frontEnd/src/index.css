@@ -7,14 +7,15 @@
   background-color: #070707;
   color: white;
 
-  --primary-backgroundcolor: #070707;
-  --secondary-backgroundcolor: #202020;
-  --primary-textcolor: #ffffff;
-  --secondary-textcolor: #ffffff;
-  --primary-inputtextcolor: #ffffff;
-  --primary-bordercolor: #eeeeee;
-  --primary-fillerlinecolor: #676767;
-  --secondary-buttoncolor: #676767;
+  --dark-primary-backgroundcolor: #070707;
+  --dark-secondary-backgroundcolor: #303030;
+  --dark-primary-textcolor: #ffffff;
+  --dark-secondary-textcolor: #ffffff;
+  --dark-primary-inputtextcolor: #ffffff;
+  --dark-primary-bordercolor: #eeeeee;
+  --dark-primary-fillerlinecolor: #676767;
+  --dark-secondary-buttoncolor: #676767;
+  --dark-lightblue-buttoncolor: #76abae;
 }
 html {
   display: flex;
