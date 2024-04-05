@@ -1,0 +1,102 @@
+[
+  {
+    "email": "Judd_Pagac@gmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Jeramy",
+    "last_name": "Walter",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-05T02:01:30.921Z",
+    "last_login_at": "2024-04-04T19:54:31.197Z"
+  },
+  {
+    "email": "Daija.Rowe56@gmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Anahi",
+    "last_name": "Beier",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-05T11:02:49.789Z",
+    "last_login_at": "2024-04-05T01:00:17.921Z"
+  },
+  {
+    "email": "Laverna.Lowe@hotmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Roxanne",
+    "last_name": "Rohan",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-05T09:32:40.842Z",
+    "last_login_at": "2024-04-05T02:35:34.682Z"
+  },
+  {
+    "email": "Skylar.Kuhlman@hotmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Zaria",
+    "last_name": "Ebert",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-04T16:52:25.645Z",
+    "last_login_at": "2024-04-05T02:53:25.213Z"
+  },
+  {
+    "email": "Annabell.Stracke@yahoo.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Arely",
+    "last_name": "Padberg",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-04T17:54:20.430Z",
+    "last_login_at": "2024-04-04T13:46:14.381Z"
+  },
+  {
+    "email": "Kaela61@yahoo.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Savanna",
+    "last_name": "Mayert",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-04T18:28:20.728Z",
+    "last_login_at": "2024-04-04T18:45:37.870Z"
+  },
+  {
+    "email": "Isabelle32@hotmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Percy",
+    "last_name": "Goldner-Dare",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-04T23:42:28.936Z",
+    "last_login_at": "2024-04-05T06:13:38.180Z"
+  },
+  {
+    "email": "Jillian_Breitenberg@hotmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Sarina",
+    "last_name": "Green",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-04T19:57:43.969Z",
+    "last_login_at": "2024-04-05T10:45:07.846Z"
+  },
+  {
+    "email": "Carmella_Collier25@yahoo.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Wilfrid",
+    "last_name": "Bergstrom",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-04T13:48:13.050Z",
+    "last_login_at": "2024-04-04T19:20:17.585Z"
+  },
+  {
+    "email": "Hailee.Gottlieb@hotmail.com",
+    "password": "$2a$10$bwjatTLyBt485VxcK4dE0eV1Udfrf9pAYEUnCtQjpZ9vW8Gx9piOS",
+    "first_name": "Cleora",
+    "last_name": "Fisher",
+    "role": 0,
+    "email_verified": true,
+    "created_at": "2024-04-05T00:44:53.170Z",
+    "last_login_at": "2024-04-05T07:55:26.619Z"
+  }
+]
