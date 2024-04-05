@@ -1,7 +1,9 @@
+import TeacherHeader from "../../components/teacherHeader/teacherHeader.jsx";
+
 function TeacherHome() {
   return (
     <div className="teacherHomeContainer">
-      <h1 className="teacherHomeTitle">Teacher Home</h1>
+      <TeacherHeader />
     </div>
   );
 }
