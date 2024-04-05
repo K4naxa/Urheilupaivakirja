@@ -1,25 +1,27 @@
 import "./login.css";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
-  const handleLoginSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
     console.log(email, password);
   };
 
   return (
     <div className="container">
       <div className="loginContainer">
-        <h1 className="loginTitle">Login</h1>
-
-        <form onSubmit={handleLoginSubmit}>
+        <div className="loginHeaderContainer">Kirjautuminen</div>
+        <div className="inputContainer">
           <div className=" loginInputContainer">
-            <label>Email</label>
+            <label>Sähköposti</label>
             <input
               type="email"
               value={email}
@@ -28,7 +30,7 @@ function LoginPage() {
           </div>
 
           <div className=" loginInputContainer">
-            <label>Password</label>
+            <label>Salasana</label>
             <input
               type="password"
               value={password}
@@ -37,15 +39,36 @@ function LoginPage() {
           </div>
 
           <div className="buttonContainer">
-            <button type="button" className="registerButton Button">
-              Register
-            </button>
-            <button type="submit" className="loginButton Button">
-              Login
-            </button>
+            <div className="upperContainer">
+              <div className="box">
+                <input
+                  type="checkbox"
+                  name="stayLoggedin"
+                  id="stayLoggedIn"
+                  onChange={(e) => setStayLoggedIn(e.target.checked)}
+                />
+                <label htmlFor="stayLoggedIn">Pysy kirjautuneena</label>
+              </div>
+              <div className="box">
+                <Link to="/resetPassword">Unohditko salasanasi?</Link>
+              </div>
+            </div>
+
+            <div className="buttons">
+              <button type="button" className="registerButton Button">
+                Rekisteröidy
+              </button>
+              <button
+                type="button"
+                onClick={handleLogin}
+                className="loginButton Button"
+              >
+                Kirjaudu
+              </button>
+            </div>
           </div>
-        </form>
-        {error && <p>{error}</p>}
+          {error && <p>{error}</p>}
+        </div>
       </div>
     </div>
   );

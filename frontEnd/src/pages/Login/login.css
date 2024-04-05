@@ -3,64 +3,90 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: var(--primary-backgroundcolor);
+  background-color: var(--dark-primary-backgroundcolor);
 }
 
 .loginContainer {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background-color: var(--secondary-backgroundcolor);
-
+  background-color: var(--dark-primary-backgroundcolor);
+  border: 1px solid var(--dark-primary-fillerlinecolor);
   border-radius: 10px;
-  padding: 20px;
 }
 
-.loginTitle {
-  color: var(--primary-textcolor);
-  font-size: 2em;
-  font-weight: 400;
-  margin: 0.5rem;
-  margin-bottom: 1rem;
+.loginHeaderContainer {
+  color: var(--dark-primary-textcolor);
+  background-color: var(--dark-secondary-backgroundcolor);
+  border-radius: 10px 10px 0px 0px;
+  border: 1px solid var(--dark-primary-fillerlinecolor);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 73px;
+  width: 559px;
+  font-size: 24px;
+  margin-bottom: 2rem;
+}
+
+.inputContainer {
+  height: 400px;
+  width: 386px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .loginInputContainer {
-  color: var(--primary-textcolor);
-  font-size: 1.5em;
-  margin: 1rem;
-
+  color: var(--dark-primary-textcolor);
+  font-size: 16px;
+  width: 386px;
+  margin: 1.5rem 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 1.2rem;
-
-  & input {
-    color: var(--primary-inputtextcolor);
-    padding: 0.5rem;
-    border-radius: 5px;
-    background-color: var(--primary-backgroundcolor);
-    border: 1px solid var(--primary-bordercolor);
-  }
 }
 
-.buttonContainer {
+.upperContainer {
+  width: 100%;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0px 0 40px 0;
+}
+
+.loginInputContainer input {
+  color: var(--dark-primary-inputtextcolor);
+  padding: 0.5rem;
+  width: 100%;
+  height: 30px;
+  font-size: 20px;
+  margin-top: 5px;
+  border-radius: 10px;
+  background-color: var(--dark-secondary-backgroundcolor);
+  border: 1px solid var(--dark-primary-fillerlinecolor);
+}
+
+.buttonContainer .buttons {
+  display: flex;
+  justify-content: space-between;
   gap: 1rem;
   margin-top: 1rem;
 }
 
 .Button {
   color: var(--primary-textcolor);
-  font-size: 1em;
+  font-size: 16px;
+  width: 178px;
+  height: 54px;
   padding: 0.5rem;
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: var(--primary-backgroundcolor);
-  border: 1px solid var(--primary-bordercolor);
+  border: 1px solid var(--dark-primary-fillerlinecolor);
   cursor: pointer;
 }
 
 .loginButton {
-  background-color: var(--secondary-backgroundcolor);
+  background-color: var(--dark-lightblue-buttoncolor);
+  color: black;
 }
