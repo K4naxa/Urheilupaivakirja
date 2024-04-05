@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 export const MainContext = createContext();
 
 export const MainContextProvider = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [userType, setUserType] = useState("");
   const [userName, setUserName] = useState("");
   const [userToken, setUserToken] = useState("");
