@@ -6,7 +6,7 @@ exports.up = function(knex) {
       table.string('last_name').notNullable();
       table.string('phone').notNullable();
       table.boolean('permanent').notNullable().defaultTo(false);
-  
+      table.timestamp('created_at').defaultTo(knex.fn.now());
       table.foreign('user_id').references('users.id');
     });
   };
