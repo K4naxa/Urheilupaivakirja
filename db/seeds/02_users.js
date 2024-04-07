@@ -42,7 +42,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 1, 3, 16, 54),
         },
         {
-          email: "tina97@jordan.net",
+          email: "tiina.tarpoja@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -50,7 +50,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 1, 19, 16, 54),
         },
         {
-          email: "aaronmartinez@bradley.com",
+          email: "aaro_autoasentaja@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -58,7 +58,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 2, 24, 7, 49, 7),
         },
         {
-          email: "frankhammond@yahoo.com",
+          email: "martti_mainio@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -66,7 +66,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 1, 12, 0, 4, 29),
         },
         {
-          email: "phillipsnicholas@mcclain-gordon.com",
+          email: "raisa.ruotsalainen@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -74,7 +74,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 2, 31, 22, 19, 42),
         },
         {
-          email: "diana21@hotmail.com",
+          email: "wille.willi@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -82,7 +82,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 0, 7, 14, 28, 23),
         },
         {
-          email: "mwilliams@pierce.com",
+          email: "jaska.jokunen@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -90,7 +90,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 0, 30, 10, 9, 26),
         },
         {
-          email: "jameskelley@ramirez.com",
+          email: "matti.myohanen@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -98,7 +98,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 2, 16, 20, 19, 29),
         },
         {
-          email: "michellecarrillo@gmail.com",
+          email: "liisa.lahtonen@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -106,7 +106,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 0, 28, 19, 12, 1),
         },
         {
-          email: "dariusowens@lawson.com",
+          email: "etu-nimi.sukuniminen@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
@@ -114,7 +114,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 1, 14, 22, 11, 5),
         },
         {
-          email: "jessicawilliams@anderson.net",
+          email: "jessica.jaxu@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,
