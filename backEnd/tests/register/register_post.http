@@ -1,0 +1,13 @@
+POST http://localhost:3001/user/register HTTP/1.1
+content-type: application/json
+
+{
+    "password": "salasana",
+    "email": "uusi_kayttaja@example.com",
+    "first_name": "Uusi-Etunimi",
+    "last_name": "Uusi-Sukunimi",
+    "phone": "0401234567",
+    "sport_id": 1,
+    "group_id": 1,
+    "campus_id": 1
+}
