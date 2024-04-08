@@ -1,5 +1,7 @@
 import "./login.css";
-import { useState } from "react";
+import userService from "../../Services/userService";
+import { MainContext } from "../../mainContext";
+import { useState, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 
 function LoginPage() {
@@ -7,12 +9,60 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
+  const { setLoggedIn, setUserRole, setToken } = useContext(MainContext);
+
+  const passwordInput = useRef(null);
+
+  // Function to check if login input is valid before sending it to backend
+  const errorCheckLogin = () => {
+    if (email === "" || password === "") {
+      setError("Täytä kaikki kentät");
+      return false;
+    }
+
+    // test if password is long enough
+    if (password.length < 8) {
+      setError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
+      setPassword("");
+      return false;
+    }
+    // test if email is in correct format
+    const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    if (!myRegEx.test(email)) {
+      setError("Sähköposti ei ole oikeassa muodossa");
+      setPassword("");
+      setEmail("");
+      return false;
+    }
+    return true;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    if (!errorCheckLogin()) {
+      return;
+    }
 
-    console.log(email, password);
+    try {
+      const user = await userService.login(email, password);
+      setLoggedIn(true);
+      setUserRole(user.role);
+      setToken(user.token);
+      if (stayLoggedIn) {
+        window.localStorage.setItem(
+          "urheilupaivakirjaToken",
+          JSON.stringify(user)
+        );
+      }
+      setEmail("");
+      setPassword("");
+      console.log(user);
+    } catch (error) {
+      console.log(error);
+      setError("Sähköposti tai salasana on väärin");
+      return;
+    }
   };
 
   return (
@@ -26,6 +76,11 @@ function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  passwordInput.current.focus();
+                }
+              }}
             />
           </div>
 
@@ -34,7 +89,13 @@ function LoginPage() {
             <input
               type="password"
               value={password}
+              ref={passwordInput}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleLogin(e);
+                }
+              }}
             />
           </div>
 
