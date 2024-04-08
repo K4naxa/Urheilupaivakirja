@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const MainContext = createContext();
 
@@ -6,7 +6,39 @@ export const MainContextProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(true);
   const [userRole, setUserRole] = useState("");
   const [userName, setUserName] = useState("");
-  const [userToken, setUserToken] = useState("");
+
+  const [token, setToken] = useState(null);
+
+  //TODO: redirect to homepage after login
+
+  // Check if user token is in local storage
+  const userHook = () => {
+    const loggedUserJSON = window.localStorage.getItem(
+      "urheilupaivakirjaToken"
+    );
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setToken(user.token);
+      setLoggedIn(true);
+      setUserRole(user.role);
+    }
+  };
+
+  const startHook = () => {
+    if (token) {
+      setToken(token);
+    }
+  };
+
+  // tarkistaa onko käyttäjä kirjautunut kun sivu ladataan
+  useEffect(() => {
+    userHook();
+  }, []);
+
+  // asettaa tokenin käyttöön kun se on saatu
+  useEffect(() => {
+    startHook();
+  }, [token]);
 
   return (
     <MainContext.Provider
@@ -17,8 +49,8 @@ export const MainContextProvider = ({ children }) => {
         setUserRole,
         userName,
         setUserName,
-        userToken,
-        setUserToken,
+        token,
+        setToken,
       }}
     >
       {children}
