@@ -10,7 +10,7 @@ import Register from "./pages/Register/Register";
 
 function App() {
   // get loggedIn from MainContext
-  const { loggedIn } = useContext(MainContext);
+  const { loggedIn, userRole } = useContext(MainContext);
 
   if (!loggedIn) {
     return (

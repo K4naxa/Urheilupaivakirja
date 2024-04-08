@@ -3,7 +3,7 @@ import { createContext, useState, useEffect } from "react";
 export const MainContext = createContext();
 
 export const MainContextProvider = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [userName, setUserName] = useState("");
 
@@ -21,6 +21,7 @@ export const MainContextProvider = ({ children }) => {
       setToken(user.token);
       setLoggedIn(true);
       setUserRole(user.role);
+      console.log("logged in from local storage as userRole:", user.role);
     }
   };
 
