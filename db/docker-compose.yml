@@ -1,0 +1,16 @@
+ version: '3.1'
+
+ services:
+   db:
+     image: mysql:8.0.27
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: mypass123
+     ports:
+       - 3306:3306
+
+   phpmyadmin:
+     image: phpmyadmin
+     restart: always
+     ports:
+       - 8081:80

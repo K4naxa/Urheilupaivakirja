@@ -4,7 +4,7 @@ export const MainContext = createContext();
 
 export const MainContextProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(true);
-  const [userType, setUserType] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [userName, setUserName] = useState("");
   const [userToken, setUserToken] = useState("");
 
@@ -13,8 +13,8 @@ export const MainContextProvider = ({ children }) => {
       value={{
         loggedIn,
         setLoggedIn,
-        userType,
-        setUserType,
+        userRole,
+        setUserRole,
         userName,
         setUserName,
         userToken,
