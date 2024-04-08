@@ -5,3 +5,4 @@ node_modules/
 build/
 knexfile.js
 docker/docker-compose.yml
+docker-compose.yml
