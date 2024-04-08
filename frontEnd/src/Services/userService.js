@@ -1,10 +1,5 @@
 import axios from "axios";
 
-let token = null;
-const setToken = (newToken) => {
-  token = newToken;
-};
-
 const login = async (email, password) => {
   const response = await axios.post("/user/login", {
     email: email,
@@ -36,5 +31,5 @@ const register = async (
   return response.data;
 };
 
-export default { login, register, setToken };
+export default { login, register };
 // Path: frontEnd/src/Services/userService.js
