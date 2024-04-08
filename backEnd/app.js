@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var isAuthenticated = require('./middleware/auth');
 
+
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/user/loginRouter.js');
 var registerRouter = require('./routes/user/registerRouter.js');
@@ -23,5 +24,6 @@ app.use('/', indexRouter);
 app.use('/user/login', loginRouter);
 app.use('/user/register', registerRouter);
 app.use('/journal', isAuthenticated, journalRouter);
+
 
 module.exports = app;
