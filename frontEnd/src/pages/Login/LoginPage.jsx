@@ -1,6 +1,7 @@
 import "./login.css";
 import userService from "../../Services/userService";
-import { useState } from "react";
+import { MainContext } from "../../mainContext";
+import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
 function LoginPage() {
@@ -8,6 +9,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
+  const { setLoggedIn, setUserRole, setToken } = useContext(MainContext);
 
   // Function to check if login input is valid before sending it to backend
   const errorCheckLogin = () => {
@@ -23,7 +25,7 @@ function LoginPage() {
       return false;
     }
     // test if email is in correct format
-    const myRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
     if (!myRegEx.test(email)) {
       setError("Sähköposti ei ole oikeassa muodossa");
       setPassword("");
@@ -42,9 +44,22 @@ function LoginPage() {
 
     try {
       const user = await userService.login(email, password);
+      setLoggedIn(true);
+      setUserRole(user.role);
+      setToken(user.token);
+      if (stayLoggedIn) {
+        window.localStorage.setItem(
+          "urheilupaivakirjaToken",
+          JSON.stringify(user)
+        );
+      }
+      setEmail("");
+      setPassword("");
+      console.log(user);
     } catch (error) {
       console.log(error);
       setError("Sähköposti tai salasana on väärin");
+      return;
     }
   };
 
