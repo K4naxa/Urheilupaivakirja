@@ -7,7 +7,7 @@ exports.seed = async function (knex) {
   await knex("journal_entries").del();
   await knex("journal_entries").insert([
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 1,
@@ -20,21 +20,21 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 1, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 2,
       details: "Lepopäivä",
       date: new Date(2024, 1, 2, 0, 0),
       created_at: new Date(2024, 1, 2, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 3,
       details: "Sairaana",
       date: new Date(2024, 1, 3, 0, 0),
       created_at: new Date(2024, 1, 3, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 1,
@@ -47,7 +47,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 4, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 1,
@@ -60,7 +60,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 4, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 1,
@@ -73,7 +73,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 5, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 1,
@@ -86,7 +86,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 5, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 1,
@@ -99,7 +99,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 5, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 2,
       workout_category_id: 1,
@@ -112,7 +112,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 6, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 3,
       workout_category_id: 1,
@@ -125,7 +125,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 7, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 2,
@@ -138,7 +138,7 @@ exports.seed = async function (knex) {
       created_at: new Date(2024, 1, 8, 0, 0),
     },
     {
-      student_id: 1,
+      user_id: 3,
       entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 3,

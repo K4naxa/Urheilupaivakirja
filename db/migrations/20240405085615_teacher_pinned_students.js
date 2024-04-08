@@ -1,15 +1,15 @@
 exports.up = function(knex) {
-    return knex.schema.createTable('teacher_pinned_students', function(table) {
+    return knex.schema.createTable('pinned_students', function(table) {
       table.increments('id').primary();
-      table.integer('teacher_id').unsigned().notNullable();
-      table.integer('student_id').unsigned().notNullable();
+      table.integer('pinner_user_id').unsigned().notNullable();
+      table.integer('pinned_user_id').unsigned().notNullable();
 
-      table.foreign('teacher_id').references('teachers.id');
-      table.foreign('student_id').references('students.id');
+      table.foreign('pinner_user_id').references('users.id');
+      table.foreign('pinned_user_id').references('users.id');
     });
   };
   
   exports.down = function(knex) {
-    return knex.schema.dropTable('teacher_pinned_students');
+    return knex.schema.dropTable('pinned_students');
   };
   

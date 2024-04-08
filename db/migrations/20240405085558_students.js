@@ -18,6 +18,8 @@ exports.up = function(knex) {
       table.foreign('sport_id').references('sports.id');
       table.foreign('group_id').references('student_groups.id');
       table.foreign('campus_id').references('campuses.id');
+
+      table.index('user_id');
     });
   };
   
