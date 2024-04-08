@@ -1,7 +1,7 @@
 import "./login.css";
 import userService from "../../Services/userService";
 import { MainContext } from "../../mainContext";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 
 function LoginPage() {
@@ -10,6 +10,8 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const { setLoggedIn, setUserRole, setToken } = useContext(MainContext);
+
+  const passwordInput = useRef(null);
 
   // Function to check if login input is valid before sending it to backend
   const errorCheckLogin = () => {
@@ -74,6 +76,11 @@ function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  passwordInput.current.focus();
+                }
+              }}
             />
           </div>
 
@@ -82,7 +89,13 @@ function LoginPage() {
             <input
               type="password"
               value={password}
+              ref={passwordInput}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleLogin(e);
+                }
+              }}
             />
           </div>
 
