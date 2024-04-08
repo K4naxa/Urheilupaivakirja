@@ -6,7 +6,7 @@ const setToken = (newToken) => {
 };
 
 const login = async (email, password) => {
-  const response = await axios.post("/login", {
+  const response = await axios.post("/user/login", {
     email: email,
     password: password,
   });
@@ -35,3 +35,6 @@ const register = async (
   });
   return response.data;
 };
+
+export default { login, register, setToken };
+// Path: frontEnd/src/Services/userService.js
