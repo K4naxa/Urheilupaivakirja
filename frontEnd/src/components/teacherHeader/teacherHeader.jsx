@@ -11,21 +11,21 @@ const TeacherHeader = () => {
             <Link to="/">Etusivu</Link>
           </div>
           <div className="menuButton" id="LajitButton">
-            Lajit
+            <Link to="lajit">Lajit</Link>
           </div>
           <div className="menuButton" id="vierailijatButton">
-            Vierailijat
+            <Link>Vierailijat</Link>
           </div>
           <div className="menuButton" id="tiedotteetButton">
-            Tiedotteet
+            <Link>Tiedotteet</Link>
           </div>
           <div className="menuButton" id="verifoiButton">
-            Verifoi
+            <Link>Verifoi</Link>
           </div>
         </div>
         <div className="profileContainer">
           <div className="profileButton" id="profileButton">
-            Profiili
+            <Link to="/profile">Profiili</Link>
           </div>
           <div className="profileButton" id="logoutButton">
             Kirjaudu ulos

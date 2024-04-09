@@ -7,10 +7,11 @@ import LoginPage from "./pages/Login/LoginPage";
 import StudentHome from "./pages/StudentHome/StudentHome";
 import TeacherHome from "./pages/TeacherHome/TeacherHome";
 import Register from "./pages/Register/Register";
+import Sports from "./pages/sports/Sports";
 
 function App() {
   // get loggedIn from MainContext
-  const { loggedIn, userRole } = useContext(MainContext);
+  const { loggedIn } = useContext(MainContext);
 
   if (!loggedIn) {
     return (
@@ -22,6 +23,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/lajit" element={<Sports />} />
       <Route path="/register" element={<Register />} />
       <Route path="/resetPassword" element={<div>Reset Password</div>} />
       <Route path="/login" element={<LoginPage />} />
