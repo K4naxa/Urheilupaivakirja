@@ -10,6 +10,7 @@ const getTokenFrom = (request) => {
 
 const isAuthenticated = (req, res, next) => {
   const token = getTokenFrom(req);
+  console.log("Token: ", token);
 
   if (!token) {
     console.error("Authentication token missing");

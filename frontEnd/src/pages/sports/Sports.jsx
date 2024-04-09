@@ -5,9 +5,8 @@ import TeacherHeader from "../../components/teacherHeader/teacherHeader";
 // renders a container for a sport while checking if it is being edited
 const createSportContainer = (sport, setSports) => {
   // saves the edited sport to the server and updates the state
-  const handleSave = (newName) => {
-    const newSport = { id: sport.id, name: newName };
-    console.log(newSport);
+  const handleSave = () => {
+    const newSport = { id: sport.id, name: sport.name };
     trainingService.editSport(newSport).then(() => {
       setSports((prevSports) =>
         prevSports.map((prevSport) =>
@@ -29,11 +28,16 @@ const createSportContainer = (sport, setSports) => {
   // sets the sport's "isEditing" property to "true"
   const handleEdit = () => {
     setSports((prevSports) =>
-      prevSports.map((prevSport) =>
-        prevSport.id === sport.id
-          ? { ...prevSport, isEditing: true }
-          : prevSport
-      )
+      prevSports.map((prevSport) => {
+        if (prevSport.id === sport.id) {
+          {
+            if (sport.isEditing) return { id: sport.id, name: sport.name };
+            else return { ...prevSport, isEditing: true };
+          }
+        } else {
+          return prevSport;
+        }
+      })
     );
   };
 
@@ -43,8 +47,8 @@ const createSportContainer = (sport, setSports) => {
         <div>
           <input
             type="text"
-            placeholder={sport.name}
-            id="editSportNameInput"
+            defaultValue={sport.name}
+            onChange={(e) => (sport.name = e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSave(e.target.value);
@@ -53,9 +57,7 @@ const createSportContainer = (sport, setSports) => {
           />
         </div>
         <div>
-          <button onClick={() => handleSave(editSportNameInput.value)}>
-            Save
-          </button>{" "}
+          <button onClick={() => handleSave()}>Save</button>{" "}
           <button onClick={() => handleEdit()}>Cancel</button>
         </div>
       </div>

@@ -1,8 +1,20 @@
 import axios from "axios";
+let token = null;
+
+// set token function to get token from mainContext
+const setToken = (newToken) => {
+  token = newToken;
+};
+
+// make authorization header
+const makeHeader = () => {
+  let header = { headers: { Authorization: `bearer ${token}` } };
+  return header;
+};
 
 // get all sports
 const getSports = async () => {
-  const response = await axios.get("/sports");
+  const response = await axios.get("/sports", makeHeader());
   return response.data;
 };
 
@@ -31,4 +43,11 @@ const deleteSport = async (id) => {
   return response.data;
 };
 
-export default { getSports, getSport, addSport, editSport, deleteSport };
+export default {
+  getSports,
+  getSport,
+  addSport,
+  editSport,
+  deleteSport,
+  setToken,
+};
