@@ -1,9 +1,9 @@
-import "./teacherHeader.css";
+import "./studentHeader.css";
 import userService from "../../Services/userService";
 
 import { Link } from "react-router-dom";
 
-const TeacherHeader = () => {
+const StudentHeader = () => {
   return (
     <div className="container">
       <div className="headerContainer">
@@ -11,17 +11,9 @@ const TeacherHeader = () => {
           <div className="menuButton" id="etusivuButton">
             <Link to="/">Etusivu</Link>
           </div>
-          <div className="menuButton" id="LajitButton">
-            <Link to="/lajit">Lajit</Link>
-          </div>
-          <div className="menuButton" id="vierailijatButton">
-            <Link>Vierailijat</Link>
-          </div>
+
           <div className="menuButton" id="tiedotteetButton">
             <Link>Tiedotteet</Link>
-          </div>
-          <div className="menuButton" id="verifoiButton">
-            <Link to="/verify">Verifoi</Link>
           </div>
         </div>
         <div className="profileContainer">
@@ -45,4 +37,4 @@ const TeacherHeader = () => {
   );
 };
 
-export default TeacherHeader;
+export default StudentHeader;

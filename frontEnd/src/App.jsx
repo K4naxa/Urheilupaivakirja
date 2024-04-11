@@ -8,6 +8,7 @@ import StudentHome from "./pages/StudentHome/StudentHome";
 import TeacherHome from "./pages/TeacherHome/TeacherHome";
 import Register from "./pages/Register/Register";
 import Sports from "./pages/sports/Sports";
+import Verify from "./pages/Verify/Verify";
 
 function App() {
   // get loggedIn from MainContext
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/verify" element={<Verify />} />
       <Route path="/lajit" element={<Sports />} />
       <Route path="/register" element={<Register />} />
       <Route path="/resetPassword" element={<div>Reset Password</div>} />

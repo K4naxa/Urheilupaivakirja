@@ -20,10 +20,11 @@ const makeHeader = () => {
   return header;
 };
 
+// ................................................................................
+
 // get all sports
 const getSports = async () => {
   await waitToken();
-  console.log("getSports > makeHeader: ", makeHeader());
   const response = await axios.get("/sports", makeHeader());
   return response.data;
 };

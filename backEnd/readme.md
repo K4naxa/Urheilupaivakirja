@@ -3,88 +3,111 @@ Start with nodemon: npm run start
 #Tietokantahaut
 
 /login/
+
 > POST
 
 /register/
+
 > POST
 
-/journal/
+/user/unverified
+
 > GET
-/journal/:user_id (yksittäinen journal)
+
+/user/verify
+
+> PUT
+
+/journal/
+
+> GET
+> /journal/:user_id (yksittäinen journal)
 > GET
 
 /journal_entry/
+
 > POST
-/journal_entry/:id
+> /journal_entry/:id
 > GET
 > PUT
 > DELETE
 
 /student_group/
+
 > GET
 > POST
-/student_group/:id
+> /student_group/:id
 > PUT
 > DELETE
 
 /campus/
+
 > GET
 > POST
-/campus/:id
+> /campus/:id
 > PUT
 > DELETE
 
 /sport/
+
 > GET
 > POST
-/sport/:id
+> /sport/:id
 > PUT
 > DELETE
 
 /news/
+
 > GET
 > POST
-/news/:id
+> /news/:id
 > PUT
 > DELETE
 
 /journal_entry_type/
+
 > GET
 > POST
-/journal_entry_type/:id
+> /journal_entry_type/:id
 > PUT
 > DELETE
 
 /workout_type/
+
 > GET
 > POST
-/workout_type/
+> /workout_type/
 > PUT
 > DELETE
 
 /workout_categories/
+
 > GET
 > POST
-/workout_categories/
+> /workout_categories/
 > PUT
 > DELETE
 
 /user/:id
+
 > PUT (CHANGE PASSWORD)
 > DELETE
 
 /student/
+
 > GET
-/student/:id
+> /student/:id
 > GET
 > PUT
 
 /teacher/:id
+
 > GET
 > PUT
 
 /spectator/
+
 > GET
-/spectator/:id
+> /spectator/:id
 > GET
 > PUT

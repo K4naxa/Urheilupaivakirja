@@ -8,6 +8,7 @@ const getTokenFrom = (request) => {
     : null;
 };
 
+// checks if user has any authentication token
 const isAuthenticated = (req, res, next) => {
   const token = getTokenFrom(req);
   console.log("Token: ", token);
@@ -29,8 +30,22 @@ const isAuthenticated = (req, res, next) => {
     next();
   } catch (error) {
     console.error("JWT verification error: ", error.message);
-    return res.status(401).json({ error: "Token verification failed" });
+    return 0;
   }
 };
 
-module.exports = isAuthenticated;
+// Get the role from token
+const getRole = (req) => {
+  const token = getTokenFrom(req);
+  let role = null;
+  try {
+    const decodedToken = jwt.verify(token, config.SECRET);
+    role = decodedToken.role;
+  } catch (error) {
+    console.error("GetRole Verification error in auth : ", error.message);
+    return res.status(401).json({ error: "Token verification failed" });
+  }
+  return role;
+};
+
+module.exports = { isAuthenticated, getRole };
