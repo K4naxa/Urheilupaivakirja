@@ -55,6 +55,11 @@ function LoginPage() {
           "urheilupaivakirjaToken",
           JSON.stringify(user)
         );
+      } else {
+        window.sessionStorage.setItem(
+          "urheilupaivakirjaToken",
+          JSON.stringify(user)
+        );
       }
       setEmail("");
       setPassword("");
