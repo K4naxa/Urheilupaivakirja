@@ -1,5 +1,5 @@
 import "./teacheHeader.css";
-
+import userService from "../../Services/userService";
 import { Link } from "react-router-dom";
 
 const TeacherHeader = () => {
@@ -11,7 +11,7 @@ const TeacherHeader = () => {
             <Link to="/">Etusivu</Link>
           </div>
           <div className="menuButton" id="LajitButton">
-            <Link to="lajit">Lajit</Link>
+            <Link to="/lajit">Lajit</Link>
           </div>
           <div className="menuButton" id="vierailijatButton">
             <Link>Vierailijat</Link>
@@ -28,7 +28,13 @@ const TeacherHeader = () => {
             <Link to="/profile">Profiili</Link>
           </div>
           <div className="profileButton" id="logoutButton">
-            Kirjaudu ulos
+            <button
+              onClick={() => {
+                userService.logout();
+              }}
+            >
+              Kirjaudu ulos
+            </button>
           </div>
         </div>
       </div>

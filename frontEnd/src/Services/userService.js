@@ -31,5 +31,11 @@ const register = async (
   return response.data;
 };
 
-export default { login, register };
+const logout = () => {
+  window.localStorage.removeItem("urheilupaivakirjaToken");
+  window.sessionStorage.removeItem("urheilupaivakirjaToken");
+  window.location.reload();
+};
+
+export default { login, register, logout };
 // Path: frontEnd/src/Services/userService.js
