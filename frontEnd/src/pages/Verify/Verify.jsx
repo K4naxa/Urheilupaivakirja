@@ -5,12 +5,9 @@ import { MainContext } from "../../mainContext";
 
 const createUserContainer = (user, setUsers) => {
   const handleVerify = () => {
-    console.log(user);
     userService.verifyUser(user).then(() => {
       setUsers((prevUsers) =>
-        prevUsers.map((prevUser) =>
-          prevUser.id === user.id ? { ...prevUser, isVerified: true } : prevUser
-        )
+        prevUsers.filter((prevUser) => prevUser.id !== user.id)
       );
     });
   };

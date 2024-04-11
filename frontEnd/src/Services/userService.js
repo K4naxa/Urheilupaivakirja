@@ -69,7 +69,7 @@ const getUnverifiedUsers = async () => {
 
 const verifyUser = async (user) => {
   await waitToken();
-  const response = await axios.put(`/user/verify`, user.id, makeHeader());
+  const response = await axios.put(`/user/verify/${user.id}`, {}, makeHeader());
   return response.data;
 };
 
