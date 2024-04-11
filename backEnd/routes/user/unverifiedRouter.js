@@ -1,7 +1,8 @@
 var express = require("express");
-var express = require("express");
 const jwt = require("jsonwebtoken");
 var router = express.Router();
+
+const { getRole } = require("../../middleware/auth");
 
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
@@ -12,20 +13,6 @@ const getTokenFrom = (request) => {
   return authorization && authorization.toLowerCase().startsWith("bearer ")
     ? authorization.substring(7)
     : null;
-};
-
-// Get role from token
-const getRole = (req) => {
-  const token = getTokenFrom(req);
-  let role = null;
-  try {
-    const decodedToken = jwt.verify(token, config.SECRET);
-    role = decodedToken.role;
-  } catch (error) {
-    console.error("JWT verification error in sportsR : ", error.message);
-    return res.status(401).json({ error: "Token verification failed" });
-  }
-  return role;
 };
 
 // checks if request was done by admin / role 1 > returns all unverified users

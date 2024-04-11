@@ -11,11 +11,19 @@ const createUserContainer = (user, setUsers) => {
       );
     });
   };
+  const handleDelete = () => {
+    userService.deleteUser(user.id).then(() => {
+      setUsers((prevUsers) =>
+        prevUsers.filter((prevUser) => prevUser.id !== user.id)
+      );
+    });
+  };
 
   return (
     <div key={user.id} className="userContainer">
       <div>{user.email}</div>
       <button onClick={() => handleVerify()}>Verify</button>
+      <button onClick={() => handleDelete()}>Delete</button>
     </div>
   );
 };

@@ -59,6 +59,14 @@ const logout = () => {
   window.location.href = "/";
 };
 
+// User Controls -------------------------------------------------------------------
+
+const deleteUser = async (id) => {
+  await waitToken();
+  const response = await axios.delete(`/user/${id}`, makeHeader());
+  return response.data;
+};
+
 // Unverified users -------------------------------------------------------------------
 
 const getUnverifiedUsers = async () => {
@@ -82,5 +90,6 @@ export default {
   logout,
   getUnverifiedUsers,
   verifyUser,
+  deleteUser,
 };
 // Path: frontEnd/src/Services/userService.js
