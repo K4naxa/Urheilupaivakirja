@@ -122,9 +122,11 @@ function LoginPage() {
             </div>
 
             <div className="buttons">
+            <Link to="/registration">
               <button type="button" className="registerButton Button">
                 Rekisteröidy
               </button>
+              </Link>
               <button
                 type="button"
                 onClick={handleLogin}

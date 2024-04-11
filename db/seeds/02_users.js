@@ -10,7 +10,7 @@ exports.seed = function (knex) {
     .then(function () {
       return knex("users").insert([
         {
-          email: "admin@example.com",
+          email: "teacher@example.com",
           password: hashedpassword,
           role_id: 1,
           email_verified: true,
@@ -26,7 +26,7 @@ exports.seed = function (knex) {
           last_login_at: new Date(2024, 1, 2, 16, 54),
         },
         {
-          email: "kayttaja@example.com",
+          email: "student@example.com",
           password: hashedpassword,
           role_id: 3,
           email_verified: true,

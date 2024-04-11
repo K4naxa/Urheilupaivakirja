@@ -7,7 +7,7 @@ const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
 
 // Register a new student
-router.post('/', async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   const user = req.body;
   const saltRounds = 10;
 
@@ -26,7 +26,8 @@ router.post('/', async (req, res, next) => {
       };
 
       // Insert the new user and get the id of the inserted user
-      const [userId] = await trx("users").insert(newUser, "id");
+      const insertResult = await trx("users").insert(newUser);
+      const userId = insertResult[0];
 
       // Prepare new student data
       const newStudent = {
@@ -54,7 +55,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   //TODO: IMPLEMENT ADMIN AUTHENTICATION, NOW JUST FOR TESTING PURPOSES
   try {
     await knex.transaction(async (trx) => {

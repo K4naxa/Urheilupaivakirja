@@ -31,6 +31,8 @@ Start with nodemon: npm run start
 > GET
 > PUT
 > DELETE
+> /journal_entry/options
+> GET
 
 /student_group/
 
@@ -111,3 +113,6 @@ Start with nodemon: npm run start
 > /spectator/:id
 > GET
 > PUT
+
+/public/options
+>GET
