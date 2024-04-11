@@ -69,12 +69,31 @@ router.post("/", (req, res) => {
     });
   }
 
-  const sport = req.body;
+  // Check if sport already exists
   knex("sports")
-    .insert(sport)
-    .then((id_arr) => {
-      sport.id = id_arr[0];
-      res.json(sport);
+    .select("*")
+    .where("name", "=", req.body.name)
+    .then((rows) => {
+      if (rows.length > 0) {
+        return res.status(400).json({ error: "Sport already exists" });
+      } else {
+        // Add sport
+        const sport = req.body;
+        knex("sports")
+          .insert(sport)
+          .then((id_arr) => {
+            sport.id = id_arr[0];
+            res.json(sport);
+          })
+          .catch((err) => {
+            console.log("Error inserting sport:", err);
+            res.status(500).json({ error: "Internal server error" });
+          });
+      }
+    })
+    .catch((err) => {
+      console.log("Error checking existing sport:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
