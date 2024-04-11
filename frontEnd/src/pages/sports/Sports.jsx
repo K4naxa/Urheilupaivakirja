@@ -79,17 +79,24 @@ const createSportContainer = (sport, setSports) => {
 };
 
 const handleNewSport = (newSport, setSports) => {
-  trainingService.addSport({ name: newSport }).then((serverSport) => {
-    setSports((prevSports) => [
-      ...prevSports,
-      { name: serverSport.name, id: serverSport.id },
-    ]);
-  });
+  trainingService
+    .addSport({ name: newSport })
+    .then((serverSport) => {
+      setSports((prevSports) => [
+        ...prevSports,
+        { name: serverSport.name, id: serverSport.id },
+      ]);
+    })
+    .catch((error) => {
+      console.log(error.response.data);
+      return;
+    });
 };
 
 const Sports = () => {
   const [sports, setSports] = useState([]);
   const [newSport, setNewSport] = useState("");
+
   const { token } = useContext(MainContext);
 
   // get sports from the server on the first render

@@ -3,10 +3,6 @@ import trainingService from "./Services/trainingService";
 
 export const MainContext = createContext();
 
-const useReloadOnTokenChange = () => {
-  const { token } = useContext(MainContext);
-};
-
 export const MainContextProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("");
@@ -48,19 +44,6 @@ export const MainContextProvider = ({ children }) => {
   // asettaa tokenin käyttöön kun se on saatu
   useEffect(() => {
     startHook();
-  }, [token]);
-
-  useEffect(() => {
-    const handleTokenChange = () => {
-      window.location.reload();
-    };
-    // Listen to changes in the token
-    window.addEventListener("tokenchange", handleTokenChange);
-
-    return () => {
-      // Clean up event listener on unmount
-      window.removeEventListener("tokenchange", handleTokenChange);
-    };
   }, [token]);
 
   return (
