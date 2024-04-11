@@ -27,6 +27,8 @@ const getRole = (req) => {
   return role;
 };
 
+// ................................................................................
+
 // Get all sports
 router.get("/", (req, res, next) => {
   knex("sports")

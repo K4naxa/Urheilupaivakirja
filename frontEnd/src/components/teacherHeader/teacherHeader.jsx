@@ -12,7 +12,7 @@ const TeacherHeader = () => {
             <Link to="/">Etusivu</Link>
           </div>
           <div className="menuButton" id="LajitButton">
-            <Link to="lajit">Lajit</Link>
+            <Link to="/lajit">Lajit</Link>
           </div>
           <div className="menuButton" id="vierailijatButton">
             <Link>Vierailijat</Link>
@@ -21,7 +21,7 @@ const TeacherHeader = () => {
             <Link>Tiedotteet</Link>
           </div>
           <div className="menuButton" id="verifoiButton">
-            <Link>Verifoi</Link>
+            <Link to="/verify">Verifoi</Link>
           </div>
         </div>
         <div className="profileContainer">

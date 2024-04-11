@@ -19,6 +19,7 @@ const makeHeader = () => {
   let header = { headers: { Authorization: `bearer ${token}` } };
   return header;
 };
+// ................................................................................
 
 // get all sports
 const getSports = async () => {

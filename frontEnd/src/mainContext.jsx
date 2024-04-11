@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import trainingService from "./Services/trainingService";
+import userService from "./Services/userService";
 
 export const MainContext = createContext();
 
@@ -34,6 +35,7 @@ export const MainContextProvider = ({ children }) => {
     if (!token) return;
 
     trainingService.setToken(token);
+    userService.setToken(token);
   };
 
   // tarkistaa onko käyttäjä kirjautunut kun sivu ladataan

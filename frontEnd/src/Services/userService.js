@@ -1,5 +1,27 @@
 import axios from "axios";
 
+let token = null;
+let tokenPromise = null;
+
+const waitToken = async () => {
+  await tokenPromise;
+};
+
+// set token function to get token from mainContext
+const setToken = (newToken) => {
+  token = newToken;
+  console.log("token set to: ", token);
+  tokenPromise = Promise.resolve();
+};
+
+// make authorization header
+const makeHeader = () => {
+  let header = { headers: { Authorization: `bearer ${token}` } };
+  return header;
+};
+
+// ................................................................................
+
 const login = async (email, password) => {
   const response = await axios.post("/user/login", {
     email: email,
@@ -37,5 +59,21 @@ const logout = () => {
   window.location.href = "/";
 };
 
-export default { login, register, logout };
+// Unverified users -------------------------------------------------------------------
+
+const getUnverifiedUsers = async () => {
+  await waitToken();
+  const response = await axios.get("/user/unverified", makeHeader());
+  return response.data;
+};
+
+// const verifyUser = async (user) => {
+//   const id = user.id;
+//   const response = await axios.put(`/user/${id}`, makeHeader());
+//   return response.data;
+// };
+
+// ................................................................................
+
+export default { login, register, setToken, logout, getUnverifiedUsers };
 // Path: frontEnd/src/Services/userService.js
