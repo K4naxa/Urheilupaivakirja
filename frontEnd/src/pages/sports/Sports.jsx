@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import trainingService from "../../Services/trainingService";
 import TeacherHeader from "../../components/teacherHeader/teacherHeader";
+import { MainContext } from "../../mainContext";
 
 // renders a container for a sport while checking if it is being edited
 const createSportContainer = (sport, setSports) => {
@@ -77,16 +78,26 @@ const createSportContainer = (sport, setSports) => {
   }
 };
 
+const handleNewSport = (newSport, setSports) => {
+  trainingService.addSport({ name: newSport }).then((serverSport) => {
+    setSports((prevSports) => [
+      ...prevSports,
+      { name: serverSport.name, id: serverSport.id },
+    ]);
+  });
+};
+
 const Sports = () => {
   const [sports, setSports] = useState([]);
   const [newSport, setNewSport] = useState("");
+  const { token } = useContext(MainContext);
 
   // get sports from the server on the first render
   useEffect(() => {
     trainingService.getSports().then((data) => {
       setSports(data);
     });
-  }, []);
+  }, [token]);
 
   // adds "isEditing" property to the sport object and sets it to "true"
 
@@ -100,20 +111,14 @@ const Sports = () => {
         {/* input field for new sports */}
         <div>
           <input
+            className="newSportInput"
             type="text"
             placeholder="Add new sport"
             onChange={(e) => setNewSport(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                trainingService
-                  .addSport({ name: newSport })
-                  .then((serverSport) => {
-                    setSports((prevSports) => [
-                      ...prevSports,
-                      { name: serverSport.name, id: serverSport.id },
-                    ]);
-                  });
-                setNewSport(""); // Clear the newSport state after adding the new sport
+                handleNewSport(newSport, setSports);
+                e.target.value = "";
               }
             }}
           />
