@@ -14,6 +14,10 @@ Start with nodemon: npm run start
 
 > GET
 
+/user/verify
+
+> PUT
+
 /journal/
 
 > GET

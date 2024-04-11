@@ -4,21 +4,19 @@ import { useContext, useEffect, useState } from "react";
 import { MainContext } from "../../mainContext";
 
 const createUserContainer = (user, setUsers) => {
-  // const handleVerify = () => {
-  //   userService.verifyUser(user.id).then(() => {
-  //     setUsers((prevUsers) =>
-  //       prevUsers.map((prevUser) =>
-  //         prevUser.id === user.id ? { ...prevUser, isVerified: true } : prevUser
-  //       )
-  //     );
-  //   });
-  // };
+  const handleVerify = () => {
+    console.log(user);
+    userService.verifyUser(user).then(() => {
+      setUsers((prevUsers) =>
+        prevUsers.map((prevUser) =>
+          prevUser.id === user.id ? { ...prevUser, isVerified: true } : prevUser
+        )
+      );
+    });
+  };
 
   return (
     <div key={user.id} className="userContainer">
-      <div>
-        {user.firstName} {user.lastName}
-      </div>
       <div>{user.email}</div>
       <button onClick={() => handleVerify()}>Verify</button>
     </div>
@@ -30,7 +28,7 @@ const Verify = () => {
   const [unverifiedUsers, setUnverifiedUsers] = useState([]);
 
   useEffect(() => {
-    userService.getUnverifiedUsers(token).then((users) => {
+    userService.getUnverifiedUsers().then((users) => {
       setUnverifiedUsers(users);
     });
   }, [token]);

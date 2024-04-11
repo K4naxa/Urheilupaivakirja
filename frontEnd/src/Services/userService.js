@@ -67,13 +67,20 @@ const getUnverifiedUsers = async () => {
   return response.data;
 };
 
-// const verifyUser = async (user) => {
-//   const id = user.id;
-//   const response = await axios.put(`/user/${id}`, makeHeader());
-//   return response.data;
-// };
+const verifyUser = async (user) => {
+  await waitToken();
+  const response = await axios.put(`/user/verify`, user.id, makeHeader());
+  return response.data;
+};
 
 // ................................................................................
 
-export default { login, register, setToken, logout, getUnverifiedUsers };
+export default {
+  login,
+  register,
+  setToken,
+  logout,
+  getUnverifiedUsers,
+  verifyUser,
+};
 // Path: frontEnd/src/Services/userService.js

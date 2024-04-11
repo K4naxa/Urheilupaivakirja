@@ -29,19 +29,23 @@ const getRole = (req) => {
 };
 
 // checks if request was done by admin / role 1 > returns all unverified users
-router.get("/", (req, res) => {
+router.put("/", (req, res) => {
   const role = getRole(req);
   if (role !== 1) {
     return res.status(401).json({ error: "Unauthorized" });
   } else {
-    const unverifiedUsers = knex("users")
-      .where("email_verified", "=", 0)
-      .then((rows) => {
-        if (rows.length === 0) {
-          return res.status(404).json({ error: "No unverified users found" });
-        } else {
-          res.json(rows);
-        }
+    const verifiedUser_id = req.body.id;
+    const verifiedUser = req.body;
+
+    const updatedFields = {
+      email_verified: 1,
+    };
+
+    knex("users")
+      .where("id", "=", verifiedUser_id)
+      .update(updatedFields) // change email_verified to 1
+      .then(() => {
+        res.status(200).json({ message: "User verified" });
       });
   }
 });
