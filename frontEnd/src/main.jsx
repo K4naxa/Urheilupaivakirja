@@ -8,11 +8,9 @@ import { BrowserRouter } from "react-router-dom";
 import { MainContextProvider } from "./mainContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <MainContextProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </MainContextProvider>
-  </React.StrictMode>
+  <MainContextProvider>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </MainContextProvider>
 );

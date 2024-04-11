@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import trainingService from "./Services/trainingService";
 
 export const MainContext = createContext();
 
@@ -13,22 +14,26 @@ export const MainContextProvider = ({ children }) => {
 
   // Check if user token is in local storage
   const userHook = () => {
-    const loggedUserJSON = window.localStorage.getItem(
-      "urheilupaivakirjaToken"
-    );
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setToken(user.token);
-      setLoggedIn(true);
-      setUserRole(user.role);
-      console.log("logged in from local storage as userRole:", user.role);
+    let loggedUserJSON = null;
+    if (window.sessionStorage.getItem("urheilupaivakirjaToken"))
+      loggedUserJSON = window.sessionStorage.getItem("urheilupaivakirjaToken");
+    if (window.localStorage.getItem("urheilupaivakirjaToken"))
+      loggedUserJSON = window.localStorage.getItem("urheilupaivakirjaToken");
+    {
+      if (loggedUserJSON) {
+        const user = JSON.parse(loggedUserJSON);
+        setToken(user.token);
+        setLoggedIn(true);
+        setUserRole(user.role);
+        console.log("logged in from local storage as userRole:", user.role);
+      }
     }
   };
 
   const startHook = () => {
-    if (token) {
-      setToken(token);
-    }
+    if (!token) return;
+
+    trainingService.setToken(token);
   };
 
   // tarkistaa onko käyttäjä kirjautunut kun sivu ladataan

@@ -46,11 +46,17 @@ function LoginPage() {
 
     try {
       const user = await userService.login(email, password);
+
       setLoggedIn(true);
       setUserRole(user.role);
-      setToken(user.token);
+      setToken(user);
       if (stayLoggedIn) {
         window.localStorage.setItem(
+          "urheilupaivakirjaToken",
+          JSON.stringify(user)
+        );
+      } else {
+        window.sessionStorage.setItem(
           "urheilupaivakirjaToken",
           JSON.stringify(user)
         );
