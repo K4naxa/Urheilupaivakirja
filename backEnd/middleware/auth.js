@@ -12,7 +12,7 @@ const isAuthenticated = (req, res, next) => {
   const token = getTokenFrom(req);
   console.log("Token: ", token);
 
-  if (!token) {
+  if (!token || token === "" || token === null) {
     console.error("Authentication token missing");
     return res.status(401).json({ error: "Authentication token missing" });
   }

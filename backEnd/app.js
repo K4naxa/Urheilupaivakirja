@@ -23,6 +23,6 @@ app.use("/", indexRouter);
 app.use("/user/login", loginRouter);
 app.use("/user/register", registerRouter);
 app.use("/journal", isAuthenticated, journalRouter);
-app.use("/sports", sportsRouter);
+app.use("/sports", isAuthenticated, sportsRouter);
 
 module.exports = app;

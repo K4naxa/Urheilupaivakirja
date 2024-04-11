@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import trainingService from "./Services/trainingService";
 
 export const MainContext = createContext();
 
@@ -26,9 +27,9 @@ export const MainContextProvider = ({ children }) => {
   };
 
   const startHook = () => {
-    if (token) {
-      setToken(token);
-    }
+    if (!token) return;
+
+    trainingService.setToken(token);
   };
 
   // tarkistaa onko käyttäjä kirjautunut kun sivu ladataan

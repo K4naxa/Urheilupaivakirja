@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import trainingService from "../../Services/trainingService";
 import TeacherHeader from "../../components/teacherHeader/teacherHeader";
 
@@ -105,13 +105,15 @@ const Sports = () => {
             onChange={(e) => setNewSport(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                trainingService.addSport({ name: newSport }).then(() => {
-                  setSports((prevSports) => [
-                    ...prevSports,
-                    { name: newSport },
-                  ]);
-                });
-                setNewSport("");
+                trainingService
+                  .addSport({ name: newSport })
+                  .then((serverSport) => {
+                    setSports((prevSports) => [
+                      ...prevSports,
+                      { name: serverSport.name, id: serverSport.id },
+                    ]);
+                  });
+                setNewSport(""); // Clear the newSport state after adding the new sport
               }
             }}
           />

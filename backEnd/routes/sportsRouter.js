@@ -43,8 +43,9 @@ router.post("/", (req, res) => {
   const sport = req.body;
   knex("sports")
     .insert(sport)
-    .then(() => {
-      res.json({ message: "Sport added" });
+    .then((id_arr) => {
+      sport.id = id_arr[0];
+      res.json(sport);
     });
 });
 
