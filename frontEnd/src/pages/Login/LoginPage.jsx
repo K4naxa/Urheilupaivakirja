@@ -72,7 +72,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="container">
+    <div className="loginPageContainer">
       <div className="loginContainer">
         <div className="loginHeaderContainer">Kirjautuminen</div>
         <div className="inputContainer">
