@@ -1,9 +1,31 @@
 var express = require("express");
+const jwt = require("jsonwebtoken");
 var router = express.Router();
 
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
+
+const getTokenFrom = (request) => {
+  const authorization = request.get("authorization");
+  return authorization && authorization.toLowerCase().startsWith("bearer ")
+    ? authorization.substring(7)
+    : null;
+};
+
+// Get role from token
+const getRole = (req) => {
+  const token = getTokenFrom(req);
+  let role = null;
+  try {
+    const decodedToken = jwt.verify(token, config.SECRET);
+    role = decodedToken.role;
+  } catch (error) {
+    console.error("JWT verification error in sportsR : ", error.message);
+    return res.status(401).json({ error: "Token verification failed" });
+  }
+  return role;
+};
 
 // Get all sports
 router.get("/", (req, res, next) => {
@@ -40,6 +62,13 @@ router.get("/:id", (req, res) => {
 
 // Add a new sport
 router.post("/", (req, res) => {
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to add sport");
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
+
   const sport = req.body;
   knex("sports")
     .insert(sport)
@@ -51,7 +80,12 @@ router.post("/", (req, res) => {
 
 // edit a single sport by sport.id
 router.put("/:id", (req, res) => {
-  console.log("updating sport");
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to edit a sport");
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
 
   const updatedSport = {
     id: req.params.id,
@@ -69,6 +103,13 @@ router.put("/:id", (req, res) => {
 
 // delete a single sport by sport.id
 router.delete("/:id", (req, res, next) => {
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to delete sport");
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
+
   const id = req.params.id;
   knex("sports")
     .where("id", "=", id)
