@@ -31,26 +31,25 @@ const login = async (email, password) => {
 };
 
 const register = async (
-  firstName,
-  lastName,
   email,
   password,
-  group,
-  campus,
-  sport,
-  phone
+  firstName,
+  lastName,
+  phone,
+  sportId,
+  groupId,
+  campusId
 ) => {
-  const response = await axios.post("/register", {
-    firstName: firstName,
-    lastName: lastName,
+  await axios.post("user/register", {
     email: email,
     password: password,
-    group: group,
-    campus: campus,
-    sport: sport,
+    first_name: firstName,
+    last_name: lastName,
     phone: phone,
+    sport_id: sportId,
+    group_id: groupId,
+    campus_id: campusId,
   });
-  return response.data;
 };
 
 const logout = () => {

@@ -1,0 +1,97 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--dark-primary-backgroundcolor);
+}
+
+.newJournalEntryContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--dark-primary-backgroundcolor);
+  border: 1px solid var(--dark-primary-fillerlinecolor);
+  border-radius: 10px;
+}
+
+.newJournalEntryHeaderContainer {
+  color: var(--dark-primary-textcolor);
+  background-color: var(--dark-secondary-backgroundcolor);
+  border-radius: 10px 10px 0px 0px;
+  border: 1px solid var(--dark-primary-fillerlinecolor);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 73px;
+  width: 559px;
+  font-size: 24px;
+  margin-bottom: 2rem;
+}
+
+.newJournalEntryForm {
+  width: 386px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.newJournalEntryInputContainer {
+  color: var(--dark-primary-textcolor);
+  font-size: 16px;
+  width: 386px;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.upperContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0px 0 40px 0;
+}
+
+.newJournalEntryInputContainer > input {
+  color: var(--dark-primary-inputtextcolor);
+  padding: 0.5rem;
+  width: 100%;
+  height: 30px;
+  font-size: 20px;
+  margin-top: 5px;
+  border-radius: 10px;
+  background-color: var(--dark-secondary-backgroundcolor);
+  border: 1px solid var(--dark-primary-fillerlinecolor);
+}
+
+.buttonContainer .buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.Button {
+  color: var(--primary-textcolor);
+  font-size: 16px;
+  width: 178px;
+  height: 54px;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: var(--primary-backgroundcolor);
+  border: 1px solid var(--dark-primary-fillerlinecolor);
+  cursor: pointer;
+}
+
+.newJournalEntryButton {
+  background-color: var(--dark-lightblue-buttoncolor);
+  color: black;
+}
+
+.radioOptionHorizontalContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}

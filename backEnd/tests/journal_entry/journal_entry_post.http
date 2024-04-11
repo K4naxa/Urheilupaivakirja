@@ -1,0 +1,15 @@
+POST http://localhost:3001/journal_entry/ HTTP/1.1
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnRAZXhhbXBsZS5jb20iLCJ1c2VyX2lkIjozLCJyb2xlIjozLCJpYXQiOjE3MTI4NTcyMjR9.ohXku8rhUTlbM7C3Cu6eB29JBVGmaI5hepion1JmPo8
+content-type: application/json
+
+{
+    "entry_type_id": 1,
+    "workout_type_id": 1,
+    "workout_category_id": 1,
+    "length_hours": 1,
+    "length_minutes": 15,
+    "time_of_day": 1,
+    "intensity": 2,
+    "details": "Test Entry",
+    "date": "2024-02-09"
+}

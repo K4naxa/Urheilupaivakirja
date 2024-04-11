@@ -5,9 +5,9 @@ exports.up = function(knex) {
       table.integer('entry_type_id').unsigned().notNullable();
       table.integer('workout_type_id').unsigned();
       table.integer('workout_category_id').unsigned();
+      table.integer('time_of_day_id').unsigned();
       table.integer('length_hours');
       table.integer('length_minutes');
-      table.string('time_of_day');
       table.integer('intensity');
       table.text('details');
       table.date('date').notNullable();
@@ -18,6 +18,7 @@ exports.up = function(knex) {
       table.foreign('entry_type_id').references('journal_entry_types.id');
       table.foreign('workout_type_id').references('workout_types.id');
       table.foreign('workout_category_id').references('workout_categories.id');
+      table.foreign('time_of_day_id').references('time_of_day.id');
     });
   };
   

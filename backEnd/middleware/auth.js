@@ -48,4 +48,18 @@ const getRole = (req) => {
   return role;
 };
 
-module.exports = { isAuthenticated, getRole };
+const getUserId = req => {
+  const token = getTokenFrom(req);
+  let userId = null;
+  try {
+    const decodedToken = jwt.verify(token, config.SECRET);
+    userId = decodedToken.user_id;
+  } catch (error) {
+    console.error("GetUserId Verification error in auth : ", error.message);
+    return res.status(401).json({ error: "Token verification failed" });
+  }
+  return userId;
+
+}
+
+module.exports = { isAuthenticated, getRole, getUserId };

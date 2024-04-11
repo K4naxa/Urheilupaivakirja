@@ -22,6 +22,45 @@ const makeHeader = () => {
 
 // ................................................................................
 
+// post new journal entry
+
+const postJournalEntry = async (
+  entry_type_id,
+  workout_type_id,
+  workout_category_id,
+  time_of_day_id,
+  length_hours,
+  length_minutes,
+  intensity,
+  details,
+  date
+) => {
+  await waitToken();
+  let journalEntry = {
+    entry_type_id,
+    workout_type_id,
+    workout_category_id,
+    time_of_day_id,
+    length_hours,
+    length_minutes,
+    intensity,
+    details,
+    date
+  };
+
+  const response = await axios.post("/journal_entry", journalEntry, makeHeader());
+  return response.data;
+};
+
+// get journal entry options (journal_entry_types, workout_types, workout_categories)
+const getJournalEntryOptions = async () => {
+  await waitToken();
+  const response = await axios.get("/journal_entry/options", makeHeader());
+  return response.data;
+};
+
+// ................................................................................
+
 // get all sports
 const getSports = async () => {
   await waitToken();
@@ -59,6 +98,8 @@ const deleteSport = async (id) => {
 };
 
 export default {
+  postJournalEntry,
+  getJournalEntryOptions,
   getSports,
   getSport,
   addSport,
