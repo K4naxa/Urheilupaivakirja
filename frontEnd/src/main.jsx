@@ -5,7 +5,7 @@ import App from "./App.jsx";
 import "./index.css";
 
 import { BrowserRouter } from "react-router-dom";
-import { MainContextProvider } from "./mainContext";
+import { MainContextProvider } from "./context/mainContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <MainContextProvider>

@@ -91,4 +91,4 @@ export default {
   verifyUser,
   deleteUser,
 };
-// Path: frontEnd/src/Services/userService.js
+// Path: frontEnd/src/services/userService.js

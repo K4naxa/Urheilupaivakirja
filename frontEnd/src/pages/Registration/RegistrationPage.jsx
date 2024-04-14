@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import userService from "../../Services/userService";
+import userService from "../../services/userService";
 import { useNavigate } from "react-router-dom";
-import "./RegistrationPage.css";
-import { getOptions } from "../../Services/publicService";
+import "./registrationPage.css";
+import { getOptions } from "../../services/publicService";
 
 const RegistrationPage = () => {
-  const [userData, setUserData] = useState({
+  const [registrationData, setRegistrationData] = useState({
     email: "",
     password: "",
     passwordAgain: "",
@@ -38,52 +38,52 @@ const RegistrationPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log(userData);
-  }, [userData]);
+    console.log(registrationData);
+  }, [registrationData]);
 
   const navigate = useNavigate();
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
-    setUserData({
-      ...userData,
+    setRegistrationData({
+      ...registrationData,
       [name]: value,
     });
   };
 
   const errorCheckRegistration = () => {
     if (
-      userData.email === "" ||
-      userData.password === "" ||
-      userData.passwordAgain === "" ||
-      userData.firstName === "" ||
-      userData.lastName === "" ||
-      userData.phone === "" ||
-      userData.sportId === null ||
-      userData.groupId === null ||
-      userData.campusId === null
+      registrationData.email === "" ||
+      registrationData.password === "" ||
+      registrationData.passwordAgain === "" ||
+      registrationData.firstName === "" ||
+      registrationData.lastName === "" ||
+      registrationData.phone === "" ||
+      registrationData.sportId === null ||
+      registrationData.groupId === null ||
+      registrationData.campusId === null
     ) {
       setError("Täytä kaikki kentät");
       return false;
     }
 
     // test if password is long enough
-    if (userData.password.length < 8 || userData.passwordAgain.length < 8) {
+    if (registrationData.password.length < 8 || registrationData.passwordAgain.length < 8) {
       setError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
-      setUserData(currentData => ({ ...currentData, password: "", passwordAgain: "" }));
+      setRegistrationData(currentData => ({ ...currentData, password: "", passwordAgain: "" }));
       return false;
     }
 
     // test if passwords match
-    if (userData.password !== userData.passwordAgain) {
+    if (registrationData.password !== registrationData.passwordAgain) {
       setError("Salasanat eivät täsmää");
       return false;
     }
     // test if email is in correct format
     const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-    if (!myRegEx.test(userData.email)) {
+    if (!myRegEx.test(registrationData.email)) {
       setError("Sähköposti ei ole oikeassa muodossa");
-      setUserData(currentData => ({ ...currentData, password: "", passwordAgain: "" }));
+      setRegistrationData(currentData => ({ ...currentData, password: "", passwordAgain: "" }));
       return false;
     }
     return true;
@@ -97,14 +97,14 @@ const RegistrationPage = () => {
     }
     try {
       await userService.register(
-        userData.email,
-        userData.password,
-        userData.firstName,
-        userData.lastName,
-        userData.phone,
-        userData.sportId,
-        userData.groupId,
-        userData.campusId
+        registrationData.email,
+        registrationData.password,
+        registrationData.firstName,
+        registrationData.lastName,
+        registrationData.phone,
+        registrationData.sportId,
+        registrationData.groupId,
+        registrationData.campusId
       );
       navigate("/login");
     } catch (error) {
@@ -115,10 +115,10 @@ const RegistrationPage = () => {
   return (
     <>
       <div className="container">
-        <div className="registrationContainer">
-          <div className="registrationHeaderContainer">Rekisteröityminen</div>
-          <form className="registrationForm" onSubmit={registerHandler}>
-            <div className="registrationInputContainer">
+        <div className="registration-container">
+          <div className="registration-header-container">Rekisteröityminen</div>
+          <form className="registration-form" onSubmit={registerHandler}>
+            <div className="registration-input-container">
               <label htmlFor="email-input">Sähköposti</label>
               <input
                 onChange={changeHandler}
@@ -126,10 +126,10 @@ const RegistrationPage = () => {
                 name="email"
                 id="email-input"
                 placeholder="sähköposti@email.fi"
-                value={userData.username}
+                value={registrationData.email}
               />
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="password-input">Salasana</label>
               <input
                 onChange={changeHandler}
@@ -137,10 +137,10 @@ const RegistrationPage = () => {
                 name="password"
                 id="password-input"
                 placeholder="Salasana"
-                value={userData.username}
+                value={registrationData.password}
               />
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="password-input-2">Salasana uudelleen</label>
               <input
                 onChange={changeHandler}
@@ -148,10 +148,10 @@ const RegistrationPage = () => {
                 name="passwordAgain"
                 id="password-input-2"
                 placeholder="Salasana uudelleen"
-                value={userData.username}
+                value={registrationData.passwordAgain}
               />
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="first-name-input">Etunimi</label>
               <input
                 onChange={changeHandler}
@@ -159,10 +159,10 @@ const RegistrationPage = () => {
                 name="firstName"
                 id="first-name-input"
                 placeholder="Etunimi"
-                value={userData.username}
+                value={registrationData.firstName}
               />
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="last-name-input">Sukunimi</label>
               <input
                 onChange={changeHandler}
@@ -170,10 +170,10 @@ const RegistrationPage = () => {
                 name="lastName"
                 id="last-name-input"
                 placeholder="Sukunimi"
-                value={userData.username}
+                value={registrationData.lastName}
               />
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="phone-select">Puhelinnumero</label>
               <input
                 onChange={changeHandler}
@@ -181,18 +181,18 @@ const RegistrationPage = () => {
                 name="phone"
                 id="phone-input"
                 placeholder="0401234567"
-                value={userData.username}
+                value={registrationData.phone}
               />
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="sport-select">Laji</label>
               <select
-                value={userData.sportId || ""}
+                value={registrationData.sportId || ""}
                 name="sportId"
                 id="sport-select"
                 onChange={changeHandler}
               >
-                {userData.sportId === null && (
+                {registrationData.sportId === null && (
                   <option value="">Valitse laji</option>
                 )}
                 {options.sports.map((sport) => (
@@ -202,25 +202,25 @@ const RegistrationPage = () => {
                 ))}
                 <option value="new">+ Lisää uusi</option>
               </select>
-              {userData.sportId === "new" && (
+              {registrationData.sportId === "new" && (
                 <input
                   type="text"
                   name="newSport"
                   placeholder="Kirjoita uusi laji MUTTA ÄLÄ LÄHETÄ..."
-                  value={userData.newSport}
+                  value={registrationData.newSport}
                   onChange={changeHandler}
                 />
               )}
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="group-select">Ryhmätunnus</label>
               <select
-                value={userData.groupId || ""}
+                value={registrationData.groupId || ""}
                 name="groupId"
                 id="group-select"
                 onChange={changeHandler}
               >
-                {userData.groupId === null && (
+                {registrationData.groupId === null && (
                   <option value="">Valitse ryhmä</option>
                 )}
                 {options.student_groups.map((group) => (
@@ -230,15 +230,15 @@ const RegistrationPage = () => {
                 ))}
               </select>
             </div>
-            <div className="registrationInputContainer">
+            <div className="registration-input-container">
               <label htmlFor="campus-select">Toimipaikka</label>
               <select
-                value={userData.campusId || ""}
+                value={registrationData.campusId || ""}
                 name="campusId"
                 id="campus-select"
                 onChange={changeHandler}
               >
-                {userData.campusId === null && (
+                {registrationData.campusId === null && (
                   <option value="">Valitse toimipaikka</option>
                 )}
                 {options.campuses.map((campus) => (
@@ -248,7 +248,7 @@ const RegistrationPage = () => {
                 ))}
               </select>
             </div>
-            <button className="Button" type="submit">
+            <button className="button" type="submit">
               Rekisteröidy
             </button>
           </form>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./NewJournalEntryPage.css";
-import trainingService from "../../Services/trainingService.js";
+import "./newJournalEntryPage.css";
+import trainingService from "../../services/trainingService.js";
 
 const NewJournalEntryPage = () => {
   const [journalData, setJournalData] = useState({
@@ -115,12 +115,12 @@ const NewJournalEntryPage = () => {
     <>
       <div className="container">
         <div className="newJournalEntryContainer">
-          <div className="newJournalEntryHeaderContainer">Uusi harjoitus</div>
+          <div className="newJournalEntryheader-container">Uusi harjoitus</div>
           <form
             className="newJournalEntryForm"
             onSubmit={newJournalEntryHandler}
           >
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label htmlFor="date-picker">Päivämäärä</label>
               <input
                 type="date"
@@ -130,7 +130,7 @@ const NewJournalEntryPage = () => {
                 id="date-picker"
               />
             </div>
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label htmlFor="length-hours-picker">Kesto</label>
               <input
                 type="number"
@@ -154,7 +154,7 @@ const NewJournalEntryPage = () => {
                 id = "length-minutes-picker"
               />
             </div>
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label>Merkintätyyppi</label>
               <div className="radioOptionHorizontalContainer">
                 {options.journal_entry_types.map((entry) =>
@@ -166,7 +166,7 @@ const NewJournalEntryPage = () => {
                 )}
               </div>
             </div>
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label>Harjoitustyyppi</label>
               <div className="radioOptionHorizontalContainer">
                 {options.workout_types.map((type) =>
@@ -178,7 +178,7 @@ const NewJournalEntryPage = () => {
                 )}
               </div>
             </div>
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label>Harjoituskategoria</label>
               <div className="radioOptionHorizontalContainer">
                 {options.workout_categories.map((category) =>
@@ -191,7 +191,7 @@ const NewJournalEntryPage = () => {
               </div>
             </div>
 
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label>Ajankohta</label>
               <div className="radioOptionHorizontalContainer">
                 {options.time_of_day.map((time) =>
@@ -203,7 +203,7 @@ const NewJournalEntryPage = () => {
                 )}
               </div>
             </div>
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label>Rankkuus</label>
               <div className="radioOptionHorizontalContainer">
                 {[1, 2, 3, 4, 5].map((intensity) =>
@@ -215,7 +215,7 @@ const NewJournalEntryPage = () => {
                 )}
               </div>
             </div>
-            <div className="newJournalEntryInputContainer">
+            <div className="newJournalEntryinput-container">
               <label htmlFor="details-textarea">Lisätiedot</label>
               <textarea
                 onChange={changeHandler}
@@ -226,7 +226,7 @@ const NewJournalEntryPage = () => {
                 value={journalData.details}
               />
             </div>
-            <button className="Button" type="submit">
+            <button className="button" type="submit">
               Lisää harjoitus
             </button>
           </form>

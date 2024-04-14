@@ -1,4 +1,4 @@
-.loginPageContainer {
+.login-page-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -6,20 +6,20 @@
   background-color: var(--dark-primary-backgroundcolor);
 }
 
-.loginContainer {
+.login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: var(--dark-primary-backgroundcolor);
-  border: 1px solid var(--dark-primary-fillerlinecolor);
+  border: 1px solid var(--dark-primary-filler-linecolor);
   border-radius: 10px;
 }
 
-.loginHeaderContainer {
+.login-header-container {
   color: var(--dark-primary-textcolor);
   background-color: var(--dark-secondary-backgroundcolor);
   border-radius: 10px 10px 0px 0px;
-  border: 1px solid var(--dark-primary-fillerlinecolor);
+  border: 1px solid var(--dark-primary-filler-linecolor);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -29,7 +29,7 @@
   margin-bottom: 2rem;
 }
 
-.inputContainer {
+.input-container {
   height: 400px;
   width: 386px;
   display: flex;
@@ -37,7 +37,7 @@
   align-items: center;
 }
 
-.loginInputContainer {
+.login-input-container {
   color: var(--dark-primary-textcolor);
   font-size: 16px;
   width: 386px;
@@ -47,7 +47,7 @@
   justify-content: center;
 }
 
-.upperContainer {
+.upper-container {
   width: 100%;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@
   margin: 0px 0 40px 0;
 }
 
-.loginInputContainer input {
+.login-input-container input {
   color: var(--dark-primary-inputtextcolor);
   padding: 0.5rem;
   width: 100%;
@@ -64,17 +64,17 @@
   margin-top: 5px;
   border-radius: 10px;
   background-color: var(--dark-secondary-backgroundcolor);
-  border: 1px solid var(--dark-primary-fillerlinecolor);
+  border: 1px solid var(--dark-primary-filler-linecolor);
 }
 
-.buttonContainer .buttons {
+.button-container .buttons {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-.Button {
+.button {
   color: var(--primary-textcolor);
   font-size: 16px;
   width: 178px;
@@ -82,11 +82,11 @@
   padding: 0.5rem;
   border-radius: 10px;
   background-color: var(--primary-backgroundcolor);
-  border: 1px solid var(--dark-primary-fillerlinecolor);
+  border: 1px solid var(--dark-primary-filler-linecolor);
   cursor: pointer;
 }
 
-.loginButton {
+.login-button {
   background-color: var(--dark-lightblue-buttoncolor);
   color: black;
 }

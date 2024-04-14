@@ -1,20 +1,19 @@
-import "./App.css";
+import "./app.css";
 import { Routes, Route } from "react-router-dom";
 import { useContext } from "react";
-import { MainContext } from "./mainContext";
+import { mainContext } from "./context/mainContext";
 
-import LoginPage from "./pages/Login/LoginPage";
-import StudentHome from "./pages/StudentHome/StudentHome";
-import TeacherHome from "./pages/TeacherHome/TeacherHome";
-import Register from "./pages/Register/Register";
-import RegistrationPage from "./pages/Registration/RegistrationPage";
-import Sports from "./pages/sports/Sports";
-import Verify from "./pages/Verify/Verify";
-import NewJournalEntryPage from "./pages/NewJournalEntry/NewJournalEntryPage";
+import LoginPage from "./pages/login/LoginPage";
+import StudentHome from "./pages/student-home/StudentHome";
+import TeacherHome from "./pages/teacher-home/TeacherHome";
+import RegistrationPage from "./pages/registration/RegistrationPage";
+import Sports from "./pages/sports/SportsPage";
+import Verify from "./pages/verify/Verify";
+import NewJournalEntryPage from "./pages/new-journal-entry/NewJournalEntryPage";
 
 function App() {
-  // get loggedIn from MainContext
-  const { loggedIn } = useContext(MainContext);
+  // get loggedIn from mainContext
+  const { loggedIn } = useContext(mainContext);
 
   if (!loggedIn) {
     return (
@@ -29,7 +28,6 @@ function App() {
     <Routes>
       <Route path="/verify" element={<Verify />} />
       <Route path="/lajit" element={<Sports />} />
-      <Route path="/register" element={<Register />} />
       <Route path="/resetPassword" element={<div>Reset Password</div>} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/studentHome" element={<StudentHome />} />

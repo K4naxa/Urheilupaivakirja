@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
-import trainingService from "../../Services/trainingService";
-import TeacherHeader from "../../components/teacherHeader/teacherHeader";
-import { MainContext } from "../../mainContext";
+import trainingService from "../../services/trainingService";
+import TeacherHeader from "../../layouts/teacher-header/TeacherHeader";
+import { mainContext } from "../../context/mainContext";
 
 // renders a container for a sport while checking if it is being edited
 const createSportContainer = (sport, setSports) => {
@@ -97,7 +97,7 @@ const Sports = () => {
   const [sports, setSports] = useState([]);
   const [newSport, setNewSport] = useState("");
 
-  const { token } = useContext(MainContext);
+  const { token } = useContext(mainContext);
 
   // get sports from the server on the first render
   useEffect(() => {
