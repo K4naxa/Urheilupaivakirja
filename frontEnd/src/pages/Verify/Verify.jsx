@@ -1,7 +1,7 @@
-import TeacherHeader from "../../components/teacherHeader/teacherHeader";
-import userService from "../../Services/userService";
+import TeacherHeader from "../../layouts/teacher-header/TeacherHeader";
+import userService from "../../services/userService";
 import { useContext, useEffect, useState } from "react";
-import { MainContext } from "../../mainContext";
+import { mainContext } from "../../context/mainContext";
 
 const createUserContainer = (user, setUsers) => {
   const handleVerify = () => {
@@ -29,7 +29,7 @@ const createUserContainer = (user, setUsers) => {
 };
 
 const Verify = () => {
-  const { token } = useContext(MainContext);
+  const { token } = useContext(mainContext);
   const [unverifiedUsers, setUnverifiedUsers] = useState([]);
 
   useEffect(() => {

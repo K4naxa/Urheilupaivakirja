@@ -1,4 +1,4 @@
-import TeacherHeader from "../../components/teacherHeader/teacherHeader.jsx";
+import TeacherHeader from "../../layouts/teacher-header/TeacherHeader.jsx";
 
 function TeacherHome() {
   return (

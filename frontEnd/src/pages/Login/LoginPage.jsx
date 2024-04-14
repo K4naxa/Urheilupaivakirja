@@ -1,6 +1,6 @@
-import "./login.css";
-import userService from "../../Services/userService";
-import { MainContext } from "../../mainContext";
+import "./loginPage.css";
+import userService from "../../services/userService";
+import { mainContext } from "../../context/mainContext";
 import { useState, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,7 +9,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
-  const { setLoggedIn, setUserRole, setToken } = useContext(MainContext);
+  const { setLoggedIn, setUserRole, setToken } = useContext(mainContext);
 
   const passwordInput = useRef(null);
 
@@ -72,11 +72,11 @@ function LoginPage() {
   };
 
   return (
-    <div className="loginPageContainer">
-      <div className="loginContainer">
-        <div className="loginHeaderContainer">Kirjautuminen</div>
-        <div className="inputContainer">
-          <div className=" loginInputContainer">
+    <div className="login-page-container">
+      <div className="login-container">
+        <div className="login-header-container">Kirjautuminen</div>
+        <div className="input-container">
+          <div className=" login-input-container">
             <label>Sähköposti</label>
             <input
               type="email"
@@ -90,7 +90,7 @@ function LoginPage() {
             />
           </div>
 
-          <div className=" loginInputContainer">
+          <div className=" login-input-container">
             <label>Salasana</label>
             <input
               type="password"
@@ -105,8 +105,8 @@ function LoginPage() {
             />
           </div>
 
-          <div className="buttonContainer">
-            <div className="upperContainer">
+          <div className="button-container">
+            <div className="upper-container">
               <div className="box">
                 <input
                   type="checkbox"
@@ -123,14 +123,14 @@ function LoginPage() {
 
             <div className="buttons">
             <Link to="/registration">
-              <button type="button" className="registerButton Button">
+              <button type="button" className="registerButton button">
                 Rekisteröidy
               </button>
               </Link>
               <button
                 type="button"
                 onClick={handleLogin}
-                className="loginButton Button"
+                className="login-button button"
               >
                 Kirjaudu
               </button>

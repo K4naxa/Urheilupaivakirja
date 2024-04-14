@@ -1,4 +1,4 @@
-import StudentHeader from "../../components/studentHeader/studentHeader";
+import StudentHeader from "../../layouts/student-header/StudentHeader";
 function StudentHome() {
   return (
     <div className="studentHomeContainer">

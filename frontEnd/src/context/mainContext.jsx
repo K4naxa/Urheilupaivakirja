@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect } from "react";
-import trainingService from "./Services/trainingService";
-import userService from "./Services/userService";
+import trainingService from "../services/trainingService";
+import userService from "../services/userService";
 
-export const MainContext = createContext();
+export const mainContext = createContext();
 
 export const MainContextProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -49,7 +49,7 @@ export const MainContextProvider = ({ children }) => {
   }, [token]);
 
   return (
-    <MainContext.Provider
+    <mainContext.Provider
       value={{
         loggedIn,
         setLoggedIn,
@@ -62,6 +62,6 @@ export const MainContextProvider = ({ children }) => {
       }}
     >
       {children}
-    </MainContext.Provider>
+    </mainContext.Provider>
   );
 };

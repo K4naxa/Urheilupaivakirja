@@ -1,26 +1,26 @@
 import "./studentHeader.css";
-import userService from "../../Services/userService";
+import userService from "../../services/userService";
 
 import { Link } from "react-router-dom";
 
 const StudentHeader = () => {
   return (
     <div className="container">
-      <div className="headerContainer">
-        <div className="menuContainer">
-          <div className="menuButton" id="etusivuButton">
+      <div className="header-container">
+        <div className="menu-container">
+          <div className="menu-button" id="etusivuButton">
             <Link to="/">Etusivu</Link>
           </div>
 
-          <div className="menuButton" id="tiedotteetButton">
+          <div className="menu-button" id="tiedotteetButton">
             <Link>Tiedotteet</Link>
           </div>
         </div>
-        <div className="profileContainer">
-          <div className="profileButton" id="profileButton">
+        <div className="profile-container">
+          <div className="profile-button" id="profileButton">
             <Link to="/profile">Profiili</Link>
           </div>
-          <div className="profileButton" id="logoutButton">
+          <div className="profile-button" id="logoutButton">
             <button
               className="button"
               onClick={() => {
@@ -32,7 +32,7 @@ const StudentHeader = () => {
           </div>
         </div>
       </div>
-      <div className="fillerLine"></div>
+      <div className="filler-line"></div>
     </div>
   );
 };
