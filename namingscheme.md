@@ -1,60 +1,66 @@
-
+i
 ## PascalCase
 
 ### Components
-const TeacherHeader = () => {
+`const TeacherHeader = () => {
    ...
-}
+}`
 
 ### Component files
-TeacherHeader.jsx
-LoginPage.jsx
+`TeacherHeader.jsx
+LoginPage.jsx`
 
 
 
 ## camelCase
 
 ### All other files that are not components
-teacherHeader.css
-userService.js
+`teacherHeader.css`
+`userService.js`
 
 ### Functions & Variables
-const getFullName = (firstName, lastName) => {
+`const getFullName = (firstName, lastName) => {
     return `${firstName} ${lastName}`;
-}
+}`
 
 ### Object properties
-const user = {
+`const user = {
   userName: "student123",
   firstName: "Etunimi",
   lastName: "Sukunimi"
-}
+}`
 
 ### CSS & HTML IDs
+`<input id="passwordInput">
+...
+</input>`
 
+`#passwordInput {
+  background-color: white;
+}`
 
 
 ## snake-case
 
 ### Folders
-/frontend/src/pages/new_journal_entry/NewJournalEntry.jsx
+`/frontend/src/pages/new_journal_entry/NewJournalEntry.jsx`
 
 ## CSS Class names
-header-container {
+`header-container {
     display: "flex";
-}
+}`
 
-<div className="header-container">
+`<div className="header-container">
   ...
-</div>
+</div>`
 
 
 
 ## SCREAMING_SNAKE_CASE
 
 ### Constants
-const BASE_PATH = "https://domain.services/api";
+`const BASE_PATH = "https://domain.services/api";`
 
 ### Global Variables
-const ENVIRONMENT = 'PRODUCTION';
-const PI = 3.14159;
+`const ENVIRONMENT = 'PRODUCTION';
+const PI = 3.14159;`
