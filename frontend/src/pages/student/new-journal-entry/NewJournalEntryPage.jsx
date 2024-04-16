@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./newJournalEntryPage.css";
-import trainingService from "../../services/trainingService.js";
+import trainingService from "../../../services/trainingService.js";
 
 const NewJournalEntryPage = () => {
   const [journalData, setJournalData] = useState({

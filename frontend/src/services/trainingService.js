@@ -1,22 +1,18 @@
 import axios from "axios";
 
-let token = null;
-let tokenPromise = null;
-
-const waitToken = async () => {
-  await tokenPromise;
-};
-
-// set token function to get token from mainContext
-const setToken = (newToken) => {
-  token = newToken;
-  console.log("token set to: ", token);
-  tokenPromise = Promise.resolve();
+// get token from localStorage
+const getToken = () => {
+  const userJson = localStorage.getItem('user');
+  if (userJson) {
+    const user = JSON.parse(userJson);
+    return user.token;
+  }
+  return null;
 };
 
 // make authorization header
 const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${token}` } };
+  let header = { headers: { Authorization: `bearer ${getToken()}`} };
   return header;
 };
 
@@ -35,7 +31,6 @@ const postJournalEntry = async (
   details,
   date
 ) => {
-  await waitToken();
   let journalEntry = {
     entry_type_id,
     workout_type_id,
@@ -54,7 +49,6 @@ const postJournalEntry = async (
 
 // get journal entry options (journal_entry_types, workout_types, workout_categories)
 const getJournalEntryOptions = async () => {
-  await waitToken();
   const response = await axios.get("/journal_entry/options", makeHeader());
   return response.data;
 };
@@ -63,7 +57,6 @@ const getJournalEntryOptions = async () => {
 
 // get all sports
 const getSports = async () => {
-  await waitToken();
   const response = await axios.get("/sports", makeHeader());
   return response.data;
 };
@@ -105,6 +98,6 @@ export default {
   addSport,
   editSport,
   deleteSport,
-  setToken,
-  token,
+  /*setToken,
+  token,*/
 };
