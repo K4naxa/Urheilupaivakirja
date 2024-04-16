@@ -1,15 +1,17 @@
 import "./loginPage.css";
 import userService from "../../services/userService";
-import { mainContext } from "../../context/mainContext";
+//import { mainContext } from "../../context/mainContext";
 import { useState, useContext, useRef } from "react";
-import { Link } from "react-router-dom";
-
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from '../../hooks/useAuth';
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [stayLoggedIn, setStayLoggedIn] = useState(false);
-  const { setLoggedIn, setUserRole, setToken } = useContext(mainContext);
+  const { login } = useAuth();
+
+  /*const [stayLoggedIn, setStayLoggedIn] = useState(false);
+  const { setLoggedIn, setUserRole, setToken } = useContext(mainContext); */
 
   const passwordInput = useRef(null);
 
@@ -43,10 +45,9 @@ function LoginPage() {
     if (!errorCheckLogin()) {
       return;
     }
-
     try {
       const user = await userService.login(email, password);
-
+      /*
       setLoggedIn(true);
       setUserRole(user.role);
       setToken(user);
@@ -60,10 +61,11 @@ function LoginPage() {
           "urheilupaivakirjaToken",
           JSON.stringify(user)
         );
-      }
+      } */
       setEmail("");
       setPassword("");
       console.log(user);
+      login(user);
     } catch (error) {
       console.log(error);
       setError("Sähköposti tai salasana on väärin");
@@ -122,10 +124,10 @@ function LoginPage() {
             </div>
 
             <div className="buttons">
-            <Link to="/registration">
-              <button type="button" className="registerButton button">
-                Rekisteröidy
-              </button>
+              <Link to="/registration">
+                <button type="button" className="registerButton button">
+                  Rekisteröidy
+                </button>
               </Link>
               <button
                 type="button"

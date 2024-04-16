@@ -1,22 +1,17 @@
 import axios from "axios";
 
-let token = null;
-let tokenPromise = null;
-
-const waitToken = async () => {
-  await tokenPromise;
-};
-
-// set token function to get token from mainContext
-const setToken = (newToken) => {
-  token = newToken;
-  console.log("token set to: ", token);
-  tokenPromise = Promise.resolve();
+const getToken = () => {
+  const userJson = localStorage.getItem('user');
+  if (userJson) {
+    const user = JSON.parse(userJson);
+    return user.token;
+  }
+  return null;
 };
 
 // make authorization header
 const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${token}` } };
+  let header = { headers: { Authorization: `bearer ${getToken()}`} };
   return header;
 };
 
@@ -61,7 +56,6 @@ const logout = () => {
 // User Controls -------------------------------------------------------------------
 
 const deleteUser = async (id) => {
-  await waitToken();
   const response = await axios.delete(`/user/${id}`, makeHeader());
   return response.data;
 };
@@ -69,13 +63,11 @@ const deleteUser = async (id) => {
 // Unverified users -------------------------------------------------------------------
 
 const getUnverifiedUsers = async () => {
-  await waitToken();
   const response = await axios.get("/user/unverified", makeHeader());
   return response.data;
 };
 
 const verifyUser = async (user) => {
-  await waitToken();
   const response = await axios.put(`/user/verify/${user.id}`, {}, makeHeader());
   return response.data;
 };
@@ -85,7 +77,6 @@ const verifyUser = async (user) => {
 export default {
   login,
   register,
-  setToken,
   logout,
   getUnverifiedUsers,
   verifyUser,

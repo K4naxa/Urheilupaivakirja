@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
-import trainingService from "../../services/trainingService";
-import TeacherHeader from "../../layouts/teacher-header/TeacherHeader";
-import { mainContext } from "../../context/mainContext";
+import trainingService from "../../../../services/trainingService";
+import { useAuth } from "../../../../hooks/useAuth";
+
 
 // renders a container for a sport while checking if it is being edited
 const createSportContainer = (sport, setSports) => {
@@ -93,24 +93,23 @@ const handleNewSport = (newSport, setSports) => {
     });
 };
 
-const Sports = () => {
+const SportsPage = () => {
+  const { user } = useAuth(); 
+
   const [sports, setSports] = useState([]);
   const [newSport, setNewSport] = useState("");
-
-  const { token } = useContext(mainContext);
 
   // get sports from the server on the first render
   useEffect(() => {
     trainingService.getSports().then((data) => {
       setSports(data);
     });
-  }, [token]);
+  }, []);
 
   // adds "isEditing" property to the sport object and sets it to "true"
 
   return (
     <div>
-      <TeacherHeader />
       <h1>Sports</h1>
       <div className="sportsContainer">
         {sports.map((sport) => createSportContainer(sport, setSports))}
@@ -135,4 +134,4 @@ const Sports = () => {
   );
 };
 
-export default Sports;
+export default SportsPage;

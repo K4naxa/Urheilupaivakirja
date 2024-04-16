@@ -1,9 +1,8 @@
-import TeacherHeader from "../../layouts/teacher-header/TeacherHeader.jsx";
+import TeacherHeader from "../../../layouts/teacher-layout/TeacherLayout.jsx";
 
 function TeacherHome() {
   return (
     <div className="teacherHomeContainer">
-      <TeacherHeader />
     </div>
   );
 }
