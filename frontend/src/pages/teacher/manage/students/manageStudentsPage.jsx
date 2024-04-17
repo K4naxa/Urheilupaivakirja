@@ -35,24 +35,45 @@ const createStudentContainer = (student, students, setStudents) => {
 const ManageStudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
-    userService.getStudents().then((data) => {
-      setStudents(data);
-      setLoading(false);
-      console.log(data);
-    });
-  }, []);
+    if (!showArchived) {
+      userService.getStudents().then((data) => {
+        setStudents(data);
+        setLoading(false);
+        console.log(data);
+      });
+    } else {
+      userService.getArchivedStudents().then((data) => {
+        setStudents(data);
+        setLoading(false);
+        console.log(data);
+      });
+    }
+  }, [showArchived]);
 
   return (
     <div>
       <h1>Manage Students</h1>
+      <button onClick={() => setShowArchived(!showArchived)}>
+        {showArchived ? "Hide Archived" : "Show Archived"}
+      </button>
       {loading ? (
         <p>Loading...</p>
       ) : (
         <div className="manage-student-container">
-          {students.map((student) =>
-            createStudentContainer(student, students, setStudents)
+          {students.length > 0 ? (
+            students.map((student) =>
+              createStudentContainer(
+                student,
+                students,
+                setStudents,
+                showArchived
+              )
+            )
+          ) : (
+            <p>No students found</p>
           )}
         </div>
       )}

@@ -42,7 +42,11 @@ export default defineConfig({
         changeOrigin: true,
       },
 
-      "/student/archive": {
+      "/students/archive": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+      "/students/archived": {
         target: "http://localhost:3001",
         changeOrigin: true,
       },
