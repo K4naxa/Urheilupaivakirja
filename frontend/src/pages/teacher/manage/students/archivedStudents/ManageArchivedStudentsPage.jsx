@@ -10,13 +10,14 @@ const createStudentContainer = (student, students, setStudents) => {
   };
 
   const handleArchive = async () => {
-    await userService.archiveStudent(student.id);
+    console.log(student.id);
+    await userService.toggleStudentArchive(student.id);
     const newStudents = students.filter((s) => s.user_id !== student.user_id);
     setStudents(newStudents);
   };
 
   return (
-    <div className="manage-student-cell" key={student.user_id}>
+    <div className="manage-student-cell" key={student.id}>
       <div className="student-info-name">
         {student.first_name} {student.last_name}
       </div>

@@ -84,7 +84,7 @@ const getArchivedStudents = async () => {
   return response.data;
 };
 
-const archiveStudent = async (id) => {
+const toggleStudentArchive = async (id) => {
   const response = await axios.put(`/students/archive/${id}`, {}, makeHeader());
   return response.data;
 };
@@ -97,7 +97,7 @@ export default {
   verifyUser,
   deleteUser,
   getStudents,
-  archiveStudent,
+  toggleStudentArchive,
   getArchivedStudents,
 };
 // Path: frontEnd/src/services/userService.js

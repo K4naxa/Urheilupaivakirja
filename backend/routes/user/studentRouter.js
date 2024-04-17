@@ -32,10 +32,6 @@ router.get("/", async (req, res) => {
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id");
 
-    if (students.length === 0) {
-      return res.status(404).json({ error: "No students found" });
-    }
-
     res.json(students);
   } catch (error) {
     console.error("Error fetching students:", error);
@@ -54,6 +50,7 @@ router.get("/archived", async (req, res) => {
 
     const students = await knex("students")
       .select(
+        "students.id",
         "students.user_id",
         "students.first_name",
         "students.last_name",
@@ -83,19 +80,34 @@ router.put("/archive/:id", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const student = await knex("students")
+    await knex("students")
       .where("id", "=", req.params.id)
-      .update({ archived: true })
+      .first() // Retrieve the first matching student
+      .then(async (student) => {
+        if (!student) {
+          console.log("Student not found" + req.params.id);
+          return res.status(404).json({ error: "Student not found" });
+        }
+
+        // Toggle the 'archived' status
+        const newArchivedStatus = !student.archived;
+
+        // Update the 'archived' status to the new value
+        await knex("students")
+          .where("id", "=", req.params.id)
+          .update({ archived: newArchivedStatus });
+
+        return res.json({
+          message: "Student archived status updated successfully",
+        });
+      })
       .catch((error) => {
-        console.error("Error archiving student:", error);
+        console.error("Error toggling archived status:", error);
         return res.status(500).json({ error: "Internal server error" });
       });
-
-    console.log("Student archived:", student);
-    res.json(student);
   } catch (error) {
-    console.error("Error archiving student:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error toggling archived status:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
