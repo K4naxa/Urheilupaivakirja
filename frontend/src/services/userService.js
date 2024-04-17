@@ -79,6 +79,11 @@ const getStudents = async () => {
   return response.data;
 };
 
+const archiveStudent = async (id) => {
+  const response = await axios.put(`/students/archive/${id}`, {}, makeHeader());
+  return response.data;
+};
+
 export default {
   login,
   register,
@@ -87,5 +92,6 @@ export default {
   verifyUser,
   deleteUser,
   getStudents,
+  archiveStudent,
 };
 // Path: frontEnd/src/services/userService.js
