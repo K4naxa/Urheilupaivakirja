@@ -1,12 +1,8 @@
 .manage-student-cell {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
   padding: 10px;
   border-bottom: 1px solid #e0e0e0;
-}
-.manage-student-cell-info {
-  display: grid;
+
   width: 100%;
   grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr 1fr;
   grid-template-areas: "name email sport group campus buttons";
@@ -27,4 +23,11 @@
 }
 .student-info-campus {
   grid-area: campus;
+}
+
+.student-info-buttons {
+  grid-area: buttons;
+  display: flex;
+  justify-content: end;
+  gap: 2rem;
 }

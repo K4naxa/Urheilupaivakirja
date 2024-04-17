@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
 
     const students = await knex("students")
       .select(
-        "students.id",
+        "students.user_id",
         "students.first_name",
         "students.last_name",
         "users.email",
@@ -24,6 +24,7 @@ router.get("/", async (req, res) => {
         "student_groups.group_identifier as group",
         "campuses.name as campus"
       )
+      .where("students.archived", false)
       .leftJoin("users", "students.user_id", "users.id")
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
@@ -56,6 +57,7 @@ router.put("/archive/:id", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
       });
 
+    console.log("Student archived:", student);
     res.json(student);
   } catch (error) {
     console.error("Error archiving student:", error);
