@@ -4,7 +4,7 @@ var router = express.Router();
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
-const { getRole } = require("../middleware/auth");
+const { getRole, isAuthenticated } = require("../middleware/auth");
 
 router.get("/options", async (req, res, next) => {
   Promise.all([
@@ -30,6 +30,8 @@ router.get("/options", async (req, res, next) => {
     });
 });
 
+// User Group Management -----------------------------------------------------------------
+
 // get all groups
 router.get("/groups", async (req, res, next) => {
   knex("student_groups")
@@ -48,18 +50,18 @@ router.get("/groups", async (req, res, next) => {
 // check if the user is an admin and then edit the group
 router.put("/groups/:id", async (req, res, next) => {
   const role = getRole(req);
-  if (role !== "admin") {
+  if (role !== 1) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   const { id } = req.params;
-  const { name } = req.body;
+  const { group_identifier } = req.body;
 
   knex("student_groups")
     .where({ id })
-    .update({ name })
+    .update({ group_identifier })
     .then(() => {
-      res.status(200).json({ id, name });
+      res.status(200).json({ id, group_identifier });
     })
     .catch((err) => {
       console.log("Error updating group", err);
@@ -69,10 +71,33 @@ router.put("/groups/:id", async (req, res, next) => {
     });
 });
 
-// check if the user is an admin and then delete the group
+// adds a new group after checking if user is admin
+router.post("/groups", async (req, res, next) => {
+  const role = getRole(req);
+  if (role !== 1) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const { group_identifier } = req.body;
+
+  knex("student_groups")
+    .insert({ group_identifier })
+    .returning("id")
+    .then((id) => {
+      res.status(201).json({ id: id[0], group_identifier });
+    })
+    .catch((err) => {
+      console.log("Error adding group", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while adding the group" });
+    });
+});
+
+// check if the user is an admin (1) and then delete the group
 router.delete("/groups/:id", async (req, res, next) => {
   const role = getRole(req);
-  if (role !== "admin") {
+  if (role !== 1) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 

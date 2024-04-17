@@ -30,6 +30,13 @@ const getGroups = async () => {
   return response.data;
 };
 
+const addGroup = async (newGroup) => {
+  console.log(makeHeader());
+  const group = { group_identifier: newGroup };
+  const response = await axios.post("/public/groups", group, makeHeader());
+  return response.data;
+};
+
 const editGroup = async (group) => {
   const response = await axios.put(
     `/public/groups/${group.id}`,
@@ -44,4 +51,4 @@ const deleteGroup = async (id) => {
   return response.data;
 };
 
-export default { getOptions, getGroups, editGroup, deleteGroup };
+export default { getOptions, getGroups, editGroup, deleteGroup, addGroup };

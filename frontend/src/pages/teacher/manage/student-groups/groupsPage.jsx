@@ -1,5 +1,6 @@
 import "./groupsPage.css";
 import publicService from "../../../../services/publicService";
+import { useAuth } from "../../../../hooks/useAuth";
 
 import { useState, useEffect } from "react";
 
@@ -7,7 +8,7 @@ import { useState, useEffect } from "react";
 const createGroupContainer = (group, setGroups) => {
   // saves the edited group to the server and updates the state
   const handleSave = () => {
-    const newGroup = { id: group.id, name: group.group_identifier };
+    const newGroup = { id: group.id, group_identifier: group.group_identifier };
     publicService.editGroup(newGroup).then(() => {
       setGroups((prevGroups) =>
         prevGroups.map((prevGroup) =>
@@ -79,8 +80,16 @@ const createGroupContainer = (group, setGroups) => {
   }
 };
 
+const handleNewGroup = (newGroup, setGroups) => {
+  publicService.addGroup(newGroup).then((group) => {
+    setGroups((prevGroups) => [...prevGroups, group]);
+  });
+};
+
 const GroupsPage = () => {
+  const { user } = useAuth();
   const [groups, setGroups] = useState([]);
+  const [newGroup, setNewGroup] = useState("");
 
   useEffect(() => {
     publicService.getGroups().then((data) => {
@@ -94,6 +103,22 @@ const GroupsPage = () => {
       <h1>Student Groups</h1>
       <div className="groupsContainer">
         {groups.map((group) => createGroupContainer(group, setGroups))}
+
+        {/* input field for new sports */}
+        <div>
+          <input
+            className="newSportInput"
+            type="text"
+            placeholder="Add new sport"
+            onChange={(e) => setNewGroup(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleNewGroup(newGroup, setGroups);
+                e.target.value = "";
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );
