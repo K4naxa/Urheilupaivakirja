@@ -1,0 +1,33 @@
+.manage-student-cell {
+  display: grid;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+
+  width: 100%;
+  grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr 1fr;
+  grid-template-areas: "name email sport group campus buttons";
+  align-items: center;
+}
+
+.student-info-name {
+  grid-area: name;
+}
+.student-info-email {
+  grid-area: email;
+}
+.student-info-sport {
+  grid-area: sport;
+}
+.student-info-group {
+  grid-area: group;
+}
+.student-info-campus {
+  grid-area: campus;
+}
+
+.student-info-buttons {
+  grid-area: buttons;
+  display: flex;
+  justify-content: end;
+  gap: 2rem;
+}

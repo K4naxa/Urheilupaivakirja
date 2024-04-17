@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import userService from "../../../../services/userService";
-import "./manageStudentsPage.css";
+import userService from "../../../../../services/userService";
+import "./ManageStudentsPage.css";
 
 const createStudentContainer = (student, students, setStudents) => {
   const handleDelete = async () => {
@@ -32,45 +32,28 @@ const createStudentContainer = (student, students, setStudents) => {
   );
 };
 
-const ManageStudentsPage = () => {
+const ManageActiveStudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
-    if (!showArchived) {
-      userService.getStudents().then((data) => {
-        setStudents(data);
-        setLoading(false);
-        console.log(data);
-      });
-    } else {
-      userService.getArchivedStudents().then((data) => {
-        setStudents(data);
-        setLoading(false);
-        console.log(data);
-      });
-    }
-  }, [showArchived]);
+    userService.getStudents().then((data) => {
+      setStudents(data);
+      setLoading(false);
+      console.log(data);
+    });
+  }, []);
 
   return (
     <div>
       <h1>Manage Students</h1>
-      <button onClick={() => setShowArchived(!showArchived)}>
-        {showArchived ? "Hide Archived" : "Show Archived"}
-      </button>
       {loading ? (
         <p>Loading...</p>
       ) : (
         <div className="manage-student-container">
           {students.length > 0 ? (
             students.map((student) =>
-              createStudentContainer(
-                student,
-                students,
-                setStudents,
-                showArchived
-              )
+              createStudentContainer(student, students, setStudents)
             )
           ) : (
             <p>No students found</p>
@@ -81,4 +64,4 @@ const ManageStudentsPage = () => {
   );
 };
 
-export default ManageStudentsPage;
+export default ManageActiveStudentsPage;
