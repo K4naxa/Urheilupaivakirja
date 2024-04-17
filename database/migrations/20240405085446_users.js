@@ -8,7 +8,7 @@ exports.up = function (knex) {
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("last_login_at");
 
-    table.foreign("role_id").references("roles.id");
+    table.foreign("role_id").references("roles.id").onDelete("CASCADE");
   });
 };
 
