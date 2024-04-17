@@ -16,6 +16,7 @@ var verifyRouter = require("./routes/user/verifyRouter.js");
 var userRouter = require("./routes/user/userRouter.js");
 var publicRouter = require("./routes/publicRouter.js");
 var journalEntryRouter = require("./routes/journalEntryRouter.js");
+var studentsRouter = require("./routes/user/studentRouter.js");
 var app = express();
 
 app.use(logger("dev"));
@@ -30,6 +31,7 @@ app.use("/user/verify", isAuthenticated, verifyRouter);
 app.use("/user/login", loginRouter);
 app.use("/user/register", registerRouter);
 app.use("/user/unverified", isAuthenticated, unverifiedRouter);
+app.use("/students", isAuthenticated, studentsRouter);
 app.use("/journal", isAuthenticated, journalRouter);
 app.use("/sports", isAuthenticated, sportsRouter);
 app.use("/public", publicRouter);
