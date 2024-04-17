@@ -1,0 +1,13 @@
+.manage-layout-header {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+#manage-nav {
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2rem;
+}

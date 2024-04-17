@@ -41,13 +41,11 @@ const ManageArchivedStudentsPage = () => {
     userService.getArchivedStudents().then((data) => {
       setStudents(data);
       setLoading(false);
-      console.log(data);
     });
   }, []);
 
   return (
     <div>
-      <h1>Manage Students</h1>
       {loading ? (
         <p>Loading...</p>
       ) : (
