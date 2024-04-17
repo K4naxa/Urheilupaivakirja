@@ -86,10 +86,33 @@ const handleNewGroup = (newGroup, setGroups) => {
   });
 };
 
+// handles error checking for duplicates and empty strings
+const handleInputError = (newInput, setError, groups) => {
+  if (newInput === "") {
+    setError("Syötä uuden ryhmän nimi");
+    return false;
+  }
+  if (newInput.length > 20) {
+    setError("Ryhmän nimi liian pitkä");
+    return false;
+  }
+  if (newInput.length < 8) {
+    setError("Ryhmän nimi liian lyhyt");
+    return false;
+  }
+  if (groups.some((group) => group.group_identifier === newInput)) {
+    setError("Ryhmä on jo olemassa");
+    return false;
+  }
+  setError("");
+  return true;
+};
+
 const GroupsPage = () => {
   const { user } = useAuth();
   const [groups, setGroups] = useState([]);
   const [newGroup, setNewGroup] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     publicService.getGroups().then((data) => {
@@ -102,10 +125,9 @@ const GroupsPage = () => {
     <div className="groupsPage">
       <h1>Student Groups</h1>
       <div className="groupsContainer">
-        {groups.map((group) => createGroupContainer(group, setGroups))}
-
         {/* input field for new sports */}
         <div>
+          <span className="error">{error}</span> <br />
           <input
             className="newSportInput"
             type="text"
@@ -113,12 +135,14 @@ const GroupsPage = () => {
             onChange={(e) => setNewGroup(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                if (!handleInputError(newGroup, setError, groups)) return;
                 handleNewGroup(newGroup, setGroups);
                 e.target.value = "";
               }
             }}
           />
         </div>
+        {groups.map((group) => createGroupContainer(group, setGroups))}
       </div>
     </div>
   );

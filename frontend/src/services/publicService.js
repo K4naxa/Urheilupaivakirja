@@ -31,7 +31,6 @@ const getGroups = async () => {
 };
 
 const addGroup = async (newGroup) => {
-  console.log(makeHeader());
   const group = { group_identifier: newGroup };
   const response = await axios.post("/public/groups", group, makeHeader());
   return response.data;

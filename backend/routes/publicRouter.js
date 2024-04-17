@@ -82,7 +82,6 @@ router.post("/groups", async (req, res, next) => {
 
   knex("student_groups")
     .insert({ group_identifier })
-    .returning("id")
     .then((id) => {
       res.status(201).json({ id: id[0], group_identifier });
     })
