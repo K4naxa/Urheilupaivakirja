@@ -117,7 +117,6 @@ const GroupsPage = () => {
   useEffect(() => {
     publicService.getGroups().then((data) => {
       setGroups(data);
-      console.log(data);
     });
   }, []);
 
