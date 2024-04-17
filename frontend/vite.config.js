@@ -32,7 +32,11 @@ export default defineConfig({
       "/journal_entry": {
         target: "http://localhost:3001",
         changeOrigin: true,
-      },  
+      },
+      "/public/groups": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
     },
   },
 });
