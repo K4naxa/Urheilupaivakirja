@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import userService from "../../services/userService";
 import { useNavigate } from "react-router-dom";
 import "./registrationPage.css";
-import { getOptions } from "../../services/publicService";
+import publicService from "../../services/publicService";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -27,7 +27,7 @@ const RegistrationPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const optionsData = await getOptions();
+        const optionsData = await publicService.getOptions();
         setOptions(optionsData);
       } catch (error) {
         console.error("Failed to fetch options:", error);
@@ -68,9 +68,16 @@ const RegistrationPage = () => {
     }
 
     // test if password is long enough
-    if (registrationData.password.length < 8 || registrationData.passwordAgain.length < 8) {
+    if (
+      registrationData.password.length < 8 ||
+      registrationData.passwordAgain.length < 8
+    ) {
       setError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
-      setRegistrationData(currentData => ({ ...currentData, password: "", passwordAgain: "" }));
+      setRegistrationData((currentData) => ({
+        ...currentData,
+        password: "",
+        passwordAgain: "",
+      }));
       return false;
     }
 
@@ -83,7 +90,11 @@ const RegistrationPage = () => {
     const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
     if (!myRegEx.test(registrationData.email)) {
       setError("Sähköposti ei ole oikeassa muodossa");
-      setRegistrationData(currentData => ({ ...currentData, password: "", passwordAgain: "" }));
+      setRegistrationData((currentData) => ({
+        ...currentData,
+        password: "",
+        passwordAgain: "",
+      }));
       return false;
     }
     return true;

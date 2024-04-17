@@ -1,7 +1,6 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import trainingService from "../../../../services/trainingService";
 import { useAuth } from "../../../../hooks/useAuth";
-
 
 // renders a container for a sport while checking if it is being edited
 const createSportContainer = (sport, setSports) => {
@@ -94,7 +93,7 @@ const handleNewSport = (newSport, setSports) => {
 };
 
 const SportsPage = () => {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
   const [sports, setSports] = useState([]);
   const [newSport, setNewSport] = useState("");

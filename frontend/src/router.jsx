@@ -16,7 +16,8 @@ import Verify from "./pages/teacher/verify/Verify";
 import SportsPage from "./pages/teacher/manage/sports/SportsPage";
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import Visitors from "./pages/teacher/manage/visitors/VisitorsPage";
-import SportsPageV2 from "./pages/teacher/manage/sports-v2/SportsPage-v2";  
+import SportsPageV2 from "./pages/teacher/manage/sports-v2/SportsPage-v2";
+import GroupsPage from "./pages/teacher/manage/student-groups/groupsPage";
 import NoPage from "./pages/NoPage";
 
 export const router = createBrowserRouter([
@@ -33,11 +34,16 @@ export const router = createBrowserRouter([
                 <StudentLayout />
               </StudentRoute>
             ),
-            children: [
-              { index: true, element: <StudentHome /> },
-            ],
+            children: [{ index: true, element: <StudentHome /> }],
           },
-          { path: "merkinnat/uusi", element: <StudentRoute><NewJournalEntryPage /></StudentRoute> },
+          {
+            path: "merkinnat/uusi",
+            element: (
+              <StudentRoute>
+                <NewJournalEntryPage />
+              </StudentRoute>
+            ),
+          },
 
           { path: "/kirjaudu", element: <LoginPage /> },
           { path: "/rekisteroidy", element: <RegistrationPage /> },
@@ -56,15 +62,16 @@ export const router = createBrowserRouter([
                 element: <ManageLayout />,
                 children: [
                   { path: "lajit", element: <SportsPage /> },
-                  { path: "lajit-v2", element: <SportsPageV2/>},
-                  { path: "vierailijat", element: <Visitors/>},
+                  { path: "lajit-v2", element: <SportsPageV2 /> },
+                  { path: "vierailijat", element: <Visitors /> },
+                  { path: "ryhmat", element: <GroupsPage /> },
                 ],
               },
             ],
           },
         ],
       },
-      {path: "*", element: <NoPage/>}
+      { path: "*", element: <NoPage /> },
     ],
   },
 ]);
