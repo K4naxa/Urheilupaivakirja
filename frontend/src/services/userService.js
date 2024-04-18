@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const getToken = () => {
-  const userJson = localStorage.getItem('user');
+  const userJson = localStorage.getItem("user");
   if (userJson) {
     const user = JSON.parse(userJson);
     return user.token;
@@ -11,7 +11,7 @@ const getToken = () => {
 
 // make authorization header
 const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${getToken()}`} };
+  let header = { headers: { Authorization: `bearer ${getToken()}` } };
   return header;
 };
 
@@ -72,7 +72,22 @@ const verifyUser = async (user) => {
   return response.data;
 };
 
-// ................................................................................
+// Stundent Management -------------------------------------------------------------------
+
+const getStudents = async () => {
+  const response = await axios.get("/students", makeHeader());
+  return response.data;
+};
+
+const getArchivedStudents = async () => {
+  const response = await axios.get("/students/archived", makeHeader());
+  return response.data;
+};
+
+const toggleStudentArchive = async (id) => {
+  const response = await axios.put(`/students/archive/${id}`, {}, makeHeader());
+  return response.data;
+};
 
 export default {
   login,
@@ -81,5 +96,8 @@ export default {
   getUnverifiedUsers,
   verifyUser,
   deleteUser,
+  getStudents,
+  toggleStudentArchive,
+  getArchivedStudents,
 };
 // Path: frontEnd/src/services/userService.js

@@ -11,7 +11,6 @@ const getTokenFrom = (request) => {
 // checks if user has any authentication token
 const isAuthenticated = (req, res, next) => {
   const token = getTokenFrom(req);
-  console.log("Token: ", token);
 
   if (!token || token === "" || token === null) {
     console.error("Authentication token missing");
@@ -48,7 +47,7 @@ const getRole = (req) => {
   return role;
 };
 
-const getUserId = req => {
+const getUserId = (req) => {
   const token = getTokenFrom(req);
   let userId = null;
   try {
@@ -59,7 +58,6 @@ const getUserId = req => {
     return res.status(401).json({ error: "Token verification failed" });
   }
   return userId;
-
-}
+};
 
 module.exports = { isAuthenticated, getRole, getUserId };

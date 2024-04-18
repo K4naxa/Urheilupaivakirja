@@ -18,24 +18,15 @@ router.delete("/:id", (req, res) => {
     const user_id = req.params.id;
 
     // Delete associated records in the students table
-    knex("students")
-      .where("user_id", "=", user_id)
+    knex("users")
+      .where("id", "=", user_id)
       .delete()
+
       .then(() => {
-        // Now that associated records are deleted, delete the user
-        knex("users")
-          .where("id", "=", user_id)
-          .delete()
-          .then(() => {
-            res.status(200).json({ message: "User deleted" });
-          })
-          .catch((error) => {
-            console.error("Error deleting user:", error);
-            res.status(500).json({ error: "Internal server error" });
-          });
+        res.status(200).json({ message: "User deleted" });
       })
       .catch((error) => {
-        console.error("Error deleting associated records:", error);
+        console.error("Error deleting user:", error);
         res.status(500).json({ error: "Internal server error" });
       });
   }
