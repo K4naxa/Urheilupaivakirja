@@ -49,10 +49,8 @@ router.get("/groups", async (req, res, next) => {
 
 // check if the user is an admin and then edit the group
 router.put("/groups/:id", async (req, res, next) => {
-  const role = getRole(req);
-  if (role !== 1) {
+  if (getRole(req) !== 1)
     return res.status(401).json({ error: "Unauthorized" });
-  }
 
   const { id } = req.params;
   const { group_identifier } = req.body;
@@ -73,10 +71,8 @@ router.put("/groups/:id", async (req, res, next) => {
 
 // adds a new group after checking if user is admin
 router.post("/groups", async (req, res, next) => {
-  const role = getRole(req);
-  if (role !== 1) {
+  if (getRole(req) !== 1)
     return res.status(401).json({ error: "Unauthorized" });
-  }
 
   const { group_identifier } = req.body;
 
@@ -95,10 +91,8 @@ router.post("/groups", async (req, res, next) => {
 
 // check if the user is an admin (1) and then delete the group
 router.delete("/groups/:id", async (req, res, next) => {
-  const role = getRole(req);
-  if (role !== 1) {
+  if (getRole(req) !== 1)
     return res.status(401).json({ error: "Unauthorized" });
-  }
 
   const { id } = req.params;
 
@@ -116,4 +110,77 @@ router.delete("/groups/:id", async (req, res, next) => {
     });
 });
 
+// Campus Management -----------------------------------------------------------------
+
+// get all campuses with student count
+router.get("/campuses", async (req, res, next) => {
+  knex("campuses")
+    .select("campuses.*")
+    .leftJoin("students", "campuses.id", "students.campus_id")
+    .count("students.id as student_count")
+    .groupBy("campuses.id")
+    .then((rows) => {
+      res.json(rows);
+    });
+});
+
+// create a new campus
+router.post("/campuses", isAuthenticated, (req, res, next) => {
+  const { name } = req.body;
+
+  knex("campuses")
+    .insert({ name })
+    .then((id) => {
+      res.status(201).json({ id: id[0], name });
+    })
+    .catch((err) => {
+      console.log("Error adding campus", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while adding the campus" });
+    });
+});
+
+// check if the user is an admin and then edit the campus
+router.put("/campuses/:id", isAuthenticated, (req, res, next) => {
+  if (getRole(req) !== 1)
+    return res.status(401).json({ error: "Unauthorized" });
+
+  const { id } = req.params;
+  const { name } = req.body;
+
+  knex("campuses")
+    .where({ id }, "=", "id")
+    .update({ name })
+    .then(() => {
+      res.status(200).json({ id, name });
+    })
+    .catch((err) => {
+      console.log("Error updating campus", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while updating the campus" });
+    });
+});
+
+// check if the user is an admin and then delete the campus
+router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
+  if (getRole(req) !== 1)
+    return res.status(401).json({ error: "Unauthorized" });
+
+  const { id } = req.params;
+
+  knex("campuses")
+    .where({ id })
+    .del()
+    .then(() => {
+      res.status(200).json({ id });
+    })
+    .catch((err) => {
+      console.log("Error deleting campus", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the campus" });
+    });
+});
 module.exports = router;
