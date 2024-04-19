@@ -3,16 +3,49 @@ import { useNavigate } from "react-router-dom";
 import "./newJournalEntryPage.css";
 import trainingService from "../../../services/trainingService.js";
 
+const existingEntriesMockup = [
+  {
+    entry_type: "1",
+    workout_type: "1",
+    workout_category: "1",
+    length_in_minutes: "60",
+    time_of_day: "1",
+    intensity: 1,
+    date: "2024-04-18",
+    details: "",
+  },
+  {
+    entry_type: "2",
+    workout_type: "2",
+    workout_category: "2",
+    length_in_minutes: "60",
+    time_of_day: "2",
+    intensity: 2,
+    date: "2024-04-17",
+    details: "",
+  },
+  {
+    entry_type: "3",
+    workout_type: "3",
+    workout_category: "3",
+    length_in_minutes: "60",
+    time_of_day: "3",
+    intensity: 3,
+    date: "2024-04-16",
+    details: "",
+  },
+];
+
 const NewJournalEntryPage = () => {
+  //TODO: new date = today (from other branch)
   const [journalData, setJournalData] = useState({
-    entry_type: "",
+    entry_type: "1",
     workout_type: "",
-    workout_category: "",
-    length_hours: "",
-    length_minutes: "",
+    workout_category: "1",
+    length_in_minutes: "60",
     time_of_day: "",
     intensity: null,
-    date: "",
+    date: "2024-04-18",
     details: "",
   });
   const [options, setOptions] = useState({
@@ -21,8 +54,14 @@ const NewJournalEntryPage = () => {
     workout_categories: [],
     time_of_day: [],
   });
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showDetails, setShowDetails] = useState(false);
+  const [conflict, setConflict] = useState({ value: false, message: "" });
+  const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
+  const [existingEntries, setExistingEntries] = useState([]);
 
+  // get options for entry_types, workout types, workout categories and time of day
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,66 +77,212 @@ const NewJournalEntryPage = () => {
   }, []);
 
   useEffect(() => {
+    const fetchExistingEntries = async () => {
+      try {
+        let newExistingEntries = /* await trainingService.getUserJournalEntriesByDate(journalData.date); */ existingEntriesMockup
+        const formattedExistingEntries = newExistingEntries.map((entry) => ({
+          ...entry,
+          date: formatDateString(entry.date),
+        }));
+        setExistingEntries(formattedExistingEntries);
+      } catch (error) {
+        console.error("Failed to fetch existing entries:", error);
+      }
+    };
+    fetchExistingEntries();
+  }, [journalData.date]);
+
+  useEffect(() => {
+    console.log("Existing Entries Updated:", existingEntries);
+  }, [existingEntries]);
+
+  useEffect(() => {
     console.log(journalData);
   }, [journalData]);
 
+  // check for conflicts when entry_type is changed
+  useEffect(() => {
+    setErrors({});
+  }, [journalData.entry_type]);
+
+  // check for conflicts when date or entry_type is changed
+  useEffect(() => {
+    setSubmitButtonIsDisabled(false);
+    setConflict({ value: false, message: "" });
+    checkForConflicts(
+      journalData.entry_type,
+      journalData.date,
+      existingEntries
+    );
+  }, [journalData.date, journalData.entry_type, existingEntries]);
+
+  // if workout type is changed to 1 (akatemia) or 2 (seura), set workout category to 1 (omalaji)
+  useEffect(() => {
+    if (journalData.workout_type === "1" || journalData.workout_type === "2") {
+      setJournalData((prevState) => ({
+        ...prevState,
+        workout_category: options.workout_categories[0].id.toString(),
+      }));
+    }
+  }, [journalData.workout_type]);
+
   const navigate = useNavigate();
+
+  function formatDateString(isoDateString) {
+    const date = new Date(isoDateString);
+
+    // Extract year, month, and day
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed, add 1
+    const day = date.getDate().toString().padStart(2, "0");
+
+    // Combine into desired format
+    return `${year}-${month}-${day}`;
+  }
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
-    setJournalData({
+    setJournalData(journalData => ({
       ...journalData,
       [name]: value,
-    });
+    }));
   };
+  
 
   const errorCheckJournalEntry = () => {
-    /*if (
-      journalData.entry_type === "" ||
-      journalData.workout_type === "" ||
-      journalData.length_hours === "" ||
-      journalData.length_minutes === "" ||
-      journalData.time_of_day === "" ||
-      journalData.intensity === "" ||
-      journalData.details === null ||
-      journalData.groupId === null ||
-      journalData.date === null ||
-      journalData.campusId === null
+    //TODO: regex here
+    if (
+      journalData.entry_type != 1 ||
+      journalData.entry_type != 2 ||
+      journalData.entry_type != 3
     ) {
-      setError("Täytä kaikki kentät");
-      return false;
+      setErrors({ ...errors, entry_type: true });
     }
-    */
+    if (journalData.date === "") {
+      setErrors({ ...errors, date: true });
+    }
+    if (journalData.entry_type === "1") {
+      if (journalData.workout_type === "") {
+        setErrors({ ...errors, workout_type: true });
+        return false;
+      }
+      if (journalData.workout_category === "") {
+        setErrors({ ...errors, workout_category: true });
+      }
+      if (journalData.length === "") {
+        setErrors({ ...errors, length_in_minutes: true });
+      }
+
+      if (journalData.time_of_day === "") {
+        setErrors({ ...errors, time_of_day: true });
+      }
+      if (journalData.intensity === "") {
+        setErrors({ ...errors, intensity: true });
+      }
+    }
+
     return true;
+  };
+
+  const checkForConflicts = (entry_type, inputDate, existingEntries) => {
+    // Check if there are any existing entries on the same date
+    const conflictEntry = existingEntries.find(
+      (entry) => entry.date === inputDate
+    );
+
+    if (!conflictEntry) {
+      console.log("No conflict detected, using:", existingEntries)
+      return false; // No conflict if no entries exist on this date
+    }
+    else console.log("Conflict detected, using:", existingEntries)
+
+    //if entry type is the same as the existing entry but not an exercise, disable submit button
+    if (conflictEntry.entry_type === entry_type && entry_type != "1") {
+      setSubmitButtonIsDisabled(true);
+      console.log("button disabled");
+    }
+
+    const conflictMessages = {
+      1: {
+        // Existing exercise entries
+        2: "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen lepopäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.", //new entry is rest day
+        3: "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen sairauspäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.", //new entry is sick day
+      },
+      2: {
+        // Existing rest day entry
+        1: "Päivä on merkitty lepopäiväksi. Tämän merkinnän lisääminen merkitsee päivän harjoituspäiväksi.", //new entry is workout
+        2: "Päivä on jo merkitty lepopäiväksi.", //new entry is rest day
+        3: "Päivä on merkitty lepopäiväksi. Tämän merkinnän lisääminen merkitsee päivän sairauspäiväksi.", //new entry is sick day
+      },
+      3: {
+        // Existing sick day entry
+        1: "Päivä on merkitty sairauspäiväksi. Tämän merkinnän lisääminen merkitsee päivän harjoituspäiväksi.", //new entry is workout
+        2: "Päivä on merkitty sairauspäiväksi. Tämän merkinnän lisääminen merkitsee päivän lepopäiväksi.", //new entry is rest day
+        3: "Päivä on jo merkitty sairauspäiväksi.", //new entry is sick day
+      },
+    };
+
+    // Check if the existing entry type is relevant to check against the new entry type
+    if (
+      conflictMessages[conflictEntry.entry_type] &&
+      conflictMessages[conflictEntry.entry_type][entry_type]
+    ) {
+      setConflict({
+        value: true,
+        message: conflictMessages[conflictEntry.entry_type][entry_type],
+      });
+      return true;
+    }
+
+    return false; // No relevant conflict detected
   };
 
   const newJournalEntryHandler = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrors("");
     if (!errorCheckJournalEntry()) {
       return;
     }
-    try {
-      await trainingService.postJournalEntry(
-        journalData.entry_type,
-        journalData.workout_type,
-        journalData.workout_category,
-        journalData.time_of_day,
-        journalData.length_hours,
-        journalData.length_minutes,
-        journalData.intensity,
-        journalData.details,
-        journalData.date
-      );
-      navigate("/");
-    } catch (error) {
-      console.error("Error creating a new journal entry:", error);
+    // if entry type is workout
+    if (journalData.entry_type === "1") {
+      try {
+        await trainingService.postJournalEntry(
+          journalData.entry_type,
+          journalData.workout_type,
+          journalData.workout_category,
+          journalData.time_of_day,
+          journalData.length_in_minutes,
+          journalData.intensity,
+          journalData.details,
+          journalData.date
+        );
+      } catch (error) {
+        console.error("Error creating a new journal entry:", error);
+      }
     }
+    // if entry type is sick day or rest day
+    else if (journalData.entry_type === "2" || journalData.entry_type === "3") {
+      try {
+        await trainingService.postJournalEntry(
+          journalData.entry_type,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          journalData.details,
+          journalData.date
+        );
+      } catch (error) {
+        console.error("Error creating a new journal entry:", error);
+      }
+    }
+    navigate("/");
   };
-
   const renderRadioButton = (name, value, label) => {
     return (
-      <div key={`${name}-${value}`}>
+      <div className="journal-entry-radio-button" key={`${name}-${value}`}>
         <input
           type="radio"
           name={`${name}`}
@@ -111,52 +296,36 @@ const NewJournalEntryPage = () => {
     );
   };
 
+  function convertTime(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours === 0) {
+      return `${minutes}min`;
+    }
+    if (minutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${minutes}min`;
+  }
+
   return (
     <>
       <div className="container">
-        <div className="newJournalEntryContainer">
-          <div className="newJournalEntryheader-container">Uusi harjoitus</div>
+        {
+          // TODO: POISTA TEKSTI
+        }
+        <p>18.04.2024 = harjoituspäivä</p>
+        <p>17.04.2024 = lepopäivä</p>
+        <p>16.04.2024 = sairauspäivä</p>
+        <div className="journal-entry-container">
+          <div className="journal-entry-header-container">Uusi harjoitus</div>
           <form
-            className="newJournalEntryForm"
+            className="journal-entry-form"
             onSubmit={newJournalEntryHandler}
           >
-            <div className="newJournalEntryinput-container">
-              <label htmlFor="date-picker">Päivämäärä</label>
-              <input
-                type="date"
-                name="date"
-                value={journalData.date}
-                onChange={changeHandler}
-                id="date-picker"
-              />
-            </div>
-            <div className="newJournalEntryinput-container">
-              <label htmlFor="length-hours-picker">Kesto</label>
-              <input
-                type="number"
-                name="length_hours"
-                value={journalData.length_hours}
-                onChange={changeHandler}
-                placeholder="Tunnit"
-                min = "0"
-                max = "23"
-                id = "length-hours-picker"
-              />
-              {/*TODO: MIN JA MAX EIVÄT TOIMI KUNNOLLA!*/}
-              <input
-                type="number"
-                name="length_minutes"
-                value={journalData.length_minutes}
-                onChange={changeHandler}
-                placeholder="Minuutit"
-                min= "0"
-                max = "59"
-                id = "length-minutes-picker"
-              />
-            </div>
-            <div className="newJournalEntryinput-container">
+            <div className="journal-entry-input-container">
               <label>Merkintätyyppi</label>
-              <div className="radioOptionHorizontalContainer">
+              <div className="radio-option-horizontal-container">
                 {options.journal_entry_types.map((entry) =>
                   renderRadioButton(
                     "entry_type",
@@ -166,72 +335,132 @@ const NewJournalEntryPage = () => {
                 )}
               </div>
             </div>
-            <div className="newJournalEntryinput-container">
-              <label>Harjoitustyyppi</label>
-              <div className="radioOptionHorizontalContainer">
-                {options.workout_types.map((type) =>
-                  renderRadioButton(
-                    "workout_type",
-                    type.id.toString(),
-                    type.name
-                  )
-                )}
-              </div>
-            </div>
-            <div className="newJournalEntryinput-container">
-              <label>Harjoituskategoria</label>
-              <div className="radioOptionHorizontalContainer">
-                {options.workout_categories.map((category) =>
-                  renderRadioButton(
-                    "workout_category",
-                    category.id.toString(),
-                    category.name
-                  )
-                )}
-              </div>
-            </div>
 
-            <div className="newJournalEntryinput-container">
-              <label>Ajankohta</label>
-              <div className="radioOptionHorizontalContainer">
-                {options.time_of_day.map((time) =>
-                  renderRadioButton(
-                    "time_of_day",
-                    time.id.toString(),
-                    time.name
-                  )
-                )}
-              </div>
-            </div>
-            <div className="newJournalEntryinput-container">
-              <label>Rankkuus</label>
-              <div className="radioOptionHorizontalContainer">
-                {[1, 2, 3, 4, 5].map((intensity) =>
-                  renderRadioButton(
-                    "intensity",
-                    intensity.toString(),
-                    intensity.toString()
-                  )
-                )}
-              </div>
-            </div>
-            <div className="newJournalEntryinput-container">
-              <label htmlFor="details-textarea">Lisätiedot</label>
-              <textarea
+            <div className="journal-entry-input-container">
+              <label htmlFor="date-picker">Päivämäärä</label>
+              <input
+                type="date"
+                name="date"
+                value={journalData.date}
                 onChange={changeHandler}
-                type="text"
-                name="details"
-                id="details-textarea"
-                placeholder=""
-                value={journalData.details}
+                id="date-picker"
               />
             </div>
-            <button className="button" type="submit">
+
+            {journalData.entry_type === "1" && (
+              <div className="journal-entry-input-container">
+                <label htmlFor="length_in_minutes">
+                  Kesto: {convertTime(journalData.length_in_minutes)}
+                </label>
+                <input
+                  type="range"
+                  min="30"
+                  max="180"
+                  value={journalData.length_in_minutes}
+                  step="30"
+                  id="length_in_minutes"
+                  onChange={changeHandler}
+                  name="length_in_minutes"
+                />
+              </div>
+            )}
+
+            {journalData.entry_type === "1" && (
+              <div
+                className={`journal-entry-input-container ${
+                  errors.workout_type ? "missing-input" : ""
+                }`}
+              >
+                <label>Harjoitustyyppi</label>
+                <div className="radio-option-horizontal-container">
+                  {options.workout_types.map((type) =>
+                    renderRadioButton(
+                      "workout_type",
+                      type.id.toString(),
+                      type.name
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            {journalData.entry_type === "1" && (
+              <div className="journal-entry-input-container">
+                <label htmlFor="workout-category">Harjoituskategoria</label>
+                <select
+                  id="workoutCategory"
+                  name="workout_category"
+                  value={journalData.workout_category}
+                  onChange={changeHandler}
+                  disabled={journalData.workout_type != "3"}
+                >
+                  {options.workout_categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {journalData.entry_type === "1" && (
+              <div className="journal-entry-input-container">
+                <label>Ajankohta</label>
+                <div className="radio-option-horizontal-container">
+                  {options.time_of_day.map((time) =>
+                    renderRadioButton(
+                      "time_of_day",
+                      time.id.toString(),
+                      time.name
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            {journalData.entry_type === "1" && (
+              <div className="journal-entry-input-container">
+                <label>Rankkuus</label>
+                <div className="radio-option-horizontal-container">
+                  {[1, 2, 3].map((intensity) =>
+                    renderRadioButton(
+                      "intensity",
+                      intensity.toString(),
+                      intensity.toString()
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="journal-entry-input-container">
+              <label
+                htmlFor="details-textarea"
+                onClick={() => setShowDetails((prevState) => !prevState)}
+              >
+                Lisätiedot V
+              </label>
+              {showDetails && (
+                <textarea
+                  onChange={changeHandler}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={journalData.details}
+                />
+              )}
+            </div>
+            <div>{errorMessage && <p>{errorMessage}</p>}</div>
+            <div>{conflict.value && <p>{conflict.message}</p>}</div>
+            <button
+              className="submit-button"
+              type="submit"
+              disabled={submitButtonIsDisabled}
+            >
               Lisää harjoitus
             </button>
           </form>
         </div>
-        <div>{error && <p>{error}</p>}</div>
       </div>
     </>
   );
