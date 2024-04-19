@@ -2,7 +2,7 @@ import axios from "axios";
 
 // get token from localStorage
 const getToken = () => {
-  const userJson = localStorage.getItem('user');
+  const userJson = localStorage.getItem("user");
   if (userJson) {
     const user = JSON.parse(userJson);
     return user.token;
@@ -12,7 +12,7 @@ const getToken = () => {
 
 // make authorization header
 const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${getToken()}`} };
+  let header = { headers: { Authorization: `bearer ${getToken()}` } };
   return header;
 };
 
@@ -20,32 +20,32 @@ const makeHeader = () => {
 
 // post new journal entry
 
-const postJournalEntry = async (
-  entry_type_id,
-  workout_type_id,
-  workout_category_id,
-  time_of_day_id,
-  length_hours,
-  length_minutes,
-  intensity,
-  details,
-  date
-) => {
+const postJournalEntry = async (newJournalEntry) => {
   let journalEntry = {
-    entry_type_id,
-    workout_type_id,
-    workout_category_id,
-    time_of_day_id,
-    length_hours,
-    length_minutes,
-    intensity,
-    details,
-    date
+    entry_type_id: newJournalEntry.entry_type,
+    workout_type_id: newJournalEntry.workout_type,
+    workout_category_id: newJournalEntry.workout_category,
+    time_of_day_id: newJournalEntry.time_of_day,
+    length_hours: newJournalEntry.length_hours,
+    length_minutes: newJournalEntry.length_minutes,
+    intensity: newJournalEntry.intensity,
+    details: newJournalEntry.details,
+    date: newJournalEntry.date,
   };
 
-  const response = await axios.post("/journal_entry", journalEntry, makeHeader());
+  const response = await axios.post(
+    "/journal_entry",
+    journalEntry,
+    makeHeader()
+  );
   return response.data;
 };
+
+const getJournalEntry = async (id) => {
+  const response = await axios.get(`/journal_entry/${id}`, makeHeader());
+  return response.data;
+
+}
 
 // get journal entry options (journal_entry_types, workout_types, workout_categories)
 const getJournalEntryOptions = async () => {
@@ -92,6 +92,7 @@ const deleteSport = async (id) => {
 
 export default {
   postJournalEntry,
+  getJournalEntry,
   getJournalEntryOptions,
   getSports,
   getSport,

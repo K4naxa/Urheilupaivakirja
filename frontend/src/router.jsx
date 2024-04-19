@@ -5,7 +5,8 @@ import TeacherRoute from "./components/TeacherRoute";
 
 import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
 
-import NewJournalEntryPage from "./pages/student/new-journal-entry/NewJournalEntryPage";
+import NewJournalEntryPage from "./pages/student/journal-entry/new/NewJournalEntryPage";
+import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
 import StudentLayout from "./layouts/student-layout/StudentLayout";
 import StudentHome from "./pages/student/student-home/StudentHome";
 import TeacherLayout from "./layouts/teacher-layout/TeacherLayout";
@@ -22,6 +23,7 @@ import ManageStudentsLayout from "./layouts/manageStudents-layout/manageStudents
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/activeStudents/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/archivedStudents/ManageArchivedStudentsPage";
 import NoPage from "./pages/NoPage";
+
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +46,14 @@ export const router = createBrowserRouter([
             element: (
               <StudentRoute>
                 <NewJournalEntryPage />
+              </StudentRoute>
+            ),
+          },
+          {
+            path: "merkinnat/muokkaa/:entry_id",
+            element: (
+              <StudentRoute>
+                <EditJournalEntryPage />
               </StudentRoute>
             ),
           },

@@ -7,20 +7,6 @@ const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
 // Post a new journal entry
-router.post("/", async (req, res, next) => {
-  const entry = req.body;
-  entry.user_id = getUserId(req)
-  entry.created_at = new Date();
-  try {
-    const rows = await knex("journal_entries").insert(entry);
-    res.json(rows);
-  } catch (err) {
-    console.log("INSERT INTO `journal_entries` failed", err);
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating a new journal entry." });
-  }
-});
 
 router.get("/options", async (req, res, next) => {
   try {
@@ -43,5 +29,47 @@ router.get("/options", async (req, res, next) => {
       });
   }
 });
+
+router.get("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const data = await knex("journal_entries").select([
+      "id as entry_id",
+      "entry_type_id as entry_type",
+      "workout_type_id as workout_type",
+      "workout_category_id as workout_category",
+      "length_hours",
+      "length_minutes",
+      "time_of_day_id as time_of_day",
+      "intensity",
+      "date",
+      "details"
+    ])
+    .where("id", id)
+    .first();
+    res.json(data);
+  } catch (err) {
+    console.log("GET /journal_entry/:id failed", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching a journal entry." });
+  }
+});
+
+router.post("/", async (req, res, next) => {
+  const entry = req.body;
+  entry.user_id = getUserId(req)
+  entry.created_at = new Date();
+  try {
+    const rows = await knex("journal_entries").insert(entry);
+    res.json(rows);
+  } catch (err) {
+    console.log("INSERT INTO `journal_entries` failed", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating a new journal entry." });
+  }
+});
+
 
 module.exports = router;
