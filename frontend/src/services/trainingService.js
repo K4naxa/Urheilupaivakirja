@@ -36,7 +36,7 @@ const postJournalEntry = async (
   length_in_minutes,
   intensity,
   details,
-  date
+  date,
 ) => {
   let journalEntry = {
     entry_type_id,
@@ -46,7 +46,7 @@ const postJournalEntry = async (
     length_in_minutes,
     intensity,
     details,
-    date
+    date,
   };
 
   const response = await axios.post("/journal_entry", journalEntry, makeHeader());

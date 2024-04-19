@@ -67,7 +67,7 @@ const NewJournalEntryPage = () => {
       try {
         const optionsData = await trainingService.getJournalEntryOptions();
         setOptions(optionsData);
-        console.log(optionsData);
+        console.log("Fetched options data:", optionsData);
       } catch (error) {
         console.error("Failed to fetch options:", error);
       }
@@ -79,7 +79,8 @@ const NewJournalEntryPage = () => {
   useEffect(() => {
     const fetchExistingEntries = async () => {
       try {
-        let newExistingEntries = /* await trainingService.getUserJournalEntriesByDate(journalData.date); */ existingEntriesMockup
+        let newExistingEntries =
+          await trainingService.getUserJournalEntriesByDate(journalData.date); //existingEntriesMockup
         const formattedExistingEntries = newExistingEntries.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
@@ -101,11 +102,10 @@ const NewJournalEntryPage = () => {
   }, [journalData]);
 
   // check for conflicts when entry_type is changed
-  useEffect(() => {
-    setErrors({});
-  }, [journalData.entry_type]);
 
   // check for conflicts when date or entry_type is changed
+
+
   useEffect(() => {
     setSubmitButtonIsDisabled(false);
     setConflict({ value: false, message: "" });
@@ -114,7 +114,8 @@ const NewJournalEntryPage = () => {
       journalData.date,
       existingEntries
     );
-  }, [journalData.date, journalData.entry_type, existingEntries]);
+    setErrors({});
+  }, [existingEntries, journalData.entry_type]);
 
   // if workout type is changed to 1 (akatemia) or 2 (seura), set workout category to 1 (omalaji)
   useEffect(() => {
@@ -142,12 +143,11 @@ const NewJournalEntryPage = () => {
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
-    setJournalData(journalData => ({
+    setJournalData((journalData) => ({
       ...journalData,
       [name]: value,
     }));
   };
-  
 
   const errorCheckJournalEntry = () => {
     //TODO: regex here
@@ -191,15 +191,18 @@ const NewJournalEntryPage = () => {
     );
 
     if (!conflictEntry) {
-      console.log("No conflict detected, using:", existingEntries)
+      console.log("No conflict detected, using:", existingEntries);
       return false; // No conflict if no entries exist on this date
     }
-    else console.log("Conflict detected, using:", existingEntries)
 
+    if (conflictEntry.entry_type_id == 1 && entry_type == 1) {
+      setSubmitButtonIsDisabled(false);
+      console.log("No conflicts as both entry types are 1, using:", existingEntries);
+    }
     //if entry type is the same as the existing entry but not an exercise, disable submit button
-    if (conflictEntry.entry_type === entry_type && entry_type != "1") {
+
+    if (conflictEntry.entry_type_id == entry_type && entry_type != "1") {
       setSubmitButtonIsDisabled(true);
-      console.log("button disabled");
     }
 
     const conflictMessages = {
@@ -224,13 +227,17 @@ const NewJournalEntryPage = () => {
 
     // Check if the existing entry type is relevant to check against the new entry type
     if (
-      conflictMessages[conflictEntry.entry_type] &&
-      conflictMessages[conflictEntry.entry_type][entry_type]
+      conflictMessages[conflictEntry.entry_type_id] &&
+      conflictMessages[conflictEntry.entry_type_id][entry_type]
     ) {
       setConflict({
         value: true,
-        message: conflictMessages[conflictEntry.entry_type][entry_type],
+        message: conflictMessages[conflictEntry.entry_type_id][entry_type],
       });
+      console.log(
+        "Conflict detected:",
+        conflictMessages[conflictEntry.entry_type_id][entry_type]
+      );
       return true;
     }
 
@@ -265,7 +272,6 @@ const NewJournalEntryPage = () => {
       try {
         await trainingService.postJournalEntry(
           journalData.entry_type,
-          null,
           null,
           null,
           null,
@@ -306,6 +312,15 @@ const NewJournalEntryPage = () => {
       return `${hours}h`;
     }
     return `${hours}h ${minutes}min`;
+  }
+
+  function getSubmitButtonText(entry_type) {
+    switch (entry_type) {
+      case '1': return "Lisää harjoitus";
+      case '2': return "Merkitse lepopäiväksi";
+      case '3': return "Merkitse sairauspäiväksi";
+      default: return "Submit"; // Default case to handle unexpected values
+    }
   }
 
   return (
@@ -457,7 +472,7 @@ const NewJournalEntryPage = () => {
               type="submit"
               disabled={submitButtonIsDisabled}
             >
-              Lisää harjoitus
+              {getSubmitButtonText(journalData.entry_type)}
             </button>
           </form>
         </div>
