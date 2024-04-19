@@ -112,10 +112,13 @@ router.delete("/groups/:id", async (req, res, next) => {
 
 // Campus Management -----------------------------------------------------------------
 
-// get all campuses
+// get all campuses with student count
 router.get("/campuses", async (req, res, next) => {
   knex("campuses")
-    .select("*")
+    .select("campuses.*")
+    .leftJoin("students", "campuses.id", "students.campus_id")
+    .count("students.id as student_count")
+    .groupBy("campuses.id")
     .then((rows) => {
       res.json(rows);
     });

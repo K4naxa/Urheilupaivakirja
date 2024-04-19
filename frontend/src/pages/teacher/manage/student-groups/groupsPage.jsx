@@ -88,18 +88,6 @@ const handleNewGroup = (newGroup, setGroups) => {
 
 // handles error checking for duplicates and empty strings
 const handleInputError = (newInput, setError, groups) => {
-  if (newInput === "") {
-    setError("Syötä uuden ryhmän nimi");
-    return false;
-  }
-  if (newInput.length > 20) {
-    setError("Ryhmän nimi liian pitkä");
-    return false;
-  }
-  if (newInput.length < 8) {
-    setError("Ryhmän nimi liian lyhyt");
-    return false;
-  }
   if (groups.some((group) => group.group_identifier === newInput)) {
     setError("Ryhmä on jo olemassa");
     return false;

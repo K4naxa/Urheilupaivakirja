@@ -74,6 +74,7 @@ const createCampusContainer = (campus, setCampuses) => {
     return (
       <div key={campus.id} className="campus-cell">
         <div className="campus-name">{campus.name}</div>
+        <div className="campus-student-count">{campus.student_count}</div>
         <div className="campus-buttons">
           <button onClick={() => handleEdit()}>Edit</button>
           <button onClick={() => handleDelete()}>Delete</button>
@@ -115,6 +116,7 @@ const CampusPage = () => {
 
   useEffect(() => {
     publicService.getCampuses().then((data) => setCampuses(data));
+    console.log(campuses);
   }, []);
 
   return (
@@ -148,6 +150,11 @@ const CampusPage = () => {
             />
           </div>
           <div className="campus-list">
+            <div className="campus-cell campus-list-header">
+              <div className="name">Toimipaikka</div>
+              <div className="count">Opiskelijat</div>
+              <div className="buttons">Toiminnot</div>
+            </div>
             {campuses.map((campus) =>
               createCampusContainer(campus, setCampuses)
             )}
