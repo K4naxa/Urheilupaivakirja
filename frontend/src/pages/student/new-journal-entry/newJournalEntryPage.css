@@ -1,5 +1,5 @@
 
-.newJournalEntryContainer {
+.journal-entry-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,7 +8,7 @@
   border-radius: 10px;
 }
 
-.newJournalEntryheader-container {
+.journal-entry-header-container {
   color: var(--dark-primary-textcolor);
   background-color: var(--dark-secondary-backgroundcolor);
   border-radius: 10px 10px 0px 0px;
@@ -22,18 +22,19 @@
   margin-bottom: 2rem;
 }
 
-.newJournalEntryForm {
-  width: 386px;
+.journal-entry-form {
+  width: 559px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.newJournalEntryinput-container {
+.journal-entry-input-container {
   color: var(--dark-primary-textcolor);
   font-size: 16px;
   width: 386px;
   margin: 1.5rem 0;
+  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -47,7 +48,7 @@
   margin: 0px 0 40px 0;
 }
 
-.newJournalEntryinput-container > input {
+.journal-entry-input-container > input {
   color: var(--dark-primary-inputtextcolor);
   padding: 0.5rem;
   width: 100%;
@@ -66,25 +67,76 @@
   margin-top: 1rem;
 }
 
-.button {
+.submit-button {
   color: var(--primary-textcolor);
   font-size: 16px;
   width: 178px;
   height: 54px;
   padding: 0.5rem;
   border-radius: 10px;
-  background-color: var(--primary-backgroundcolor);
+  background-color: rgb(63, 63, 63);
   border: 1px solid var(--dark-primary-filler-linecolor);
   cursor: pointer;
 }
 
-.newJournalEntryButton {
+.submit-button:disabled {
+  background-color:rgba(112, 112, 112, 0.2);
+  color: rgba(211, 211, 211, 0.2);
+  border: 1px solid rgba(211, 211, 211, 0.1);
+  cursor: not-allowed;
+
+
+}
+
+.journal-entry-button {
   background-color: var(--dark-lightblue-buttoncolor);
   color: black;
 }
 
-.radioOptionHorizontalContainer {
+.radio-option-horizontal-container {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
+
+.journal-entry-radio-button {
+  float: left;
+  margin: 0 5px 0 0;
+  width: 100px;
+  height: 40px;
+  position: relative;
+}
+
+.journal-entry-radio-button label,
+.journal-entry-radio-button input {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  border: 2px solid grey;
+}
+
+.journal-entry-radio-button input[type="radio"] {
+ display: none;
+}
+
+.journal-entry-radio-button input[type="radio"]:checked + label {
+  background: #20b8be;
+  border-radius: 4px;
+  border: 2px solid grey;
+}
+
+.journal-entry-radio-button label {
+  text-align: center;
+  cursor: pointer;
+  z-index: 90;
+  line-height: 1.8em;
+}
+
+.missing-input {
+  border-left: 5px solid rgba(255, 0, 0, 0.7);
+}
+
