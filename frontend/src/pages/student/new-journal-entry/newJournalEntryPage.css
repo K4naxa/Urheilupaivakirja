@@ -23,7 +23,7 @@
 }
 
 .journal-entry-form {
-  width: 386px;
+  width: 559px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,6 +34,7 @@
   font-size: 16px;
   width: 386px;
   margin: 1.5rem 0;
+  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -136,6 +137,6 @@
 }
 
 .missing-input {
-  background-color: red;
+  border-left: 5px solid rgba(255, 0, 0, 0.7);
 }
 

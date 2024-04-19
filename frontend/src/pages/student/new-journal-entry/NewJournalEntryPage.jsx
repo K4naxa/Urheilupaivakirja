@@ -3,39 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./newJournalEntryPage.css";
 import trainingService from "../../../services/trainingService.js";
 
-const existingEntriesMockup = [
-  {
-    entry_type: "1",
-    workout_type: "1",
-    workout_category: "1",
-    length_in_minutes: "60",
-    time_of_day: "1",
-    intensity: 1,
-    date: "2024-04-18",
-    details: "",
-  },
-  {
-    entry_type: "2",
-    workout_type: "2",
-    workout_category: "2",
-    length_in_minutes: "60",
-    time_of_day: "2",
-    intensity: 2,
-    date: "2024-04-17",
-    details: "",
-  },
-  {
-    entry_type: "3",
-    workout_type: "3",
-    workout_category: "3",
-    length_in_minutes: "60",
-    time_of_day: "3",
-    intensity: 3,
-    date: "2024-04-16",
-    details: "",
-  },
-];
-
 const NewJournalEntryPage = () => {
   //TODO: new date = today (from other branch)
   const [journalData, setJournalData] = useState({
@@ -44,7 +11,7 @@ const NewJournalEntryPage = () => {
     workout_category: "1",
     length_in_minutes: "60",
     time_of_day: "",
-    intensity: null,
+    intensity: "",
     date: "2024-04-18",
     details: "",
   });
@@ -76,11 +43,12 @@ const NewJournalEntryPage = () => {
     fetchData();
   }, []);
 
+  // fetch existing entries by date when date is changed (and update existingEntries)
   useEffect(() => {
     const fetchExistingEntries = async () => {
       try {
         let newExistingEntries =
-          await trainingService.getUserJournalEntriesByDate(journalData.date); //existingEntriesMockup
+          await trainingService.getUserJournalEntriesByDate(journalData.date);
         const formattedExistingEntries = newExistingEntries.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
@@ -101,12 +69,14 @@ const NewJournalEntryPage = () => {
     console.log(journalData);
   }, [journalData]);
 
-  // check for conflicts when entry_type is changed
-
-  // check for conflicts when date or entry_type is changed
-
-
   useEffect(() => {
+    console.log("Errors:", errors);
+  }, [errors]);
+
+  // check for conflicts when entry type is changed or existing entries are updated (i.e. when date is changed)
+  useEffect(() => {
+    setErrors({});
+    setErrorMessage("");
     setSubmitButtonIsDisabled(false);
     setConflict({ value: false, message: "" });
     checkForConflicts(
@@ -114,10 +84,16 @@ const NewJournalEntryPage = () => {
       journalData.date,
       existingEntries
     );
-    setErrors({});
   }, [existingEntries, journalData.entry_type]);
 
-  // if workout type is changed to 1 (akatemia) or 2 (seura), set workout category to 1 (omalaji)
+  // clear error message when errors are fixed
+  useEffect(() => {
+    if (Object.keys(errors).length === 0) {
+      setErrorMessage("");
+    }
+  }, [errors]);
+
+  // if workout_type is changed to 1 (akatemia) or 2 (seura), set workout_category to 1 (omalaji)
   useEffect(() => {
     if (journalData.workout_type === "1" || journalData.workout_type === "2") {
       setJournalData((prevState) => ({
@@ -132,14 +108,13 @@ const NewJournalEntryPage = () => {
   function formatDateString(isoDateString) {
     const date = new Date(isoDateString);
 
-    // Extract year, month, and day
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed, add 1
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
 
-    // Combine into desired format
     return `${year}-${month}-${day}`;
   }
+
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
@@ -147,44 +122,67 @@ const NewJournalEntryPage = () => {
       ...journalData,
       [name]: value,
     }));
+
+    if (value.trim() !== "") {
+      setErrors((prevErrors) => {
+        const { [name]: removedError, ...restErrors } = prevErrors;
+        return restErrors;
+      });
+    }
   };
 
   const errorCheckJournalEntry = () => {
     //TODO: regex here
-    if (
-      journalData.entry_type != 1 ||
-      journalData.entry_type != 2 ||
-      journalData.entry_type != 3
-    ) {
-      setErrors({ ...errors, entry_type: true });
-    }
-    if (journalData.date === "") {
-      setErrors({ ...errors, date: true });
-    }
-    if (journalData.entry_type === "1") {
-      if (journalData.workout_type === "") {
-        setErrors({ ...errors, workout_type: true });
-        return false;
-      }
-      if (journalData.workout_category === "") {
-        setErrors({ ...errors, workout_category: true });
-      }
-      if (journalData.length === "") {
-        setErrors({ ...errors, length_in_minutes: true });
-      }
+    let hasMissingInputs = false;
+    setErrors({});
 
-      if (journalData.time_of_day === "") {
-        setErrors({ ...errors, time_of_day: true });
+    const checkIfEmpty = (fieldValue, fieldName) => {
+      if (fieldValue === "") {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [fieldName]: true,
+        }));
+        return true;
       }
-      if (journalData.intensity === "") {
-        setErrors({ ...errors, intensity: true });
-      }
+      return false;
+    };
+
+    // if entry type is not 1, 2 or 3
+    if (![1, 2, 3].includes(Number(journalData.entry_type))) {
+      setErrors((prevErrors) => ({ ...prevErrors, entry_type: true }));
+      hasMissingInputs = true;
+    }
+
+    hasMissingInputs |= checkIfEmpty(journalData.date, "date"); // Using bitwise OR to update hasMissingInputs
+
+    if (journalData.entry_type === "1") {
+      hasMissingInputs |= checkIfEmpty(
+        journalData.workout_type,
+        "workout_type"
+      );
+      hasMissingInputs |= checkIfEmpty(
+        journalData.workout_category,
+        "workout_category"
+      );
+      hasMissingInputs |= checkIfEmpty(
+        journalData.length_in_minutes,
+        "length_in_minutes"
+      );
+      hasMissingInputs |= checkIfEmpty(journalData.time_of_day, "time_of_day");
+      hasMissingInputs |= checkIfEmpty(journalData.intensity, "intensity");
+    }
+
+    if (hasMissingInputs) {
+      setErrorMessage("Täytä kaikki kentät.");
+      return false;
     }
 
     return true;
   };
 
+  // check for conflicts between new and existing entries
   const checkForConflicts = (entry_type, inputDate, existingEntries) => {
+    console.log("Checking for conflicts with:", entry_type, inputDate, existingEntries);
     // Check if there are any existing entries on the same date
     const conflictEntry = existingEntries.find(
       (entry) => entry.date === inputDate
@@ -197,7 +195,10 @@ const NewJournalEntryPage = () => {
 
     if (conflictEntry.entry_type_id == 1 && entry_type == 1) {
       setSubmitButtonIsDisabled(false);
-      console.log("No conflicts as both entry types are 1, using:", existingEntries);
+      console.log(
+        "No conflicts as both entry types are 1, using:",
+        existingEntries
+      );
     }
     //if entry type is the same as the existing entry but not an exercise, disable submit button
 
@@ -208,6 +209,7 @@ const NewJournalEntryPage = () => {
     const conflictMessages = {
       1: {
         // Existing exercise entries
+        // 1: this option does not exist as 1:1 conflict is handled above
         2: "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen lepopäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.", //new entry is rest day
         3: "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen sairauspäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.", //new entry is sick day
       },
@@ -316,10 +318,14 @@ const NewJournalEntryPage = () => {
 
   function getSubmitButtonText(entry_type) {
     switch (entry_type) {
-      case '1': return "Lisää harjoitus";
-      case '2': return "Merkitse lepopäiväksi";
-      case '3': return "Merkitse sairauspäiväksi";
-      default: return "Submit"; // Default case to handle unexpected values
+      case "1":
+        return "Lisää harjoitus";
+      case "2":
+        return "Merkitse lepopäiväksi";
+      case "3":
+        return "Merkitse sairauspäiväksi";
+      default:
+        return "Submit"; // Default case to handle unexpected values
     }
   }
 
@@ -363,7 +369,11 @@ const NewJournalEntryPage = () => {
             </div>
 
             {journalData.entry_type === "1" && (
-              <div className="journal-entry-input-container">
+              <div
+                className={`journal-entry-input-container ${
+                  errors.length_in_minutes ? "missing-input" : ""
+                }`}
+              >
                 <label htmlFor="length_in_minutes">
                   Kesto: {convertTime(journalData.length_in_minutes)}
                 </label>
@@ -400,7 +410,11 @@ const NewJournalEntryPage = () => {
             )}
 
             {journalData.entry_type === "1" && (
-              <div className="journal-entry-input-container">
+              <div
+                className={`journal-entry-input-container ${
+                  errors.workout_category ? "missing-input" : ""
+                }`}
+              >
                 <label htmlFor="workout-category">Harjoituskategoria</label>
                 <select
                   id="workoutCategory"
@@ -419,7 +433,11 @@ const NewJournalEntryPage = () => {
             )}
 
             {journalData.entry_type === "1" && (
-              <div className="journal-entry-input-container">
+              <div
+                className={`journal-entry-input-container ${
+                  errors.time_of_day ? "missing-input" : ""
+                }`}
+              >
                 <label>Ajankohta</label>
                 <div className="radio-option-horizontal-container">
                   {options.time_of_day.map((time) =>
@@ -434,7 +452,11 @@ const NewJournalEntryPage = () => {
             )}
 
             {journalData.entry_type === "1" && (
-              <div className="journal-entry-input-container">
+              <div
+                className={`journal-entry-input-container ${
+                  errors.intensity ? "missing-input" : ""
+                }`}
+              >
                 <label>Rankkuus</label>
                 <div className="radio-option-horizontal-container">
                   {[1, 2, 3].map((intensity) =>
