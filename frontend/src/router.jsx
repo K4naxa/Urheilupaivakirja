@@ -21,6 +21,7 @@ import GroupsPage from "./pages/teacher/manage/student-groups/groupsPage";
 import ManageStudentsLayout from "./layouts/manageStudents-layout/manageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/activeStudents/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/archivedStudents/ManageArchivedStudentsPage";
+import CampusPage from "./pages/teacher/manage/campuses/campusPage";
 import NoPage from "./pages/NoPage";
 
 export const router = createBrowserRouter([
@@ -68,6 +69,7 @@ export const router = createBrowserRouter([
                   { path: "lajit-v2", element: <SportsPageV2 /> },
                   { path: "vierailijat", element: <Visitors /> },
                   { path: "ryhmat", element: <GroupsPage /> },
+                  { path: "toimipaikat", element: <CampusPage /> },
                   {
                     path: "opiskelijat",
                     element: <ManageStudentsLayout />,

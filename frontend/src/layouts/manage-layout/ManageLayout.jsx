@@ -15,6 +15,9 @@ const ManageLayout = () => {
           <div className="menu-button" id="ryhmatButton">
             <NavLink to="/opettaja/hallitse/ryhmat">Ryhmät</NavLink>
           </div>
+          <div className="menu-button" id="toimipaikatButton">
+            <NavLink to="/opettaja/hallitse/toimipaikat">Toimipaikat</NavLink>
+          </div>
           <div className="menu-button" id="vierailijatButton">
             <NavLink to="/opettaja/hallitse/vierailijat">Vierailijat</NavLink>
           </div>
