@@ -20,10 +20,14 @@ const HeatMap_Year = () => {
       // clean up the data for the heatmap
       const entries = data.map((entry) => {
         const date = dayjs(entry.date).valueOf();
-        const value = entry.length_in_minutes;
+        let value = entry.length_in_minutes;
+
+        if (entry.entry_type_id === 3) value = -99;
+
         return {
           date: date,
           value: value,
+          entry_type: entry.entry_type_id,
         };
       });
       setData(data);
@@ -34,6 +38,7 @@ const HeatMap_Year = () => {
   const cal = new CalHeatmap();
 
   useEffect(() => {
+    document.getElementById("cal-heatmap").innerHTML = "";
     cal.paint(
       {
         itemSelector: "#cal-heatmap",
@@ -58,11 +63,12 @@ const HeatMap_Year = () => {
         },
         scale: {
           color: {
-            scheme: "greens",
+            range: ["red", "gray", "lightgreen", "green", "darkgreen"],
             type: "linear",
-            domain: [0, 180],
+            domain: [-99, 0, 60, 120, 180],
           },
         },
+
         domain: {
           type: "month",
           gutter: 10,
@@ -74,6 +80,7 @@ const HeatMap_Year = () => {
         },
         subDomain: {
           type: "day",
+          label: "DD",
           width: 17,
           height: 17,
           gutter: 4,
@@ -88,18 +95,19 @@ const HeatMap_Year = () => {
               const hours = Math.floor(value / 60);
               const minutes = value % 60;
 
-              return value
-                ? "<div>" +
-                    dayjs(date).format("DD/MM/YYYY") +
-                    "</div>" +
-                    "<div>" +
-                    +hours +
-                    "h : " +
-                    minutes +
-                    "m " +
-                    "Treenattu" +
-                    "</div>"
-                : null;
+              return (
+                "<div>" +
+                dayjs(date).format("DD/MM/YYYY") +
+                "</div>" +
+                value +
+                "<div>" +
+                +hours +
+                "h : " +
+                minutes +
+                "m " +
+                "Treenattu" +
+                "</div>"
+              );
             },
           },
         ],
@@ -128,7 +136,30 @@ const HeatMap_Year = () => {
   return (
     <div className="heatmap-container">
       <h1>Heatmap</h1>
+      <div className="controls">
+        <a
+          className="button button--sm button--secondary margin-bot--sm"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            cal.previous();
+          }}
+        >
+          ← Previous
+        </a>
+        <a
+          className="button button--sm button--secondary margin-left--xs margin-bot--sm"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            cal.next();
+          }}
+        >
+          Next →
+        </a>
+      </div>
       <div id="cal-heatmap"></div>
+
       <div
         id="map-legend"
         style={{ display: "inline-block", margin: "0 8px" }}
