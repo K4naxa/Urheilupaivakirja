@@ -6,19 +6,20 @@ import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
-const HeatMap_Year = ({ data }) => {
+const HeatMap_Month = ({ data }) => {
+  const cal = new CalHeatmap();
+
   useEffect(() => {
-    const cal = new CalHeatmap();
-    document.getElementById("cal-heatmap").innerHTML = "";
+    document.getElementById("cal-heatmapMonth").innerHTML = "";
 
     cal.paint(
       {
-        itemSelector: "#cal-heatmap",
+        itemSelector: "#cal-heatmapMonth",
         theme: "dark",
 
         date: {
-          start: new Date(2024, 1, 1),
           max: new Date(2024, 12, 31),
+          highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -29,7 +30,7 @@ const HeatMap_Year = ({ data }) => {
               ),
           },
         },
-        range: 12,
+        range: 1,
         data: {
           source: data,
           x: "date",
@@ -38,7 +39,7 @@ const HeatMap_Year = ({ data }) => {
         },
         scale: {
           color: {
-            range: ["red", "gray", "lightgreen", "green", "darkgreen"],
+            range: ["#CCA700", "gray", "lightgreen", "green", "darkgreen"],
             type: "linear",
             domain: [-99, 0, 60, 120, 180],
           },
@@ -46,18 +47,18 @@ const HeatMap_Year = ({ data }) => {
 
         domain: {
           type: "month",
-          gutter: 10,
           label: {
             position: "top",
             align: "center",
             width: 50,
+            height: 20,
           },
         },
         subDomain: {
           type: "day",
-          width: 17,
-          height: 17,
-          gutter: 4,
+          width: 30,
+          height: 30,
+          gutter: 5,
           radius: 2,
         },
       },
@@ -104,8 +105,8 @@ const HeatMap_Year = ({ data }) => {
           {
             position: "left",
             key: "left",
+            height: 35,
             text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
-            padding: [0, 5, 0, 0],
           },
         ],
       ]
@@ -113,7 +114,7 @@ const HeatMap_Year = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="heatmapMonth-container">
+    <div className="heatmap-container">
       <h1>Heatmap</h1>
       <div className="controls">
         <a
@@ -133,9 +134,9 @@ const HeatMap_Year = ({ data }) => {
           Next
         </a>
       </div>
-      <div id="cal-heatmap"></div>
+      <div id="cal-heatmapMonth"></div>
     </div>
   );
 };
 
-export default HeatMap_Year;
+export default HeatMap_Month;
