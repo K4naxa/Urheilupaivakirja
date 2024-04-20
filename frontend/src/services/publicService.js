@@ -50,4 +50,46 @@ const deleteGroup = async (id) => {
   return response.data;
 };
 
-export default { getOptions, getGroups, editGroup, deleteGroup, addGroup };
+// Campus Management -----------------------------------------------------------------
+
+// get all campuses
+const getCampuses = async () => {
+  const response = await axios.get("/public/campuses");
+  return response.data;
+};
+// add a new campus
+const addCampus = async (newCampus) => {
+  const campus = { name: newCampus };
+  const response = await axios.post("/public/campuses", campus, makeHeader());
+  return response.data;
+};
+
+// edit a campus
+const editCampus = async (campus) => {
+  const response = await axios.put(
+    `/public/campuses/${campus.id}`,
+    campus,
+    makeHeader()
+  );
+  return response.data;
+};
+
+// delete a campus
+const deleteCampus = async (id) => {
+  const response = await axios.delete(`/public/campuses/${id}`, makeHeader());
+  return response.data;
+};
+
+// ................................................................................
+
+export default {
+  getOptions,
+  getGroups,
+  editGroup,
+  deleteGroup,
+  addGroup,
+  getCampuses,
+  addCampus,
+  editCampus,
+  deleteCampus,
+};

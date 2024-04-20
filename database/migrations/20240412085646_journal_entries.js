@@ -6,8 +6,7 @@ exports.up = function (knex) {
     table.integer("workout_type_id").unsigned();
     table.integer("workout_category_id").unsigned();
     table.integer("time_of_day_id").unsigned();
-    table.integer("length_hours");
-    table.integer("length_minutes");
+    table.integer("length_in_minutes");
     table.integer("intensity");
     table.text("details");
     table.date("date").notNullable();

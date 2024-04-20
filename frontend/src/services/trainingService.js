@@ -18,19 +18,35 @@ const makeHeader = () => {
 
 // ................................................................................
 
+// get journal entries by date
+const getUserJournalEntriesByDate = async (date) => {
+  const response = await axios.get(`/journal_entry/date/${date}`, makeHeader());
+  return response.data;
+}
+
+// ................................................................................
+
 // post new journal entry
 
-const postJournalEntry = async (newJournalEntry) => {
+const postJournalEntry = async (
+  entry_type_id,
+  workout_type_id,
+  workout_category_id,
+  time_of_day_id,
+  length_in_minutes,
+  intensity,
+  details,
+  date,
+) => {
   let journalEntry = {
-    entry_type_id: newJournalEntry.entry_type,
-    workout_type_id: newJournalEntry.workout_type,
-    workout_category_id: newJournalEntry.workout_category,
-    time_of_day_id: newJournalEntry.time_of_day,
-    length_hours: newJournalEntry.length_hours,
-    length_minutes: newJournalEntry.length_minutes,
-    intensity: newJournalEntry.intensity,
-    details: newJournalEntry.details,
-    date: newJournalEntry.date,
+    entry_type_id,
+    workout_type_id,
+    workout_category_id,
+    time_of_day_id,
+    length_in_minutes,
+    intensity,
+    details,
+    date,
   };
 
   const response = await axios.post(
@@ -91,6 +107,7 @@ const deleteSport = async (id) => {
 };
 
 export default {
+  getUserJournalEntriesByDate,
   postJournalEntry,
   getJournalEntry,
   getJournalEntryOptions,
@@ -99,6 +116,4 @@ export default {
   addSport,
   editSport,
   deleteSport,
-  /*setToken,
-  token,*/
 };
