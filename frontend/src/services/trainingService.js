@@ -2,7 +2,7 @@ import axios from "axios";
 
 // get token from localStorage
 const getToken = () => {
-  const userJson = localStorage.getItem('user');
+  const userJson = localStorage.getItem("user");
   if (userJson) {
     const user = JSON.parse(userJson);
     return user.token;
@@ -12,19 +12,22 @@ const getToken = () => {
 
 // make authorization header
 const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${getToken()}`} };
+  let header = { headers: { Authorization: `bearer ${getToken()}` } };
   return header;
 };
 
-// ................................................................................
+// Journal Entries --------------------------------------------------------------------
+
+const getJournalEntries = async () => {
+  const response = await axios.get("/journal", makeHeader());
+  return response.data;
+};
 
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
   const response = await axios.get(`/journal_entry/date/${date}`, makeHeader());
   return response.data;
-}
-
-// ................................................................................
+};
 
 // post new journal entry
 
@@ -36,7 +39,7 @@ const postJournalEntry = async (
   length_in_minutes,
   intensity,
   details,
-  date,
+  date
 ) => {
   let journalEntry = {
     entry_type_id,
@@ -49,7 +52,11 @@ const postJournalEntry = async (
     date,
   };
 
-  const response = await axios.post("/journal_entry", journalEntry, makeHeader());
+  const response = await axios.post(
+    "/journal_entry",
+    journalEntry,
+    makeHeader()
+  );
   return response.data;
 };
 
@@ -105,4 +112,5 @@ export default {
   addSport,
   editSport,
   deleteSport,
+  getJournalEntries,
 };

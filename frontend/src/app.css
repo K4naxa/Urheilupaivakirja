@@ -10,6 +10,9 @@
   gap: 5rem;
 }
 
-#top-nav a.active, #top-nav a:hover, #manage-nav a.active, #manage-nav a:hover{
+#top-nav a.active,
+#top-nav a:hover,
+#manage-nav a.active,
+#manage-nav a:hover {
   text-decoration: underline;
-} 
+}
