@@ -119,6 +119,18 @@ exports.seed = async function (knex) {
     {
       user_id: 3,
       entry_type_id: 1,
+      workout_type_id: 3,
+      workout_category_id: 1,
+      length_in_minutes: 60,
+      time_of_day_id: 2,
+      intensity: 3,
+      details: "Treeni 1",
+      date: new Date(2024, 1, 7, 0, 0),
+      created_at: new Date(2024, 1, 7, 0, 0),
+    },
+    {
+      user_id: 3,
+      entry_type_id: 1,
       workout_type_id: 1,
       workout_category_id: 2,
       length_in_minutes: 30,

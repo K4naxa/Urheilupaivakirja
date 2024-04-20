@@ -5,10 +5,8 @@ import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
-import LegendLite from "cal-heatmap/plugins/LegendLite";
 
 import trainingService from "../services/trainingService";
-import { useAuth } from "../hooks/useAuth";
 
 const HeatMap_Year = () => {
   const [data, setData] = useState([]);
@@ -19,10 +17,10 @@ const HeatMap_Year = () => {
       console.log(data);
       // clean up the data for the heatmap
       const entries = data.map((entry) => {
-        const date = dayjs(entry.date).valueOf();
+        const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
         let value = entry.length_in_minutes;
 
-        if (entry.entry_type_id === 3) value = -99;
+        if (entry.entry_type_id === 3) value = -99; // color value for sick day
 
         return {
           date: date,
@@ -43,7 +41,10 @@ const HeatMap_Year = () => {
       {
         itemSelector: "#cal-heatmap",
         theme: "dark",
+
         date: {
+          start: new Date(2024, 1, 1),
+          max: new Date(2024, 12, 31),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -80,7 +81,6 @@ const HeatMap_Year = () => {
         },
         subDomain: {
           type: "day",
-          label: "DD",
           width: 17,
           height: 17,
           gutter: 4,
@@ -91,23 +91,36 @@ const HeatMap_Year = () => {
         [
           Tooltip,
           {
-            text: function (date, value, data) {
+            text: function (date, value) {
+              if (value === null || undefined) return;
+              if (value === -99)
+                return (
+                  "<div>" +
+                  dayjs(date).format("DD/MM/YYYY") +
+                  "</div>" +
+                  "Sairaana"
+                );
+              if (value === 0)
+                return (
+                  "<div>" + dayjs(date).format("DD/MM/YYYY") + "</div>" + "Lepo"
+                );
+
               const hours = Math.floor(value / 60);
               const minutes = value % 60;
 
-              return (
-                "<div>" +
-                dayjs(date).format("DD/MM/YYYY") +
-                "</div>" +
-                value +
-                "<div>" +
-                +hours +
-                "h : " +
-                minutes +
-                "m " +
-                "Treenattu" +
-                "</div>"
-              );
+              if (value)
+                return (
+                  "<div>" +
+                  dayjs(date).format("DD/MM/YYYY") +
+                  "</div>" +
+                  "<div>" +
+                  +hours +
+                  "h : " +
+                  minutes +
+                  "m " +
+                  "Treenattu" +
+                  "</div>"
+                );
             },
           },
         ],
@@ -121,14 +134,6 @@ const HeatMap_Year = () => {
             padding: [0, 5, 0, 0],
           },
         ],
-        [
-          LegendLite,
-          {
-            itemSelector: "#map-legend",
-            includeBlank: false,
-            legendCellSize: 20,
-          },
-        ],
       ]
     );
   }, [data]);
@@ -138,32 +143,23 @@ const HeatMap_Year = () => {
       <h1>Heatmap</h1>
       <div className="controls">
         <a
-          className="button button--sm button--secondary margin-bot--sm"
-          href="#"
           onClick={(e) => {
             e.preventDefault();
             cal.previous();
           }}
         >
-          ← Previous
+          Previous
         </a>
         <a
-          className="button button--sm button--secondary margin-left--xs margin-bot--sm"
-          href="#"
           onClick={(e) => {
             e.preventDefault();
             cal.next();
           }}
         >
-          Next →
+          Next
         </a>
       </div>
       <div id="cal-heatmap"></div>
-
-      <div
-        id="map-legend"
-        style={{ display: "inline-block", margin: "0 8px" }}
-      ></div>
     </div>
   );
 };
