@@ -8,7 +8,6 @@ const knex = require("knex")(options);
 
 // Post a new journal entry
 router.post("/", async (req, res, next) => {
-  console.log(req.body);
   const entry = req.body;
   entry.user_id = getUserId(req);
   entry.created_at = new Date();
@@ -39,7 +38,7 @@ router.post("/", async (req, res, next) => {
               .del();
           }
         } else {
-          // for new entries that are rest or sick days, always delete existing entries
+          // for rest or sick days, delete all existing entries
           await trx("journal_entries")
             .where({
               user_id: entry.user_id,
@@ -49,13 +48,12 @@ router.post("/", async (req, res, next) => {
         }
       }
 
-      // lastly, insert new entry
+      // insert entry after handling possible conflicts
       const rows = await trx("journal_entries").insert(entry);
       return rows;
     });
 
     res.json(result);
-    console.log(result);
   } catch (err) {
     console.log("Transaction failed", err);
     res.status(500).json({
@@ -96,14 +94,12 @@ router.get("/options", async (req, res, next) => {
 
 router.get("/date/:date", async (req, res, next) => {
   const date = req.params.date;
-  console.log(date);
   const user_id = getUserId(req);
 
   try {
     const rows = await knex("journal_entries")
       .select("*")
       .where({ user_id, date });
-    console.log(rows);
     res.json(rows);
   } catch (err) {
     console.log("SELECT * FROM `journal_entries` failed", err);
@@ -114,26 +110,93 @@ router.get("/date/:date", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   const id = req.params.id;
   try {
-    const data = await knex("journal_entries").select([
-      "id as entry_id",
-      "entry_type_id as entry_type",
-      "workout_type_id as workout_type",
-      "workout_category_id as workout_category",
-      "length_hours",
-      "length_minutes",
-      "time_of_day_id as time_of_day",
-      "intensity",
-      "date",
-      "details"
-    ])
-    .where("id", id)
-    .first();
+    const data = await knex("journal_entries")
+      .select([
+        "id as entry_id",
+        "entry_type_id as entry_type",
+        "workout_type_id as workout_type",
+        "workout_category_id as workout_category",
+        "length_in_minutes",
+        "time_of_day_id as time_of_day",
+        "intensity",
+        "date",
+        "details",
+      ])
+      .where("id", id)
+      .first();
     res.json(data);
   } catch (err) {
     console.log("GET /journal_entry/:id failed", err);
     res
       .status(500)
       .json({ error: "An error occurred while fetching a journal entry." });
+  }
+});
+
+// Update a journal entry
+router.put("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const entry = req.body;
+  entry.updated_at = new Date();
+
+  try {
+    await knex.transaction(async (trx) => {
+      // Check if the entry exists
+      const existingEntry = await trx("journal_entries")
+        .where("id", id)
+        .first();
+
+      if (!existingEntry) {
+        throw new Error("Entry not found.");
+      }
+
+      // check for conflicts (entries on the same day) except for the entry being updated
+      const conflicts = await trx("journal_entries")
+        .where({
+          user_id: entry.user_id || existingEntry.user_id,
+          date: entry.date || existingEntry.date,
+        })
+        .andWhereNot("id", id);
+
+      if (conflicts.length > 0) {
+        if (entry.entry_type_id == 1) {
+          const allTypeOne = conflicts.every(
+            (conflict) => conflict.entry_type_id == 1
+          );
+
+          if (!allTypeOne) {
+            // if not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
+            await trx("journal_entries")
+              .where({
+                user_id: entry.user_id || existingEntry.user_id,
+                date: entry.date || existingEntry.date,
+              })
+              .andWhereNot("id", id)
+              .del();
+          }
+        } else {
+          // for rest or sick days, delete all existing conflicting entries
+          await trx("journal_entries")
+            .where({
+              user_id: entry.user_id || existingEntry.user_id,
+              date: entry.date || existingEntry.date,
+            })
+            .andWhereNot("id", id)
+            .del();
+        }
+      }
+
+      // update entry after handling possible conflicts
+      const rows = await trx("journal_entries").where("id", id).update(entry);
+      return rows;
+    });
+
+    res.json({ message: "Entry updated successfully" });
+  } catch (err) {
+    console.log("PUT /journal_entry/:id failed", err);
+    res.status(500).json({
+      error: "An error occurred while updating a journal entry.",
+    });
   }
 });
 

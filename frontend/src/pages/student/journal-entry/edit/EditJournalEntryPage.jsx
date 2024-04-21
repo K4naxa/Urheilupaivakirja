@@ -17,7 +17,7 @@ const EditJournalEntryPage = () => {
     details: "",
   });
 
-  let { entry_id } = useParams();
+  const { entry_id } = useParams();
 
   useEffect(() => {
     const fetchJournalEntry = async () => {
