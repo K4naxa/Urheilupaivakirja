@@ -200,4 +200,19 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
+// Delete a journal entry
+router.delete("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  //TODO: Check if the user is authorized to delete the entry
+  try {
+    const rows = await knex("journal_entries").where("id", id).del();
+    res.json({ message: "Entry deleted successfully" });
+  } catch (err) {
+    console.log("DELETE /journal_entry/:id failed", err);
+    res.status(500).json({
+      error: "An error occurred while deleting a journal entry.",
+    });
+  }
+});
+
 module.exports = router;
