@@ -2,7 +2,7 @@ import axios from "axios";
 
 // get token from localStorage
 const getToken = () => {
-  const userJson = localStorage.getItem('user');
+  const userJson = localStorage.getItem("user");
   if (userJson) {
     const user = JSON.parse(userJson);
     return user.token;
@@ -12,17 +12,28 @@ const getToken = () => {
 
 // make authorization header
 const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${getToken()}`} };
+  let header = { headers: { Authorization: `bearer ${getToken()}` } };
   return header;
 };
 
 // ................................................................................
 
+const getAllUserJournalEntries = async () => {
+  const response = await axios.get("/journal/user", makeHeader());
+  return response.data;
+}
+
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
   const response = await axios.get(`/journal_entry/date/${date}`, makeHeader());
   return response.data;
-}
+};
+
+// get journal entry by id
+const getJournalEntry = async (id) => {
+  const response = await axios.get(`/journal_entry/${id}`, makeHeader());
+  return response.data;
+};
 
 // ................................................................................
 
@@ -36,7 +47,7 @@ const postJournalEntry = async (
   length_in_minutes,
   intensity,
   details,
-  date,
+  date
 ) => {
   let journalEntry = {
     entry_type_id,
@@ -49,13 +60,39 @@ const postJournalEntry = async (
     date,
   };
 
-  const response = await axios.post("/journal_entry", journalEntry, makeHeader());
+  const response = await axios.post(
+    "/journal_entry",
+    journalEntry,
+    makeHeader()
+  );
   return response.data;
 };
 
-// get journal entry options (journal_entry_types, workout_types, workout_categories)
+// get journal entry options (journal_entry_types, workout_types, workout_categories) for creating a new journal entry
 const getJournalEntryOptions = async () => {
   const response = await axios.get("/journal_entry/options", makeHeader());
+  return response.data;
+};
+
+// edit existing journal entry
+const editJournalEntry = async (journalEntry) => {
+  let id = journalEntry.entry_id;
+  let updatedJournalEntry = {
+    id: journalEntry.entry_id,
+    entry_type_id: journalEntry.entry_type,
+    workout_type_id: journalEntry.workout_type,
+    workout_category_id: journalEntry.workout_category,
+    time_of_day_id: journalEntry.time_of_day,
+    length_in_minutes: journalEntry.length_in_minutes,
+    intensity: journalEntry.intensity,
+    details: journalEntry.details,
+    date: journalEntry.date,
+  };
+  const response = await axios.put(
+    `/journal_entry/${id}`,
+    updatedJournalEntry,
+    makeHeader()
+  );
   return response.data;
 };
 
@@ -97,8 +134,11 @@ const deleteSport = async (id) => {
 };
 
 export default {
+  getAllUserJournalEntries,
   getUserJournalEntriesByDate,
   postJournalEntry,
+  editJournalEntry,
+  getJournalEntry,
   getJournalEntryOptions,
   getSports,
   getSport,

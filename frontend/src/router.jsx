@@ -6,6 +6,7 @@ import TeacherRoute from "./components/TeacherRoute";
 import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
 
 import NewJournalEntryPage from "./pages/student/new-journal-entry/NewJournalEntryPage";
+import EditJournalEntryPage from "./pages/student/edit-journal-entry/EditJournalEntryPage";
 import StudentLayout from "./layouts/student-layout/StudentLayout";
 import StudentHome from "./pages/student/student-home/StudentHome";
 import TeacherLayout from "./layouts/teacher-layout/TeacherLayout";
@@ -23,6 +24,7 @@ import ManageActiveStudentsPage from "./pages/teacher/manage/students/activeStud
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/archivedStudents/ManageArchivedStudentsPage";
 import CampusPage from "./pages/teacher/manage/campuses/campusPage";
 import NoPage from "./pages/NoPage";
+import RecentJournalEntries from "./pages/student/recent-journal-entries/RecentJournalEntries";
 
 export const router = createBrowserRouter([
   {
@@ -38,13 +40,25 @@ export const router = createBrowserRouter([
                 <StudentLayout />
               </StudentRoute>
             ),
-            children: [{ index: true, element: <StudentHome /> }],
+            children: [
+              { index: true, element: <StudentHome /> },
+              { path: "merkinnat", element: <RecentJournalEntries /> },
+            ],
           },
+
           {
             path: "merkinnat/uusi",
             element: (
               <StudentRoute>
                 <NewJournalEntryPage />
+              </StudentRoute>
+            ),
+          },
+          {
+            path: "merkinnat/muokkaa/:entry_id",
+            element: (
+              <StudentRoute>
+                <EditJournalEntryPage />
               </StudentRoute>
             ),
           },
