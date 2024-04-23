@@ -12,11 +12,11 @@ import "./app.css";
 //import { MainContextProvider } from "./context/mainContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  //<React.StrictMode>
+  <React.StrictMode>
     <RouterProvider router={router}>
       <AuthProvider>
         <App />
       </AuthProvider>
     </RouterProvider>
-  //</React.StrictMode>
+  </React.StrictMode>
 );

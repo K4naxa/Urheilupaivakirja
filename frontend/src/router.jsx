@@ -5,26 +5,32 @@ import TeacherRoute from "./components/TeacherRoute";
 
 import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
 
-import NewJournalEntryPage from "./pages/student/new-journal-entry/NewJournalEntryPage";
-import EditJournalEntryPage from "./pages/student/edit-journal-entry/EditJournalEntryPage";
+//student
 import StudentLayout from "./layouts/student-layout/StudentLayout";
 import StudentHome from "./pages/student/student-home/StudentHome";
+import NewJournalEntryPage from "./pages/student/journal-entry/new/NewJournalEntryPage";
+import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
+import RecentJournalEntries from "./pages/student/recent-journal-entries/RecentJournalEntries";
+
+//teacher
 import TeacherLayout from "./layouts/teacher-layout/TeacherLayout";
 import TeacherHome from "./pages/teacher/teacher-home/TeacherHome";
-import LoginPage from "./pages/login/LoginPage";
-import RegistrationPage from "./pages/registration/RegistrationPage";
 import Verify from "./pages/teacher/verify/Verify";
-import SportsPage from "./pages/teacher/manage/sports/SportsPage";
+
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
+import SportsPage from "./pages/teacher/manage/sports/SportsPage";
 import Visitors from "./pages/teacher/manage/visitors/VisitorsPage";
 import SportsPageV2 from "./pages/teacher/manage/sports-v2/SportsPage-v2";
 import GroupsPage from "./pages/teacher/manage/student-groups/groupsPage";
+import CampusPage from "./pages/teacher/manage/campuses/campusPage";
+
 import ManageStudentsLayout from "./layouts/manageStudents-layout/manageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/activeStudents/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/archivedStudents/ManageArchivedStudentsPage";
-import CampusPage from "./pages/teacher/manage/campuses/campusPage";
+//misc
 import NoPage from "./pages/NoPage";
-import RecentJournalEntries from "./pages/student/recent-journal-entries/RecentJournalEntries";
+import LoginPage from "./pages/login/LoginPage";
+import RegistrationPage from "./pages/registration/RegistrationPage";
 
 export const router = createBrowserRouter([
   {
@@ -43,24 +49,12 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <StudentHome /> },
               { path: "merkinnat", element: <RecentJournalEntries /> },
+              { path: "merkinnat/uusi", element: <NewJournalEntryPage /> },
+              {
+                path: "merkinnat/muokkaa/:entry_id",
+                element: <EditJournalEntryPage />,
+              },
             ],
-          },
-
-          {
-            path: "merkinnat/uusi",
-            element: (
-              <StudentRoute>
-                <NewJournalEntryPage />
-              </StudentRoute>
-            ),
-          },
-          {
-            path: "merkinnat/muokkaa/:entry_id",
-            element: (
-              <StudentRoute>
-                <EditJournalEntryPage />
-              </StudentRoute>
-            ),
           },
 
           { path: "/kirjaudu", element: <LoginPage /> },
