@@ -4,7 +4,8 @@ import publicService from "../../../../services/publicService";
 import { useAuth } from "../../../../hooks/useAuth";
 
 // renders a container for a campus while checking if it is being edited
-const createCampusContainer = (campus, setCampuses) => {
+const CreateCampusContainer = ({ campus, setCampuses }) => {
+  const [newName, setNewName] = useState(campus.name);
   // checks if campus has edit value and removes it if it does, otherwise creates a edit value
   const handleEdit = () => {
     setCampuses((prevCampuses) =>
@@ -42,15 +43,15 @@ const createCampusContainer = (campus, setCampuses) => {
 
   if (campus.isEditing) {
     return (
-      <div key={campus.id} className="campus-cell">
+      <div className="campus-cell">
         <div className="campus-name">
           <input
             autoFocus
             type="text"
             className="campus-edit-input"
             id="campus-edit-input"
-            defaultValue={campus.name}
-            onChange={(e) => (campus.name = e.target.value)}
+            defaultValue={newName}
+            onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSave(e.target.value);
@@ -59,20 +60,14 @@ const createCampusContainer = (campus, setCampuses) => {
           />
         </div>
         <div className="campus-buttons">
-          <button
-            onClick={() =>
-              handleSave(document.getElementById("campus-edit-input").value)
-            }
-          >
-            Save
-          </button>{" "}
+          <button onClick={() => handleSave(newName)}>Save</button>{" "}
           <button onClick={() => handleEdit()}>Cancel</button>
         </div>
       </div>
     );
   } else {
     return (
-      <div key={campus.id} className="campus-cell">
+      <div className="campus-cell">
         <div className="campus-name">{campus.name}</div>
         <div className="campus-student-count">{campus.student_count}</div>
         <div className="campus-buttons">
@@ -155,9 +150,13 @@ const CampusPage = () => {
               <div className="count">Opiskelijat</div>
               <div className="buttons">Toiminnot</div>
             </div>
-            {campuses.map((campus) =>
-              createCampusContainer(campus, setCampuses)
-            )}
+            {campuses.map((campus) => (
+              <CreateCampusContainer
+                campus={campus}
+                setCampuses={setCampuses}
+                key={campus.id}
+              />
+            ))}
           </div>
         </div>
       </div>
