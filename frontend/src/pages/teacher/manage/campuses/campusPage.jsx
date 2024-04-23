@@ -1,7 +1,6 @@
 import "./campusPage.css";
 import { useState, useEffect } from "react";
 import publicService from "../../../../services/publicService";
-import { useAuth } from "../../../../hooks/useAuth";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses }) => {
@@ -104,14 +103,12 @@ const handleInputError = (input, setError, campuses) => {
 };
 
 const CampusPage = () => {
-  const { user } = useAuth();
   const [campuses, setCampuses] = useState([]);
   const [newCampus, setNewCampus] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     publicService.getCampuses().then((data) => setCampuses(data));
-    console.log(campuses);
   }, []);
 
   return (
