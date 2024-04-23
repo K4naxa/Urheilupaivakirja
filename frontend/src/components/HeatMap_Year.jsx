@@ -7,8 +7,8 @@ import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Year = ({ data }) => {
+  const cal = new CalHeatmap();
   useEffect(() => {
-    const cal = new CalHeatmap();
     document.getElementById("cal-heatmap").innerHTML = "";
 
     cal.paint(
@@ -38,7 +38,7 @@ const HeatMap_Year = ({ data }) => {
         },
         scale: {
           color: {
-            range: ["red", "gray", "lightgreen", "green", "darkgreen"],
+            range: ["#CCA700", "gray", "lightgreen", "green", "darkgreen"],
             type: "linear",
             domain: [-99, 0, 60, 120, 180],
           },

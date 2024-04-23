@@ -3,6 +3,7 @@ import axios from "axios";
 // get token from localStorage
 const getToken = () => {
   const userJson = localStorage.getItem("user");
+
   if (userJson) {
     const user = JSON.parse(userJson);
     return user.token;
@@ -26,15 +27,13 @@ const getJournalEntries = async () => {
 const getAllUserJournalEntries = async () => {
   const response = await axios.get("/journal/user", makeHeader());
   return response.data;
-}
+};
 
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
   const response = await axios.get(`/journal_entry/date/${date}`, makeHeader());
   return response.data;
 };
-<<<<<<< HEAD
-=======
 
 // get journal entry by id
 const getJournalEntry = async (id) => {
@@ -43,7 +42,6 @@ const getJournalEntry = async (id) => {
 };
 
 // ................................................................................
->>>>>>> 7ae6aa4ae6855af602a5241a7f10e484941d18a2
 
 // post new journal entry
 

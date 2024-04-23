@@ -111,7 +111,7 @@ const HeatMap_Month = ({ data }) => {
         ],
       ]
     );
-  }, [data]);
+  }, []);
 
   return (
     <div className="heatmap-container">
