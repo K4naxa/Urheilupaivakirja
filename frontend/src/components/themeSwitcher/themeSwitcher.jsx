@@ -6,12 +6,12 @@ const ThemeSwitcher = () => {
   return (
     <div>
       <button
-        className={`bg-${theme === "light" ? "primary-light" : "primary-dark"}`}
+        className={`bg-primary-${theme} text-primary-${theme}`}
         onClick={toggleTheme}
       >
         Toggle theme
       </button>
-      <p>Current theme: {theme}</p>
+      <p className={`text-primary-${theme}`}>Current theme: {theme}</p>
     </div>
   );
 };

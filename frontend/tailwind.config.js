@@ -30,22 +30,25 @@ export default {
   },
   safelist: [
     {
-      pattern: /bg-primary-.*/,
+      pattern: /bg-primary-(dark|light)/,
     },
     {
-      pattern: /text-primary-.*/,
+      pattern: /bg-secondary-(dark|light)/,
     },
     {
-      pattern: /border-primary-.*/,
+      pattern: /text-primary-(dark|light)/,
     },
     {
-      pattern: /bg-secondary-.*/,
+      pattern: /text-secondary-(dark|light)/,
     },
     {
-      pattern: /text-secondary-.*/,
+      pattern: /text-link-(dark|light)/,
     },
     {
-      pattern: /border-secondary-.*/,
+      pattern: /border-primary-(dark|light)/,
+    },
+    {
+      pattern: /border-secondary-(dark|light)/,
     },
   ],
   plugins: [],

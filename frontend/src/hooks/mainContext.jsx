@@ -9,6 +9,10 @@ export const MainContextProvider = ({ children }) => {
     setTheme(localTheme);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = `var(--bg-primary-${theme})`;
+  }, [theme]);
+
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
     localStorage.setItem("theme", theme);

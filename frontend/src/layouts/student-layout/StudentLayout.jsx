@@ -9,15 +9,18 @@ const StudentLayout = () => {
   const { logout } = useAuth();
   const { theme } = useMainContext();
 
-  const linkClass = `text-primary-${theme}  hover:text-link-${theme} px-4`;
+  const linkClass = `text-primary-${theme} px-4 py-2`;
 
   return (
     <>
       <header
-        className={`bg-primary-${theme} flex justify-between items-center`}
+        className={`bg-primary-${theme} flex justify-between items-center `}
       >
         <nav id="top-nav" className="w-full ">
-          <Link to="/" className={linkClass}>
+          <Link
+            to="/"
+            className={`text-primary-${theme} px-4 py-2 hover:text-link-${theme}`}
+          >
             Etusivu
           </Link>
           <Link to="/tiedotteet/" className={linkClass}>

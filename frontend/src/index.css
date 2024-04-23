@@ -9,4 +9,7 @@
 }
 :root {
   font-family: roboto, sans-serif;
+  --bg-primary-dark: #070707;
+  --bg-primary-light: #f3f4f6;
+  /* Define other variables as needed */
 }
