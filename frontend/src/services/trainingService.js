@@ -23,11 +23,27 @@ const getJournalEntries = async () => {
   return response.data;
 };
 
+const getAllUserJournalEntries = async () => {
+  const response = await axios.get("/journal/user", makeHeader());
+  return response.data;
+}
+
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
   const response = await axios.get(`/journal_entry/date/${date}`, makeHeader());
   return response.data;
 };
+<<<<<<< HEAD
+=======
+
+// get journal entry by id
+const getJournalEntry = async (id) => {
+  const response = await axios.get(`/journal_entry/${id}`, makeHeader());
+  return response.data;
+};
+
+// ................................................................................
+>>>>>>> 7ae6aa4ae6855af602a5241a7f10e484941d18a2
 
 // post new journal entry
 
@@ -60,9 +76,31 @@ const postJournalEntry = async (
   return response.data;
 };
 
-// get journal entry options (journal_entry_types, workout_types, workout_categories)
+// get journal entry options (journal_entry_types, workout_types, workout_categories) for creating a new journal entry
 const getJournalEntryOptions = async () => {
   const response = await axios.get("/journal_entry/options", makeHeader());
+  return response.data;
+};
+
+// edit existing journal entry
+const editJournalEntry = async (journalEntry) => {
+  let id = journalEntry.entry_id;
+  let updatedJournalEntry = {
+    id: journalEntry.entry_id,
+    entry_type_id: journalEntry.entry_type,
+    workout_type_id: journalEntry.workout_type,
+    workout_category_id: journalEntry.workout_category,
+    time_of_day_id: journalEntry.time_of_day,
+    length_in_minutes: journalEntry.length_in_minutes,
+    intensity: journalEntry.intensity,
+    details: journalEntry.details,
+    date: journalEntry.date,
+  };
+  const response = await axios.put(
+    `/journal_entry/${id}`,
+    updatedJournalEntry,
+    makeHeader()
+  );
   return response.data;
 };
 
@@ -104,8 +142,11 @@ const deleteSport = async (id) => {
 };
 
 export default {
+  getAllUserJournalEntries,
   getUserJournalEntriesByDate,
   postJournalEntry,
+  editJournalEntry,
+  getJournalEntry,
   getJournalEntryOptions,
   getSports,
   getSport,

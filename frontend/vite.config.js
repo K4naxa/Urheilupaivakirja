@@ -58,6 +58,14 @@ export default defineConfig({
         target: "http://localhost:3001",
         changeOrigin: true,
       },
+      "/journal/": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+      "/journal/user": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
     },
   },
 });

@@ -1,6 +1,5 @@
 import "./loginPage.css";
 import userService from "../../services/userService";
-//import { mainContext } from "../../context/mainContext";
 import { useState, useContext, useRef } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from '../../hooks/useAuth';
@@ -10,9 +9,7 @@ function LoginPage() {
   const [error, setError] = useState("");
   const { login } = useAuth();
 
-  /*const [stayLoggedIn, setStayLoggedIn] = useState(false);
-  const { setLoggedIn, setUserRole, setToken } = useContext(mainContext); */
-
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const passwordInput = useRef(null);
 
   // Function to check if login input is valid before sending it to backend
@@ -47,21 +44,6 @@ function LoginPage() {
     }
     try {
       const user = await userService.login(email, password);
-      /*
-      setLoggedIn(true);
-      setUserRole(user.role);
-      setToken(user);
-      if (stayLoggedIn) {
-        window.localStorage.setItem(
-          "urheilupaivakirjaToken",
-          JSON.stringify(user)
-        );
-      } else {
-        window.sessionStorage.setItem(
-          "urheilupaivakirjaToken",
-          JSON.stringify(user)
-        );
-      } */
       setEmail("");
       setPassword("");
       console.log(user);
@@ -124,7 +106,7 @@ function LoginPage() {
             </div>
 
             <div className="buttons">
-              <Link to="/registration">
+              <Link to="/rekisteroidy">
                 <button type="button" className="registerButton button">
                   Rekisteröidy
                 </button>
