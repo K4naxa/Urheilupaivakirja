@@ -1,12 +1,18 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import trainingService from "../services/trainingService";
 
 const MainContext = createContext();
 export const MainContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
+  const [studentJournal, setStudentJournal] = useState(null);
 
   useEffect(() => {
     const localTheme = localStorage.getItem("theme") || "light";
     setTheme(localTheme);
+
+    trainingService
+      .getAllUserJournalEntries()
+      .then((data) => setStudentJournal(data));
   }, []);
 
   useEffect(() => {
@@ -14,12 +20,13 @@ export const MainContextProvider = ({ children }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-    localStorage.setItem("theme", theme);
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
   return (
-    <MainContext.Provider value={{ theme, toggleTheme }}>
+    <MainContext.Provider value={{ theme, toggleTheme, studentJournal }}>
       {children}
     </MainContext.Provider>
   );
