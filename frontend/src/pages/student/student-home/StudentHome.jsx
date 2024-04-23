@@ -1,8 +1,11 @@
-import StudentHeader from "../../../layouts/student-layout/StudentLayout";
+import { useMainContext } from "../../../hooks/mainContext";
+
 function StudentHome() {
+  const { theme } = useMainContext();
+  console.log(theme);
   return (
-    <div className="studentHomeContainer">
-      <h1 className="studentHomeTitle">Student Home</h1>
+    <div className={`bg-primary-${theme}`}>
+      <h1>Student Home</h1>
     </div>
   );
 }
