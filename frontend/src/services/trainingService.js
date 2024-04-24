@@ -3,6 +3,7 @@ import axios from "axios";
 // get token from localStorage
 const getToken = () => {
   const userJson = localStorage.getItem("user");
+
   if (userJson) {
     const user = JSON.parse(userJson);
     return user.token;
@@ -16,12 +17,17 @@ const makeHeader = () => {
   return header;
 };
 
-// ................................................................................
+// Journal Entries --------------------------------------------------------------------
+
+const getJournalEntries = async () => {
+  const response = await axios.get("/journal", makeHeader());
+  return response.data;
+};
 
 const getAllUserJournalEntries = async () => {
   const response = await axios.get("/journal/user", makeHeader());
   return response.data;
-}
+};
 
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
@@ -152,4 +158,5 @@ export default {
   addSport,
   editSport,
   deleteSport,
+  getJournalEntries,
 };

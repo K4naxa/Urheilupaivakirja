@@ -7,7 +7,7 @@
   font-family: roboto, sans-serif;
   font-weight: 400;
 
-  background-color: #070707;
+  background-color: var(--dark-primary-backgroundcolor);
   color: white;
 
   --dark-primary-backgroundcolor: #070707;
@@ -19,6 +19,15 @@
   --dark-primary-filler-linecolor: #676767;
   --dark-secondary-buttoncolor: #676767;
   --dark-lightblue-buttoncolor: #76abae;
+
+  --light-primary-backgroundcolor: #ffffff;
+  --light-secondary-backgroundcolor: #f5f5f5;
+  --light-primary-textcolor: #000000;
+  --light-secondary-textcolor: #000000;
+  --light-primary-inputtextcolor: #000000;
+  --light-primary-bordercolor: #000000;
+  --light-primary-filler-linecolor: #676767;
+  --light-secondary-buttoncolor: #676767;
 }
 html {
   display: flex;
