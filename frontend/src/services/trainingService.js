@@ -102,6 +102,12 @@ const editJournalEntry = async (journalEntry) => {
   return response.data;
 };
 
+// delete journal entry
+const deleteJournalEntry = async (id) => {
+  const response = await axios.delete(`/journal_entry/${id}`, makeHeader());
+  return response.data;
+}
+
 // ................................................................................
 
 // get all sports
@@ -144,6 +150,7 @@ export default {
   getUserJournalEntriesByDate,
   postJournalEntry,
   editJournalEntry,
+  deleteJournalEntry,
   getJournalEntry,
   getJournalEntryOptions,
   getSports,
