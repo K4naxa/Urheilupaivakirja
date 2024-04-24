@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-
+import { useMainContext } from "../hooks/mainContext";
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Month = ({ journal }) => {
+  const { theme } = useMainContext();
   const [data, setData] = useState([]);
   const cal = new CalHeatmap();
 
@@ -33,7 +34,7 @@ const HeatMap_Month = ({ journal }) => {
     cal.paint(
       {
         itemSelector: "#cal-heatmapMonth",
-        theme: "dark",
+        theme: { theme },
 
         date: {
           start: new Date(2024, 1, 1),
