@@ -1,26 +1,19 @@
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { useMainContext } from "../../hooks/mainContext";
 
 import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 
 const StudentLayout = () => {
   const { logout } = useAuth();
-  const { theme } = useMainContext();
 
-  const linkClass = `text-primary-${theme} px-4 py-2`;
+  const linkClass = `text-textPrimary px-4 py-2 hover:text-blue-500 px-4 py-2`;
 
   return (
     <>
-      <header
-        className={`bg-primary-${theme} flex justify-between items-center `}
-      >
-        <nav id="top-nav" className="w-full ">
-          <Link
-            to="/"
-            className={`text-primary-${theme} px-4 py-2 hover:text-link-${theme}`}
-          >
+      <header className={`bg-bgkPrimary flex items-center px-4 py-2 `}>
+        <nav id="top-nav" className="flex w-full gap-8 justify-center">
+          <Link to="/" className={linkClass}>
             Etusivu
           </Link>
           <Link to="/tiedotteet/" className={linkClass}>
@@ -33,7 +26,7 @@ const StudentLayout = () => {
             Merkinnät
           </Link>
         </nav>
-        <div className="justify-end">
+        <div className="flex relative right-4 top-4">
           <div className="profile-button" id="profileButton">
             <Link to="/profiili" className={linkClass}>
               Profiili
@@ -51,7 +44,7 @@ const StudentLayout = () => {
           </div>
         </div>
       </header>
-      <div className="filler-line"></div>
+      <div className="h-[1px] w-full bg-blue-400 "></div>
       <main>
         <Outlet />
         <div className="absolute bottom-2 right-5">

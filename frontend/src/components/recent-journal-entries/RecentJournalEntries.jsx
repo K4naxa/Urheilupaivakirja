@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import trainingService from "../../../services/trainingService.js";
+import trainingService from "../../services/trainingService";
 import "./recentJournalEntries.css";
 import { useNavigate } from "react-router-dom";
 
@@ -90,9 +90,9 @@ const RecentJournalEntry = ({ entry }) => {
       <div className="recent-journal-entry-bottom-container">
         {entry.details && (
           <div className="recent-journal-entry-detail">
-          <span className="label">Lisätiedot:</span>
-          <span className="value">{entry.details}</span>
-        </div>
+            <span className="label">Lisätiedot:</span>
+            <span className="value">{entry.details}</span>
+          </div>
         )}
       </div>
     </div>
@@ -113,7 +113,7 @@ const RecentJournalEntries = () => {
     };
     fetchRecentJournalEntries();
   }, []);
-  
+
   return (
     <div className="recent-journal-entries-horizontal-container">
       <div className="recent-journal-entries-vertical-container">

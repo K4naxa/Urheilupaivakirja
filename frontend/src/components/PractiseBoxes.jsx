@@ -71,9 +71,9 @@ const PractiseBoxes = ({ journalEntries }) => {
     }
   }, [journalEntries, showMonth]);
 
-  const boxClass = `bg-secondary-${theme} flex flex-col p-3 rounded-md h-24 w-24 justify-center `;
-  const highlightClass = `text-primary-${theme} self-center justify-self-center font-bold text-lg`;
-  const secondaryText = `text-sm text-secondary${theme} justify-self-end`;
+  const boxClass = `bg-bgkSecondary flex flex-col p-3 rounded-md h-24 w-24 justify-center `;
+  const highlightClass = `text-textPrimary self-center justify-self-center font-bold text-lg`;
+  const secondaryText = `text-sm text-textSecondary justify-self-end`;
 
   return (
     <div className="block">
@@ -82,9 +82,7 @@ const PractiseBoxes = ({ journalEntries }) => {
         <button onClick={() => setShowMonth(false)}>Show Year</button>
       </div>
       <div className="flex gap-5 m-1  p-1">
-        <div
-          className={`bg-secondary-${theme} flex flex-col justify-center p-3 rounded-md h-24 w-24`}
-        >
+        <div className={boxClass}>
           <p className="flex justify-center align-bottom">
             <p className={highlightClass}>{trainingData.hours}</p>
             <p className={secondaryText}> Tuntia</p>

@@ -34,7 +34,7 @@ const HeatMap_Month = ({ journal }) => {
     cal.paint(
       {
         itemSelector: "#cal-heatmapMonth",
-        theme: { theme },
+        theme: "theme",
 
         date: {
           start: new Date(2024, 1, 1),
@@ -49,6 +49,7 @@ const HeatMap_Month = ({ journal }) => {
               ),
           },
         },
+        Animation: null,
         range: 1,
         data: {
           source: data,

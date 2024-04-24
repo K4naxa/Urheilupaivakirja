@@ -5,13 +5,10 @@ const ThemeSwitcher = () => {
 
   return (
     <div>
-      <button
-        className={`bg-primary-${theme} text-primary-${theme}`}
-        onClick={toggleTheme}
-      >
+      <button className={` text-textPrimary`} onClick={toggleTheme}>
         Toggle theme
       </button>
-      <p className={`text-primary-${theme}`}>Current theme: {theme}</p>
+      <p className={`text-textPrimary`}>Current theme: {theme}</p>
     </div>
   );
 };

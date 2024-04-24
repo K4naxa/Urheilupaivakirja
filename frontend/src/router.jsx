@@ -10,7 +10,6 @@ import StudentLayout from "./layouts/student-layout/StudentLayout";
 import StudentHome from "./pages/student/student-home/StudentHome";
 import NewJournalEntryPage from "./pages/student/journal-entry/new/NewJournalEntryPage";
 import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
-import RecentJournalEntries from "./pages/student/recent-journal-entries/RecentJournalEntries";
 
 //teacher
 import TeacherLayout from "./layouts/teacher-layout/TeacherLayout";
@@ -48,7 +47,6 @@ export const router = createBrowserRouter([
             ),
             children: [
               { index: true, element: <StudentHome /> },
-              { path: "merkinnat", element: <RecentJournalEntries /> },
               { path: "merkinnat/uusi", element: <NewJournalEntryPage /> },
               {
                 path: "merkinnat/muokkaa/:entry_id",

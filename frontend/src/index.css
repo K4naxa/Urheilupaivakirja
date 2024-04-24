@@ -3,13 +3,21 @@
 @tailwind components;
 @tailwind utilities;
 
-#root {
-  height: 100vh;
-  width: 100%;
-}
-:root {
-  font-family: roboto, sans-serif;
-  --bg-primary-dark: #070707;
-  --bg-primary-light: #f3f4f6;
-  /* Define other variables as needed */
+@layer base {
+  :root {
+    font-family: roboto, sans-serif;
+    --color-bg-primary: 243 244 246;
+    --color-bg-secondary: 217 217 217;
+    --color-text-primary: 0 0 0;
+    --color-text-secondary: 103 103 103;
+    --color-border-primary: 95 95 95;
+  }
+  :root[data-theme="dark"] {
+    font-family: roboto, sans-serif;
+    --color-bg-primary: 7 7 7;
+    --color-bg-secondary: 16 18 19;
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 103 103 103;
+    --color-border-primary: 255 255 255;
+  }
 }

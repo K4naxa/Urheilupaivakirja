@@ -9,6 +9,7 @@ export const MainContextProvider = ({ children }) => {
   useEffect(() => {
     const localTheme = localStorage.getItem("theme") || "light";
     setTheme(localTheme);
+    document.documentElement.setAttribute("data-theme", localTheme);
 
     trainingService
       .getAllUserJournalEntries()
@@ -16,13 +17,14 @@ export const MainContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.style.backgroundColor = `var(--bg-primary-${theme})`;
+    document.documentElement.style.backgroundColor = `var(--color-bg-primary)`;
   }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
+    location.reload();
   };
 
   return (
