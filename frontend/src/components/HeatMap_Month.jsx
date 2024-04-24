@@ -75,9 +75,9 @@ const HeatMap_Month = ({ journal }) => {
         },
         subDomain: {
           type: "day",
-          width: 27,
-          height: 27,
-          gutter: 4,
+          width: 42,
+          height: 42,
+          gutter: 5,
           radius: 2,
         },
       },
@@ -133,7 +133,7 @@ const HeatMap_Month = ({ journal }) => {
   }, [data]);
 
   return (
-    <div className="heatmapMonth-container">
+    <div className="block">
       <h1>Heatmap</h1>
       <div className="controls">
         <a

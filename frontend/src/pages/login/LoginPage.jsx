@@ -1,8 +1,8 @@
 import "./loginPage.css";
 import userService from "../../services/userService";
-import { useState, useContext, useRef } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { useAuth } from '../../hooks/useAuth';
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

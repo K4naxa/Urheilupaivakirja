@@ -76,7 +76,7 @@ const PractiseBoxes = ({ journalEntries }) => {
   const secondaryText = `text-sm text-secondary${theme} justify-self-end`;
 
   return (
-    <div>
+    <div className="block">
       <div>
         <button onClick={() => setShowMonth(true)}>Show Month</button>
         <button onClick={() => setShowMonth(false)}>Show Year</button>

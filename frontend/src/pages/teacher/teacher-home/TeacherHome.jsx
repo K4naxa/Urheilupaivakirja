@@ -1,5 +1,4 @@
 import trainingService from "../../../services/trainingService.js";
-import dayjs from "dayjs";
 import HeatMap_Month from "../../../components/HeatMap_Month.jsx";
 import HeatMap_Year from "../../../components/HeatMap_Year.jsx";
 
