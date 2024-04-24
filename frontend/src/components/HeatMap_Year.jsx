@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 import CalHeatmap from "cal-heatmap";
@@ -6,14 +6,33 @@ import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
-const HeatMap_Year = ({ data }) => {
+const HeatMap_Year = ({ journal }) => {
+  const [data, setData] = useState([]);
   const cal = new CalHeatmap();
+
   useEffect(() => {
-    document.getElementById("cal-heatmap").innerHTML = "";
+    // clean up the data for the heatmap
+    const entries = journal.map((entry) => {
+      const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
+      let value = entry.length_in_minutes;
+
+      if (entry.entry_type_id === 3) value = -99; // color value for sick day
+
+      return {
+        date: date,
+        value: value,
+        entry_type: entry.entry_type_id,
+      };
+    });
+    setData(entries);
+  }, [journal]);
+
+  useEffect(() => {
+    document.getElementById("cal-heatmapYear").innerHTML = "";
 
     cal.paint(
       {
-        itemSelector: "#cal-heatmap",
+        itemSelector: "#cal-heatmapYear",
         theme: "dark",
 
         date: {
@@ -113,7 +132,7 @@ const HeatMap_Year = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="heatmapMonth-container">
+    <div className="heatmapYear-container">
       <h1>Heatmap</h1>
       <div className="controls">
         <a
@@ -133,7 +152,7 @@ const HeatMap_Year = ({ data }) => {
           Next
         </a>
       </div>
-      <div id="cal-heatmap"></div>
+      <div id="cal-heatmapYear"></div>
     </div>
   );
 };

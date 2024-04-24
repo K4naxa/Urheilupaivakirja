@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 import CalHeatmap from "cal-heatmap";
@@ -6,8 +6,26 @@ import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
-const HeatMap_Month = ({ data }) => {
+const HeatMap_Month = ({ journal }) => {
+  const [data, setData] = useState([]);
   const cal = new CalHeatmap();
+
+  useEffect(() => {
+    // clean up the data for the heatmap
+    const entries = journal.map((entry) => {
+      const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
+      let value = entry.length_in_minutes;
+
+      if (entry.entry_type_id === 3) value = -99; // color value for sick day
+
+      return {
+        date: date,
+        value: value,
+        entry_type: entry.entry_type_id,
+      };
+    });
+    setData(entries);
+  }, [journal]);
 
   useEffect(() => {
     document.getElementById("cal-heatmapMonth").innerHTML = "";
@@ -18,8 +36,8 @@ const HeatMap_Month = ({ data }) => {
         theme: "dark",
 
         date: {
+          start: new Date(2024, 1, 1),
           max: new Date(2024, 12, 31),
-          highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -47,18 +65,18 @@ const HeatMap_Month = ({ data }) => {
 
         domain: {
           type: "month",
+          gutter: 10,
           label: {
             position: "top",
             align: "center",
             width: 50,
-            height: 20,
           },
         },
         subDomain: {
           type: "day",
-          width: 30,
-          height: 30,
-          gutter: 5,
+          width: 27,
+          height: 27,
+          gutter: 4,
           radius: 2,
         },
       },
@@ -105,16 +123,16 @@ const HeatMap_Month = ({ data }) => {
           {
             position: "left",
             key: "left",
-            height: 35,
             text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
+            padding: [0, 5, 0, 0],
           },
         ],
       ]
     );
-  }, []);
+  }, [data]);
 
   return (
-    <div className="heatmap-container">
+    <div className="heatmapMonth-container">
       <h1>Heatmap</h1>
       <div className="controls">
         <a
