@@ -33,6 +33,10 @@ export default defineConfig({
         target: "http://localhost:3001",
         changeOrigin: true,
       },
+      "/journal": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
       "/public/groups": {
         target: "http://localhost:3001",
         changeOrigin: true,

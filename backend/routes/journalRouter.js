@@ -46,6 +46,7 @@ router.get("/", (req, res, next) => {
   knex("journal_entries")
     .select("*")
     .then((rows) => {
+      console.log("select * from `journal_entries`");
       res.json(rows);
     })
     .catch((err) => {
