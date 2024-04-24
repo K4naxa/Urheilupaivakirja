@@ -1,7 +1,10 @@
+import { useMainContext } from "../hooks/mainContext";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import dayOfYear from "dayjs/plugin/dayOfYear";
 
 const PractiseBoxes = ({ journalEntries }) => {
+  const { theme } = useMainContext();
   const [showMonth, setShowMonth] = useState(true);
   const [trainingData, setTrainingData] = useState({
     hours: null,
@@ -45,14 +48,11 @@ const PractiseBoxes = ({ journalEntries }) => {
       );
 
       // Calculate activity as a percentage
+      dayjs.extend(dayOfYear);
       if (showMonth) {
-        activity = Math.floor(
-          (uniqueDays.size / currentDate.daysInMonth()) * 100
-        );
+        activity = Math.floor((uniqueDays.size / dayjs().daysInMonth()) * 100);
       } else {
-        activity = Math.floor(
-          (uniqueDays.size / currentDate.dayOfYear()) * 100
-        );
+        activity = Math.floor((uniqueDays.size / dayjs().dayOfYear()) * 100);
       }
 
       // Calculate total hours and minutes
@@ -71,18 +71,39 @@ const PractiseBoxes = ({ journalEntries }) => {
     }
   }, [journalEntries, showMonth]);
 
+  const boxClass = `bg-secondary-${theme} flex flex-col p-3 rounded-md h-24 w-24 justify-center `;
+  const highlightClass = `text-primary-${theme} self-center justify-self-center font-bold text-lg`;
+  const secondaryText = `text-sm text-secondary${theme} justify-self-end`;
+
   return (
     <div>
       <div>
         <button onClick={() => setShowMonth(true)}>Show Month</button>
         <button onClick={() => setShowMonth(false)}>Show Year</button>
       </div>
-      <div>
-        <h1>Training Data</h1>
-        <p>Hours: {trainingData.hours}</p>
-        <p>Minutes: {trainingData.minutes}</p>
-        <p>Count: {trainingData.count}</p>
-        <p>Activity: {trainingData.activity}</p>
+      <div className="flex gap-5 m-1  p-1">
+        <div
+          className={`bg-secondary-${theme} flex flex-col justify-center p-3 rounded-md h-24 w-24`}
+        >
+          <p className="flex justify-center align-bottom">
+            <p className={highlightClass}>{trainingData.hours}</p>
+            <p className={secondaryText}> Tuntia</p>
+          </p>
+          <p className="flex">
+            <span className={highlightClass}>{trainingData.minutes}</span>
+            <p className={secondaryText}> min</p>
+          </p>
+          <p className={secondaryText}>Treenattu aika</p>
+        </div>
+        <div className={boxClass}>
+          <p className="self-center justify-self-center font-bold text-lg">
+            {trainingData.count}
+          </p>
+          <p className={secondaryText}>Treenikertaa</p>
+        </div>
+        <div className={boxClass}>
+          <p>Activity: {trainingData.activity}%</p>
+        </div>
       </div>
     </div>
   );

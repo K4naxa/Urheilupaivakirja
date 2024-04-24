@@ -8,7 +8,7 @@ export default {
         "secondary-dark": "#101213",
 
         "primary-light": "#f3f4f6",
-        "secondary-light": "#d1d5db",
+        "secondary-light": "#EEEEEE",
       },
       textColor: {
         "primary-dark": "#FFFFFF",

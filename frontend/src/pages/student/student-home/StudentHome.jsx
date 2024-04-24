@@ -21,11 +21,8 @@ function StudentHome() {
   } else
     return (
       <div
-        className={`bg-primary-${theme} flex flex-col justify-center text-primary-${theme}`}
+        className={`bg-primary-${theme} grid grid-cols-3 grid-rows-3 gap-4 p-4`}
       >
-        <h1 className="text-xl">Student Home</h1>
-        <p className="text-lg">Welcome to the student home page</p>
-
         <PractiseBoxes journalEntries={studentJournal} />
       </div>
     );
