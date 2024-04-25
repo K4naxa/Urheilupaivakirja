@@ -12,9 +12,18 @@ export default {
         textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",
 
         borderPrimary: "rgb(var(--color-border-primary) / <alpha-value>)",
+
+        graphPrimary: "rgb(var(--color-graph-primary) / <alpha-value>)",
+        graphSecondary: "rgb(var(--color-graph-secondary) / <alpha-value>)",
       },
       animation: {
         "spin-slow": "spin 3s linear infinite",
+      },
+      gridTemplateColumns: {
+        mainPage: "repeat(3, minmax(1fr, 330px))",
+      },
+      gridTemplateRows: {
+        mainPage: "repeat(3, minmax(1fr, 330px))",
       },
     },
   },

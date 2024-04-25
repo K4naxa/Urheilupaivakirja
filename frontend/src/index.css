@@ -8,10 +8,18 @@
     font-family: roboto, sans-serif;
     --color-bg-primary: 243 244 246;
     --color-bg-secondary: 217 217 217;
+
     --color-text-primary: 0 0 0;
     --color-text-secondary: 103 103 103;
+
     --color-border-primary: 95 95 95;
+
+    --color-graph-primary: 49 156 255;
+    --color-graph-secondary: 34 40 49;
+
+    background-color: var(--color-bg-primary);
   }
+
   :root[data-theme="dark"] {
     font-family: roboto, sans-serif;
     --color-bg-primary: 7 7 7;
@@ -19,5 +27,10 @@
     --color-text-primary: 255 255 255;
     --color-text-secondary: 103 103 103;
     --color-border-primary: 255 255 255;
+
+    --color-graph-primary: 49 156 255;
+    --color-graph-secondary: 34 40 49;
+
+    background-color: var(--color-bg-primary);
   }
 }

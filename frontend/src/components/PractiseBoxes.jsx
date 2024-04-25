@@ -1,10 +1,8 @@
-import { useMainContext } from "../hooks/mainContext";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 
 const PractiseBoxes = ({ journalEntries }) => {
-  const { theme } = useMainContext();
   const [showMonth, setShowMonth] = useState(true);
   const [trainingData, setTrainingData] = useState({
     hours: null,
@@ -12,7 +10,6 @@ const PractiseBoxes = ({ journalEntries }) => {
     count: null,
     activity: null,
   });
-  console.log(journalEntries);
 
   // Filter out all exept training practices
 
