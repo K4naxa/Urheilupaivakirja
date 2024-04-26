@@ -6,31 +6,69 @@
 @layer base {
   :root {
     font-family: roboto, sans-serif;
-    --color-bg-primary: 243 244 246;
-    --color-bg-secondary: 217 217 217;
+    --color-bg-primary: 235 238 241;
+    --color-bg-secondary: 255 255 255;
 
     --color-text-primary: 0 0 0;
     --color-text-secondary: 103 103 103;
 
+    --color-header-primary: 83 131 232;
+    --color-header-secondary: 40 52 78;
+
     --color-border-primary: 95 95 95;
 
     --color-graph-primary: 49 156 255;
-    --color-graph-secondary: 34 40 49;
-
-    background-color: var(--color-bg-primary);
+    --color-graph-secondary: 40 52 78;
   }
 
   :root[data-theme="dark"] {
     font-family: roboto, sans-serif;
-    --color-bg-primary: 7 7 7;
-    --color-bg-secondary: 16 18 19;
+    --color-bg-primary: 28 28 31;
+    --color-bg-secondary: 49 49 60;
     --color-text-primary: 255 255 255;
-    --color-text-secondary: 103 103 103;
+    --color-text-secondary: 151 149 173;
     --color-border-primary: 255 255 255;
 
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 34 40 49;
-
-    background-color: var(--color-bg-primary);
   }
+  body {
+    background-color: rgb(var(--color-bg-primary));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.mainArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Cal-Heatmap Settings */
+.ch-subdomain-bg {
+  fill: rgb(var(--color-bg-secondary));
+}
+
+.ch-subdomain-bg.highlight {
+  stroke: rgb(var(--color-graph-primary));
+  stroke-width: 1px;
+}
+
+.ch-subdomain-bg:hover {
+  stroke: #000;
+  stroke-width: 1px;
+}
+[data-theme="dark"] .ch-subdomain-bg {
+  fill: rgb(var(--color-bg-secondary));
+}
+
+[data-theme="dark"] .ch-subdomain-bg.highlight {
+  stroke: rgb(var(--color-graph-primary));
+}
+
+[data-theme="dark"] .ch-subdomain-bg:hover {
+  stroke: #636e7b;
 }

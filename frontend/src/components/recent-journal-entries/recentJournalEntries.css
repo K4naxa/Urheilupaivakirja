@@ -1,11 +1,6 @@
 /* THE STYLING IS PRETTY ROUGH AS IT IS JUST A TEMPLATE */
 
 /* Main horizontal container styling */
-.recent-journal-entries-horizontal-container {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
 
 /* Vertical container for individual entries */
 .recent-journal-entries-vertical-container {

@@ -3,6 +3,7 @@ import PractiseBoxes from "../../../components/PractiseBoxes";
 import HeatMap_Month from "../../../components/HeatMap_Month";
 import HeatMap_Year from "../../../components/HeatMap_Year";
 import RecentJournalEntries from "../../../components/recent-journal-entries/RecentJournalEntries";
+import WorkoutIntensityChart from "../../../components/WorkoutIntensityChart";
 import WorkoutActivityChart from "../../../components/WorkoutActivityChart";
 import { useState, useEffect } from "react";
 
@@ -24,21 +25,29 @@ function StudentHome() {
     );
   } else
     return (
-      <div
-        className={`bg-bgkPrimary text-textPrimary grid grid-cols-mainPage  grid-rows-mainPage justify-center gap-4 p-4`}
-      >
-        <div className=" flex flex-col row-start-1 row-span-2 align-middle justify-center">
-          <HeatMap_Month journal={studentJournal} />
-          <PractiseBoxes journalEntries={studentJournal} />
+      <div className="mainArea my-4">
+        <div className="flex justify-center">
+          <button className="text-xl px-6 py-4 bg-graphPrimary rounded-md ">
+            Uusi Harjoitus
+          </button>
         </div>
-        <div className="row-start-1 col-start-2">
-          <WorkoutActivityChart journal={studentJournal} />
-        </div>
-        <div className="block row-start-1 row-span-2 col-start-3 overflow-y-scroll max-h-96">
-          <RecentJournalEntries />
-        </div>
-        <div className="flex row-start-3 row-span-1 col-span-2">
-          <HeatMap_Year journal={studentJournal} />
+        <div
+          className={`bg-bgkPrimary text-textPrimary grid gap-12 grid-cols-1  md:grid-cols-3 p-4`}
+        >
+          <div className=" flex flex-col align-middle justify-between">
+            <HeatMap_Month journal={studentJournal} />
+            <PractiseBoxes journalEntries={studentJournal} />
+          </div>
+          <div className=" flex flex-col gap-4">
+            <WorkoutActivityChart journal={studentJournal} />
+            <WorkoutIntensityChart journal={studentJournal} />
+          </div>
+          <div className="block  overflow-y-scroll">
+            <RecentJournalEntries />
+          </div>
+          <div className="flex  col-span-3 overflow-auto">
+            <HeatMap_Year journal={studentJournal} />
+          </div>
         </div>
       </div>
     );

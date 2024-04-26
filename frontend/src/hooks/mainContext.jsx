@@ -4,6 +4,8 @@ import trainingService from "../services/trainingService";
 const MainContext = createContext();
 export const MainContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
+  const [showDate, setShowDate] = useState(new Date());
+
   const [studentJournal, setStudentJournal] = useState(null);
 
   useEffect(() => {
@@ -28,7 +30,15 @@ export const MainContextProvider = ({ children }) => {
   };
 
   return (
-    <MainContext.Provider value={{ theme, toggleTheme, studentJournal }}>
+    <MainContext.Provider
+      value={{
+        theme,
+        toggleTheme,
+        studentJournal,
+        showDate,
+        setShowDate,
+      }}
+    >
       {children}
     </MainContext.Provider>
   );

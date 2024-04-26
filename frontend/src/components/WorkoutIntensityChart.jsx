@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import CreateGraphCell from "./CreateGraphCell";
 import dayjs from "dayjs";
 
-export default function WorkoutActivityChart({ journal }) {
+export default function WorkoutIntensityChart({ journal }) {
   const [data, setData] = useState({});
   const [showMonth, setShowMonth] = useState(true);
 
@@ -11,12 +11,9 @@ export default function WorkoutActivityChart({ journal }) {
       one: 0,
       two: 0,
       three: 0,
-      rest: 0,
-      sick: 0,
-      totalEntries: 0,
     });
 
-    let filteredEntries = [...journal];
+    let filteredEntries = journal.filter((entry) => entry.intensity !== null);
     if (showMonth) {
       filteredEntries = filteredEntries.filter(
         (entry) => dayjs(entry.date).month() === dayjs().month()
@@ -31,30 +28,18 @@ export default function WorkoutActivityChart({ journal }) {
       one: 0,
       two: 0,
       three: 0,
-      rest: 0,
-      sick: 0,
-      totalEntries: filteredEntries.length,
+      totalEntries: 0,
     };
 
     filteredEntries.forEach((entry) => {
-      if (entry.entry_type_id === 1) {
-        if (entry.length_in_minutes >= 180) {
-          newData.three++;
-        }
-        if (entry.length_in_minutes >= 120 && entry.length_in_minutes < 180) {
-          newData.two++;
-        }
-        if (entry.length_in_minutes < 120) {
-          newData.one++;
-        }
-      } else if (entry.entry_type_id === 2) {
-        newData.rest++;
-      } else {
-        newData.sick++;
-      }
+      newData.totalEntries++;
+      if (entry.intensity === 1) newData.one++;
+      if (entry.intensity === 2) newData.two++;
+      if (entry.intensity === 3) newData.three++;
     });
     setData(newData);
     console.log(filteredEntries);
+    console.log(newData);
   }, [journal, showMonth]);
 
   return (
@@ -77,27 +62,9 @@ export default function WorkoutActivityChart({ journal }) {
           Vuosi
         </p>
       </div>
-      <CreateGraphCell
-        value={data.one}
-        max={data.totalEntries}
-        text="1 Tunti"
-      />
-      <CreateGraphCell
-        value={data.two}
-        max={data.totalEntries}
-        text="2 Tunti"
-      />
-      <CreateGraphCell
-        value={data.three}
-        max={data.totalEntries}
-        text="+3 Tuntia"
-      />
-      <CreateGraphCell value={data.rest} max={data.totalEntries} text="Lepo" />
-      <CreateGraphCell
-        value={data.sick}
-        max={data.totalEntries}
-        text="Sairaana"
-      />
+      <CreateGraphCell value={data.one} max={data.totalEntries} text="Chilli" />
+      <CreateGraphCell value={data.two} max={data.totalEntries} text="perus" />
+      <CreateGraphCell value={data.three} max={data.totalEntries} text="Kova" />
     </div>
   );
 }

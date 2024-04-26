@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
@@ -7,9 +7,46 @@ import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Month = ({ journal }) => {
-  const { theme } = useMainContext();
+  const { showDate, setShowDate } = useMainContext();
   const [data, setData] = useState([]);
   const cal = new CalHeatmap();
+  const monthNames = [
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
+  ];
+
+  const handlePreviousMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
+    setShowDate(newDate);
+  };
+
+  const handleNextMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
+    setShowDate(newDate);
+  };
+  const handlePreviousYearClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear() - 1, showDate.getMonth());
+    setShowDate(newDate);
+  };
+
+  const handleNextYearClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear() + 1, showDate.getMonth());
+    setShowDate(newDate);
+  };
 
   useEffect(() => {
     // clean up the data for the heatmap
@@ -30,15 +67,17 @@ const HeatMap_Month = ({ journal }) => {
 
   useEffect(() => {
     document.getElementById("cal-heatmapMonth").innerHTML = "";
+    const theme = document.querySelector("html").getAttribute("data-theme");
 
     cal.paint(
       {
         itemSelector: "#cal-heatmapMonth",
-        theme: "theme",
+        theme: theme,
 
         date: {
-          start: new Date(2024, 1, 1),
+          start: showDate,
           max: new Date(2024, 12, 31),
+          highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -69,17 +108,15 @@ const HeatMap_Month = ({ journal }) => {
           type: "month",
           gutter: 10,
           label: {
-            position: "top",
-            align: "center",
-            width: 50,
+            text: null,
           },
         },
         subDomain: {
           type: "day",
-          width: 42,
-          height: 42,
-          gutter: 5,
-          radius: 2,
+          width: 65,
+          height: 65,
+          gutter: 10,
+          radius: 5,
         },
       },
       [
@@ -125,34 +162,35 @@ const HeatMap_Month = ({ journal }) => {
           {
             position: "left",
             key: "left",
-            text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
-            padding: [0, 5, 0, 0],
+            height: 65,
+            gutter: 10,
+            width: 30,
+            text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
           },
         ],
       ]
     );
-  }, [data]);
+  }, [data, showDate]);
 
   return (
-    <div className="block">
-      <h1>Heatmap</h1>
-      <div className="controls">
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.previous();
-          }}
-        >
+    <div className="flex flex-col w-full text-center ">
+      <div className="flex justify-center gap-4">
+        <button className="hover:underline" onClick={handlePreviousYearClick}>
           Previous
-        </a>
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.next();
-          }}
-        >
+        </button>
+        <h2 className="text-textPrimary text-3xl">{showDate.getFullYear()}</h2>
+        <button className="hover:underline" onClick={handleNextYearClick}>
           Next
-        </a>
+        </button>
+      </div>
+      <div className="flex gap-4 justify-center">
+        <button className="hover:underline" onClick={handlePreviousMonthClick}>
+          Previous
+        </button>
+        <p>{monthNames[showDate.getMonth()]}</p>
+        <button className="hover:underline" onClick={handleNextMonthClick}>
+          Next
+        </button>
       </div>
       <div id="cal-heatmapMonth"></div>
     </div>

@@ -8,7 +8,7 @@ import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Year = ({ journal }) => {
-  const { theme } = useMainContext();
+  const { showDate } = useMainContext();
 
   const [data, setData] = useState([]);
   const cal = new CalHeatmap();
@@ -32,15 +32,18 @@ const HeatMap_Year = ({ journal }) => {
 
   useEffect(() => {
     document.getElementById("cal-heatmapYear").innerHTML = "";
+    const theme = document.documentElement.getAttribute("data-theme");
 
     cal.paint(
       {
         itemSelector: "#cal-heatmapYear",
-        theme: { theme },
+        animationDuration: 0,
+        theme: theme,
 
         date: {
-          start: new Date(2024, 1, 1),
+          start: showDate,
           max: new Date(2024, 12, 31),
+          highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -79,7 +82,7 @@ const HeatMap_Year = ({ journal }) => {
           type: "day",
           width: 17,
           height: 17,
-          gutter: 4,
+          gutter: 5,
           radius: 2,
         },
       },
@@ -128,33 +131,16 @@ const HeatMap_Year = ({ journal }) => {
             key: "left",
             text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
             padding: [0, 5, 0, 0],
+            height: 17,
+            gutter: 5,
           },
         ],
       ]
     );
-  }, [data]);
+  }, [data, showDate]);
 
   return (
     <div className="heatmapYear-container">
-      <h1>Heatmap</h1>
-      <div className="controls">
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.previous();
-          }}
-        >
-          Previous
-        </a>
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.next();
-          }}
-        >
-          Next
-        </a>
-      </div>
       <div id="cal-heatmapYear"></div>
     </div>
   );

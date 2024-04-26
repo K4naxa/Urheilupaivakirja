@@ -115,8 +115,8 @@ const RecentJournalEntries = () => {
   }, []);
 
   return (
-    <div className="recent-journal-entries-horizontal-container">
-      <div className="recent-journal-entries-vertical-container">
+    <div className=" max-h-[420px] w-96">
+      <div className="flex flex-col w-full gap-1">
         {recentEntries.map((entry) => (
           <RecentJournalEntry key={entry.id} entry={entry} />
         ))}

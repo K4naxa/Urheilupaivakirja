@@ -73,12 +73,26 @@ const PractiseBoxes = ({ journalEntries }) => {
   const secondaryText = `text-sm text-textSecondary justify-self-end`;
 
   return (
-    <div className="block">
+    <div className="flex flex-col w-full">
       <div>
-        <button onClick={() => setShowMonth(true)}>Show Month</button>
-        <button onClick={() => setShowMonth(false)}>Show Year</button>
+        <div className="flex gap-2 my-0 text-sm">
+          <p className="text-lg">Harjoitukset</p>
+          <p
+            className={` my-auto hover:cursor-pointer hover:underline ${showMonth ? "text-textPrimary" : "text-textSecondary"}`}
+            onClick={() => setShowMonth(true)}
+          >
+            Kuukausi
+          </p>
+          <p className="my-auto"> |</p>
+          <p
+            onClick={() => setShowMonth(false)}
+            className={`my-auto hover:cursor-pointer hover:underline ${showMonth ? "text-textSecondary" : "text-textPrimary"}`}
+          >
+            Vuosi
+          </p>
+        </div>
       </div>
-      <div className="flex gap-5 m-1  p-1">
+      <div className="flex justify-between my-1">
         <div className={boxClass}>
           <p className="flex justify-center align-bottom">
             <p className={highlightClass}>{trainingData.hours}</p>

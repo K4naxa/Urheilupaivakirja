@@ -20,7 +20,7 @@ export default {
         "spin-slow": "spin 3s linear infinite",
       },
       gridTemplateColumns: {
-        mainPage: "repeat(3, minmax(1fr, 330px))",
+        mainPage: "repeat(3, 330px))",
       },
       gridTemplateRows: {
         mainPage: "repeat(3, minmax(1fr, 330px))",

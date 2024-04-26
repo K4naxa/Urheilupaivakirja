@@ -10,8 +10,8 @@ const StudentLayout = () => {
   const linkClass = `text-textPrimary px-4 py-2 hover:text-blue-500 px-4 py-2`;
 
   return (
-    <>
-      <header className={`bg-bgkPrimary flex items-center px-4 py-2 `}>
+    <div className="flex flex-col w-full">
+      <header className={`bg-bgkPrimary flex items-center  py-4 text-xl`}>
         <nav id="top-nav" className="flex w-full gap-8 justify-center">
           <Link to="/" className={linkClass}>
             Etusivu
@@ -26,7 +26,7 @@ const StudentLayout = () => {
             Merkinnät
           </Link>
         </nav>
-        <div className="flex relative right-4 top-4">
+        <div className="flex absolute items-center right-4">
           <div className="profile-button" id="profileButton">
             <Link to="/profiili" className={linkClass}>
               Profiili
@@ -45,13 +45,13 @@ const StudentLayout = () => {
         </div>
       </header>
       <div className="h-[1px] w-full bg-blue-400 "></div>
-      <main>
+      <main className="max-w-1480">
         <Outlet />
         <div className="absolute bottom-2 right-5">
           <ThemeSwitcher />
         </div>
       </main>
-    </>
+    </div>
   );
 };
 
