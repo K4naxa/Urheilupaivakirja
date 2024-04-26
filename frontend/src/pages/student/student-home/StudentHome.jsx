@@ -25,27 +25,27 @@ function StudentHome() {
     );
   } else
     return (
-      <div className="mainArea my-4">
+      <div className="mainArea ">
         <div className="flex justify-center">
           <button className="text-xl px-6 py-4 bg-graphPrimary rounded-md ">
             Uusi Harjoitus
           </button>
         </div>
         <div
-          className={`bg-bgkPrimary text-textPrimary grid gap-12 grid-cols-1  md:grid-cols-3 p-4`}
+          className={`bg-bgkPrimary text-textPrimary grid gap-4 md:gap-12 grid-cols-1 md:grid-cols-3 md:grid-rows-2 p-4`}
         >
-          <div className=" flex flex-col align-middle justify-between">
+          <div className=" flex flex-col align-middle gap-4 md:gap-12 justify-between">
             <HeatMap_Month journal={studentJournal} />
             <PractiseBoxes journalEntries={studentJournal} />
           </div>
-          <div className=" flex flex-col gap-4">
+          <div className=" flex flex-col gap-8">
             <WorkoutActivityChart journal={studentJournal} />
             <WorkoutIntensityChart journal={studentJournal} />
           </div>
-          <div className="block  overflow-y-scroll">
+          <div className="overflow-y-scroll">
             <RecentJournalEntries />
           </div>
-          <div className="flex  col-span-3 overflow-auto">
+          <div className="flex  md:col-span-3 overflow-x-scroll">
             <HeatMap_Year journal={studentJournal} />
           </div>
         </div>

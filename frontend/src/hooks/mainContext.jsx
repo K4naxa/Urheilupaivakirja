@@ -26,7 +26,7 @@ export const MainContextProvider = ({ children }) => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-    location.reload();
+    document.documentElement.setAttribute("data-theme", newTheme);
   };
 
   return (

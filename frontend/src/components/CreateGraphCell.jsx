@@ -1,4 +1,6 @@
 export default function CreateGraphCell({ value, max, text }) {
+  if (value === null || undefined) value = 0;
+  if (max === 0 || null || undefined) max = 1;
   const percentage = Math.round((value / max) * 1000) / 10;
 
   return (

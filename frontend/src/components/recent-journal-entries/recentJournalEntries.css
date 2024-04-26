@@ -1,12 +1,5 @@
-/* THE STYLING IS PRETTY ROUGH AS IT IS JUST A TEMPLATE */
-
-/* Main horizontal container styling */
-
 /* Vertical container for individual entries */
 .recent-journal-entries-vertical-container {
-  /* Activate for basic scrolling
-  max-height: 800px;
-  overflow-x: auto; */
   display: flex;
   flex-direction: column;
   width: 90%;

@@ -11,7 +11,7 @@ const StudentLayout = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <header className={`bg-bgkPrimary flex items-center  py-4 text-xl`}>
+      {/* <header className={`bg-bgkPrimary flex items-center  py-4 text-xl`}>
         <nav id="top-nav" className="flex w-full gap-8 justify-center">
           <Link to="/" className={linkClass}>
             Etusivu
@@ -43,9 +43,9 @@ const StudentLayout = () => {
             </button>
           </div>
         </div>
-      </header>
+      </header> */}
       <div className="h-[1px] w-full bg-blue-400 "></div>
-      <main className="max-w-1480">
+      <main className="max-w-[1280px]">
         <Outlet />
         <div className="absolute bottom-2 right-5">
           <ThemeSwitcher />

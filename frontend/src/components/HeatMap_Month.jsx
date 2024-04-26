@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
@@ -75,8 +75,9 @@ const HeatMap_Month = ({ journal }) => {
         theme: theme,
 
         date: {
-          start: showDate,
-          max: new Date(2024, 12, 31),
+          start: dayjs(
+            new Date(showDate.getFullYear(), showDate.getMonth(), 5)
+          ).format("YYYY-MM-DD"),
           highlight: new Date(),
           name: "x-pseudo",
           locale: {
@@ -113,9 +114,9 @@ const HeatMap_Month = ({ journal }) => {
         },
         subDomain: {
           type: "day",
-          width: 65,
-          height: 65,
-          gutter: 10,
+          width: 45,
+          height: 45,
+          gutter: 7,
           radius: 5,
         },
       },
@@ -173,26 +174,32 @@ const HeatMap_Month = ({ journal }) => {
   }, [data, showDate]);
 
   return (
-    <div className="flex flex-col w-full text-center ">
-      <div className="flex justify-center gap-4">
-        <button className="hover:underline" onClick={handlePreviousYearClick}>
-          Previous
-        </button>
-        <h2 className="text-textPrimary text-3xl">{showDate.getFullYear()}</h2>
-        <button className="hover:underline" onClick={handleNextYearClick}>
-          Next
-        </button>
+    <div className="flex flex-col w-full text-center gap-4">
+      <div className="flex flex-col w-full text-center">
+        <div className="flex gap-4 justify-center">
+          <button
+            className="hover:underline"
+            onClick={handlePreviousMonthClick}
+          >
+            Previous
+          </button>
+          <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
+          <button className="hover:underline" onClick={handleNextMonthClick}>
+            Next
+          </button>
+        </div>
+        <div className="flex justify-center gap-4">
+          <button className="hover:underline" onClick={handlePreviousYearClick}>
+            Previous
+          </button>
+          <h2 className="text-textPrimary">{showDate.getFullYear()}</h2>
+          <button className="hover:underline" onClick={handleNextYearClick}>
+            Next
+          </button>
+        </div>
       </div>
-      <div className="flex gap-4 justify-center">
-        <button className="hover:underline" onClick={handlePreviousMonthClick}>
-          Previous
-        </button>
-        <p>{monthNames[showDate.getMonth()]}</p>
-        <button className="hover:underline" onClick={handleNextMonthClick}>
-          Next
-        </button>
-      </div>
-      <div id="cal-heatmapMonth"></div>
+
+      <div id="cal-heatmapMonth" className="flex w-full justify-center"></div>
     </div>
   );
 };

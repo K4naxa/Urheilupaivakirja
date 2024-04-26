@@ -41,8 +41,9 @@ const HeatMap_Year = ({ journal }) => {
         theme: theme,
 
         date: {
-          start: showDate,
-          max: new Date(2024, 12, 31),
+          start: dayjs(new Date(showDate.getFullYear(), 1, 1)).format(
+            "YYYY-MM-DD"
+          ),
           highlight: new Date(),
           name: "x-pseudo",
           locale: {
@@ -137,13 +138,9 @@ const HeatMap_Year = ({ journal }) => {
         ],
       ]
     );
-  }, [data, showDate]);
+  }, [data, showDate.getFullYear()]);
 
-  return (
-    <div className="heatmapYear-container">
-      <div id="cal-heatmapYear"></div>
-    </div>
-  );
+  return <div id="cal-heatmapYear" className="flex w-full"></div>;
 };
 
 export default HeatMap_Year;

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import CreateGraphCell from "./CreateGraphCell";
+import { useMainContext } from "../hooks/mainContext";
 import dayjs from "dayjs";
 
 export default function WorkoutIntensityChart({ journal }) {
   const [data, setData] = useState({});
   const [showMonth, setShowMonth] = useState(true);
+  const { showDate } = useMainContext();
 
   useEffect(() => {
     setData({
@@ -16,11 +18,11 @@ export default function WorkoutIntensityChart({ journal }) {
     let filteredEntries = journal.filter((entry) => entry.intensity !== null);
     if (showMonth) {
       filteredEntries = filteredEntries.filter(
-        (entry) => dayjs(entry.date).month() === dayjs().month()
+        (entry) => dayjs(entry.date).month() === dayjs(showDate).month()
       );
     } else {
       filteredEntries = filteredEntries.filter(
-        (entry) => dayjs(entry.date).year() === dayjs().year()
+        (entry) => dayjs(entry.date).year() === dayjs(showDate).year()
       );
     }
 
@@ -38,12 +40,10 @@ export default function WorkoutIntensityChart({ journal }) {
       if (entry.intensity === 3) newData.three++;
     });
     setData(newData);
-    console.log(filteredEntries);
-    console.log(newData);
-  }, [journal, showMonth]);
+  }, [journal, showMonth, showDate]);
 
   return (
-    <div className="flex flex-col items-center w-full gap-4 bg-bgkSecondary rounded-md p-4">
+    <div className="flex flex-col items-center w-full gap-2 bg-bgkSecondary rounded-md p-4">
       <h2 className="text-textPrimary text-center text-lg my-0 ">
         Harjoitusten Pituudet
       </h2>
@@ -62,9 +62,24 @@ export default function WorkoutIntensityChart({ journal }) {
           Vuosi
         </p>
       </div>
-      <CreateGraphCell value={data.one} max={data.totalEntries} text="Chilli" />
-      <CreateGraphCell value={data.two} max={data.totalEntries} text="perus" />
-      <CreateGraphCell value={data.three} max={data.totalEntries} text="Kova" />
+      <div className="flex flex-col gap-1 w-full">
+        {" "}
+        <CreateGraphCell
+          value={data.one}
+          max={data.totalEntries}
+          text="Chilli"
+        />
+        <CreateGraphCell
+          value={data.two}
+          max={data.totalEntries}
+          text="perus"
+        />
+        <CreateGraphCell
+          value={data.three}
+          max={data.totalEntries}
+          text="Kova"
+        />
+      </div>
     </div>
   );
 }

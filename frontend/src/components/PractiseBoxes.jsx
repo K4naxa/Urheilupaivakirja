@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useMainContext } from "../hooks/mainContext";
 import dayjs from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 
 const PractiseBoxes = ({ journalEntries }) => {
+  const { showDate } = useMainContext();
   const [showMonth, setShowMonth] = useState(true);
   const [trainingData, setTrainingData] = useState({
     hours: null,
@@ -11,7 +13,7 @@ const PractiseBoxes = ({ journalEntries }) => {
     activity: null,
   });
 
-  // Filter out all exept training practices
+  // Filter out all except training practices
 
   useEffect(() => {
     if (journalEntries) {
@@ -30,7 +32,7 @@ const PractiseBoxes = ({ journalEntries }) => {
         );
       }
 
-      // Calculate total hours, minutes, count and activity
+      // Calculate total hours, minutes, count, and activity
       let totalHours = 0;
       let totalMinutes = 0;
       let count = filteredEntries.length;
@@ -94,24 +96,24 @@ const PractiseBoxes = ({ journalEntries }) => {
       </div>
       <div className="flex justify-between my-1">
         <div className={boxClass}>
-          <p className="flex justify-center align-bottom">
-            <p className={highlightClass}>{trainingData.hours}</p>
-            <p className={secondaryText}> Tuntia</p>
-          </p>
-          <p className="flex">
+          <div className="flex justify-center align-bottom">
+            <span className={highlightClass}>{trainingData.hours}</span>
+            <span className={secondaryText}> Tuntia</span>
+          </div>
+          <div className="flex">
             <span className={highlightClass}>{trainingData.minutes}</span>
-            <p className={secondaryText}> min</p>
-          </p>
-          <p className={secondaryText}>Treenattu aika</p>
+            <span className={secondaryText}> min</span>
+          </div>
+          <span className={secondaryText}>Treenattu aika</span>
         </div>
         <div className={boxClass}>
-          <p className="self-center justify-self-center font-bold text-lg">
+          <span className="self-center justify-self-center font-bold text-lg">
             {trainingData.count}
-          </p>
-          <p className={secondaryText}>Treenikertaa</p>
+          </span>
+          <span className={secondaryText}>Treenikertaa</span>
         </div>
         <div className={boxClass}>
-          <p>Activity: {trainingData.activity}%</p>
+          <span>Activity: {trainingData.activity}%</span>
         </div>
       </div>
     </div>
