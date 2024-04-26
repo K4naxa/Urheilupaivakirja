@@ -15,6 +15,9 @@ export default {
 
         graphPrimary: "rgb(var(--color-graph-primary) / <alpha-value>)",
         graphSecondary: "rgb(var(--color-graph-secondary) / <alpha-value>)",
+
+        headerPrimary: "rgb(var(--color-header-primary) / <alpha-value>)",
+        headerSecondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
       },
       animation: {
         "spin-slow": "spin 3s linear infinite",

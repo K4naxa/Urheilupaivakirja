@@ -74,3 +74,24 @@
 [data-theme="dark"] .ch-subdomain-bg:hover {
   stroke: #636e7b;
 }
+
+/* Scrollbar Settings */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #d6d6d6;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-graph-primary));
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -26,11 +26,14 @@ function StudentHome() {
   } else
     return (
       <div className="mainArea ">
-        <div className="flex justify-center">
+        <div className=" hidden md:flex md:justify-center">
           <button className="text-xl px-6 py-4 bg-graphPrimary rounded-md ">
             Uusi Harjoitus
           </button>
         </div>
+        <button className="size-20 text-3xl shadow-xl absolute right-5 bottom-10 bg-graphPrimary rounded-full">
+          +
+        </button>
         <div
           className={`bg-bgkPrimary text-textPrimary grid gap-4 md:gap-12 grid-cols-1 md:grid-cols-3 md:grid-rows-2 p-4`}
         >
@@ -42,7 +45,7 @@ function StudentHome() {
             <WorkoutActivityChart journal={studentJournal} />
             <WorkoutIntensityChart journal={studentJournal} />
           </div>
-          <div className="overflow-y-scroll">
+          <div className="">
             <RecentJournalEntries />
           </div>
           <div className="flex  md:col-span-3 overflow-x-scroll">

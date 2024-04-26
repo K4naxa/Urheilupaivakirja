@@ -43,27 +43,24 @@ export default function WorkoutIntensityChart({ journal }) {
   }, [journal, showMonth, showDate]);
 
   return (
-    <div className="flex flex-col items-center w-full gap-2 bg-bgkSecondary rounded-md p-4">
-      <h2 className="text-textPrimary text-center text-lg my-0 ">
-        Harjoitusten Pituudet
-      </h2>
-      <div className="flex gap-2 my-0 text-sm">
+    <div className="flex flex-col w-full gap-2">
+      <div className="flex  gap-2">
+        <h2 className="text-textPrimary text-lg">Treeni pituudet</h2>
         <p
-          className={`hover:cursor-pointer hover:underline ${showMonth ? "text-textPrimary" : "text-textSecondary"}`}
+          className={`hover:cursor-pointer hover:underline my-auto  text-sm ${showMonth ? "text-textPrimary" : "text-textSecondary"}`}
           onClick={() => setShowMonth(true)}
         >
           Kuukausi
         </p>
-        /
+        <p className="my-auto">|</p>
         <p
           onClick={() => setShowMonth(false)}
-          className={`hover:cursor-pointer hover:underline ${showMonth ? "text-textSecondary" : "text-textPrimary"}`}
+          className={`hover:cursor-pointer hover:underline my-auto text-sm ${showMonth ? "text-textSecondary" : "text-textPrimary"}`}
         >
           Vuosi
         </p>
       </div>
-      <div className="flex flex-col gap-1 w-full">
-        {" "}
+      <div className="flex flex-col gap-1 w-full bg-bgkSecondary rounded-md p-4">
         <CreateGraphCell
           value={data.one}
           max={data.totalEntries}
