@@ -25,7 +25,7 @@ function StudentHome() {
     );
   } else
     return (
-      <div className="mainArea min-w-[370px] overflow-x-scroll">
+      <div className="mainArea overflow-x-auto">
         <div className=" hidden lg:flex md:justify-center">
           <button className="text-xl px-6 py-4 bg-graphPrimary rounded-md ">
             Uusi Harjoitus
@@ -45,7 +45,7 @@ function StudentHome() {
           <div className="lg:col-span-1 sm:col-span-2">
             <RecentJournalEntries />
           </div>
-          <div className="flex  lg:col-span-3 sm:col-span-2 overflow-x-scroll">
+          <div className="flex  lg:col-span-3 sm:col-span-2 overflow-x-auto">
             <HeatMap_Year journal={studentJournal} />
           </div>
         </div>

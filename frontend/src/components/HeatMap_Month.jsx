@@ -121,6 +121,7 @@ const HeatMap_Month = ({ journal }) => {
           height: 40,
           gutter: 7,
           radius: 5,
+          label: "D",
         },
       },
       [

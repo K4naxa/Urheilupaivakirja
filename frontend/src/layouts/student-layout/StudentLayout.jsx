@@ -99,7 +99,7 @@ const StudentLayout = () => {
           </div>
         </nav>
       </header>
-      <main className="max-w-[1280px]">
+      <main className="max-w-[1480px]">
         <Outlet />
         <div className="absolute bottom-2 right-5">
           <ThemeSwitcher />
