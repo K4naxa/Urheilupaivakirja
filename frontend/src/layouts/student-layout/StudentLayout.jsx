@@ -14,15 +14,17 @@ const StudentLayout = () => {
   const { logout } = useAuth();
   const [showBar, setShowBar] = useState(false);
 
-  const linkClass = `flex flex-col items-center text-textPrimary px-2`;
+  const linkClass = `flex flex-col items-center text-textPrimary hover:text-graphPrimary`;
 
   return (
-    <div className="flex flex-col w-full">
+    <div className=" flex w-full flex-col">
       <header
-        className={`hidden bg-bgkPrimary lg:flex items-center w-full text-xl relative border-b-2 border-graphPrimary mb-12 max-h-16`}
+        className={`bg-bgkPrimary border-graphPrimary mb-12 hidden w-full 
+         items-center justify-between border-b-2 px-4 py-2 text-xl lg:flex`}
       >
-        <nav id="top-nav" className="  md:flex w-full gap-8 justify-center">
-          <div className="hidden md:flex gap-8 justify-center ">
+        <nav id="top-nav" className="flex justify-center gap-8">
+          <div className="text-textPrimary flex justify-center gap-8 ">
+            <>Urheilupäiväkirja</>
             <Link to="/" className={linkClass}>
               Etusivu
             </Link>
@@ -31,15 +33,21 @@ const StudentLayout = () => {
             </Link>
           </div>
         </nav>
-        <div className=" flex items-center gap-2 right-4 ">
-          <div className="m-0 p-0" id="profileButton">
+        <div className=" right-4 flex items-center gap-4 ">
+          <button className="bg-graphPrimary text-bgkPrimary border-graphPrimary rounded-md border-2 px-4 py-2 drop-shadow-lg hover:border-white">
+            + Uusi Merkintä
+          </button>
+
+          <ThemeSwitcher />
+          <div className="" id="profileButton">
             <NavLink
               to="/profiili"
               className={
-                "flex flex-col items-center text-textPrimary px-2 hover:text-bgkSecondary active:text-graphPrimary"
+                "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary flex flex-col items-center px-2"
               }
             >
               <FiUser />
+              <p className="text-[12px]">Käyttäjä</p>
             </NavLink>
           </div>
           <div className="m-0 p-0" id="logoutButton">
@@ -50,6 +58,7 @@ const StudentLayout = () => {
               }}
             >
               <FiLogOut />
+              <p className="text-[12px]">Kirjaudu ulos</p>
             </button>
           </div>
         </div>
@@ -57,13 +66,13 @@ const StudentLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`lg:hidden bg-bgkPrimary bottom-0  flex items-center w-full text-xl fixed h-16 shadow-upper-shadow `}
+        className={`bg-bgkPrimary shadow-upper-shadow fixed  bottom-0 flex h-16 w-full items-center text-xl lg:hidden `}
       >
         <nav
           id="top-nav"
-          className="grid grid-cols-mHeader w-full place-content-center"
+          className="grid-cols-mHeader grid w-full place-content-center"
         >
-          <div className="flex items-center text-2xl justify-around">
+          <div className="flex items-center justify-around text-2xl">
             <NavLink to="/" className={linkClass}>
               <FiHome />
               <p className="text-[12px]">Etusivu</p>
@@ -74,9 +83,12 @@ const StudentLayout = () => {
             </Link>
           </div>
           <div className="flex justify-center">
-            <button className="size-16 absolute bottom-8 rounded-full bg-bgkSecondary border-t-2 border-graphPrimary text-graphPrimary text-3xl drop-shadow-xl shadow-upper-shadow active:scale-110 duration-100">
+            <button className="bg-bgkSecondary border-graphPrimary text-graphPrimary shadow-upper-shadow absolute bottom-8 z-10 size-16 rounded-full border-t-2 text-3xl drop-shadow-xl duration-100 active:scale-110">
               +
             </button>
+            <div className=" absolute bottom-0 ">
+              <ThemeSwitcher />
+            </div>
           </div>
           <div className=" flex items-center justify-around ">
             <div className="m-0 p-0" id="profileButton">
@@ -99,11 +111,8 @@ const StudentLayout = () => {
           </div>
         </nav>
       </header>
-      <main className="max-w-[1480px]">
+      <main className="mx-1 max-w-[1480px] lg:mx-4">
         <Outlet />
-        <div className="absolute bottom-2 right-5">
-          <ThemeSwitcher />
-        </div>
       </main>
     </div>
   );

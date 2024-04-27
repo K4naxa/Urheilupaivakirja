@@ -36,6 +36,18 @@
     --color-graph-secondary: 34 40 49;
   }
 
+  :root[data-theme="dark"] {
+    font-family: roboto, sans-serif;
+    --color-bg-primary: 28 28 31;
+    --color-bg-secondary: 49 49 60;
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 151 149 173;
+    --color-border-primary: 255 255 255;
+
+    --color-graph-primary: 49 156 255;
+    --color-graph-secondary: 34 40 49;
+  }
+
   body {
     background-color: rgb(var(--color-bg-primary));
     display: flex;
@@ -83,7 +95,9 @@ a.active {
 
 /* Scrollbar Settings */
 ::-webkit-scrollbar {
+  margin: 10px;
   width: 10px;
+  height: 10px;
 }
 
 /* Track */

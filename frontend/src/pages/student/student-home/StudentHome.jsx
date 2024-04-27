@@ -25,16 +25,12 @@ function StudentHome() {
     );
   } else
     return (
-      <div className="mainArea overflow-x-auto">
-        <div className=" hidden lg:flex md:justify-center">
-          <button className="text-xl px-6 py-4 bg-graphPrimary rounded-md ">
-            Uusi Harjoitus
-          </button>
-        </div>
+      <div className="mainArea overflow-x-auto pb-14">
+        <div className=" hidden md:justify-center lg:flex"></div>
         <div
-          className={`bg-bgkPrimary text-textPrimary grid gap-4 md:gap-8 lg:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg::grid-rows-2 p-4`}
+          className={`bg-bgkPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-12`}
         >
-          <div className=" flex flex-col align-middle gap-4 md:gap-12 justify-between">
+          <div className=" flex flex-col justify-between gap-4 align-middle md:gap-12">
             <HeatMap_Month journal={studentJournal} />
             <PractiseBoxes journalEntries={studentJournal} />
           </div>
@@ -42,10 +38,10 @@ function StudentHome() {
             <WorkoutActivityChart journal={studentJournal} />
             <WorkoutIntensityChart journal={studentJournal} />
           </div>
-          <div className="lg:col-span-1 sm:col-span-2">
+          <div className="sm:col-span-2 lg:col-span-1">
             <RecentJournalEntries />
           </div>
-          <div className="flex  lg:col-span-3 sm:col-span-2 overflow-x-auto">
+          <div className="flex  overflow-x-auto sm:col-span-2 lg:col-span-3">
             <HeatMap_Year journal={studentJournal} />
           </div>
         </div>

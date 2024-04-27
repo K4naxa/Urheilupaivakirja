@@ -79,7 +79,7 @@ const HeatMap_Month = ({ journal }) => {
 
         date: {
           start: dayjs(
-            new Date(showDate.getFullYear(), showDate.getMonth(), 5)
+            new Date(showDate.getFullYear(), showDate.getMonth(), 5),
           ).format("YYYY-MM-DD"),
           highlight: new Date(),
           name: "x-pseudo",
@@ -88,7 +88,7 @@ const HeatMap_Month = ({ journal }) => {
             timezone: "Europe/Helsinki",
             months:
               "Tammikuu_Helmikuu_Maaliskuu_Huhtikuu_Toukokuu_Kesäkuu_Heinäkuu_Elokuu_Syyskuu_Lokakuu_Marraskuu_Joulukuu".split(
-                "_"
+                "_",
               ),
           },
         },
@@ -117,8 +117,8 @@ const HeatMap_Month = ({ journal }) => {
         },
         subDomain: {
           type: "xDay",
-          width: 40,
-          height: 40,
+          width: 45,
+          height: 45,
           gutter: 7,
           radius: 5,
           label: "D",
@@ -165,24 +165,24 @@ const HeatMap_Month = ({ journal }) => {
         [
           CalendarLabel,
           {
-            position: "left",
-            key: "left",
-            height: 65,
-            gutter: 10,
-            width: 30,
+            position: "top",
+            key: "weekdays",
+            height: 20,
+            gutter: 7,
+            width: 45,
             text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
           },
         ],
-      ]
+      ],
     );
   }, [data, showDate]);
 
   return (
-    <div className="flex flex-col w-full text-center gap-4">
+    <div className="flex w-full flex-col gap-4 text-center">
       {/* date controls */}
-      <div className="flex flex-col w-full text-center">
+      <div className="flex w-full flex-col text-center">
         <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-        <div className="flex gap-4 justify-center hover:">
+        <div className="hover: flex justify-center gap-4">
           <button
             className="hover:underline"
             onClick={handlePreviousMonthClick}
@@ -195,7 +195,7 @@ const HeatMap_Month = ({ journal }) => {
           </button>
           <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
           <button
-            className="hover:underline hover:fill-blue-500"
+            className="hover:fill-blue-500 hover:underline"
             onClick={handleNextMonthClick}
           >
             <IconContext.Provider

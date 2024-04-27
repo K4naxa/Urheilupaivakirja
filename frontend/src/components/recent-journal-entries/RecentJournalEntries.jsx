@@ -37,29 +37,29 @@ const labelClass = "text-textSecondary min-w-16";
 const RecentJournalEntry = ({ entry }) => {
   const navigate = useNavigate();
   return (
-    <div className=" flex flex-col w-full bg-bgkSecondary rounded-md shadow-sm ">
+    <div className=" bg-bgkSecondary flex w-full snap-start flex-col rounded-md shadow-sm ">
       {/* Header */}
-      <div className="grid grid-cols-3 bg-bgkSecondary rounded-t-md border-b-2 border-graphPrimary py-2  ">
+      <div className="bg-bgkSecondary border-graphPrimary grid grid-cols-3 rounded-t-md border-b-2 py-2  ">
         {entry.entry_type &&
           (entry.entry_type === "Lepo" || entry.entry_type === "Sairaana") && (
-            <p className="col-start-1 mx-2 justify-self-start text-textPrimary">
+            <p className="text-textPrimary col-start-1 mx-2 justify-self-start">
               {entry.entry_type}
             </p>
           )}
         {entry.date && (
-          <p className="col-start-2 text-textPrimary text-center">
+          <p className="text-textPrimary col-start-2 text-center">
             {formatDateToDisplay(entry.date)}
           </p>
         )}
         <button
           onClick={() => navigate(`/merkinnat/muokkaa/${entry.id}`)}
-          className="col-start-3 justify-self-end mx-4"
+          className="col-start-3 mx-4 justify-self-end"
         >
           <FiEdit3 />
         </button>
       </div>
       {/* content container */}
-      <div className="w-full p-2 pb-0 grid gap-2 grid-cols-2">
+      <div className="grid w-full grid-cols-2 gap-2 p-2 pb-0">
         {/* left Container */}
         <div>
           {entry.length_in_minutes && (
@@ -122,9 +122,9 @@ const RecentJournalEntries = () => {
   }, []);
 
   return (
-    <div className=" flex flex-col max-h-[570px] w-full gap-2 ">
+    <div className=" flex max-h-[570px] w-full flex-col gap-2 ">
       <h2 className="text-lg">Viimeisimmät merkinnät</h2>
-      <div className="flex flex-col w-full overflow-y-auto gap-4 rounded-md  scroll-smooth">
+      <div className="flex w-full snap-y scroll-m-1 flex-col gap-4  overflow-y-auto scroll-smooth rounded-md">
         {recentEntries.map((entry) => (
           <RecentJournalEntry key={entry.id} entry={entry} />
         ))}
