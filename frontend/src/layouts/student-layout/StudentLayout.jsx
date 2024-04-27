@@ -17,8 +17,8 @@ const StudentLayout = () => {
   return (
     <div className=" flex w-full flex-col">
       <header
-        className={`bg-bgkPrimary border-graphPrimary mb-12 hidden w-full  
-         items-center justify-between border-b-2 px-4 py-2 text-xl lg:flex`}
+        className={`bg-bgkPrimary border-graphPrimary fixed mb-12 hidden  
+         w-full items-center justify-between border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8">
           <div className="text-textPrimary flex justify-center gap-8 ">
@@ -109,7 +109,7 @@ const StudentLayout = () => {
           </div>
         </nav>
       </header>
-      <main className="mx-1 max-w-[1480px] lg:mx-4">
+      <main className="mx-1 max-w-[1480px] lg:mx-4 lg:mt-20">
         <Outlet />
       </main>
     </div>

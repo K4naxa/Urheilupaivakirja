@@ -34,7 +34,7 @@ function StudentHome() {
             <HeatMap_Month journal={studentJournal} />
             <PractiseBoxes journalEntries={studentJournal} />
           </div>
-          <div className=" flex flex-col gap-8">
+          <div className=" flex flex-col gap-4">
             <WorkoutActivityChart journal={studentJournal} />
             <WorkoutIntensityChart journal={studentJournal} />
           </div>

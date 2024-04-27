@@ -70,6 +70,10 @@ a.active {
 /* Cal-Heatmap Settings */
 .ch-subdomain-bg {
   fill: rgb(var(--color-bg-secondary));
+  color: rgb(var(--color-text-primary));
+}
+.ch-subdomain-text {
+  fill: rgb(var(--color-text-secondary));
 }
 
 .ch-subdomain-bg.highlight {
@@ -91,6 +95,7 @@ a.active {
 
 [data-theme="dark"] .ch-subdomain-bg:hover {
   stroke: #636e7b;
+  color: rgb(var(--color-text-primary));
 }
 
 /* Scrollbar Settings */

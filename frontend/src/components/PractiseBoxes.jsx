@@ -73,12 +73,12 @@ const PractiseBoxes = ({ journalEntries }) => {
     }
   }, [journalEntries, showMonth, showDate]);
 
-  const boxClass = `bg-bgkSecondary flex flex-col justify-between p-3 rounded-md min-w-28 min-h-28 `;
+  const boxClass = `bg-bgkSecondary flex flex-col justify-between p-2 rounded-md w-24 h-24`;
   const highlightClass = `text-textPrimary self-center justify-self-center font-bold my-auto text-lg`;
-  const secondaryText = `text-sm text-textSecondary justify-self-center`;
+  const secondaryText = `text-sm text-textSecondary text-center justify-self-center`;
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col gap-2">
       <div>
         <div className="my-0 flex gap-2 text-sm">
           <p className="text-lg">Harjoitukset</p>
@@ -97,7 +97,7 @@ const PractiseBoxes = ({ journalEntries }) => {
           </p>
         </div>
       </div>
-      <div className="min-w flex flex-wrap justify-between gap-4">
+      <div className="min-w flex justify-between gap-2">
         <div className={boxClass}>
           <div className="grid grid-cols-2 items-center">
             <span className={highlightClass}>{trainingData.hours}</span>
@@ -107,13 +107,11 @@ const PractiseBoxes = ({ journalEntries }) => {
             <span className={highlightClass}>{trainingData.minutes}</span>
             <span className={secondaryText}> min</span>
           </div>
-          <span className={secondaryText}>Treenattu aika</span>
+          <span className={secondaryText}>Treenattu</span>
         </div>
         <div className={boxClass}>
           <span className={highlightClass}>{trainingData.count}</span>
-          <span className={"text-textSecondary bottom-0 text-sm"}>
-            Treenikertaa
-          </span>
+          <span className={secondaryText}>Treenikertaa</span>
         </div>
         <div className={boxClass}>
           <span className={highlightClass}>{trainingData.activity}%</span>
