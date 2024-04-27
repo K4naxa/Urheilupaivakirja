@@ -62,6 +62,15 @@
   align-items: center;
   width: 100%;
 }
+.fixed-header {
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
 
 a.active {
   color: rgb(var(--color-graph-primary));

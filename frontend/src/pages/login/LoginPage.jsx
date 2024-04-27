@@ -1,4 +1,4 @@
-import "./loginPage.css";
+import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 import userService from "../../services/userService";
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
@@ -56,15 +56,19 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-container">
-        <div className="login-header-container">Kirjautuminen</div>
-        <div className="input-container">
-          <div className=" login-input-container">
+    <div className="bg-bgkPrimary flex h-screen w-screen  justify-center">
+      <div className="bg-bgkSecondary flex  h-fit flex-col gap-4 self-center rounded-md border-2 shadow-md">
+        <div className="bg-graphPrimary ce rounded-t-md p-5 text-center text-xl shadow-md">
+          Kirjautuminen
+        </div>
+        <div className="flex flex-col gap-4 p-12">
+          <div className=" flex w-full flex-col gap-1">
             <label>Sähköposti</label>
             <input
               type="email"
               value={email}
+              required
+              className="bg-bgkPrimary text-textPrimary h-10 w-full rounded-md border-2 p-1 "
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -74,12 +78,14 @@ function LoginPage() {
             />
           </div>
 
-          <div className=" login-input-container">
+          <div className=" flex w-full flex-col gap-1">
             <label>Salasana</label>
             <input
+              className="bg-bgkPrimary text-textPrimary h-10 w-full rounded-md border-2 p-1"
               type="password"
               value={password}
               ref={passwordInput}
+              required
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -89,8 +95,8 @@ function LoginPage() {
             />
           </div>
 
-          <div className="button-container">
-            <div className="upper-container">
+          <div className="flex flex-col justify-between gap-1">
+            <div className="flex items-center justify-between">
               <div className="box">
                 <input
                   type="checkbox"
@@ -105,9 +111,12 @@ function LoginPage() {
               </div>
             </div>
 
-            <div className="buttons">
+            <div className="flex justify-between gap-1 ">
               <Link to="/rekisteroidy">
-                <button type="button" className="registerButton button">
+                <button
+                  type="button"
+                  className="text-textPrimary border-graphPrimary cursor-pointer border-2 px-4 py-2 "
+                >
                   Rekisteröidy
                 </button>
               </Link>
@@ -122,6 +131,9 @@ function LoginPage() {
           </div>
           {error && <p>{error}</p>}
         </div>
+      </div>
+      <div className="absolute right-5 top-5">
+        <ThemeSwitcher />
       </div>
     </div>
   );

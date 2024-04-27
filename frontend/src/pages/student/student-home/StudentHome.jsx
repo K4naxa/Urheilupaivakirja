@@ -26,7 +26,6 @@ function StudentHome() {
   } else
     return (
       <div className="mainArea overflow-x-auto pb-14">
-        <div className=" hidden md:justify-center lg:flex"></div>
         <div
           className={`bg-bgkPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-12`}
         >
