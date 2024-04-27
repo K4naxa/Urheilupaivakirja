@@ -4,7 +4,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
-import { useState } from "react";
 import { FiMessageSquare } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 
@@ -12,25 +11,24 @@ import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 
 const StudentLayout = () => {
   const { logout } = useAuth();
-  const [showBar, setShowBar] = useState(false);
 
-  const linkClass = `flex flex-col items-center text-textPrimary hover:text-graphPrimary`;
+  const linkClass = `flex flex-col items-center text-textPrimary hover:underline`;
 
   return (
     <div className=" flex w-full flex-col">
       <header
-        className={`bg-bgkPrimary border-graphPrimary mb-12 hidden w-full 
+        className={`bg-bgkPrimary border-graphPrimary mb-12 hidden w-full  
          items-center justify-between border-b-2 px-4 py-2 text-xl lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8">
           <div className="text-textPrimary flex justify-center gap-8 ">
             <>Urheilupäiväkirja</>
-            <Link to="/" className={linkClass}>
+            <NavLink to="/" className={linkClass}>
               Etusivu
-            </Link>
-            <Link to="/tiedotteet/" className={linkClass}>
+            </NavLink>
+            <NavLink to="/tiedotteet/" className={linkClass}>
               Tiedotteet
-            </Link>
+            </NavLink>
           </div>
         </nav>
         <div className=" right-4 flex items-center gap-4 ">

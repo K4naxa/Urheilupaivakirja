@@ -18,17 +18,19 @@ const PractiseBoxes = ({ journalEntries }) => {
   useEffect(() => {
     if (journalEntries) {
       let filteredEntries = journalEntries.filter(
-        (entry) => entry.intensity !== null
+        (entry) => entry.intensity !== null,
       );
 
-      // filter out by month or year
+      // filter out by month or year based on showDate
       if (showMonth) {
         filteredEntries = filteredEntries.filter(
-          (entry) => dayjs(entry.date).month() === dayjs().month()
+          (entry) =>
+            dayjs(entry.date).month() === dayjs(showDate).month() &&
+            dayjs(entry.date).year() === dayjs(showDate).year(),
         );
       } else {
         filteredEntries = filteredEntries.filter(
-          (entry) => dayjs(entry.date).year() === dayjs().year()
+          (entry) => dayjs(entry.date).year() === dayjs(showDate).year(),
         );
       }
 
@@ -37,21 +39,22 @@ const PractiseBoxes = ({ journalEntries }) => {
       let totalMinutes = 0;
       let count = filteredEntries.length;
       let activity = 0;
-      const currentDate = dayjs();
 
       // get unique days of the month or year that have exercises
       const uniqueDays = new Set(
-        filteredEntries
-          .filter((entry) => dayjs(entry.date).date() <= currentDate.date()) // Filter entries up to the current day
-          .map((entry) => dayjs(entry.date).date())
+        filteredEntries.map((entry) => dayjs(entry.date).date()),
       );
 
       // Calculate activity as a percentage
       dayjs.extend(dayOfYear);
       if (showMonth) {
-        activity = Math.floor((uniqueDays.size / dayjs().daysInMonth()) * 100);
+        activity = Math.floor(
+          (uniqueDays.size / dayjs(showDate).daysInMonth()) * 100,
+        );
       } else {
-        activity = Math.floor((uniqueDays.size / dayjs().dayOfYear()) * 100);
+        activity = Math.floor(
+          (uniqueDays.size / dayjs(showDate).dayOfYear()) * 100,
+        );
       }
 
       // Calculate total hours and minutes
@@ -68,16 +71,16 @@ const PractiseBoxes = ({ journalEntries }) => {
         activity: activity,
       });
     }
-  }, [journalEntries, showMonth]);
+  }, [journalEntries, showMonth, showDate]);
 
-  const boxClass = `bg-bgkSecondary flex flex-col p-3 rounded-md h-24 w-24 justify-center `;
-  const highlightClass = `text-textPrimary self-center justify-self-center font-bold text-lg`;
-  const secondaryText = `text-sm text-textSecondary justify-self-end`;
+  const boxClass = `bg-bgkSecondary flex flex-col justify-between p-3 rounded-md min-w-28 min-h-28 `;
+  const highlightClass = `text-textPrimary self-center justify-self-center font-bold my-auto text-lg`;
+  const secondaryText = `text-sm text-textSecondary justify-self-center`;
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full flex-col">
       <div>
-        <div className="flex gap-2 my-0 text-sm">
+        <div className="my-0 flex gap-2 text-sm">
           <p className="text-lg">Harjoitukset</p>
           <p
             className={` my-auto hover:cursor-pointer hover:underline ${showMonth ? "text-textPrimary" : "text-textSecondary"}`}
@@ -94,26 +97,27 @@ const PractiseBoxes = ({ journalEntries }) => {
           </p>
         </div>
       </div>
-      <div className="flex justify-between my-1">
+      <div className="min-w flex flex-wrap justify-between gap-4">
         <div className={boxClass}>
-          <div className="flex justify-center align-bottom">
+          <div className="grid grid-cols-2 items-center">
             <span className={highlightClass}>{trainingData.hours}</span>
             <span className={secondaryText}> Tuntia</span>
           </div>
-          <div className="flex">
+          <div className="grid grid-cols-2 items-center">
             <span className={highlightClass}>{trainingData.minutes}</span>
             <span className={secondaryText}> min</span>
           </div>
           <span className={secondaryText}>Treenattu aika</span>
         </div>
         <div className={boxClass}>
-          <span className="self-center justify-self-center font-bold text-lg">
-            {trainingData.count}
+          <span className={highlightClass}>{trainingData.count}</span>
+          <span className={"text-textSecondary bottom-0 text-sm"}>
+            Treenikertaa
           </span>
-          <span className={secondaryText}>Treenikertaa</span>
         </div>
         <div className={boxClass}>
-          <span>Activity: {trainingData.activity}%</span>
+          <span className={highlightClass}>{trainingData.activity}%</span>
+          <span className={secondaryText}>Aktiivisuus</span>
         </div>
       </div>
     </div>

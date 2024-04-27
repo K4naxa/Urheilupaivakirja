@@ -124,7 +124,7 @@ const RecentJournalEntries = () => {
   return (
     <div className=" flex max-h-[570px] w-full flex-col gap-2 ">
       <h2 className="text-lg">Viimeisimmät merkinnät</h2>
-      <div className="flex w-full snap-y scroll-m-1 flex-col gap-4  overflow-y-auto scroll-smooth rounded-md">
+      <div className="flex w-full snap-y scroll-m-1 flex-col gap-4 overflow-y-auto  overscroll-none scroll-smooth rounded-md">
         {recentEntries.map((entry) => (
           <RecentJournalEntry key={entry.id} entry={entry} />
         ))}
