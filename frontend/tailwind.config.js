@@ -23,10 +23,12 @@ export default {
         "spin-slow": "spin 3s linear infinite",
       },
       gridTemplateColumns: {
+        merkInfo: "auto 1fr",
         mainPage: "repeat(3, 330px))",
+        mHeader: "1fr 100px 1fr",
       },
-      gridTemplateRows: {
-        mainPage: "repeat(3, minmax(1fr, 330px))",
+      boxShadow: {
+        "upper-shadow": "0 -10px 10px -10px rgba(0, 0, 0, 0.2)",
       },
     },
   },

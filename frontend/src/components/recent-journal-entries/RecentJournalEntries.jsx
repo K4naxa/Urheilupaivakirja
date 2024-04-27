@@ -31,7 +31,8 @@ function formatDateToDisplay(isoDateString) {
   return `${day}.${month}.${year}`;
 }
 
-const dataContainerClass = "grid grid-cols-2 gap-2";
+const dataContainerClass = "grid grid-cols-merkInfo gap-2";
+const labelClass = "text-textSecondary min-w-16";
 
 const RecentJournalEntry = ({ entry }) => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const RecentJournalEntry = ({ entry }) => {
         <div>
           {entry.length_in_minutes && (
             <div className={dataContainerClass}>
-              <span className="text-textSecondary">Kesto:</span>
+              <span className={labelClass}>Kesto:</span>
               <span className="text-textPrimary">
                 {convertTime(entry.length_in_minutes)}
               </span>
@@ -72,7 +73,7 @@ const RecentJournalEntry = ({ entry }) => {
 
           {entry.intensity && (
             <div className={dataContainerClass}>
-              <span className="label">Rankkuus:</span>
+              <span className={labelClass}>Rankkuus:</span>
               <span className="value">{entry.intensity}</span>
             </div>
           )}
@@ -81,13 +82,13 @@ const RecentJournalEntry = ({ entry }) => {
         <div>
           {entry.workout_category && (
             <div className={dataContainerClass}>
-              <span className="label">Laji:</span>
+              <span className={labelClass}>Laji:</span>
               <span className="value">{entry.workout_category}</span>
             </div>
           )}
           {entry.time_of_day && (
             <div className={dataContainerClass}>
-              <span className="label">Aika:</span>
+              <span className={labelClass}>Aika:</span>
               <span className="value">{entry.time_of_day}</span>
             </div>
           )}
@@ -96,7 +97,7 @@ const RecentJournalEntry = ({ entry }) => {
       <div className="p-2">
         {entry.details && (
           <div className=" flex flex-wrap gap-2">
-            <span className="label">Lisätiedot:</span>
+            <span className={labelClass}>Lisätiedot:</span>
             <span className="value">{entry.details}</span>
           </div>
         )}
