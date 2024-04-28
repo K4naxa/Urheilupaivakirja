@@ -73,18 +73,18 @@ function LoginPage() {
     }
   };
 
-  // TODO: fix the bug regarding using the page in landscape mode > if height is less than content > header is not visible
+  // TODO: fix the bug regarding using the page in landscape mode > if height is less than content > header is not visible ( problmen something to do wit sm:h-fit )
   return (
-    <div className="bg-bgkPrimary text-textPrimary grid place-items-center  h-screen w-screen ">
-      <div className="bg-bgkSecondary border-borderPrimary flex h-full min-h-max  w-full md:max-w-[500px] flex-col self-center border shadow-md sm:h-fit sm:rounded-md">
+    <div className="bg-bgkPrimary text-textPrimary grid place-items-center  h-screen w-screen">
+      <div className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="bg-graphPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Kirjautuminen
         </div>
         <div className="relative flex h-full pt-20 flex-col gap-8 p-8 sm:p-12">
           {error && (
-            // TODO: make this slide down from top
-            <div className="">
-              <div className="absolute left-0 top-0 flex w-full justify-center bg-red-500 p-1 text-center text-lg  ">
+            // TODO: make the error message appear by sliding down from the top
+            <div className="absolute left-0 top-0 w-full flex justify-center">
+              <div className="bg-red-500 text-white w-full p-1 text-center text-lg rounded-b-md shadow-md transition-all duration-500">
                 {error}
               </div>
             </div>
