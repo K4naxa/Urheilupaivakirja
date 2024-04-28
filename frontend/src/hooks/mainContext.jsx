@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import trainingService from "../services/trainingService";
 
 const MainContext = createContext();
+
 export const MainContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
   const [showDate, setShowDate] = useState(new Date());

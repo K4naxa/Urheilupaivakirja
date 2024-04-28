@@ -4,10 +4,13 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 function LoginPage() {
+  const [errors, setErrors] = useState({
+    errorMessage: "",
+    emailError: "",
+    passwordError: "",
+  });
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState(false);
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
 
@@ -18,24 +21,29 @@ function LoginPage() {
 
   // function to check if email is in correct format
   const checkEmail = () => {
+    setErrors({ ...errors, emailError: "" });
     if (email.length < 1) {
-      setEmailError("Sähköposti ei voi olla tyhjä");
+      setErrors({ ...errors, emailError: "Sähköposti on pakollinen" });
+
       return false;
     }
     if (!myRegEx.test(email)) {
-      setEmailError("Sähköposti ei ole oikeassa muodossa");
+      setErrors({ ...errors, emailError: "Sähköposti on väärässä muodossa" });
       return false;
     }
-    setEmailError("");
     return true;
   };
 
   const checkPassword = () => {
+    setErrors({ ...errors, passwordError: "" });
     if (password.length < 8) {
-      setPasswordError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
+      setErrors({
+        ...errors,
+        passwordError: "Salasanan pituus on vähintään 8 merkkiä",
+      });
+
       return false;
     }
-    setPasswordError("");
     return true;
   };
 
@@ -67,7 +75,7 @@ function LoginPage() {
       login(user);
     } catch (error) {
       console.log(error);
-      setError("Sähköposti tai salasana on väärin");
+      setErrors({ ...errors, errorMessage: "Sähköposti tai salasana väärin" });
       setPassword("");
       return;
     }
@@ -80,12 +88,10 @@ function LoginPage() {
           Kirjautuminen
         </div>
         <div className="relative flex h-full pt-20 flex-col gap-10 p-8 sm:p-12">
-          {error && (
+          {errors.errorMessage && (
             // TODO: make the error message appear by sliding down from the top
-            <div className="w-full flex justify-center">
-              <div className="bg-red-500 text-white w-full p-1 text-center text-lg rounded-b-md shadow-md transition-all duration-500">
-                {error}
-              </div>
+            <div className="bg-red-500 text-white w-full p-1 text-center text-lg rounded-b-md shadow-md transition-all duration-500 absolute top-0 left-0">
+              {errors.errorMessage}
             </div>
           )}
           <div className=" flex w-full flex-col gap-1 relative">
@@ -94,7 +100,7 @@ function LoginPage() {
               value={email}
               required
               placeholder="Sähköposti"
-              className={` text-lg  text-textPrimary border-borderPrimary h-10 w-full focus-visible:outline-none focus-visible:border-graphPrimary border-b p-1 ${emailError ? " border-red-500" : ""}`}
+              className={` text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-graphPrimary border-b p-1 ${errors.emailError ? " border-red-500" : ""}`}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -105,9 +111,9 @@ function LoginPage() {
                 checkEmail();
               }}
             />
-            {emailError && (
+            {errors.emailError && (
               <p className="text-red-500 absolute top-full mt-1">
-                {emailError}
+                {errors.emailError}
               </p>
             )}
           </div>
@@ -115,7 +121,7 @@ function LoginPage() {
           <div className=" flex w-full flex-col gap-1 relative">
             {/* <label className="font-bold">Salasana</label> */}
             <input
-              className={` text-lg text-textPrimary border-borderPrimary h-10 w-full border-b p-1 focus-visible:outline-none focus-visible:border-graphPrimary ${passwordError ? "border-red-500" : ""}`}
+              className={` text-lg text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full border-b p-1 focus-visible:outline-none focus-visible:border-graphPrimary ${errors.passwordError ? "border-red-500" : ""}`}
               type="password"
               placeholder="Salasana"
               value={password}
@@ -131,9 +137,9 @@ function LoginPage() {
                 }
               }}
             />
-            {passwordError && (
+            {errors.passwordError && (
               <p className=" text-red-500 absolute top-full mt-1 ">
-                {passwordError}
+                {errors.passwordError}
               </p>
             )}
           </div>

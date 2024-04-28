@@ -25,53 +25,75 @@ const RegistrationPage = () => {
   const [errors, setErrors] = useState({
     errorMessage: "",
     emailError: "",
+    firstNameError: "",
+    lastNameError: "",
     passwordError: "",
     passwordAgainError: "",
     phoneError: "",
+    sportError: "",
+    groupError: "",
+    campusError: "",
   });
 
+  // reset email errors and check if email is valid
   const checkEmail = () => {
+    setErrors({ ...errors, emailError: "" });
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+
     if (registrationData.email.length < 1) {
-      setErrors(errors.emailError("Sähköposti ei voi olla tyhjä"));
+      setErrors({ ...errors, emailError: "Sähköposti ei voi olla tyhjä" });
       return false;
     }
     if (!emailRegEx.test(registrationData.email)) {
-      setErrors(errors.emailError("Sähköposti ei ole oikeassa muodossa"));
+      setErrors({
+        ...errors,
+        emailError: "Sähköposti ei ole oikeassa muodossa",
+      });
+      console.log(errors.emailError);
       return false;
     }
-    setErrors(errors.emailError(""));
     return true;
   };
 
+  // reset phone errors and check if phone is valid
   const checkPhone = () => {
+    setErrors({ ...errors, phoneError: "" });
     const phoneRegEx = /^\d{10,12}$/g;
     if (!phoneRegEx.test(registrationData.phone)) {
-      setErrors(errors.phoneError("Puhelinnumero ei ole oikeassa muodossa"));
+      setErrors({
+        ...errors,
+        phoneError: "Puhelinnumero ei ole oikeassa muodossa",
+      });
       return false;
     }
-    setErrors(errors.phoneError(""));
     return true;
   };
 
+  // reset password errors and check if password is valid
   const checkPassword = () => {
+    setErrors({ ...errors, passwordError: "", passwordAgainError: "" });
+
     if (registrationData.password.length < 8) {
-      setErrors(
-        errors.passwordError("Salasanan tulee olla vähintään 8 merkkiä pitkä")
-      );
+      setErrors({
+        ...errors,
+        passwordError: "Salasana liian lyhyt",
+      });
       return false;
     }
     if (registrationData.passwordAgain) {
       if (registrationData.password !== registrationData.passwordAgain) {
-        setErrors(errors.passwordAgainError("Salasanat eivät täsmää"));
+        setErrors({
+          ...errors,
+          passwordAgainError: "Salasanat eivät täsmää",
+        });
         return false;
       }
     }
-    setErrors(errors.passwordError(""));
 
     return true;
   };
 
+  // fetch options for registration form
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,6 +111,10 @@ const RegistrationPage = () => {
   //   console.log(registrationData);
   // }, [registrationData]);
 
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
+
   const navigate = useNavigate();
 
   const changeHandler = (e) => {
@@ -99,23 +125,55 @@ const RegistrationPage = () => {
     });
   };
 
-  const errorCheckRegistration = () => {
+  const checkForEmptyFields = () => {
     let isValid = true;
 
+    // Use functional updates to update the errors state
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      firstNameError:
+        registrationData.firstName === "" ? "Täytä tämä kenttä" : "",
+      lastNameError:
+        registrationData.lastName === "" ? "Täytä tämä kenttä" : "",
+      emailError: registrationData.email === "" ? "Täytä tämä kenttä" : "",
+      passwordError:
+        registrationData.password === "" ? "Täytä tämä kenttä" : "",
+      passwordAgainError:
+        registrationData.passwordAgain === "" ? "Täytä tämä kenttä" : "",
+      phoneError: registrationData.phone === "" ? "Täytä tämä kenttä" : "",
+      sportError: registrationData.sportId === null ? "Valitse laji" : "",
+      groupError: registrationData.groupId === null ? "Valitse ryhmä" : "",
+      campusError:
+        registrationData.campusId === null ? "Valitse toimipaikka" : "",
+    }));
+
+    // Check if any of the fields are empty
     if (
+      registrationData.firstName === "" ||
+      registrationData.lastName === "" ||
       registrationData.email === "" ||
       registrationData.password === "" ||
       registrationData.passwordAgain === "" ||
-      registrationData.firstName === "" ||
-      registrationData.lastName === "" ||
       registrationData.phone === "" ||
       registrationData.sportId === null ||
       registrationData.groupId === null ||
       registrationData.campusId === null
     ) {
-      setErrors(errors.errorMessage("Kaikki kentät on täytettävä"));
-      return false;
+      isValid = false;
     }
+
+    return isValid;
+  };
+
+  const errorCheckRegistration = () => {
+    let isValid = true;
+
+    // test if fields are empty
+    if (!checkForEmptyFields()) {
+      isValid = false;
+      return isValid;
+    }
+
     // test passwords
     if (!checkPassword()) {
       isValid = false;
@@ -123,7 +181,10 @@ const RegistrationPage = () => {
 
     // test if passwords match
     if (registrationData.password !== registrationData.passwordAgain) {
-      setErrors(errors.passwordAgainError("Salasanat eivät täsmää"));
+      setErrors({
+        ...errors,
+        passwordAgainError: "Salasanat eivät täsmää",
+      });
       isValid = false;
     }
     // test if email is in correct format
@@ -140,13 +201,12 @@ const RegistrationPage = () => {
     if (!checkPhone()) {
       isValid = false;
     }
-
     return isValid;
   };
 
   const registerHandler = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrors({ ...errors, errorMessage: "" });
     if (!errorCheckRegistration()) {
       return;
     }
@@ -167,10 +227,13 @@ const RegistrationPage = () => {
     }
   };
 
-  const containerClass = "flex flex-col gap-1 ";
+  const containerClass = "flex flex-col gap-1 relative";
+  const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
-    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 bg-bgkSecondary focus-visible:outline-none focus-visible:border-graphPrimary";
+    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgkSecondary focus-visible:outline-none focus-visible:border-graphPrimary";
+
+  // TODO: Fix bug regarding overwriting the error message to instantly green, currently gets first gray then green
   return (
     <div className="bg-bgkPrimary text-textPrimary grid place-items-center border-none   h-screen w-screen">
       <div
@@ -184,6 +247,7 @@ const RegistrationPage = () => {
           className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid w-full"
           onSubmit={registerHandler}
         >
+          {/* First Name */}
           <div className={containerClass}>
             <input
               onChange={changeHandler}
@@ -192,17 +256,29 @@ const RegistrationPage = () => {
               id="first-name-input"
               placeholder="Etunimi"
               value={registrationData.firstName}
-              className="text-lg text-textPrimary h-10 w-full r border-b p-1 bg-bgkSecondary focus-visible:outline-none focus-visible:border-graphPrimary"
+              className={
+                inputClass +
+                ` ${errors.firstNameError ? "border-red-500" : ""} `
+              }
               onBlur={(e) => {
-                if (e.length > 1) {
-                  // add border-green-600)
-                  console.log("green");
-                  e.target.style = "border-bottom: 1px solid green";
+                if (registrationData.firstName.length < 1) {
+                  setErrors({
+                    ...errors,
+                    firstNameError: "Etunimi ei voi olla tyhjä",
+                  });
+                } else {
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                  setErrors({ ...errors, firstNameError: "" });
                 }
               }}
             />
+            {errors.firstNameError && (
+              <p className={errorClass}>{errors.firstNameError}</p>
+            )}
           </div>
 
+          {/* Last name */}
           <div className={containerClass}>
             <input
               onChange={changeHandler}
@@ -210,23 +286,57 @@ const RegistrationPage = () => {
               name="lastName"
               id="last-name-input"
               placeholder="Sukunimi"
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.lastNameError && "border-red-500"}`
+              }
               value={registrationData.lastName}
+              onBlur={(e) => {
+                if (registrationData.lastName.length < 1) {
+                  setErrors({
+                    ...errors,
+                    lastNameError: "Sukunimi ei voi olla tyhjä",
+                  });
+                } else {
+                  setErrors({ ...errors, lastNameError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                }
+              }}
             />
+            {errors.lastNameError && (
+              <p className={errorClass}>{errors.lastNameError}</p>
+            )}
           </div>
 
-          <div className="flex flex-col gap-1 sm:col-span-2">
+          {/* Email */}
+          <div className="flex flex-col gap-1 sm:col-span-2 relative">
             <input
               onChange={changeHandler}
               type="text"
               name="email"
               id="email-input"
               placeholder="Sähköposti"
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.emailError && "border-red-500"}`
+              }
               value={registrationData.email}
+              onBlur={(e) => {
+                if (checkEmail()) {
+                  setErrors({ ...errors, emailError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                } else {
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
+                }
+              }}
             />
+            {errors.emailError && (
+              <p className={errorClass}>{errors.emailError}</p>
+            )}
           </div>
 
+          {/* Password */}
           <div className={containerClass}>
             <input
               onChange={changeHandler}
@@ -234,11 +344,31 @@ const RegistrationPage = () => {
               name="password"
               id="password-input"
               placeholder="Salasana"
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.passwordError ? "border-red-500" : ""}`
+              }
               value={registrationData.password}
+              onBlur={(e) => {
+                if (registrationData.password.length <= 8) {
+                  setErrors({
+                    ...errors,
+                    passwordError: "Salasana liian lyhyt",
+                  });
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
+                } else {
+                  setErrors({ ...errors, passwordError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                }
+              }}
             />
+            {errors.passwordError && (
+              <p className={errorClass}>{errors.passwordError}</p>
+            )}
           </div>
 
+          {/* Password Repeat */}
           <div className={containerClass}>
             <input
               onChange={changeHandler}
@@ -246,11 +376,32 @@ const RegistrationPage = () => {
               name="passwordAgain"
               id="password-input-2"
               placeholder="Salasana uudelleen"
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.passwordAgainError && "border-red-500"}`
+              }
               value={registrationData.passwordAgain}
+              onBlur={(e) => {
+                if (registrationData.passwordAgain.length < 1) {
+                  setErrors({
+                    ...errors,
+                    passwordAgainError: "Toista salasana",
+                  });
+                } else if (checkPassword()) {
+                  setErrors({ ...errors, passwordAgainError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                } else {
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
+                }
+              }}
             />
+            {errors.passwordAgainError && (
+              <p className={errorClass}>{errors.passwordAgainError}</p>
+            )}
           </div>
 
+          {/* phone number */}
           <div className={containerClass}>
             <input
               onChange={changeHandler}
@@ -258,18 +409,48 @@ const RegistrationPage = () => {
               name="phone"
               id="phone-input"
               placeholder="Puhelinnumero"
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.phoneError && "border-red-500"}`
+              }
               value={registrationData.phone}
+              onBlur={(e) => {
+                if (registrationData.phone.length < 1) {
+                  setErrors({
+                    ...errors,
+                    phoneError: "Puhelinnumero ei voi olla tyhjä",
+                  });
+                } else if (checkPhone()) {
+                  setErrors({ ...errors, phoneError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                } else {
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
+                }
+              }}
             />
+            {errors.phoneError && (
+              <p className={errorClass}>{errors.phoneError}</p>
+            )}
           </div>
 
+          {/* Sport */}
           <div className={containerClass}>
             <select
               value={registrationData.sportId || ""}
               name="sportId"
               id="sport-select"
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.sportError && "border-red-500"}`
+              }
               onChange={changeHandler}
+              onBlur={(e) => {
+                if (registrationData.sportId !== null) {
+                  setErrors({ ...errors, sportError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                }
+              }}
             >
               {registrationData.sportId === null && (
                 <option value="">Valitse laji</option>
@@ -289,17 +470,42 @@ const RegistrationPage = () => {
                 value={registrationData.newSport}
                 className={inputClass}
                 onChange={changeHandler}
+                onBlur={(e) => {
+                  if (registrationData.newSport === "") {
+                    setErrors({
+                      ...errors,
+                      sportError: "Lisää uusi laji",
+                    });
+                  } else {
+                    setErrors({ ...errors, sportError: "" });
+                    e.target.classList.remove("border-red-500");
+                    e.target.classList.add("border-green-500");
+                  }
+                }}
               />
+            )}
+            {errors.sportError && (
+              <p className={errorClass}>{errors.sportError}</p>
             )}
           </div>
 
+          {/* Group */}
           <div className={containerClass}>
             <select
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.groupError && "border-red-500"}`
+              }
               value={registrationData.groupId || ""}
               name="groupId"
               id="group-select"
               onChange={changeHandler}
+              onBlur={(e) => {
+                if (registrationData.groupId !== null) {
+                  setErrors({ ...errors, groupError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                }
+              }}
             >
               {registrationData.groupId === null && (
                 <option value="">Valitse ryhmä</option>
@@ -310,15 +516,28 @@ const RegistrationPage = () => {
                 </option>
               ))}
             </select>
+            {errors.groupError && (
+              <p className={errorClass}>{errors.groupError}</p>
+            )}
           </div>
 
+          {/* Campus */}
           <div className={containerClass}>
             <select
-              className={inputClass}
+              className={
+                inputClass + ` ${errors.campusError && "border-red-500"}`
+              }
               value={registrationData.campusId || ""}
               name="campusId"
               id="campus-select"
               onChange={changeHandler}
+              onBlur={(e) => {
+                if (registrationData.campusId !== null) {
+                  setErrors({ ...errors, campusError: "" });
+                  e.target.classList.remove("border-red-500");
+                  e.target.classList.add("border-green-500");
+                }
+              }}
             >
               {registrationData.campusId === null && (
                 <option value="">Valitse toimipaikka</option>
@@ -329,6 +548,9 @@ const RegistrationPage = () => {
                 </option>
               ))}
             </select>
+            {errors.campusError && (
+              <p className={errorClass}>{errors.campusError}</p>
+            )}
           </div>
 
           {/* TODO: Button to the center of the 2 cols when in sm:  */}

@@ -7,10 +7,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useLocalStorage("user", null);
   const navigate = useNavigate();
 
-    // call this function to sign in user
+  // call this function to sign in user
   const login = async (data) => {
     setUser(data);
-    console.log(data)
+    console.log(data);
     switch (data.role) {
       case 1:
         navigate("/opettaja");
