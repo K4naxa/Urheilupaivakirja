@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { useMainContext } from "../hooks/mainContext";
 
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
@@ -7,6 +8,8 @@ import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Year = ({ journal }) => {
+  const { showDate } = useMainContext();
+
   const [data, setData] = useState([]);
   const cal = new CalHeatmap();
 
@@ -29,15 +32,19 @@ const HeatMap_Year = ({ journal }) => {
 
   useEffect(() => {
     document.getElementById("cal-heatmapYear").innerHTML = "";
+    const theme = document.documentElement.getAttribute("data-theme");
 
     cal.paint(
       {
         itemSelector: "#cal-heatmapYear",
-        theme: "dark",
+        animationDuration: 0,
+        theme: theme,
 
         date: {
-          start: new Date(2024, 1, 1),
-          max: new Date(2024, 12, 31),
+          start: dayjs(new Date(showDate.getFullYear(), 1, 1)).format(
+            "YYYY-MM-DD"
+          ),
+          highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -76,7 +83,7 @@ const HeatMap_Year = ({ journal }) => {
           type: "day",
           width: 17,
           height: 17,
-          gutter: 4,
+          gutter: 5,
           radius: 2,
         },
       },
@@ -125,36 +132,15 @@ const HeatMap_Year = ({ journal }) => {
             key: "left",
             text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
             padding: [0, 5, 0, 0],
+            height: 17,
+            gutter: 5,
           },
         ],
       ]
     );
-  }, [data]);
+  }, [data, showDate.getFullYear()]);
 
-  return (
-    <div className="heatmapYear-container">
-      <h1>Heatmap</h1>
-      <div className="controls">
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.previous();
-          }}
-        >
-          Previous
-        </a>
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.next();
-          }}
-        >
-          Next
-        </a>
-      </div>
-      <div id="cal-heatmapYear"></div>
-    </div>
-  );
+  return <div id="cal-heatmapYear" className="flex w-full"></div>;
 };
 
 export default HeatMap_Year;

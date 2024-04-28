@@ -1,50 +1,122 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
-#root {
-  height: 100vh;
-  width: 100%;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    transition: color 100ms;
+    font-family: roboto, sans-serif;
+    /* --color-bg-primary: 255 255 255;
+    --color-bg-secondary: 235 238 241; */
+
+    --color-bg-primary: 235 238 241;
+    --color-bg-secondary: 255 255 255;
+
+    --color-text-primary: 0 0 0;
+    --color-text-secondary: 103 103 103;
+
+    --color-header-primary: 49 156 255;
+    --color-header-secondary: 40 52 78;
+
+    --color-border-primary: 143 142 142;
+
+    --color-graph-primary: 49 156 255;
+    --color-graph-secondary: 40 52 78;
+  }
+
+  :root[data-theme="dark"] {
+    font-family: roboto, sans-serif;
+    --color-bg-primary: 28 28 31;
+    --color-bg-secondary: 49 49 60;
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 151 149 173;
+
+    --color-header-primary: 83 131 232;
+    --color-header-secondary: 40 52 78;
+
+    --color-graph-primary: 83 131 232;
+    --color-graph-secondary: 40 52 78;
+  }
+
+  body {
+    background-color: rgb(var(--color-bg-primary));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
-:root {
-  font-family: roboto, sans-serif;
-  font-weight: 400;
 
-  background-color: var(--dark-primary-backgroundcolor);
-  color: white;
-
-  --dark-primary-backgroundcolor: #070707;
-  --dark-secondary-backgroundcolor: #303030;
-  --dark-primary-textcolor: #ffffff;
-  --dark-secondary-textcolor: #ffffff;
-  --dark-primary-inputtextcolor: #ffffff;
-  --dark-primary-bordercolor: #eeeeee;
-  --dark-primary-filler-linecolor: #676767;
-  --dark-secondary-buttoncolor: #676767;
-  --dark-lightblue-buttoncolor: #76abae;
-
-  --light-primary-backgroundcolor: #ffffff;
-  --light-secondary-backgroundcolor: #f5f5f5;
-  --light-primary-textcolor: #000000;
-  --light-secondary-textcolor: #000000;
-  --light-primary-inputtextcolor: #000000;
-  --light-primary-bordercolor: #000000;
-  --light-primary-filler-linecolor: #676767;
-  --light-secondary-buttoncolor: #676767;
-}
-html {
+.mainArea {
   display: flex;
-  justify-content: center;
-  height: 100%;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: var(--primary-backgroundcolor);
 }
 
-body {
-  width: 90%;
-  margin: 0;
+.fixed-header {
+  position: fixed;
+  justify-content: space-between;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
-a {
-  text-decoration: none;
-  color: var(--primary-textcolor);
+a.active {
+  color: rgb(var(--color-header-primary));
+}
+
+/* Cal-Heatmap Settings */
+.ch-subdomain-bg {
+  fill: rgb(var(--color-bg-secondary));
+  color: rgb(var(--color-text-primary));
+}
+.ch-subdomain-text {
+  fill: rgb(var(--color-text-secondary));
+}
+
+.ch-subdomain-bg.highlight {
+  stroke: rgb(var(--color-graph-primary));
+  stroke-width: 1px;
+}
+
+.ch-subdomain-bg:hover {
+  stroke: #000;
+  stroke-width: 1px;
+}
+[data-theme="dark"] .ch-subdomain-bg {
+  fill: rgb(var(--color-bg-secondary));
+}
+
+[data-theme="dark"] .ch-subdomain-bg.highlight {
+  stroke: rgb(var(--color-graph-primary));
+}
+
+[data-theme="dark"] .ch-subdomain-bg:hover {
+  stroke: #636e7b;
+  color: rgb(var(--color-text-primary));
+}
+
+/* Scrollbar Settings */
+::-webkit-scrollbar {
+  margin: 10px;
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #d6d6d6;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-graph-primary));
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

@@ -1,6 +1,4 @@
 import trainingService from "../../../services/trainingService.js";
-import dayjs from "dayjs";
-import HeatMap_Month from "../../../components/HeatMap_Month.jsx";
 import HeatMap_Year from "../../../components/HeatMap_Year.jsx";
 
 import { useEffect, useState } from "react";
@@ -33,8 +31,6 @@ function TeacherHome() {
       <div className="teacherHomeContainer">
         <div className="teacherHomeContent">
           <h1>Teacher Home</h1>
-          <HeatMap_Year journal={journals} />
-          <HeatMap_Month journal={journals} />
         </div>
       </div>
     );

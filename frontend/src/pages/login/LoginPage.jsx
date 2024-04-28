@@ -1,9 +1,14 @@
-import "./loginPage.css";
+import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 import userService from "../../services/userService";
-import { useState, useContext, useRef } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { useAuth } from '../../hooks/useAuth';
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 function LoginPage() {
+  const [errors, setErrors] = useState({
+    errorMessage: "",
+    emailError: "",
+    passwordError: "",
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,28 +17,48 @@ function LoginPage() {
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const passwordInput = useRef(null);
 
-  // Function to check if login input is valid before sending it to backend
-  const errorCheckLogin = () => {
-    if (email === "" || password === "") {
-      setError("Täytä kaikki kentät");
-      return false;
-    }
+  const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
-    // test if password is long enough
-    if (password.length < 8) {
-      setError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
-      setPassword("");
+  // function to check if email is in correct format
+  const checkEmail = () => {
+    setErrors({ ...errors, emailError: "" });
+    if (email.length < 1) {
+      setErrors({ ...errors, emailError: "Sähköposti on pakollinen" });
+
       return false;
     }
-    // test if email is in correct format
-    const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
     if (!myRegEx.test(email)) {
-      setError("Sähköposti ei ole oikeassa muodossa");
-      setPassword("");
-      setEmail("");
+      setErrors({ ...errors, emailError: "Sähköposti on väärässä muodossa" });
       return false;
     }
     return true;
+  };
+
+  const checkPassword = () => {
+    setErrors({ ...errors, passwordError: "" });
+    if (password.length < 8) {
+      setErrors({
+        ...errors,
+        passwordError: "Salasanan pituus on vähintään 8 merkkiä",
+      });
+
+      return false;
+    }
+    return true;
+  };
+
+  const errorCheckLogin = () => {
+    let isValid = true;
+
+    // test if password is long enough
+    if (!checkPassword()) {
+      isValid = false;
+    }
+    // test if email is in correct format
+    if (!checkEmail()) {
+      isValid = false;
+    }
+    return isValid;
   };
 
   const handleLogin = async (e) => {
@@ -50,36 +75,61 @@ function LoginPage() {
       login(user);
     } catch (error) {
       console.log(error);
-      setError("Sähköposti tai salasana on väärin");
+      setErrors({ ...errors, errorMessage: "Sähköposti tai salasana väärin" });
+      setPassword("");
       return;
     }
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-container">
-        <div className="login-header-container">Kirjautuminen</div>
-        <div className="input-container">
-          <div className=" login-input-container">
-            <label>Sähköposti</label>
+    <div className="bg-bgkPrimary text-textPrimary grid place-items-center  h-screen w-screen">
+      <div className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+        <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+          Kirjautuminen
+        </div>
+        <div className="relative flex h-full pt-20 flex-col gap-10 p-8 sm:p-12">
+          {errors.errorMessage && (
+            // TODO: make the error message appear by sliding down from the top
+            <div className="bg-red-500 text-white w-full p-1 text-center text-lg rounded-b-md shadow-md transition-all duration-500 absolute top-0 left-0">
+              {errors.errorMessage}
+            </div>
+          )}
+          <div className=" flex w-full flex-col gap-1 relative">
             <input
               type="email"
               value={email}
+              required
+              placeholder="Sähköposti"
+              className={` text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${errors.emailError ? " border-red-500" : ""}`}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   passwordInput.current.focus();
                 }
               }}
+              onBlur={() => {
+                checkEmail();
+              }}
             />
+            {errors.emailError && (
+              <p className="text-red-500 absolute top-full mt-1">
+                {errors.emailError}
+              </p>
+            )}
           </div>
 
-          <div className=" login-input-container">
-            <label>Salasana</label>
+          <div className=" flex w-full flex-col gap-1 relative">
+            {/* <label className="font-bold">Salasana</label> */}
             <input
+              className={` text-lg text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full border-b p-1 focus-visible:outline-none focus-visible:border-headerPrimary ${errors.passwordError ? "border-red-500" : ""}`}
               type="password"
+              placeholder="Salasana"
               value={password}
               ref={passwordInput}
+              required
+              onBlur={() => {
+                checkPassword();
+              }}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -87,41 +137,56 @@ function LoginPage() {
                 }
               }}
             />
+            {errors.passwordError && (
+              <p className=" text-red-500 absolute top-full mt-1 ">
+                {errors.passwordError}
+              </p>
+            )}
           </div>
 
-          <div className="button-container">
-            <div className="upper-container">
+          <div className="flex flex-col justify-between gap-8">
+            <div className="flex items-center justify-between">
               <div className="box">
                 <input
                   type="checkbox"
                   name="stayLoggedin"
                   id="stayLoggedIn"
+                  className="mr-1 hover:cursor-pointer"
                   onChange={(e) => setStayLoggedIn(e.target.checked)}
                 />
                 <label htmlFor="stayLoggedIn">Pysy kirjautuneena</label>
               </div>
-              <div className="box">
+
+              <div className="text-blue-600 hover:underline">
                 <Link to="/resetPassword">Unohditko salasanasi?</Link>
               </div>
             </div>
 
-            <div className="buttons">
-              <Link to="/rekisteroidy">
-                <button type="button" className="registerButton button">
-                  Rekisteröidy
-                </button>
-              </Link>
+            <div className="flex justify-center gap-8 ">
               <button
                 type="button"
                 onClick={handleLogin}
-                className="login-button button"
+                className="text-textPrimary border-borderPrimary bg-headerPrimary h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
               >
                 Kirjaudu
               </button>
             </div>
+            <div className="flex w-full justify-center gap-2">
+              <p className="text-textSecondary">
+                Jos sinulla ei ole käyttäjää:
+              </p>
+              <Link
+                to="/rekisteroidy"
+                className="text-blue-600 hover:underline"
+              >
+                Rekisteröidy
+              </Link>
+            </div>
           </div>
-          {error && <p>{error}</p>}
         </div>
+      </div>
+      <div className="absolute right-5 top-5">
+        <ThemeSwitcher />
       </div>
     </div>
   );

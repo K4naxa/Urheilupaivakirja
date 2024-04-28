@@ -1,14 +1,55 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-
+import { useMainContext } from "../hooks/mainContext";
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
+import { FiChevronLeft } from "react-icons/fi";
+import { FiChevronRight } from "react-icons/fi";
+import { IconContext } from "react-icons/lib";
 
 const HeatMap_Month = ({ journal }) => {
+  const { showDate, setShowDate } = useMainContext();
   const [data, setData] = useState([]);
   const cal = new CalHeatmap();
+  const monthNames = [
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
+  ];
+
+  const handlePreviousMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
+    setShowDate(newDate);
+  };
+
+  const handleNextMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
+    setShowDate(newDate);
+  };
+  const handlePreviousYearClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear() - 1, showDate.getMonth());
+    setShowDate(newDate);
+  };
+
+  const handleNextYearClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear() + 1, showDate.getMonth());
+    setShowDate(newDate);
+  };
 
   useEffect(() => {
     // clean up the data for the heatmap
@@ -29,25 +70,29 @@ const HeatMap_Month = ({ journal }) => {
 
   useEffect(() => {
     document.getElementById("cal-heatmapMonth").innerHTML = "";
+    const theme = document.querySelector("html").getAttribute("data-theme");
 
     cal.paint(
       {
         itemSelector: "#cal-heatmapMonth",
-        theme: "dark",
+        theme: theme,
 
         date: {
-          start: new Date(2024, 1, 1),
-          max: new Date(2024, 12, 31),
+          start: dayjs(
+            new Date(showDate.getFullYear(), showDate.getMonth(), 5),
+          ).format("YYYY-MM-DD"),
+          highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
             timezone: "Europe/Helsinki",
             months:
               "Tammikuu_Helmikuu_Maaliskuu_Huhtikuu_Toukokuu_Kesäkuu_Heinäkuu_Elokuu_Syyskuu_Lokakuu_Marraskuu_Joulukuu".split(
-                "_"
+                "_",
               ),
           },
         },
+        Animation: null,
         range: 1,
         data: {
           source: data,
@@ -67,17 +112,16 @@ const HeatMap_Month = ({ journal }) => {
           type: "month",
           gutter: 10,
           label: {
-            position: "top",
-            align: "center",
-            width: 50,
+            text: null,
           },
         },
         subDomain: {
-          type: "day",
-          width: 27,
-          height: 27,
-          gutter: 4,
-          radius: 2,
+          type: "xDay",
+          width: 45,
+          height: 45,
+          gutter: 7,
+          radius: 5,
+          label: "D",
         },
       },
       [
@@ -121,38 +165,51 @@ const HeatMap_Month = ({ journal }) => {
         [
           CalendarLabel,
           {
-            position: "left",
-            key: "left",
-            text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
-            padding: [0, 5, 0, 0],
+            position: "top",
+            key: "weekdays",
+            height: 20,
+            gutter: 7,
+            width: 45,
+            text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
           },
         ],
-      ]
+      ],
     );
-  }, [data]);
+  }, [data, showDate]);
 
   return (
-    <div className="heatmapMonth-container">
-      <h1>Heatmap</h1>
-      <div className="controls">
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.previous();
-          }}
-        >
-          Previous
-        </a>
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            cal.next();
-          }}
-        >
-          Next
-        </a>
+    <div className="flex w-full flex-col gap-4 text-center">
+      {/* date controls */}
+      <div className="flex w-full flex-col text-center">
+        <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+        <div className="hover: flex justify-center gap-4">
+          <button
+            className="hover:underline"
+            onClick={handlePreviousMonthClick}
+          >
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronLeft />
+            </IconContext.Provider>
+          </button>
+          <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
+          <button
+            className="hover:fill-blue-500 hover:underline"
+            onClick={handleNextMonthClick}
+          >
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronRight />
+            </IconContext.Provider>
+          </button>
+        </div>
       </div>
-      <div id="cal-heatmapMonth"></div>
+
+      {/* heatmap */}
+
+      <div id="cal-heatmapMonth" className="flex w-full justify-center"></div>
     </div>
   );
 };
