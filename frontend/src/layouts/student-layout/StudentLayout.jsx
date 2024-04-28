@@ -17,7 +17,7 @@ const StudentLayout = () => {
   return (
     <div className=" flex w-full flex-col">
       <header
-        className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden hidden  
+        className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden 
           border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8">
@@ -64,13 +64,13 @@ const StudentLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed  bottom-0 flex h-16 w-full items-center text-xl lg:hidden `}
+        className={`bg-bgkPrimary shadow-upper-shadow fixed  bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
       >
         <nav
           id="top-nav"
           className="grid-cols-mHeader grid w-full place-content-center"
         >
-          <div className="flex items-center justify-around text-2xl">
+          <div className="flex items-center justify-around">
             <NavLink to="/" className={linkClass}>
               <FiHome />
               <p className="text-[12px]">Etusivu</p>
@@ -81,7 +81,7 @@ const StudentLayout = () => {
             </Link>
           </div>
           <div className="flex justify-center">
-            <button className="bg-bgkSecondary border-graphPrimary text-graphPrimary shadow-upper-shadow absolute bottom-8 z-10 size-16 rounded-full border-t-2 text-3xl drop-shadow-xl duration-100 active:scale-110">
+            <button className="bg-bgkSecondary border-headerPrimary text-headerPrimary shadow-upper-shadow absolute bottom-8 z-10 size-16 rounded-full border-t-2 text-3xl drop-shadow-xl duration-100 active:scale-110">
               +
             </button>
             <div className=" absolute bottom-0 ">

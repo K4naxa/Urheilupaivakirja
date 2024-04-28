@@ -231,7 +231,7 @@ const RegistrationPage = () => {
   const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
-    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgkSecondary focus-visible:outline-none focus-visible:border-graphPrimary";
+    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgkSecondary focus-visible:outline-none focus-visible:border-headerPrimary";
 
   // TODO: Fix bug regarding overwriting the error message to instantly green, currently gets first gray then green
   return (
@@ -240,7 +240,7 @@ const RegistrationPage = () => {
         className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
-        <div className="bg-graphPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Rekisteröityminen
         </div>
         <form
@@ -556,7 +556,7 @@ const RegistrationPage = () => {
           {/* TODO: Button to the center of the 2 cols when in sm:  */}
           <div className="flex sm:col-span-2 w-full justify-center my-8">
             <button
-              className=" text-textPrimary border-borderPrimary bg-graphPrimary h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
+              className=" text-textPrimary border-borderPrimary bg-headerPrimary h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
               type="submit"
             >
               Rekisteröidy

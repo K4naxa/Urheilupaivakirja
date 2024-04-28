@@ -16,7 +16,7 @@
     --color-text-primary: 0 0 0;
     --color-text-secondary: 103 103 103;
 
-    --color-header-primary: 83 131 232;
+    --color-header-primary: 49 156 255;
     --color-header-secondary: 40 52 78;
 
     --color-border-primary: 143 142 142;
@@ -32,8 +32,11 @@
     --color-text-primary: 255 255 255;
     --color-text-secondary: 151 149 173;
 
-    --color-graph-primary: 49 156 255;
-    --color-graph-secondary: 34 40 49;
+    --color-header-primary: 83 131 232;
+    --color-header-secondary: 40 52 78;
+
+    --color-graph-primary: 83 131 232;
+    --color-graph-secondary: 40 52 78;
   }
 
   body {
@@ -61,7 +64,7 @@
 }
 
 a.active {
-  color: rgb(var(--color-graph-primary));
+  color: rgb(var(--color-header-primary));
 }
 
 /* Cal-Heatmap Settings */

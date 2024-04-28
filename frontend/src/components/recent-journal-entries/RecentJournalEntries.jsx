@@ -39,7 +39,7 @@ const RecentJournalEntry = ({ entry }) => {
   return (
     <div className=" bg-bgkSecondary flex w-full snap-start flex-col rounded-md p-2 shadow-md shadow-gray-700 ">
       {/* Header */}
-      <div className="bg-bgkSecondary border-graphPrimary grid grid-cols-3 rounded-t-md border-b-2 py-2  ">
+      <div className="bg-bgkSecondary border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
         {entry.entry_type &&
           (entry.entry_type === "Lepo" || entry.entry_type === "Sairaana") && (
             <p className="text-textPrimary col-start-1 mx-2 justify-self-start">
