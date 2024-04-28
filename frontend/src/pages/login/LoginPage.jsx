@@ -5,35 +5,52 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 function LoginPage() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(false);
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
 
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const passwordInput = useRef(null);
 
-  // Function to check if login input is valid before sending it to backend
-  const errorCheckLogin = () => {
-    if (email === "" || password === "") {
-      setError("Täytä kaikki kentät");
+  const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+
+  // function to check if email is in correct format
+  const checkEmail = () => {
+    if (email.length < 1) {
+      setEmailError("Sähköposti ei voi olla tyhjä");
       return false;
     }
+    if (!myRegEx.test(email)) {
+      setEmailError("Sähköposti ei ole oikeassa muodossa");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
+  const checkPassword = () => {
+    if (password.length < 8) {
+      setPasswordError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
+  const errorCheckLogin = () => {
+    let isValid = true;
 
     // test if password is long enough
-    if (password.length < 8) {
-      setError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
-      setPassword("");
-      return false;
+    if (!checkPassword()) {
+      isValid = false;
     }
     // test if email is in correct format
-    const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-    if (!myRegEx.test(email)) {
-      setError("Sähköposti ei ole oikeassa muodossa");
-      setPassword("");
-      setEmail("");
-      return false;
+    if (!checkEmail()) {
+      isValid = false;
     }
-    return true;
+    return isValid;
   };
 
   const handleLogin = async (e) => {
@@ -51,41 +68,57 @@ function LoginPage() {
     } catch (error) {
       console.log(error);
       setError("Sähköposti tai salasana on väärin");
+      setPassword("");
       return;
     }
   };
 
   return (
-    <div className="bg-bgkPrimary flex h-screen w-screen  justify-center">
-      <div className="bg-bgkSecondary flex  h-fit flex-col gap-4 self-center rounded-md border-2 shadow-md">
-        <div className="bg-graphPrimary ce rounded-t-md p-5 text-center text-xl shadow-md">
+    <div className="bg-bgkPrimary text-textPrimary flex h-screen w-screen  justify-center">
+      <div className="bg-bgkSecondary border-borderPrimary flex h-full  w-full max-w-[500px] flex-col self-center border shadow-md sm:h-fit sm:rounded-md">
+        <div className="bg-graphPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Kirjautuminen
         </div>
-        <div className="flex flex-col gap-4 p-12">
+        <div className="relative flex h-full pt-20 flex-col gap-8 p-8 sm:p-12">
+          {error && (
+            // TODO: make this slide down from top
+            <div className="absolute left-0 top-0 flex w-full justify-center bg-red-500 p-1 text-center text-lg  ">
+              {error}
+            </div>
+          )}
           <div className=" flex w-full flex-col gap-1">
-            <label>Sähköposti</label>
+            <label className="font-bold">Sähköposti</label>
             <input
               type="email"
               value={email}
               required
-              className="bg-bgkPrimary text-textPrimary h-10 w-full rounded-md border-2 p-1 "
+              className={`bg-bgkPrimary text-textPrimary border-borderPrimary h-10 w-full rounded-md border p-1 ${emailError ? " border-red-500" : ""}`}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   passwordInput.current.focus();
                 }
               }}
+              onBlur={() => {
+                checkEmail();
+              }}
             />
+            {
+              emailError && <p className="text-red-500">{emailError}</p> //TODO: make this not effect layout
+            }
           </div>
 
           <div className=" flex w-full flex-col gap-1">
-            <label>Salasana</label>
+            <label className="font-bold">Salasana</label>
             <input
-              className="bg-bgkPrimary text-textPrimary h-10 w-full rounded-md border-2 p-1"
+              className={`bg-bgkPrimary text-textPrimary border-borderPrimary h-10 w-full rounded-md border p-1 ${passwordError ? "border-red-500" : ""}`}
               type="password"
               value={password}
               ref={passwordInput}
               required
+              onBlur={() => {
+                checkPassword();
+              }}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -93,43 +126,50 @@ function LoginPage() {
                 }
               }}
             />
+            {passwordError && (
+              <p className=" text-red-500 ">{passwordError}</p> // TODO: make this not effect layout
+            )}
           </div>
 
-          <div className="flex flex-col justify-between gap-1">
+          <div className="flex flex-col justify-between gap-8">
             <div className="flex items-center justify-between">
               <div className="box">
                 <input
                   type="checkbox"
                   name="stayLoggedin"
                   id="stayLoggedIn"
+                  className="mr-1 hover:cursor-pointer"
                   onChange={(e) => setStayLoggedIn(e.target.checked)}
                 />
                 <label htmlFor="stayLoggedIn">Pysy kirjautuneena</label>
               </div>
-              <div className="box">
+
+              <div className="text-blue-600 hover:underline">
                 <Link to="/resetPassword">Unohditko salasanasi?</Link>
               </div>
             </div>
 
-            <div className="flex justify-between gap-1 ">
-              <Link to="/rekisteroidy">
-                <button
-                  type="button"
-                  className="text-textPrimary border-graphPrimary cursor-pointer border-2 px-4 py-2 "
-                >
-                  Rekisteröidy
-                </button>
-              </Link>
+            <div className="flex justify-center gap-8 ">
               <button
                 type="button"
                 onClick={handleLogin}
-                className="login-button button"
+                className="text-textPrimary border-borderPrimary bg-graphPrimary h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
               >
                 Kirjaudu
               </button>
             </div>
+            <div className="flex w-full justify-center gap-2">
+              <p className="text-textSecondary">
+                Jos sinulla ei ole käyttäjää:
+              </p>
+              <Link
+                to="/rekisteroidy"
+                className="text-blue-600 hover:underline"
+              >
+                Rekisteröidy
+              </Link>
+            </div>
           </div>
-          {error && <p>{error}</p>}
         </div>
       </div>
       <div className="absolute right-5 top-5">

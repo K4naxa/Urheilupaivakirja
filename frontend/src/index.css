@@ -5,12 +5,13 @@
 
 @layer base {
   :root {
+    transition: color 100ms;
     font-family: roboto, sans-serif;
-    --color-bg-primary: 255 255 255;
-    --color-bg-secondary: 235 238 241;
+    /* --color-bg-primary: 255 255 255;
+    --color-bg-secondary: 235 238 241; */
 
-    /* --color-bg-primary: 235 238 241;
-    --color-bg-secondary: 255 255 255; */
+    --color-bg-primary: 235 238 241;
+    --color-bg-secondary: 255 255 255;
 
     --color-text-primary: 0 0 0;
     --color-text-secondary: 103 103 103;
@@ -18,7 +19,7 @@
     --color-header-primary: 83 131 232;
     --color-header-secondary: 40 52 78;
 
-    --color-border-primary: 95 95 95;
+    --color-border-primary: 143 142 142;
 
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 40 52 78;
@@ -30,19 +31,6 @@
     --color-bg-secondary: 49 49 60;
     --color-text-primary: 255 255 255;
     --color-text-secondary: 151 149 173;
-    --color-border-primary: 255 255 255;
-
-    --color-graph-primary: 49 156 255;
-    --color-graph-secondary: 34 40 49;
-  }
-
-  :root[data-theme="dark"] {
-    font-family: roboto, sans-serif;
-    --color-bg-primary: 28 28 31;
-    --color-bg-secondary: 49 49 60;
-    --color-text-primary: 255 255 255;
-    --color-text-secondary: 151 149 173;
-    --color-border-primary: 255 255 255;
 
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 34 40 49;
@@ -64,7 +52,6 @@
 }
 .fixed-header {
   position: fixed;
-  display: flex;
   justify-content: space-between;
   align-items: center;
   top: 0;
