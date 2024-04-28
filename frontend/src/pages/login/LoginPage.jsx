@@ -73,20 +73,23 @@ function LoginPage() {
     }
   };
 
+  // TODO: fix the bug regarding using the page in landscape mode > if height is less than content > header is not visible
   return (
-    <div className="bg-bgkPrimary text-textPrimary flex h-screen w-screen  justify-center">
-      <div className="bg-bgkSecondary border-borderPrimary flex h-full  w-full max-w-[500px] flex-col self-center border shadow-md sm:h-fit sm:rounded-md">
+    <div className="bg-bgkPrimary text-textPrimary grid place-items-center  h-screen w-screen ">
+      <div className="bg-bgkSecondary border-borderPrimary flex h-full min-h-max  w-full md:max-w-[500px] flex-col self-center border shadow-md sm:h-fit sm:rounded-md">
         <div className="bg-graphPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Kirjautuminen
         </div>
         <div className="relative flex h-full pt-20 flex-col gap-8 p-8 sm:p-12">
           {error && (
             // TODO: make this slide down from top
-            <div className="absolute left-0 top-0 flex w-full justify-center bg-red-500 p-1 text-center text-lg  ">
-              {error}
+            <div className="">
+              <div className="absolute left-0 top-0 flex w-full justify-center bg-red-500 p-1 text-center text-lg  ">
+                {error}
+              </div>
             </div>
           )}
-          <div className=" flex w-full flex-col gap-1">
+          <div className=" flex w-full flex-col gap-1 relative">
             <label className="font-bold">Sähköposti</label>
             <input
               type="email"
@@ -103,12 +106,14 @@ function LoginPage() {
                 checkEmail();
               }}
             />
-            {
-              emailError && <p className="text-red-500">{emailError}</p> //TODO: make this not effect layout
-            }
+            {emailError && (
+              <p className="text-red-500 absolute top-full mt-1">
+                {emailError}
+              </p>
+            )}
           </div>
 
-          <div className=" flex w-full flex-col gap-1">
+          <div className=" flex w-full flex-col gap-1 relative">
             <label className="font-bold">Salasana</label>
             <input
               className={`bg-bgkPrimary text-textPrimary border-borderPrimary h-10 w-full rounded-md border p-1 ${passwordError ? "border-red-500" : ""}`}
@@ -127,7 +132,9 @@ function LoginPage() {
               }}
             />
             {passwordError && (
-              <p className=" text-red-500 ">{passwordError}</p> // TODO: make this not effect layout
+              <p className=" text-red-500 absolute top-full mt-1 ">
+                {passwordError}
+              </p>
             )}
           </div>
 
