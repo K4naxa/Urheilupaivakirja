@@ -103,7 +103,7 @@ const StudentLayout = () => {
                 }}
               >
                 <FiLogOut />
-                <p className="text-[12px]">Asetukset</p>
+                <p className="text-[12px]">Logout</p>
               </button>
             </div>
           </div>
