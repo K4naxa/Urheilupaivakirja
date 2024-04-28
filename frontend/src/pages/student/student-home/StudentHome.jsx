@@ -40,7 +40,7 @@ function StudentHome() {
           <div className="sm:col-span-2 lg:col-span-1">
             <RecentJournalEntries />
           </div>
-          <div className="flex  overflow-x-auto sm:col-span-2 lg:col-span-3">
+          <div className="flex  overflow-x-auto self-center sm:col-span-2 lg:col-span-3">
             <HeatMap_Year journal={studentJournal} />
           </div>
         </div>

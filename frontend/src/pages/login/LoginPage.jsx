@@ -73,29 +73,28 @@ function LoginPage() {
     }
   };
 
-  // TODO: fix the bug regarding using the page in landscape mode > if height is less than content > header is not visible ( problmen something to do wit sm:h-fit )
   return (
     <div className="bg-bgkPrimary text-textPrimary grid place-items-center  h-screen w-screen">
       <div className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="bg-graphPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Kirjautuminen
         </div>
-        <div className="relative flex h-full pt-20 flex-col gap-8 p-8 sm:p-12">
+        <div className="relative flex h-full pt-20 flex-col gap-10 p-8 sm:p-12">
           {error && (
             // TODO: make the error message appear by sliding down from the top
-            <div className="absolute left-0 top-0 w-full flex justify-center">
+            <div className="w-full flex justify-center">
               <div className="bg-red-500 text-white w-full p-1 text-center text-lg rounded-b-md shadow-md transition-all duration-500">
                 {error}
               </div>
             </div>
           )}
           <div className=" flex w-full flex-col gap-1 relative">
-            <label className="font-bold">Sähköposti</label>
             <input
               type="email"
               value={email}
               required
-              className={`bg-bgkPrimary text-textPrimary border-borderPrimary h-10 w-full rounded-md border p-1 ${emailError ? " border-red-500" : ""}`}
+              placeholder="Sähköposti"
+              className={` text-lg  text-textPrimary border-borderPrimary h-10 w-full focus-visible:outline-none focus-visible:border-graphPrimary border-b p-1 ${emailError ? " border-red-500" : ""}`}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -114,10 +113,11 @@ function LoginPage() {
           </div>
 
           <div className=" flex w-full flex-col gap-1 relative">
-            <label className="font-bold">Salasana</label>
+            {/* <label className="font-bold">Salasana</label> */}
             <input
-              className={`bg-bgkPrimary text-textPrimary border-borderPrimary h-10 w-full rounded-md border p-1 ${passwordError ? "border-red-500" : ""}`}
+              className={` text-lg text-textPrimary border-borderPrimary h-10 w-full border-b p-1 focus-visible:outline-none focus-visible:border-graphPrimary ${passwordError ? "border-red-500" : ""}`}
               type="password"
+              placeholder="Salasana"
               value={password}
               ref={passwordInput}
               required

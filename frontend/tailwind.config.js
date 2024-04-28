@@ -26,6 +26,7 @@ export default {
         merkInfo: "auto 1fr",
         mainPage: "repeat(3, 330px))",
         mHeader: "1fr 100px 1fr",
+        regGrid: "1fr 1fr",
       },
       boxShadow: {
         "upper-shadow": "0 -10px 10px -10px rgba(0, 0, 0, 0.2)",

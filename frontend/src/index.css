@@ -50,6 +50,10 @@
   align-items: center;
   width: 100%;
 }
+.regGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 .fixed-header {
   position: fixed;
   justify-content: space-between;
