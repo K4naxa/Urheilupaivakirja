@@ -3,6 +3,8 @@ import userService from "../../services/userService";
 import { useNavigate } from "react-router-dom";
 import publicService from "../../services/publicService";
 import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
+import { Link } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -240,8 +242,15 @@ const RegistrationPage = () => {
         className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
-        <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
-          Rekisteröityminen
+        <div className=" relative bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+          <p>Rekisteröityminen</p>
+
+          <Link
+            to="/LoginPage"
+            className="absolute bottom-1/2 translate-y-1/2 left-5 text-3xl"
+          >
+            <FiArrowLeft />
+          </Link>
         </div>
         <form
           className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid w-full"
@@ -262,10 +271,8 @@ const RegistrationPage = () => {
               }
               onBlur={(e) => {
                 if (registrationData.firstName.length < 1) {
-                  setErrors({
-                    ...errors,
-                    firstNameError: "Etunimi ei voi olla tyhjä",
-                  });
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
                 } else {
                   e.target.classList.remove("border-red-500");
                   e.target.classList.add("border-green-500");
@@ -292,10 +299,8 @@ const RegistrationPage = () => {
               value={registrationData.lastName}
               onBlur={(e) => {
                 if (registrationData.lastName.length < 1) {
-                  setErrors({
-                    ...errors,
-                    lastNameError: "Sukunimi ei voi olla tyhjä",
-                  });
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
                 } else {
                   setErrors({ ...errors, lastNameError: "" });
                   e.target.classList.remove("border-red-500");
@@ -321,7 +326,10 @@ const RegistrationPage = () => {
               }
               value={registrationData.email}
               onBlur={(e) => {
-                if (checkEmail()) {
+                if (registrationData.email.length < 1) {
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
+                } else if (checkEmail()) {
                   setErrors({ ...errors, emailError: "" });
                   e.target.classList.remove("border-red-500");
                   e.target.classList.add("border-green-500");
@@ -349,7 +357,10 @@ const RegistrationPage = () => {
               }
               value={registrationData.password}
               onBlur={(e) => {
-                if (registrationData.password.length <= 8) {
+                if (registrationData.password.length < 1) {
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
+                } else if (registrationData.password.length <= 8) {
                   setErrors({
                     ...errors,
                     passwordError: "Salasana liian lyhyt",
@@ -382,10 +393,8 @@ const RegistrationPage = () => {
               value={registrationData.passwordAgain}
               onBlur={(e) => {
                 if (registrationData.passwordAgain.length < 1) {
-                  setErrors({
-                    ...errors,
-                    passwordAgainError: "Toista salasana",
-                  });
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
                 } else if (checkPassword()) {
                   setErrors({ ...errors, passwordAgainError: "" });
                   e.target.classList.remove("border-red-500");
@@ -415,10 +424,8 @@ const RegistrationPage = () => {
               value={registrationData.phone}
               onBlur={(e) => {
                 if (registrationData.phone.length < 1) {
-                  setErrors({
-                    ...errors,
-                    phoneError: "Puhelinnumero ei voi olla tyhjä",
-                  });
+                  e.target.classList.remove("border-green-500");
+                  e.target.classList.add("border-red-500");
                 } else if (checkPhone()) {
                   setErrors({ ...errors, phoneError: "" });
                   e.target.classList.remove("border-red-500");
