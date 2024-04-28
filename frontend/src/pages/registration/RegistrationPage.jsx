@@ -22,7 +22,55 @@ const RegistrationPage = () => {
     sports: [],
     campuses: [],
   });
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({
+    errorMessage: "",
+    emailError: "",
+    passwordError: "",
+    passwordAgainError: "",
+    phoneError: "",
+  });
+
+  const checkEmail = () => {
+    const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    if (registrationData.email.length < 1) {
+      setErrors(errors.emailError("Sähköposti ei voi olla tyhjä"));
+      return false;
+    }
+    if (!emailRegEx.test(registrationData.email)) {
+      setErrors(errors.emailError("Sähköposti ei ole oikeassa muodossa"));
+      return false;
+    }
+    setErrors(errors.emailError(""));
+    return true;
+  };
+
+  const checkPhone = () => {
+    const phoneRegEx = /^\d{10,12}$/g;
+    if (!phoneRegEx.test(registrationData.phone)) {
+      setErrors(errors.phoneError("Puhelinnumero ei ole oikeassa muodossa"));
+      return false;
+    }
+    setErrors(errors.phoneError(""));
+    return true;
+  };
+
+  const checkPassword = () => {
+    if (registrationData.password.length < 8) {
+      setErrors(
+        errors.passwordError("Salasanan tulee olla vähintään 8 merkkiä pitkä")
+      );
+      return false;
+    }
+    if (registrationData.passwordAgain) {
+      if (registrationData.password !== registrationData.passwordAgain) {
+        setErrors(errors.passwordAgainError("Salasanat eivät täsmää"));
+        return false;
+      }
+    }
+    setErrors(errors.passwordError(""));
+
+    return true;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,9 +85,9 @@ const RegistrationPage = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log(registrationData);
-  }, [registrationData]);
+  // useEffect(() => {
+  //   console.log(registrationData);
+  // }, [registrationData]);
 
   const navigate = useNavigate();
 
@@ -52,6 +100,8 @@ const RegistrationPage = () => {
   };
 
   const errorCheckRegistration = () => {
+    let isValid = true;
+
     if (
       registrationData.email === "" ||
       registrationData.password === "" ||
@@ -63,41 +113,35 @@ const RegistrationPage = () => {
       registrationData.groupId === null ||
       registrationData.campusId === null
     ) {
-      setError("Täytä kaikki kentät");
+      setErrors(errors.errorMessage("Kaikki kentät on täytettävä"));
       return false;
     }
-
-    // test if password is long enough
-    if (
-      registrationData.password.length < 8 ||
-      registrationData.passwordAgain.length < 8
-    ) {
-      setError("Salasanan tulee olla vähintään 8 merkkiä pitkä");
-      setRegistrationData((currentData) => ({
-        ...currentData,
-        password: "",
-        passwordAgain: "",
-      }));
-      return false;
+    // test passwords
+    if (!checkPassword()) {
+      isValid = false;
     }
 
     // test if passwords match
     if (registrationData.password !== registrationData.passwordAgain) {
-      setError("Salasanat eivät täsmää");
-      return false;
+      setErrors(errors.passwordAgainError("Salasanat eivät täsmää"));
+      isValid = false;
     }
     // test if email is in correct format
-    const myRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-    if (!myRegEx.test(registrationData.email)) {
-      setError("Sähköposti ei ole oikeassa muodossa");
+    if (!checkEmail()) {
       setRegistrationData((currentData) => ({
         ...currentData,
         password: "",
         passwordAgain: "",
       }));
-      return false;
+      isValid = false;
     }
-    return true;
+
+    // test if phone number is in correct format
+    if (!checkPhone()) {
+      isValid = false;
+    }
+
+    return isValid;
   };
 
   const registerHandler = async (e) => {
@@ -148,7 +192,14 @@ const RegistrationPage = () => {
               id="first-name-input"
               placeholder="Etunimi"
               value={registrationData.firstName}
-              className={inputClass}
+              className="text-lg text-textPrimary h-10 w-full r border-b p-1 bg-bgkSecondary focus-visible:outline-none focus-visible:border-graphPrimary"
+              onBlur={(e) => {
+                if (e.length > 1) {
+                  // add border-green-600)
+                  console.log("green");
+                  e.target.style = "border-bottom: 1px solid green";
+                }
+              }}
             />
           </div>
 
@@ -170,7 +221,7 @@ const RegistrationPage = () => {
               type="text"
               name="email"
               id="email-input"
-              placeholder="sähköposti"
+              placeholder="Sähköposti"
               className={inputClass}
               value={registrationData.email}
             />
