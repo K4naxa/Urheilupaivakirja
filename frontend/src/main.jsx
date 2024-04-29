@@ -4,18 +4,24 @@ import { RouterProvider } from "react-router";
 import { router } from "./router";
 import { AuthProvider } from "./hooks/useAuth";
 import { MainContextProvider } from "./hooks/mainContext.jsx";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import App from "./App.jsx";
 import "./index.css";
+import "./app.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <MainContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <MainContextProvider>
       <RouterProvider router={router}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </RouterProvider>
-    </MainContextProvider>
+          <AuthProvider>
+              <App />
+            <ReactQueryDevtools initialIsOpen={true} />
+            </AuthProvider>
+        </RouterProvider>
+        </MainContextProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );

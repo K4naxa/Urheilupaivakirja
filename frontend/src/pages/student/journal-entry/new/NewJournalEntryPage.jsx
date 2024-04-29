@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./newJournalEntryPage.css";
 import trainingService from "../../../../services/trainingService.js";
+import { useQuery } from "@tanstack/react-query";
 
 const NewJournalEntryPage = () => {
   //TODO: new date = today (from other branch)
@@ -15,33 +16,13 @@ const NewJournalEntryPage = () => {
     date: "2024-04-18",
     details: "",
   });
-  const [options, setOptions] = useState({
-    journal_entry_types: [],
-    workout_types: [],
-    workout_categories: [],
-    time_of_day: [],
-  });
+
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({ value: false, message: "" });
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
   const [existingEntries, setExistingEntries] = useState([]);
-
-  // get options for entry_types, workout types, workout categories and time of day
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const optionsData = await trainingService.getJournalEntryOptions();
-        setOptions(optionsData);
-        console.log("Fetched options data:", optionsData);
-      } catch (error) {
-        console.error("Failed to fetch options:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // fetch existing entries by date when date is changed (and update existingEntries)
   useEffect(() => {
@@ -98,7 +79,7 @@ const NewJournalEntryPage = () => {
     if (journalData.workout_type === "1" || journalData.workout_type === "2") {
       setJournalData((prevState) => ({
         ...prevState,
-        workout_category: options.workout_categories[0].id.toString(),
+        workout_category: optionsData.workout_categories[0].id.toString(),
       }));
     }
   }, [journalData.workout_type]);
@@ -333,6 +314,24 @@ const NewJournalEntryPage = () => {
     }
   }
 
+  //QUERY
+  const { data: optionsData, status: optionsStatus, error } = useQuery({
+    queryKey: ['options'],
+    queryFn: () => trainingService.getJournalEntryOptions(),
+  });
+
+  if (optionsStatus === 'pending') {
+    console.log('is loading');
+    return <p>Loading...</p>;
+  }
+
+  if (optionsStatus === 'error') {
+    console.log('is erroring');
+    console.error('Error:', error);
+    return <p>Error: {error?.message || 'Unknown error'}</p>;
+  }
+
+
   return (
     <>
       <div className="container">
@@ -345,7 +344,7 @@ const NewJournalEntryPage = () => {
             <div className="journal-entry-input-container">
               <label>Merkintätyyppi</label>
               <div className="radio-option-horizontal-container">
-                {options.journal_entry_types.map((entry) =>
+                {optionsData.journal_entry_types.map((entry) =>
                   renderRadioButton(
                     "entry_type",
                     entry.id.toString(),
@@ -396,7 +395,7 @@ const NewJournalEntryPage = () => {
               >
                 <label>Harjoitustyyppi</label>
                 <div className="radio-option-horizontal-container">
-                  {options.workout_types.map((type) =>
+                  {optionsData.workout_types.map((type) =>
                     renderRadioButton(
                       "workout_type",
                       type.id.toString(),
@@ -421,7 +420,7 @@ const NewJournalEntryPage = () => {
                   onChange={changeHandler}
                   disabled={journalData.workout_type != "3"}
                 >
-                  {options.workout_categories.map((category) => (
+                  {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
@@ -438,7 +437,7 @@ const NewJournalEntryPage = () => {
               >
                 <label>Ajankohta</label>
                 <div className="radio-option-horizontal-container">
-                  {options.time_of_day.map((time) =>
+                  {optionsData.time_of_day.map((time) =>
                     renderRadioButton(
                       "time_of_day",
                       time.id.toString(),
@@ -488,13 +487,13 @@ const NewJournalEntryPage = () => {
             <div>{errorMessage && <p>{errorMessage}</p>}</div>
             <div>{conflict.value && <p>{conflict.message}</p>}</div>
             <div className="journal-entry-button-container">
-            <button
-              className="submit-button"
-              type="submit"
-              disabled={submitButtonIsDisabled}
-            >
-              {getSubmitButtonText(journalData.entry_type)}
-            </button>
+              <button
+                className="submit-button"
+                type="submit"
+                disabled={submitButtonIsDisabled}
+              >
+                {getSubmitButtonText(journalData.entry_type)}
+              </button>
             </div>
           </form>
         </div>

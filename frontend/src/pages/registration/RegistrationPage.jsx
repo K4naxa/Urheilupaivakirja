@@ -5,6 +5,7 @@ import publicService from "../../services/publicService";
 import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
+import { check } from "prettier";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -24,76 +25,9 @@ const RegistrationPage = () => {
     sports: [],
     campuses: [],
   });
-  const [errors, setErrors] = useState({
-    errorMessage: "",
-    emailError: "",
-    firstNameError: "",
-    lastNameError: "",
-    passwordError: "",
-    passwordAgainError: "",
-    phoneError: "",
-    sportError: "",
-    groupError: "",
-    campusError: "",
-  });
+  const [errors, setErrors] = useState({});
 
-  // reset email errors and check if email is valid
-  const checkEmail = () => {
-    setErrors({ ...errors, emailError: "" });
-    const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-
-    if (registrationData.email.length < 1) {
-      setErrors({ ...errors, emailError: "Sähköposti ei voi olla tyhjä" });
-      return false;
-    }
-    if (!emailRegEx.test(registrationData.email)) {
-      setErrors({
-        ...errors,
-        emailError: "Sähköposti ei ole oikeassa muodossa",
-      });
-      console.log(errors.emailError);
-      return false;
-    }
-    return true;
-  };
-
-  // reset phone errors and check if phone is valid
-  const checkPhone = () => {
-    setErrors({ ...errors, phoneError: "" });
-    const phoneRegEx = /^\d{10,12}$/g;
-    if (!phoneRegEx.test(registrationData.phone)) {
-      setErrors({
-        ...errors,
-        phoneError: "Puhelinnumero ei ole oikeassa muodossa",
-      });
-      return false;
-    }
-    return true;
-  };
-
-  // reset password errors and check if password is valid
-  const checkPassword = () => {
-    setErrors({ ...errors, passwordError: "", passwordAgainError: "" });
-
-    if (registrationData.password.length < 8) {
-      setErrors({
-        ...errors,
-        passwordError: "Salasana liian lyhyt",
-      });
-      return false;
-    }
-    if (registrationData.passwordAgain) {
-      if (registrationData.password !== registrationData.passwordAgain) {
-        setErrors({
-          ...errors,
-          passwordAgainError: "Salasanat eivät täsmää",
-        });
-        return false;
-      }
-    }
-
-    return true;
-  };
+  console.log("Rerendering the whole component");
 
   // fetch options for registration form
   useEffect(() => {
@@ -109,12 +43,12 @@ const RegistrationPage = () => {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(registrationData);
-  // }, [registrationData]);
+  useEffect(() => {
+    console.log("Registrations changed: ", registrationData);
+  }, [registrationData]);
 
   useEffect(() => {
-    console.log(errors);
+    console.log("Errors changed: ", errors);
   }, [errors]);
 
   const navigate = useNavigate();
@@ -128,87 +62,66 @@ const RegistrationPage = () => {
   };
 
   const checkForEmptyFields = () => {
-    let isValid = true;
+    const generateErrorMessage = (field, message) => {
+      const value =
+        registrationData[field] === "" || registrationData[field] === null
+          ? "error"
+          : "success";
+      const existingError = errors[field];
+      const errorMessage =
+        registrationData[field] === "" || registrationData[field] === null
+          ? message
+          : existingError
+            ? existingError.message
+            : "";
+      return {
+        value: existingError ? existingError.value : value,
+        message: errorMessage,
+      };
+    };
 
-    // Use functional updates to update the errors state
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      firstNameError:
-        registrationData.firstName === "" ? "Täytä tämä kenttä" : "",
-      lastNameError:
-        registrationData.lastName === "" ? "Täytä tämä kenttä" : "",
-      emailError: registrationData.email === "" ? "Täytä tämä kenttä" : "",
-      passwordError:
-        registrationData.password === "" ? "Täytä tämä kenttä" : "",
-      passwordAgainError:
-        registrationData.passwordAgain === "" ? "Täytä tämä kenttä" : "",
-      phoneError: registrationData.phone === "" ? "Täytä tämä kenttä" : "",
-      sportError: registrationData.sportId === null ? "Valitse laji" : "",
-      groupError: registrationData.groupId === null ? "Valitse ryhmä" : "",
-      campusError:
-        registrationData.campusId === null ? "Valitse toimipaikka" : "",
-    }));
-
-    // Check if any of the fields are empty
-    if (
-      registrationData.firstName === "" ||
-      registrationData.lastName === "" ||
-      registrationData.email === "" ||
-      registrationData.password === "" ||
-      registrationData.passwordAgain === "" ||
-      registrationData.phone === "" ||
-      registrationData.sportId === null ||
-      registrationData.groupId === null ||
-      registrationData.campusId === null
-    ) {
-      isValid = false;
-    }
-
-    return isValid;
+    setErrors({
+      firstName: generateErrorMessage("firstName", "Täytä tämä kenttä"),
+      lastName: generateErrorMessage("lastName", "Täytä tämä kenttä"),
+      email: generateErrorMessage("email", "Täytä tämä kenttä"),
+      password: generateErrorMessage("password", "Täytä tämä kenttä"),
+      passwordAgain: generateErrorMessage("passwordAgain", "Täytä tämä kenttä"),
+      phone: generateErrorMessage("phone", "Täytä tämä kenttä"),
+      sportId: generateErrorMessage("sportId", "Valitse laji"),
+      groupId: generateErrorMessage("groupId", "Valitse ryhmä"),
+      campusId: generateErrorMessage("campusId", "Valitse toimipaikka"),
+    });
   };
 
   const errorCheckRegistration = () => {
     let isValid = true;
 
-    // test if fields are empty
-    if (!checkForEmptyFields()) {
-      isValid = false;
-      return isValid;
-    }
+    //TODO: Create separate error checking functions for each field
+    errorCheckSimpleInput(registrationData.firstName, "firstName");
+    errorCheckSimpleInput(registrationData.lastName, "lastName");
+    errorCheckEmail();
+    errorCheckPassword();
+    errorCheckPasswordAgain();
+    errorCheckPhone();
+    errorCheckDropdown(registrationData.sportId, "sportId");
+    errorCheckDropdown(registrationData.groupId, "groupId");
+    errorCheckDropdown(registrationData.campusId, "campusId");
 
-    // test passwords
-    if (!checkPassword()) {
-      isValid = false;
-    }
+    checkForEmptyFields();
 
-    // test if passwords match
-    if (registrationData.password !== registrationData.passwordAgain) {
-      setErrors({
-        ...errors,
-        passwordAgainError: "Salasanat eivät täsmää",
-      });
-      isValid = false;
-    }
-    // test if email is in correct format
-    if (!checkEmail()) {
-      setRegistrationData((currentData) => ({
-        ...currentData,
-        password: "",
-        passwordAgain: "",
-      }));
-      isValid = false;
-    }
 
-    // test if phone number is in correct format
-    if (!checkPhone()) {
-      isValid = false;
+    for (const field in errors) {
+      if (errors[field].value !== "success") {
+        isValid = false;
+        break;
+      }
     }
+    console.log(isValid)
     return isValid;
   };
 
   const registerHandler = async (e) => {
     e.preventDefault();
-    setErrors({ ...errors, errorMessage: "" });
     if (!errorCheckRegistration()) {
       return;
     }
@@ -227,6 +140,179 @@ const RegistrationPage = () => {
     } catch (error) {
       console.error("Error registering:", error);
     }
+  };
+
+  const errorCheckSimpleInput = (fieldValue, fieldName) => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+
+      if (fieldValue === "") {
+        newErrors[fieldName] = {
+          value: "error",
+        };
+      } else {
+        // Only set to success if the field passes all checks
+        newErrors[fieldName] = {
+          value: "success",
+        };
+      }
+      return newErrors;
+    });
+  };
+
+  // reset email errors and check if email is valid
+  const errorCheckEmail = () => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+
+      if (registrationData.email.length < 1) {
+        newErrors.email = {
+          value: "error",
+        };
+      } else if (!emailRegEx.test(registrationData.email)) {
+        newErrors.email = {
+          value: "error",
+          message: "Sähköposti ei ole oikeassa muodossa",
+        };
+      } else {
+        // Successfully validate the email
+        newErrors.email = {
+          value: "success",
+        };
+      }
+
+      return newErrors;
+    });
+  };
+
+  const errorCheckPhone = () => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      const phoneRegEx = /^\d{10,12}$/g;
+
+      if (registrationData.phone.length < 1) {
+        newErrors.phone = {
+          value: "error",
+        };
+      } else if (!phoneRegEx.test(registrationData.phone)) {
+        newErrors.phone = {
+          value: "error",
+          message: "Puhelinnumero ei ole oikeassa muodossa",
+        };
+      } else {
+        newErrors.phone = {
+          value: "success",
+        };
+      }
+
+      return newErrors;
+    });
+  };
+
+  // reset password errors and check if password is valid
+  const errorCheckPassword = () => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+
+      if (registrationData.password.length < 1) {
+        newErrors.password = {
+          value: "error",
+        };
+        return newErrors;
+      }
+
+      // Check if the password is too short
+      if (registrationData.password.length < 8) {
+        newErrors.password = {
+          value: "error",
+          message: "Salasana liian lyhyt",
+        };
+      } else {
+        // Set password as valid if it's long enough
+        newErrors.password = {
+          value: "success",
+        };
+      }
+
+      // Additionally check if passwordAgain needs revalidation
+      if (registrationData.passwordAgain) {
+        if (registrationData.password !== registrationData.passwordAgain) {
+          newErrors.passwordAgain = {
+            value: "error",
+            message: "Salasanat eivät täsmää",
+          };
+        } else {
+          newErrors.passwordAgain = {
+            value: "success",
+          };
+        }
+      } else {
+        delete newErrors.passwordAgain;
+      }
+
+      return newErrors;
+    });
+  };
+
+  const errorCheckPasswordAgain = () => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+
+      if (registrationData.passwordAgain.length < 1) {
+        newErrors.passwordAgain = {
+          value: "error",
+        };
+        return newErrors;
+      }
+
+      if (
+        registrationData.passwordAgain &&
+        registrationData.password !== registrationData.passwordAgain
+      ) {
+        newErrors.passwordAgain = {
+          value: "error",
+          message: "Salasanat eivät täsmää", // "Passwords do not match"
+        };
+      } else if (registrationData.passwordAgain) {
+        // Set passwordAgain as valid if it matches
+        newErrors.passwordAgain = {
+          value: "success",
+        };
+      } else {
+        // Clear any existing error if no passwordAgain is provided yet
+        delete newErrors.passwordAgain;
+      }
+
+      return newErrors;
+    });
+  };
+
+  const errorCheckDropdown = (fieldValue, fieldName) => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+
+      // Assume that an empty string or a specific default value indicates no valid selection
+      if (fieldValue === "" || fieldValue === "default") {
+        newErrors[fieldName] = {
+          value: "error",
+          message: "Valitse vaihtoehto", // "Select an option" in Finnish
+        };
+      } else {
+        // If a valid option is selected, mark it as successful
+        newErrors[fieldName] = {
+          value: "success",
+        };
+      }
+
+      return newErrors;
+    });
+  };
+
+  const handleDropdownChange = (event) => {
+    changeHandler(event);
+
+    errorCheckDropdown(event.target.value, event.target.name);
   };
 
   const containerClass = "flex flex-col gap-1 relative";
@@ -267,21 +353,20 @@ const RegistrationPage = () => {
               value={registrationData.firstName}
               className={
                 inputClass +
-                ` ${errors.firstNameError ? "border-red-500" : ""} `
+                (errors.firstName && errors.firstName.value
+                  ? errors.firstName.value === "error"
+                    ? " border-red-500"
+                    : errors.firstName.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
-              onBlur={(e) => {
-                if (registrationData.firstName.length < 1) {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else {
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                  setErrors({ ...errors, firstNameError: "" });
-                }
+              onBlur={() => {
+                errorCheckSimpleInput(registrationData.firstName, "firstName");
               }}
             />
-            {errors.firstNameError && (
-              <p className={errorClass}>{errors.firstNameError}</p>
+            {errors.firstName && errors.firstName.message && (
+              <p className={errorClass}>{errors.firstName.message}</p>
             )}
           </div>
 
@@ -294,22 +379,22 @@ const RegistrationPage = () => {
               id="last-name-input"
               placeholder="Sukunimi"
               className={
-                inputClass + ` ${errors.lastNameError && "border-red-500"}`
+                inputClass +
+                (errors.lastName && errors.lastName.value
+                  ? errors.lastName.value === "error"
+                    ? " border-red-500"
+                    : errors.lastName.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.lastName}
-              onBlur={(e) => {
-                if (registrationData.lastName.length < 1) {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else {
-                  setErrors({ ...errors, lastNameError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                }
+              onBlur={() => {
+                errorCheckSimpleInput(registrationData.lastName, "lastName");
               }}
             />
-            {errors.lastNameError && (
-              <p className={errorClass}>{errors.lastNameError}</p>
+            {errors.lastName && errors.lastName.message && (
+              <p className={errorClass}>{errors.lastName.message}</p>
             )}
           </div>
 
@@ -322,25 +407,22 @@ const RegistrationPage = () => {
               id="email-input"
               placeholder="Sähköposti"
               className={
-                inputClass + ` ${errors.emailError && "border-red-500"}`
+                inputClass +
+                (errors.email && errors.email.value
+                  ? errors.email.value === "error"
+                    ? " border-red-500"
+                    : errors.email.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.email}
-              onBlur={(e) => {
-                if (registrationData.email.length < 1) {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else if (checkEmail()) {
-                  setErrors({ ...errors, emailError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                } else {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                }
+              onBlur={() => {
+                errorCheckEmail();
               }}
             />
-            {errors.emailError && (
-              <p className={errorClass}>{errors.emailError}</p>
+            {errors.email && errors.email.message && (
+              <p className={errorClass}>{errors.email.message}</p>
             )}
           </div>
 
@@ -353,29 +435,20 @@ const RegistrationPage = () => {
               id="password-input"
               placeholder="Salasana"
               className={
-                inputClass + ` ${errors.passwordError ? "border-red-500" : ""}`
+                inputClass +
+                (errors.password && errors.password.value
+                  ? errors.password.value === "error"
+                    ? " border-red-500"
+                    : errors.password.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.password}
-              onBlur={(e) => {
-                if (registrationData.password.length < 1) {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else if (registrationData.password.length <= 8) {
-                  setErrors({
-                    ...errors,
-                    passwordError: "Salasana liian lyhyt",
-                  });
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else {
-                  setErrors({ ...errors, passwordError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                }
-              }}
+              onBlur={() => errorCheckPassword()}
             />
-            {errors.passwordError && (
-              <p className={errorClass}>{errors.passwordError}</p>
+            {errors.password && errors.password.message && (
+              <p className={errorClass}>{errors.password.message}</p>
             )}
           </div>
 
@@ -388,25 +461,20 @@ const RegistrationPage = () => {
               id="password-input-2"
               placeholder="Salasana uudelleen"
               className={
-                inputClass + ` ${errors.passwordAgainError && "border-red-500"}`
+                inputClass +
+                (errors.passwordAgain && errors.passwordAgain.value
+                  ? errors.passwordAgain.value === "error"
+                    ? " border-red-500"
+                    : errors.passwordAgain.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.passwordAgain}
-              onBlur={(e) => {
-                if (registrationData.passwordAgain.length < 1) {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else if (checkPassword()) {
-                  setErrors({ ...errors, passwordAgainError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                } else {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                }
-              }}
+              onBlur={() => errorCheckPasswordAgain()}
             />
-            {errors.passwordAgainError && (
-              <p className={errorClass}>{errors.passwordAgainError}</p>
+            {errors.passwordAgain && errors.passwordAgain.message && (
+              <p className={errorClass}>{errors.passwordAgain.message}</p>
             )}
           </div>
 
@@ -419,25 +487,20 @@ const RegistrationPage = () => {
               id="phone-input"
               placeholder="Puhelinnumero"
               className={
-                inputClass + ` ${errors.phoneError && "border-red-500"}`
+                inputClass +
+                (errors.phone && errors.phone.value
+                  ? errors.phone.value === "error"
+                    ? " border-red-500"
+                    : errors.phone.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.phone}
-              onBlur={(e) => {
-                if (registrationData.phone.length < 1) {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                } else if (checkPhone()) {
-                  setErrors({ ...errors, phoneError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                } else {
-                  e.target.classList.remove("border-green-500");
-                  e.target.classList.add("border-red-500");
-                }
-              }}
+              onBlur={() => errorCheckPhone()}
             />
-            {errors.phoneError && (
-              <p className={errorClass}>{errors.phoneError}</p>
+            {errors.phone && errors.phone.message && (
+              <p className={errorClass}>{errors.phone.message}</p>
             )}
           </div>
 
@@ -448,16 +511,16 @@ const RegistrationPage = () => {
               name="sportId"
               id="sport-select"
               className={
-                inputClass + ` ${errors.sportError && "border-red-500"}`
+                inputClass +
+                (errors.sportId && errors.sportId.value
+                  ? errors.sportId.value === "error"
+                    ? " border-red-500"
+                    : errors.sportId.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
-              onChange={changeHandler}
-              onBlur={(e) => {
-                if (registrationData.sportId !== null) {
-                  setErrors({ ...errors, sportError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                }
-              }}
+              onChange={handleDropdownChange}
             >
               {registrationData.sportId === null && (
                 <option value="">Valitse laji</option>
@@ -476,23 +539,11 @@ const RegistrationPage = () => {
                 placeholder="Kirjoita uusi laji MUTTA ÄLÄ LÄHETÄ..."
                 value={registrationData.newSport}
                 className={inputClass}
-                onChange={changeHandler}
-                onBlur={(e) => {
-                  if (registrationData.newSport === "") {
-                    setErrors({
-                      ...errors,
-                      sportError: "Lisää uusi laji",
-                    });
-                  } else {
-                    setErrors({ ...errors, sportError: "" });
-                    e.target.classList.remove("border-red-500");
-                    e.target.classList.add("border-green-500");
-                  }
-                }}
+                onChange={handleDropdownChange}
               />
             )}
-            {errors.sportError && (
-              <p className={errorClass}>{errors.sportError}</p>
+            {errors.sportId && errors.sportId.message && (
+              <p className={errorClass}>{errors.sportId.message}</p>
             )}
           </div>
 
@@ -500,19 +551,19 @@ const RegistrationPage = () => {
           <div className={containerClass}>
             <select
               className={
-                inputClass + ` ${errors.groupError && "border-red-500"}`
+                inputClass +
+                (errors.groupId && errors.groupId.value
+                  ? errors.groupId.value === "error"
+                    ? " border-red-500"
+                    : errors.groupId.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.groupId || ""}
               name="groupId"
               id="group-select"
-              onChange={changeHandler}
-              onBlur={(e) => {
-                if (registrationData.groupId !== null) {
-                  setErrors({ ...errors, groupError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                }
-              }}
+              onChange={handleDropdownChange}
             >
               {registrationData.groupId === null && (
                 <option value="">Valitse ryhmä</option>
@@ -523,8 +574,8 @@ const RegistrationPage = () => {
                 </option>
               ))}
             </select>
-            {errors.groupError && (
-              <p className={errorClass}>{errors.groupError}</p>
+            {errors.groupId && errors.groupId.message && (
+              <p className={errorClass}>{errors.groupId.message}</p>
             )}
           </div>
 
@@ -532,19 +583,19 @@ const RegistrationPage = () => {
           <div className={containerClass}>
             <select
               className={
-                inputClass + ` ${errors.campusError && "border-red-500"}`
+                inputClass +
+                (errors.campusId && errors.campusId.value
+                  ? errors.campusId.value === "error"
+                    ? " border-red-500"
+                    : errors.campusId.value === "success"
+                      ? " border-green-500"
+                      : ""
+                  : "")
               }
               value={registrationData.campusId || ""}
               name="campusId"
               id="campus-select"
-              onChange={changeHandler}
-              onBlur={(e) => {
-                if (registrationData.campusId !== null) {
-                  setErrors({ ...errors, campusError: "" });
-                  e.target.classList.remove("border-red-500");
-                  e.target.classList.add("border-green-500");
-                }
-              }}
+              onChange={handleDropdownChange}
             >
               {registrationData.campusId === null && (
                 <option value="">Valitse toimipaikka</option>
@@ -555,8 +606,8 @@ const RegistrationPage = () => {
                 </option>
               ))}
             </select>
-            {errors.campusError && (
-              <p className={errorClass}>{errors.campusError}</p>
+            {errors.campusId && errors.campusId.message && (
+              <p className={errorClass}>{errors.campusId.message}</p>
             )}
           </div>
 
