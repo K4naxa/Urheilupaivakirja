@@ -1,4 +1,3 @@
-import "./teacherLayout.css";
 import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
@@ -96,10 +95,7 @@ const TeacherLayout = () => {
       <header
         className={`bg-bgkPrimary shadow-upper-shadow fixed  bottom-0 flex w-full items-center text-xl lg:hidden`}
       >
-        <nav
-          id="top-nav"
-          className="grid-cols-5 grid gap-4 w-full place-content-center"
-        >
+        <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
           <NavLink to="/opettaja" className={linkClass}>
             <FiHome />
             <p className={linkTextClass}>Etusivu</p>
@@ -131,7 +127,7 @@ const TeacherLayout = () => {
           <button
             className={
               linkClass +
-              `${showMenu ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-150" : " bg-bgkPrimary"}`
+              `${showMenu ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgkPrimary"}`
             }
             onClick={() => {
               setShowMenu(!showMenu);
@@ -183,7 +179,11 @@ const TeacherLayout = () => {
         {/* Div for Menu */}
         <div className="absolute bottom-0 flex justify-center w-full">
           {showMenu && (
-            <div className=" bg-headerPrimary rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-4 place-items-center bottom-[64px] right-0 l animate-menu-appear-right">
+            <div
+              className=" bg-headerPrimary rounded-t-md w-full shadow-upper-shadow
+             absolute grid grid-cols-4 place-items-center bottom-[64px] right-0
+              animate-menu-appear-right"
+            >
               <NavLink to="/profiili" className={linkClass}>
                 <FiUser />
                 <p className={linkTextClass}>Profiili</p>
@@ -201,10 +201,9 @@ const TeacherLayout = () => {
                 <FiLogOut />
                 <p className={linkTextClass}>Kirjaudu ulos</p>
               </button>
-              <button className={linkClass}>
+              <div className={linkClass}>
                 <ThemeSwitcher />
-                <p className={linkTextClass}>Teema</p>
-              </button>
+              </div>
             </div>
           )}
         </div>

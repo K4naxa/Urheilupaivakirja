@@ -25,6 +25,7 @@ export default {
         mainPage: "repeat(3, 330px))",
         mHeader: "1fr 64px 1fr",
         regGrid: "1fr 1fr",
+        "2fr": "1fr 1fr",
         teacherMobHeader: "1fr 1fr 1fr 1fr 1fr",
       },
       boxShadow: {

@@ -6,7 +6,7 @@ const ThemeSwitcher = () => {
   const { theme, toggleTheme } = useMainContext();
 
   return (
-    <div className="flex">
+    <div className="flex w-full h-full">
       <button
         className={` text-textPrimary rounded-full text-xl`}
         onClick={toggleTheme}
