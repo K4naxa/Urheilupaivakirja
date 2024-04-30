@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
@@ -12,7 +11,10 @@ import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 const StudentLayout = () => {
   const { logout } = useAuth();
 
-  const linkClass = `flex flex-col items-center text-textPrimary hover:underline`;
+  const linkClass =
+    "flex flex-col items-center text-textPrimary hover:underline py-2 rounded-md hover:text-headerSecondary text-xl";
+  const linkTextClass =
+    "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px]";
 
   return (
     <div className=" flex w-full flex-col">
@@ -45,7 +47,7 @@ const StudentLayout = () => {
               }
             >
               <FiUser />
-              <p className="text-[12px]">Käyttäjä</p>
+              <p className={linkTextClass}>Käyttäjä</p>
             </NavLink>
           </div>
           <div className="m-0 p-0" id="logoutButton">
@@ -56,7 +58,7 @@ const StudentLayout = () => {
               }}
             >
               <FiLogOut />
-              <p className="text-[12px]">Kirjaudu ulos</p>
+              <p className={linkTextClass}>Kirjaudu ulos</p>
             </button>
           </div>
         </div>
@@ -68,17 +70,17 @@ const StudentLayout = () => {
       >
         <nav
           id="top-nav"
-          className="grid-cols-mHeader grid w-full place-content-center"
+          className="grid-cols-mHeader gap-2 grid w-full place-content-center"
         >
-          <div className="flex items-center justify-around">
+          <div className="grid grid-cols-2 place-items-center ">
             <NavLink to="/" className={linkClass}>
               <FiHome />
-              <p className="text-[12px]">Etusivu</p>
+              <p className={linkTextClass}>Etusivu</p>
             </NavLink>
-            <Link to="/tiedotteet/" className={linkClass}>
+            <NavLink to="/tiedotteet/" className={linkClass}>
               <FiMessageSquare />
-              <p className="text-[12px]">Viestit</p>
-            </Link>
+              <p className={linkTextClass}>Viestit</p>
+            </NavLink>
           </div>
           <div className="flex justify-center">
             <button className="bg-bgkSecondary border-headerPrimary text-headerPrimary shadow-upper-shadow absolute bottom-8 z-10 size-16 rounded-full border-t-2 text-3xl drop-shadow-xl duration-100 active:scale-110">
@@ -88,24 +90,20 @@ const StudentLayout = () => {
               <ThemeSwitcher />
             </div>
           </div>
-          <div className=" flex items-center justify-around ">
-            <div className="m-0 p-0" id="profileButton">
-              <Link to="/profiili" className={linkClass}>
-                <FiUser />
-                <p className="text-[12px]">Käyttäjä</p>
-              </Link>
-            </div>
-            <div className="m-0 p-0" id="logoutButton">
-              <button
-                className={linkClass}
-                onClick={() => {
-                  logout();
-                }}
-              >
-                <FiLogOut />
-                <p className="text-[12px]">Logout</p>
-              </button>
-            </div>
+          <div className=" grid grid-cols-2 place-items-center ">
+            <button
+              className={linkClass}
+              onClick={() => {
+                logout();
+              }}
+            >
+              <FiLogOut />
+              <p className={linkTextClass}>Logout</p>
+            </button>
+            <NavLink to="/profiili" className={linkClass}>
+              <FiUser />
+              <p className={linkTextClass}>Käyttäjä</p>
+            </NavLink>
           </div>
         </nav>
       </header>

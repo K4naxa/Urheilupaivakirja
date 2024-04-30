@@ -19,17 +19,45 @@ export default {
         headerPrimary: "rgb(var(--color-header-primary) / <alpha-value>)",
         headerSecondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
       },
-      animation: {
-        "spin-slow": "spin 3s linear infinite",
-      },
+
       gridTemplateColumns: {
         merkInfo: "auto 1fr",
         mainPage: "repeat(3, 330px))",
-        mHeader: "1fr 100px 1fr",
+        mHeader: "1fr 64px 1fr",
         regGrid: "1fr 1fr",
+        teacherMobHeader: "1fr 1fr 1fr 1fr 1fr",
       },
       boxShadow: {
         "upper-shadow": "0 -10px 10px -10px rgba(0, 0, 0, 0.2)",
+      },
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+        "menu-appear-right": "slideInFromRight 0.3s forwards",
+        "menu-appear-middle": "slideInFromMiddle 0.3s forwards",
+      },
+      keyframes: {
+        slideInFromRight: {
+          "0%": {
+            transform: "translateX(80%) translateY(100%) scale(0)",
+            opacity: "0",
+          },
+
+          "100%": {
+            transform: "translateX(0) translateY(0) scale(1)",
+            opacity: "1",
+          },
+        },
+        slideInFromMiddle: {
+          "0%": {
+            transform: "translateX(0%) translateY(100%) scale(0)",
+            opacity: "0",
+          },
+
+          "100%": {
+            transform: "translateX(0) translateY(0) scale(1)",
+            opacity: "1",
+          },
+        },
       },
     },
   },

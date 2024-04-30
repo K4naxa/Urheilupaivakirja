@@ -1,34 +1,25 @@
 import { NavLink, Outlet } from "react-router-dom";
-import "./manageLayout.css";
 
 const ManageLayout = () => {
   return (
-    <>
-      <div className="manage-layout-header">
-        <nav id="manage-nav">
-          <div className="menu-button" id="lajitButton">
-            <NavLink to="/opettaja/hallitse/lajit">Lajit</NavLink>
-          </div>
-          <div className="menu-button" id="lajitButton">
-            <NavLink to="/opettaja/hallitse/lajit-v2">Lajit v2</NavLink>
-          </div>
-          <div className="menu-button" id="ryhmatButton">
-            <NavLink to="/opettaja/hallitse/ryhmat">Ryhmät</NavLink>
-          </div>
-          <div className="menu-button" id="toimipaikatButton">
-            <NavLink to="/opettaja/hallitse/toimipaikat">Toimipaikat</NavLink>
-          </div>
-          <div className="menu-button" id="vierailijatButton">
-            <NavLink to="/opettaja/hallitse/vierailijat">Vierailijat</NavLink>
-          </div>
-          <div className="menu-button" id="opiskelijatButton">
-            <NavLink to="/opettaja/hallitse/opiskelijat">Opiskelijat</NavLink>
-          </div>
-        </nav>
-      </div>
+    <div className="flex flex-col w-full">
+      <nav
+        id="manage-nav"
+        className="hidden lg:grid grid-cols-5 my-12 place-items-center gap-4"
+      >
+        <NavLink to="/opettaja/hallitse/lajit">Lajit</NavLink>
+
+        <NavLink to="/opettaja/hallitse/ryhmat">Ryhmät</NavLink>
+
+        <NavLink to="/opettaja/hallitse/toimipaikat">Toimipaikat</NavLink>
+
+        <NavLink to="/opettaja/hallitse/vierailijat">Vierailijat</NavLink>
+
+        <NavLink to="/opettaja/hallitse/opiskelijat">Opiskelijat</NavLink>
+      </nav>
 
       <Outlet />
-    </>
+    </div>
   );
 };
 
