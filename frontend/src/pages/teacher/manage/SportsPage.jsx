@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import trainingService from "../../../../services/trainingService";
+import trainingService from "../../../services/trainingService";
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
   const [editedSport, setEditedSport] = useState(sport.name);
-  const [savedSport, setSavedSport] = useState("");
   const [cellError, setCellError] = useState(false);
   // saves the edited sport to the server and updates the state
   const handleSave = () => {
@@ -30,7 +29,6 @@ function CreateSportContainer({ sport, sports, setSports }) {
             prevSport.id === sport.id ? newSport : prevSport
           )
         );
-        setSavedSport(editedSport);
       })
       .catch((error) => {
         setCellError(error.response.data.error);
@@ -53,12 +51,11 @@ function CreateSportContainer({ sport, sports, setSports }) {
 
   // sets the sport's "isEditing" property to "true"
   const handleEdit = () => {
-    setSavedSport(sport.name);
     setSports((prevSports) =>
       prevSports.map((prevSport) => {
         if (prevSport.id === sport.id) {
           {
-            if (sport.isEditing) return { id: sport.id, name: savedSport };
+            if (sport.isEditing) return { id: sport.id, name: sport.name };
             else return { ...prevSport, isEditing: true };
           }
         } else {
@@ -169,6 +166,7 @@ const SportsPage = () => {
           ...prevSports,
           { name: serverSport.name, id: serverSport.id },
         ]);
+        setErrorMessage("");
       })
       .catch((error) => {
         console.log(error.response.data);
@@ -199,8 +197,14 @@ const SportsPage = () => {
       {errorMessage && (
         <div
           className="bg-btnRed w-full text-textPrimary text-center text-lg p-2
-          mb-4 animate-menu-appear-top shadow-md rounded-b-md"
+          mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
         >
+          <button
+            onClick={() => setErrorMessage("")}
+            className="absolute right-4 bottom-1/2 translate-y-1/2"
+          >
+            X
+          </button>
           {errorMessage}
         </div>
       )}
