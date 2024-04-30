@@ -44,11 +44,12 @@ const createSportContainer = (sport, setSports) => {
     return (
       <div
         key={sport.id}
-        className="flex justify-between text-lg hover:shadow-md rounded-md px-4 py-2 items-center"
+        className="flex justify-between text-lg rounded-md
+         px-4 py-2 items-center "
       >
         <div>
           <input
-            className="text-lg text-textPrimary border-btnRed bg-bgkPrimary h-10 focus-visible:outline-none  border-b"
+            className="text-lg text-textPrimary border-headerPrimary bg-bgkSecondary h-10 focus-visible:outline-none  border-b"
             type="text"
             autoFocus
             defaultValue={sport.name}
@@ -80,7 +81,7 @@ const createSportContainer = (sport, setSports) => {
     return (
       <div
         key={sport.id}
-        className="flex justify-between text-lg hover:shadow-md rounded-md px-4 py-2 items-center"
+        className="flex justify-between text-lg hover:bg-bgkPrimary rounded-md px-4 py-2 items-center"
       >
         <div>
           <span>{sport.name}</span>
@@ -133,7 +134,7 @@ const SportsPage = () => {
   // adds "isEditing" property to the sport object and sets it to "true"
 
   return (
-    <div className="flex flex-col w-full items-center">
+    <div className="flex flex-col w-full items-center bg-bgkSecondary rounded-md ">
       {/* header for mobile*/}
       <div
         className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
@@ -143,11 +144,11 @@ const SportsPage = () => {
       </div>
 
       {/* sports container */}
-      <div className="flex flex-col px-4 gap-10 w-full max-w-[600px] mb-4">
+      <div className="flex flex-col gap-10 w-full max-w-[600px] my-4 mb-16 lg:my-8 ">
         {/* New Sport input */}
         <form className=" flex text-textPrimary text-xl center justify-center">
           <input
-            className="text-lg  text-textPrimary border-btnGreen bg-bgkPrimary h-10 focus-visible:outline-none border-b p-1"
+            className="text-lg text-textPrimary border-btnGreen bg-bgkSecondary h-10 focus-visible:outline-none border-b p-1"
             type="text"
             placeholder="Uusi laji..."
             onChange={(e) => setNewSport(e.target.value)}
@@ -160,7 +161,7 @@ const SportsPage = () => {
           />
         </form>
         {/* container for sport list */}
-        <div className="overflow-y-auto">
+        <div className="flex flex-col gap-2">
           {sports.map((sport) => createSportContainer(sport, setSports))}
         </div>
       </div>

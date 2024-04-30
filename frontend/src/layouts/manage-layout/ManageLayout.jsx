@@ -2,12 +2,13 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const ManageLayout = () => {
   const linkClass =
-    "w-32 py-4 text-lg text-center border rounded-md border-borderPrimary";
+    "w-32 py-4 text-lg text-center border rounded-md border-borderPrimary bg-bgkSecondary hover:bg-bgkPrimary hover:text-textPrimary active:bg-graphPrimary active:text-bgkSecondary ";
   return (
     <div className="flex flex-col w-full">
       <nav
         id="manage-nav"
-        className="hidden lg:grid grid-cols-5 my-12 place-items-center max-w-[670px] gap-2 self-center"
+        className="hidden lg:grid grid-cols-5 mt-8 pb-8 place-items-center gap-4 self-center
+         border-b border-headerPrimary"
       >
         <NavLink to="/opettaja/hallitse/lajit" className={linkClass}>
           Lajit
@@ -30,7 +31,7 @@ const ManageLayout = () => {
         </NavLink>
       </nav>
 
-      <div className="w-full">
+      <div className="w-full shadow-md">
         <Outlet />
       </div>
     </div>
