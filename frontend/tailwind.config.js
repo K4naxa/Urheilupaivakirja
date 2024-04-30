@@ -18,6 +18,10 @@ export default {
 
         headerPrimary: "rgb(var(--color-header-primary) / <alpha-value>)",
         headerSecondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
+
+        btnGray: "rgb(var(--color-gray) / <alpha-value>)",
+        btnGreen: "rgb(var(--color-green) / <alpha-value>)",
+        btnRed: "rgb(var(--color-red) / <alpha-value>)",
       },
 
       gridTemplateColumns: {

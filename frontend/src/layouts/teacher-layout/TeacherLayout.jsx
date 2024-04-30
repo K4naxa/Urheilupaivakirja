@@ -27,7 +27,7 @@ const TeacherLayout = () => {
   const linkTextClass =
     "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px]";
   return (
-    <div className="flex w-full flex-col text-textPrimary">
+    <div className="flex w-screen flex-col text-textPrimary flex-wrap lg:content-center ">
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden 
           border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
@@ -219,7 +219,7 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <main className="mx-1 max-w-[1480px] lg:mx-4 lg:mt-20">
+      <main className="max-w-[1480px] lg:mx-4 lg:mt-20">
         <Outlet />
       </main>
     </div>
