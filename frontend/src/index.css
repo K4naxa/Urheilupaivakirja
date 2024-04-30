@@ -64,6 +64,7 @@
 
 a.active {
   color: rgb(var(--color-header-primary));
+  border-color: rgb(var(--color-header-primary));
 }
 
 /* Cal-Heatmap Settings */

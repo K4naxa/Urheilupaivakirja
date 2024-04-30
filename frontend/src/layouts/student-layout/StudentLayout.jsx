@@ -20,7 +20,7 @@ const StudentLayout = () => {
   const linkTextClass = "text-textPrimary items-center text-[12px]";
 
   return (
-    <div className=" flex w-full flex-col">
+    <div className=" flex w-full flex-col text-textPrimary">
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden  
           border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
@@ -69,7 +69,7 @@ const StudentLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed  bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
+        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0  bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
       >
         <nav id="top-nav" className="grid-cols-mHeader gap-4 grid w-full">
           <div className="grid grid-cols-2">

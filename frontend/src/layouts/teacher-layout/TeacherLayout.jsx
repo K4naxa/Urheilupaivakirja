@@ -27,7 +27,7 @@ const TeacherLayout = () => {
   const linkTextClass =
     "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px]";
   return (
-    <div className="flex flex-col items-center text-textPrimary hover:underline">
+    <div className="flex w-full flex-col text-textPrimary">
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden 
           border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
@@ -64,36 +64,33 @@ const TeacherLayout = () => {
             </NavLink>
           </div>
         </nav>
-        <div className=" right-4 flex items-center gap-4 ">
+        <div className="grid grid-cols-3 place-items-center">
           <ThemeSwitcher />
-          <div className="" id="profileButton">
-            <NavLink
-              to="/profiili"
-              className={
-                "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary flex flex-col items-center px-2"
-              }
-            >
-              <FiUser />
-              <p className="text-[12px]">Käyttäjä</p>
-            </NavLink>
-          </div>
-          <div className="m-0 p-0" id="logoutButton">
-            <button
-              className={linkClass}
-              onClick={() => {
-                logout();
-              }}
-            >
-              <FiLogOut />
-              <p className="text-[12px]">Kirjaudu ulos</p>
-            </button>
-          </div>
+          <NavLink
+            to="/profiili"
+            className={
+              "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary flex flex-col items-center px-2"
+            }
+          >
+            <FiUser />
+            <p className={linkTextClass}>Käyttäjä</p>
+          </NavLink>
+
+          <button
+            className={linkClass}
+            onClick={() => {
+              logout();
+            }}
+          >
+            <FiLogOut />
+            <p className={linkTextClass}>Logout</p>
+          </button>
         </div>
       </header>
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed  bottom-0 flex w-full items-center text-xl lg:hidden`}
+        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
           <NavLink to="/opettaja" className={linkClass}>
@@ -105,19 +102,21 @@ const TeacherLayout = () => {
             <p className={linkTextClass}>Tiedotteet</p>
           </NavLink>
 
-          <button
+          <NavLink
+            to="/opettaja/hallitse/"
             className={
               linkClass +
               `${showControlPanel ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-150" : " bg-bgkPrimary"}`
             }
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               setShowControlPanel(!showControlPanel);
               setShowMenu(false);
             }}
           >
             <FiGrid />
             <p className={linkTextClass}>Hallinta</p>
-          </button>
+          </NavLink>
 
           <NavLink to="/opettaja/hyvaksy/" className={linkClass}>
             <FiUserCheck />
@@ -143,17 +142,26 @@ const TeacherLayout = () => {
         <div className="absolute bottom-0 flex justify-center w-full">
           {showControlPanel && (
             <div className=" bg-headerPrimary rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-5 place-items-center bottom-[64px] right-0 l animate-menu-appear-middle">
-              <NavLink to="/opettaja/hallitse/lajit" className={linkClass}>
+              <NavLink
+                to="/opettaja/hallitse/lajit"
+                className={linkClass}
+                onClick={() => showControlPanel(false)}
+              >
                 <MdOutlineSportsFootball />
                 <p className={linkTextClass}>Lajit</p>
               </NavLink>
-              <NavLink to="/opettaja/hallitse/ryhmat" className={linkClass}>
+              <NavLink
+                to="/opettaja/hallitse/ryhmat"
+                className={linkClass}
+                onClick={() => showControlPanel(false)}
+              >
                 <MdOutlineGroups />
                 <p className={linkTextClass}>Ryhmät</p>
               </NavLink>
               <NavLink
                 to="/opettaja/hallitse/toimipaikat"
                 className={linkClass}
+                onClick={() => showControlPanel(false)}
               >
                 <PiBuildings />
                 <p className={linkTextClass}>Toimipaikat</p>
@@ -161,6 +169,7 @@ const TeacherLayout = () => {
               <NavLink
                 to="/opettaja/hallitse/vierailijat"
                 className={linkClass}
+                onClick={() => showControlPanel(false)}
               >
                 <GrUserNew />
                 <p className={linkTextClass}>Vierailijat</p>
@@ -168,6 +177,7 @@ const TeacherLayout = () => {
               <NavLink
                 to="/opettaja/hallitse/opiskelijat"
                 className={linkClass}
+                onClick={() => showControlPanel(false)}
               >
                 <PiStudent />
                 <p className={linkTextClass}>Opiskelijat</p>
