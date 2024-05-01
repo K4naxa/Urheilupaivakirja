@@ -1,6 +1,5 @@
-import "./campusPage.css";
 import { useState, useEffect } from "react";
-import publicService from "../../../../services/publicService";
+import publicService from "../../../services/publicService";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses }) => {
@@ -112,49 +111,47 @@ const CampusPage = () => {
   }, []);
 
   return (
-    <div id="campus-page">
-      <div className="campus-container">
-        <div className="campus-page-header">
-          <h1 className="campus-header-title">Toimipaikat</h1>
-        </div>
-        <div className="campus-list-container">
-          {/* input field for new sports */}
-          <div>
-            <span className="error-message">{error}</span> <br />
-            <input
-              className="new-campus-input"
-              type="text"
-              placeholder="Lisää uusi toimipaikka"
-              onChange={(e) => setNewCampus(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  try {
-                    if (!handleInputError(newCampus, setError, campuses)) {
-                      return;
-                    }
-                    handleNewCampus(newCampus, setCampuses);
-                    e.target.value = "";
-                  } catch (error) {
-                    console.log(error.response.data);
+    <div className="flex flex-col w-full items-center bg-bgkSecondary rounded-md">
+      <div className="campus-page-header">
+        <h1 className="campus-header-title">Toimipaikat</h1>
+      </div>
+      <div className="campus-list-container">
+        {/* input field for new sports */}
+        <div>
+          <span className="error-message">{error}</span> <br />
+          <input
+            className="new-campus-input"
+            type="text"
+            placeholder="Lisää uusi toimipaikka"
+            onChange={(e) => setNewCampus(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                try {
+                  if (!handleInputError(newCampus, setError, campuses)) {
+                    return;
                   }
+                  handleNewCampus(newCampus, setCampuses);
+                  e.target.value = "";
+                } catch (error) {
+                  console.log(error.response.data);
                 }
-              }}
+              }
+            }}
+          />
+        </div>
+        <div className="campus-list">
+          <div className="campus-cell campus-list-header">
+            <div className="name">Toimipaikka</div>
+            <div className="count">Opiskelijat</div>
+            <div className="buttons">Toiminnot</div>
+          </div>
+          {campuses.map((campus) => (
+            <CreateCampusContainer
+              campus={campus}
+              setCampuses={setCampuses}
+              key={campus.id}
             />
-          </div>
-          <div className="campus-list">
-            <div className="campus-cell campus-list-header">
-              <div className="name">Toimipaikka</div>
-              <div className="count">Opiskelijat</div>
-              <div className="buttons">Toiminnot</div>
-            </div>
-            {campuses.map((campus) => (
-              <CreateCampusContainer
-                campus={campus}
-                setCampuses={setCampuses}
-                key={campus.id}
-              />
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </div>
