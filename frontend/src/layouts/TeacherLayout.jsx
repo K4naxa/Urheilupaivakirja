@@ -77,7 +77,9 @@ const TeacherLayout = () => {
               }
             >
               <FiUser />
-              <p className="text-[12px] leading-none px-2">Käyttäjä</p>
+              <p className="text-[12px] leading-none px-2 select-none">
+                Käyttäjä
+              </p>
             </Menu.Button>{" "}
             <Transition
               as={Fragment}
