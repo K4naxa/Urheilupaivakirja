@@ -43,7 +43,7 @@ const StudentLayout = () => {
 
         <div className="flex items-center gap-8">
           <NavLink to="/merkinnat/uusi">
-            <button className="bg-graphPrimary text-bgkPrimary border-graphPrimary rounded-md border-2 px-4 py-2 drop-shadow-lg hover:border-white">
+            <button className="bg-graphPrimary text-textPrimary hover:text-white hover:bg-headerSecondary  text-lg rounded-md px-3 py-2 drop-shadow-lg ">
               + Uusi Merkintä
             </button>
           </NavLink>
