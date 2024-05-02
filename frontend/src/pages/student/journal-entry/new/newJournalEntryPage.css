@@ -132,7 +132,6 @@
 .journal-entry-radio-button label {
   text-align: center;
   cursor: pointer;
-  z-index: 90;
   line-height: 1.8em;
 }
 

@@ -20,9 +20,9 @@ exports.seed = async function (knex) {
     },
     {
       user_id: 1,
-      title: "Joku otsikko tässä on",
-      content: "Jotain sisältöä myös",
-      created_at: new Date(2024, 4, 1, 16, 0),
+      title: "Uusin siemen uutinen",
+      content: "Tämän luettuasi punainen pallo räjähtää ja kaikki kuolevat. Tämä on vain testi. t. Joku joka ei osaa kirjoittaa uutisia (tai edes siemeniä) eli Coderus Maximus (toimituksen lisäys: copilot).",
+      created_at: new Date(2024, 3, 22, 12, 0),
     },
   ]);
 };

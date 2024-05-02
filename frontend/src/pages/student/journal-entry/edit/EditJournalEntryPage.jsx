@@ -303,7 +303,7 @@ const NewJournalEntryPage = () => {
       );
       return true;
     }
-
+    setConflict({ value: false, message: "" });
     return false; // No relevant conflict detected
   };
 

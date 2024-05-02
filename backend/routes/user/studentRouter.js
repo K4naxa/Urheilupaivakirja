@@ -5,7 +5,7 @@ const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
-const { getRole } = require("../../middleware/auth");
+const { getRole, getUserId } = require("../../middleware/auth");
 
 // Get all students and the names of their sport, group and campus
 router.get("/", async (req, res) => {
@@ -110,5 +110,25 @@ router.put("/archive/:id", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// update student.news_last_viewed_at
+
+router.put("/news", async (req, res) => {
+  const user_id = getUserId(req)
+  if (!user_id) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    await knex("students")
+      .where({ user_id: user_id })
+      .update({ news_last_viewed_at: new Date() });
+
+    return res.json({ message: "News last viewed at updated successfully" });
+  } catch (error) {
+    console.error("Error updating news last viewed at:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+})
 
 module.exports = router;

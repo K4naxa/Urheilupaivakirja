@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
 
 import StudentRoute from "./components/StudentRoute";
 import TeacherRoute from "./components/TeacherRoute";
@@ -10,6 +11,7 @@ import StudentLayout from "./layouts/student-layout/StudentLayout";
 import StudentHome from "./pages/student/student-home/StudentHome";
 import NewJournalEntryPage from "./pages/student/journal-entry/new/NewJournalEntryPage";
 import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
+import StudentNewsPage from "./pages/student/news/StudentNewsPage";
 
 //teacher
 import TeacherLayout from "./layouts/teacher-layout/TeacherLayout";
@@ -50,6 +52,10 @@ export const router = createBrowserRouter([
               {
                 path: "merkinnat/muokkaa/:entry_id",
                 element: <EditJournalEntryPage />,
+              },
+              {
+                path: "tiedotteet",
+                element: <StudentNewsPage />,
               },
             ],
           },
