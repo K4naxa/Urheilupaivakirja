@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import publicService from "../../../services/publicService";
-import {useQuery } from "@tanstack/react-query";
+import { useQuery, } from '@tanstack/react-query';
 
 const renderSingleNews = (news) => {
   return (
@@ -17,32 +17,7 @@ const StudentNewsPage = () => {
   if (isLoading) return <p>Loading...</p>;
 
   if (error) return <p>Error: {error.message}</p>;
-  /*
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const news = await publicService.getNews();
-        setNews(news);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchNews();
-  }, []);
 
-  useEffect(() => {
-    const updateNewsLastViewedAt = async () => {
-      try {
-        await publicService.updateNewsLastViewedAt();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    if (news.length > 0) {
-      updateNewsLastViewedAt();
-    }
-  }, [news]);
-*/
   return <div>{data.map((news) => renderSingleNews(news))}</div>;
 };
 

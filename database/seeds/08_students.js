@@ -2,6 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
+
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
   await knex("students").del();
@@ -15,7 +16,8 @@ exports.seed = async function (knex) {
       group_id: 1,
       campus_id: 1,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 5,
@@ -26,7 +28,8 @@ exports.seed = async function (knex) {
       group_id: 2,
       campus_id: 1,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 6,
@@ -37,7 +40,8 @@ exports.seed = async function (knex) {
       group_id: 2,
       campus_id: 2,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 7,
@@ -48,7 +52,8 @@ exports.seed = async function (knex) {
       group_id: 2,
       campus_id: 2,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 8,
@@ -59,7 +64,8 @@ exports.seed = async function (knex) {
       group_id: 3,
       campus_id: 5,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 9,
@@ -70,7 +76,8 @@ exports.seed = async function (knex) {
       group_id: 3,
       campus_id: 5,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 10,
@@ -81,7 +88,8 @@ exports.seed = async function (knex) {
       group_id: 3,
       campus_id: 5,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 11,
@@ -92,7 +100,8 @@ exports.seed = async function (knex) {
       group_id: 3,
       campus_id: 5,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 12,
@@ -103,7 +112,8 @@ exports.seed = async function (knex) {
       group_id: 4,
       campus_id: 5,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 13,
@@ -114,7 +124,8 @@ exports.seed = async function (knex) {
       group_id: 4,
       campus_id: 5,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
       user_id: 13,
@@ -125,7 +136,8 @@ exports.seed = async function (knex) {
       group_id: 5,
       campus_id: 6,
       activated: true,
-      created_at: new Date(2024, 1, 1, 16, 0),
+      created_at: new Date(2024, 1, 1),
+      news_last_viewed_at: new Date(2024, 1, 1),
     },
   ]);
 };

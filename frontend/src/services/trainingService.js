@@ -29,6 +29,7 @@ const getAllUserJournalEntries = async () => {
   return response.data;
 };
 
+
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
   const response = await axios.get(`/journal_entry/date/${date}`, makeHeader());
@@ -45,30 +46,31 @@ const getJournalEntry = async (id) => {
 
 // post new journal entry
 
-const postJournalEntry = async (
-  entry_type_id,
-  workout_type_id,
-  workout_category_id,
-  time_of_day_id,
-  length_in_minutes,
-  intensity,
-  details,
-  date
-) => {
-  let journalEntry = {
-    entry_type_id,
-    workout_type_id,
-    workout_category_id,
-    time_of_day_id,
-    length_in_minutes,
-    intensity,
-    details,
-    date,
-  };
-
+const postJournalEntry = async (journalEntry) => {
+  var entryToSend = {}
+  if (journalEntry.entry_type === "1") {
+    entryToSend = {
+      entry_type_id: journalEntry.entry_type,
+      workout_type_id: journalEntry.workout_type,
+      workout_category_id: journalEntry.workout_category,
+      time_of_day_id: journalEntry.time_of_day,
+      length_in_minutes: journalEntry.length_in_minutes,
+      intensity: journalEntry.intensity,
+      details: journalEntry.details,
+      date: journalEntry.date,
+    }
+  }
+  else
+  {
+    entryToSend = {
+      entry_type_id: journalEntry.entry_type,
+      details: journalEntry.details,
+      date: journalEntry.date,
+    }
+  }
   const response = await axios.post(
     "/journal_entry",
-    journalEntry,
+    entryToSend,
     makeHeader()
   );
   return response.data;

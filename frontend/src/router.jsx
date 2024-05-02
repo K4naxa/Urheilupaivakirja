@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
 
 import StudentRoute from "./components/StudentRoute";
 import TeacherRoute from "./components/TeacherRoute";
@@ -56,7 +57,7 @@ export const router = createBrowserRouter([
               {
                 path: "tiedotteet",
                 element: <StudentNewsPage />,
-              }
+              },
             ],
           },
 

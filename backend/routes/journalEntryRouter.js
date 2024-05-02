@@ -2,6 +2,12 @@ var express = require("express");
 var router = express.Router();
 var { getUserId } = require("../middleware/auth");
 
+const dayjs = require('dayjs')
+var utc = require('dayjs/plugin/utc')
+
+dayjs.extend(utc)
+
+
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
@@ -9,8 +15,13 @@ const knex = require("knex")(options);
 // Post a new journal entry
 router.post("/", async (req, res, next) => {
   const entry = req.body;
+
   entry.user_id = getUserId(req);
+
   entry.created_at = new Date();
+
+  entry.date = new Date(entry.date);
+  entry.date.setUTCHours(0, 0, 0, 0);
 
   try {
     const result = await knex.transaction(async (trx) => {
@@ -19,7 +30,6 @@ router.post("/", async (req, res, next) => {
         user_id: entry.user_id,
         date: entry.date,
       });
-
       // check if conflicts
       if (conflicts.length > 0) {
         if (entry.entry_type_id == 1) {

@@ -4,7 +4,7 @@ var router = express.Router();
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
-const { getRole, isAuthenticated } = require("../middleware/auth");
+const { getRole, isAuthenticated, getUserId } = require("../middleware/auth");
 
 router.get("/options", async (req, res, next) => {
   Promise.all([
@@ -183,4 +183,53 @@ router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
         .json({ error: "An error occurred while deleting the campus" });
     });
 });
+
+// Get all news
+router.get("/news", async (req, res, next) => {
+  
+  knex("news")
+    .select("*")
+    .orderBy("created_at", "desc")
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((err) => {
+      console.log("Error fetching news data", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while fetching news data" });
+    });
+});
+
+// Get unread news count
+router.get("/news/unread", async (req, res, next) => {
+  const user_id = getUserId(req);
+  if (!user_id) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    const student = await knex("students")
+      .select("news_last_viewed_at")
+      .where({ user_id: user_id })
+      .first();
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+    const hasUnreadNews = await knex("news")
+      .where("created_at", ">", student.news_last_viewed_at)
+      .first();  // We only need to check if at least one exists, not count them all
+
+    // Return true if there are unread news, false otherwise
+    res.json({ hasUnreadNews: !!hasUnreadNews });  // !! converts the object to boolean true, undefined to false
+  } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching unread news status",
+      details: error.message
+    });
+  }
+});
+
+
 module.exports = router;

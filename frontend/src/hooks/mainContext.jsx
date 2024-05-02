@@ -7,16 +7,10 @@ export const MainContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
   const [showDate, setShowDate] = useState(new Date());
 
-  const [studentJournal, setStudentJournal] = useState(null);
-
   useEffect(() => {
     const localTheme = localStorage.getItem("theme") || "light";
     setTheme(localTheme);
     document.documentElement.setAttribute("data-theme", localTheme);
-
-    trainingService
-      .getAllUserJournalEntries()
-      .then((data) => setStudentJournal(data));
   }, []);
 
   useEffect(() => {
@@ -35,7 +29,6 @@ export const MainContextProvider = ({ children }) => {
       value={{
         theme,
         toggleTheme,
-        studentJournal,
         showDate,
         setShowDate,
       }}
@@ -44,6 +37,7 @@ export const MainContextProvider = ({ children }) => {
     </MainContext.Provider>
   );
 };
+
 export const useMainContext = () => {
   return useContext(MainContext);
 };

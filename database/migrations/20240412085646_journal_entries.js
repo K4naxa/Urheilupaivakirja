@@ -9,7 +9,7 @@ exports.up = function (knex) {
     table.integer("length_in_minutes");
     table.integer("intensity");
     table.text("details");
-    table.date("date").notNullable();
+    table.timestamp("date").notNullable();
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at");
 

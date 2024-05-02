@@ -105,21 +105,12 @@ const RecentJournalEntry = ({ entry }) => {
     </div>
   );
 };
+////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
-const RecentJournalEntries = () => {
-  const [recentEntries, setRecentEntries] = useState([]);
-  useEffect(() => {
-    //TODO: get recent journal entries instead of all
-    const fetchRecentJournalEntries = async () => {
-      try {
-        const data = await trainingService.getAllUserJournalEntries();
-        setRecentEntries(data);
-      } catch (error) {
-        console.error("Failed to fetch journal entries:", error);
-      }
-    };
-    fetchRecentJournalEntries();
-  }, []);
+const RecentJournalEntries = ({journal}) => {
+  if (!journal) {
+    return ;
+  }
 
   return (
     <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
@@ -128,7 +119,7 @@ const RecentJournalEntries = () => {
         className="flex w-full snap-y scroll-m-1 flex-col gap-4 overflow-y-auto
         overscroll-none scroll-smooth rounded-md"
       >
-        {recentEntries.map((entry) => (
+        {journal.map((entry) => (
           <RecentJournalEntry key={entry.id} entry={entry} />
         ))}
       </div>
