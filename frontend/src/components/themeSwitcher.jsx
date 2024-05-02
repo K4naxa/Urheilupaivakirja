@@ -1,4 +1,4 @@
-import { useMainContext } from "../../hooks/mainContext";
+import { useMainContext } from "../hooks/mainContext";
 import { FiMoon } from "react-icons/fi";
 import { FiSun } from "react-icons/fi";
 

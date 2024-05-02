@@ -1,9 +1,9 @@
-import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
+import ThemeSwitcher from "../components/themeSwitcher";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import { Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";

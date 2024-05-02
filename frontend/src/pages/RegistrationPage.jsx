@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import userService from "../../services/userService";
+import userService from "../services/userService";
 import { useNavigate } from "react-router-dom";
-import publicService from "../../services/publicService";
-import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
+import publicService from "../services/publicService";
+import ThemeSwitcher from "../components/themeSwitcher";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { check } from "prettier"; // TODO: <-- What is this?
-import { useToast } from "../../hooks/toast-messages/useToast";
+import { useToast } from "../hooks/toast-messages/useToast";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -112,14 +112,13 @@ const RegistrationPage = () => {
 
     checkForEmptyFields();
 
-
     for (const field in errors) {
       if (errors[field].value !== "success") {
         isValid = false;
         break;
       }
     }
-    console.log(isValid)
+    console.log(isValid);
     return isValid;
   };
 
@@ -142,7 +141,10 @@ const RegistrationPage = () => {
       addToast("Rekisteröityminen onnistui", { style: "success" });
       navigate("/login");
     } catch (error) {
-      addToast("Rekisteröityminen epäonnistui", { style: "error", autoDismiss: false });
+      addToast("Rekisteröityminen epäonnistui", {
+        style: "error",
+        autoDismiss: false,
+      });
       console.error("Error registering:", error);
     }
   };

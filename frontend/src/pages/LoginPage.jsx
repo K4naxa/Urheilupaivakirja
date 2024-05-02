@@ -1,8 +1,8 @@
-import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
-import userService from "../../services/userService";
+import ThemeSwitcher from "../components/themeSwitcher";
+import userService from "../services/userService";
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 function LoginPage() {
   const [errors, setErrors] = useState({
     errorMessage: "",
