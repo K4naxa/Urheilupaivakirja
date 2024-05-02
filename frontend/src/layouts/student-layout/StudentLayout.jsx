@@ -4,9 +4,8 @@ import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 import { FiMessageSquare } from "react-icons/fi";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useState } from "react";
-
 import { FiSettings } from "react-icons/fi";
 import UnreadNewsIndicator from "../../components/UnreadNewsIndicator";
 
@@ -14,15 +13,12 @@ import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
 
 const StudentLayout = () => {
 
-
-
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-headerPrimary ";
   const linkTextClass = "text-textPrimary items-center text-[12px]";
-
   return (
     <div className=" flex w-full flex-col text-textPrimary">
       <header
@@ -30,7 +26,7 @@ const StudentLayout = () => {
           border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8">
-          <div className="text-textPrimary flex justify-center gap-8 ">
+          <div className="text-textPrimary flex justify-center gap-8">
             <>Urheilupäiväkirja</>
             <NavLink to="/" className={linkClass}>
               Etusivu
