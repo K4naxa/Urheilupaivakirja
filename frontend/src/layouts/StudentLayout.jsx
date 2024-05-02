@@ -4,10 +4,13 @@ import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 import { FiMessageSquare } from "react-icons/fi";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
+
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
 import ThemeSwitcher from "../components/themeSwitcher";
 
@@ -38,36 +41,90 @@ const StudentLayout = () => {
           </div>
         </nav>
 
-        <div className=" right-4 flex items-center gap-4 ">
-          <Link to="/merkinnat/uusi">
+        <div className="flex items-center gap-8">
+          <NavLink to="/merkinnat/uusi">
             <button className="bg-graphPrimary text-bgkPrimary border-graphPrimary rounded-md border-2 px-4 py-2 drop-shadow-lg hover:border-white">
               + Uusi Merkintä
             </button>
-          </Link>
+          </NavLink>
           <div>
             <ThemeSwitcher />
           </div>
 
           {/* Profile button */}
-          <NavLink
-            to="/profiili"
-            className="text-textPrimary hover:text-bgkSecondary active:text-graphPrimary
-               flex flex-col items-center px-2"
-          >
-            <FiUser />
-            <p className={linkTextClass}>Käyttäjä</p>
-          </NavLink>
-          <div className="m-0 p-0" id="logoutButton">
-            <button
-              className={linkClass}
-              onClick={() => {
-                logout();
-              }}
+          <Menu as="div" className="relative text-textPrimary">
+            <Menu.Button
+              className={
+                "flex flex-col items-center text-textPrimary py-2 gap-2 rounded-md  text-xl"
+              }
             >
-              <FiLogOut />
-              <p className={linkTextClass}>Kirjaudu ulos</p>
-            </button>
-          </div>
+              <FiUser />
+              <p className="text-[12px] px-2 leading-none">Käyttäjä</p>
+            </Menu.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgkSecondary text-lg divide-y divide-headerSecondary rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="px-1 py-1 ">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <NavLink
+                        to="/profiili"
+                        className={`${
+                          active
+                            ? "bg-headerPrimary text-bgkSecondary"
+                            : "text-textPrimary"
+                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                      >
+                        <FiUser />
+                        <p className={"text-[12px]"}>Profiili</p>
+                      </NavLink>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <NavLink
+                        to="/asetukset"
+                        className={`${
+                          active
+                            ? "bg-headerPrimary text-bgkSecondary"
+                            : "text-textPrimary"
+                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                      >
+                        <FiSettings />
+                        <p className={"text-[12px]"}>Asetukset</p>
+                      </NavLink>
+                    )}
+                  </Menu.Item>
+                </div>
+                <div className="px-1 py-1">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={() => {
+                          logout();
+                        }}
+                        className={`${
+                          active
+                            ? "bg-headerPrimary text-bgkSecondary"
+                            : "text-textPrimary"
+                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                      >
+                        <FiLogOut />
+                        <p className={"text-[12px]"}>Kirjaudu ulos</p>
+                      </button>
+                    )}
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
       </header>
       {/* header for mobile */}
