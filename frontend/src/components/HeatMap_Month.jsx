@@ -84,7 +84,7 @@ const HeatMap_Month = ({ journal }) => {
               ),
           },
         },
-        Animation: null,
+        animationDuration: 0,
         range: 1,
         data: {
           source: data,
