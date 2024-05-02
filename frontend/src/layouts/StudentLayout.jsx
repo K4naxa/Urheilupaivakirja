@@ -17,14 +17,15 @@ const StudentLayout = () => {
 
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-headerPrimary ";
-  const linkTextClass = "text-textPrimary items-center text-[12px]";
+  const linkTextClass =
+    "text-textPrimary items-center text-[12px] leading-none mt-2";
   return (
     <>
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
     border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
       >
-        <nav id="top-nav" className="flex justify-center gap-8">
+        <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-8">
             <p className="items-center flex">Urheilupäiväkirja</p>
             <NavLink to="/" className={linkClass}>

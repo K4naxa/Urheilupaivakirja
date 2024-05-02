@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import PractiseBoxes from "../../../components/PractiseBoxes";
-import HeatMap_Month from "../../../components/HeatMap_Month";
-import HeatMap_Year from "../../../components/HeatMap_Year";
-import RecentJournalEntries from "../../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../../components/WorkoutIntensityChart";
-import WorkoutActivityChart from "../../../components/WorkoutActivityChart";
-import trainingService from "../../../services/trainingService";
+import PractiseBoxes from "../../components/PractiseBoxes";
+import HeatMap_Month from "../../components/HeatMap_Month";
+import HeatMap_Year from "../../components/HeatMap_Year";
+import RecentJournalEntries from "../../components/RecentJournalEntries";
+import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";
+import WorkoutActivityChart from "../../components/WorkoutActivityChart";
+import trainingService from "../../services/trainingService";
 import { useEffect } from "react";
 
 function StudentHome() {

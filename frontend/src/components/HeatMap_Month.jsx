@@ -12,7 +12,6 @@ import { IconContext } from "react-icons/lib";
 const HeatMap_Month = ({ journal }) => {
   const { showDate, setShowDate } = useMainContext();
   const [data, setData] = useState([]);
-  const cal = new CalHeatmap();
   const monthNames = [
     "Tammikuu",
     "Helmikuu",
@@ -39,17 +38,6 @@ const HeatMap_Month = ({ journal }) => {
     const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
     setShowDate(newDate);
   };
-  const handlePreviousYearClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate.getFullYear() - 1, showDate.getMonth());
-    setShowDate(newDate);
-  };
-
-  const handleNextYearClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate.getFullYear() + 1, showDate.getMonth());
-    setShowDate(newDate);
-  };
 
   useEffect(() => {
     // clean up the data for the heatmap
@@ -69,9 +57,13 @@ const HeatMap_Month = ({ journal }) => {
   }, [journal]);
 
   useEffect(() => {
-    document.getElementById("cal-heatmapMonth").innerHTML = "";
+    const container = document.getElementById("cal-heatmapMonth");
+    if (!container) return; // Exit early if container doesn't exist
+    container.innerHTML = "";
+
     const theme = document.querySelector("html").getAttribute("data-theme");
 
+    const cal = new CalHeatmap();
     cal.paint(
       {
         itemSelector: "#cal-heatmapMonth",
@@ -79,7 +71,7 @@ const HeatMap_Month = ({ journal }) => {
 
         date: {
           start: dayjs(
-            new Date(showDate.getFullYear(), showDate.getMonth(), 5),
+            new Date(showDate.getFullYear(), showDate.getMonth(), 5)
           ).format("YYYY-MM-DD"),
           highlight: new Date(),
           name: "x-pseudo",
@@ -88,7 +80,7 @@ const HeatMap_Month = ({ journal }) => {
             timezone: "Europe/Helsinki",
             months:
               "Tammikuu_Helmikuu_Maaliskuu_Huhtikuu_Toukokuu_Kesäkuu_Heinäkuu_Elokuu_Syyskuu_Lokakuu_Marraskuu_Joulukuu".split(
-                "_",
+                "_"
               ),
           },
         },
@@ -173,8 +165,13 @@ const HeatMap_Month = ({ journal }) => {
             text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
           },
         ],
-      ],
+      ]
     );
+
+    return () => {
+      const cal = document.querySelector("#cal-heatmapMonth");
+      if (cal) cal.innerHTML = "";
+    };
   }, [data, showDate]);
 
   return (

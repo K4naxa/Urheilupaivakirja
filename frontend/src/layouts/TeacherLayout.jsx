@@ -25,7 +25,7 @@ const TeacherLayout = () => {
   const linkClass =
     "flex flex-col items-center text-textPrimary hover:underline py-2 rounded-md hover:text-headerSecondary text-xl";
   const linkTextClass =
-    "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px]";
+    "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px] leading-none mt-2";
   return (
     <div className="flex w-screen flex-col text-textPrimary flex-wrap lg:content-center ">
       <header

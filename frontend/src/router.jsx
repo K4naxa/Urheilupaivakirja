@@ -8,10 +8,10 @@ import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
 
 //student
 import StudentLayout from "./layouts/StudentLayout";
-import StudentHome from "./pages/student/student-home/StudentHome";
+import StudentHome from "./pages/student/StudentHome";
 import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPage";
 import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
-import StudentNewsPage from "./pages/student/news/StudentNewsPage";
+import StudentNewsPage from "./pages/student/StudentNewsPage";
 
 //teacher
 import TeacherLayout from "./layouts/TeacherLayout";
