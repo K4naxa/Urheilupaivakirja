@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import PractiseBoxes from "../../../components/PractiseBoxes";
 import HeatMap_Month from "../../../components/HeatMap_Month";
 import HeatMap_Year from "../../../components/HeatMap_Year";
-import RecentJournalEntries from "../../../components/recent-journal-entries/RecentJournalEntries";
+import RecentJournalEntries from "../../../components/RecentJournalEntries";
 import WorkoutIntensityChart from "../../../components/WorkoutIntensityChart";
 import WorkoutActivityChart from "../../../components/WorkoutActivityChart";
 import trainingService from "../../../services/trainingService";
@@ -13,18 +13,16 @@ function StudentHome() {
     data: studentJournalData,
     isLoading: studentJournalDataLoading,
     error: studentJournalDataError,
-    isSuccess
+    isSuccess,
   } = useQuery({
     queryKey: ["studentJournal"],
     queryFn: () => trainingService.getAllUserJournalEntries(),
     staleTime: 15 * 60 * 1000, // = 15 minutes in milliseconds - how long to use the cached data before re-fetching
-
   });
 
-  useEffect (() => {
+  useEffect(() => {
     console.log("StudentJournalData fetched successfully");
-  }, [isSuccess])
-
+  }, [isSuccess]);
 
   if (studentJournalDataLoading) {
     return (

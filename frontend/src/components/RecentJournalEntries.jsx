@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import trainingService from "../../services/trainingService";
+import trainingService from "../services/trainingService";
 import { useNavigate } from "react-router-dom";
 import { FiEdit3 } from "react-icons/fi";
 
@@ -107,9 +107,9 @@ const RecentJournalEntry = ({ entry }) => {
 };
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
-const RecentJournalEntries = ({journal}) => {
+const RecentJournalEntries = ({ journal }) => {
   if (!journal) {
-    return ;
+    return;
   }
 
   return (

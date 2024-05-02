@@ -7,6 +7,7 @@ import { FiMessageSquare } from "react-icons/fi";
 import { NavLink, Link } from "react-router-dom";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
+import NewJournalEntryPage from "../pages/student/journal-entry/NewJournalEntryPage";
 import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
 
 import ThemeSwitcher from "../components/themeSwitcher";
@@ -21,12 +22,12 @@ const StudentLayout = () => {
   return (
     <>
       <header
-        className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden  
-    border-b-2 px-4 py-2 text-xl h-20 shadow-md lg:flex`}
+        className={`bg-bgkPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
+    border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8">
           <div className="text-textPrimary flex justify-center gap-8">
-            <>Urheilupäiväkirja</>
+            <p className="items-center flex">Urheilupäiväkirja</p>
             <NavLink to="/" className={linkClass}>
               Etusivu
             </NavLink>
@@ -36,24 +37,26 @@ const StudentLayout = () => {
             <UnreadNewsIndicator />
           </div>
         </nav>
+
         <div className=" right-4 flex items-center gap-4 ">
           <Link to="/merkinnat/uusi">
             <button className="bg-graphPrimary text-bgkPrimary border-graphPrimary rounded-md border-2 px-4 py-2 drop-shadow-lg hover:border-white">
               + Uusi Merkintä
             </button>
           </Link>
-          <ThemeSwitcher />
-          <div className="" id="profileButton">
-            <NavLink
-              to="/profiili"
-              className={
-                "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary flex flex-col items-center px-2"
-              }
-            >
-              <FiUser />
-              <p className={linkTextClass}>Käyttäjä</p>
-            </NavLink>
+          <div>
+            <ThemeSwitcher />
           </div>
+
+          {/* Profile button */}
+          <NavLink
+            to="/profiili"
+            className="text-textPrimary hover:text-bgkSecondary active:text-graphPrimary
+               flex flex-col items-center px-2"
+          >
+            <FiUser />
+            <p className={linkTextClass}>Käyttäjä</p>
+          </NavLink>
           <div className="m-0 p-0" id="logoutButton">
             <button
               className={linkClass}
