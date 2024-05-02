@@ -19,11 +19,10 @@ import TeacherHome from "./pages/teacher/teacher-home/TeacherHome";
 import Verify from "./pages/teacher/verify/Verify";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
-import SportsPage from "./pages/teacher/manage/sports/SportsPage";
-import Visitors from "./pages/teacher/manage/visitors/VisitorsPage";
-import SportsPageV2 from "./pages/teacher/manage/sports-v2/SportsPage-v2";
-import GroupsPage from "./pages/teacher/manage/student-groups/groupsPage";
-import CampusPage from "./pages/teacher/manage/campuses/campusPage";
+import SportsPage from "./pages/teacher/manage/SportsPage";
+import Visitors from "./pages/teacher/manage/VisitorsPage";
+import GroupsPage from "./pages/teacher/manage/groupsPage";
+import CampusPage from "./pages/teacher/manage/campusPage";
 
 import ManageStudentsLayout from "./layouts/manageStudents-layout/manageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/activeStudents/ManageActiveStudentsPage";
@@ -78,7 +77,6 @@ export const router = createBrowserRouter([
                 element: <ManageLayout />,
                 children: [
                   { path: "lajit", element: <SportsPage /> },
-                  { path: "lajit-v2", element: <SportsPageV2 /> },
                   { path: "vierailijat", element: <Visitors /> },
                   { path: "ryhmat", element: <GroupsPage /> },
                   { path: "toimipaikat", element: <CampusPage /> },

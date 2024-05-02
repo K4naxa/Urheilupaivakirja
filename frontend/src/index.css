@@ -5,7 +5,6 @@
 
 @layer base {
   :root {
-    transition: color 100ms;
     font-family: roboto, sans-serif;
     /* --color-bg-primary: 255 255 255;
     --color-bg-secondary: 235 238 241; */
@@ -23,6 +22,10 @@
 
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 40 52 78;
+
+    --color-gray: 217 217 217;
+    --color-green: 0 230 0;
+    --color-red: 230 0 0;
   }
 
   :root[data-theme="dark"] {
@@ -37,6 +40,10 @@
 
     --color-graph-primary: 83 131 232;
     --color-graph-secondary: 40 52 78;
+
+    --color-gray: 100 100 100;
+    --color-green: 0 128 0;
+    --color-red: 128 0 0;
   }
 
   body {
@@ -65,6 +72,7 @@
 
 a.active {
   color: rgb(var(--color-header-primary));
+  border-color: rgb(var(--color-header-primary));
 }
 
 /* Cal-Heatmap Settings */
