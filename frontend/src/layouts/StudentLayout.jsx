@@ -7,7 +7,6 @@ import { FiMessageSquare } from "react-icons/fi";
 import { NavLink, Link } from "react-router-dom";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
-import NewJournalEntryPage from "../pages/student/journal-entry/NewJournalEntryPage";
 import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
 
 import ThemeSwitcher from "../components/themeSwitcher";
@@ -76,6 +75,7 @@ const StudentLayout = () => {
         className={`bg-bgkPrimary shadow-upper-shadow fixed left-0  bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
       >
         <nav id="top-nav" className="grid-cols-mHeader gap-4 grid w-full">
+          {/* left of navigation bar */}
           <div className="grid grid-cols-2">
             <NavLink to="/" className={linkClass}>
               <FiHome />
@@ -86,15 +86,24 @@ const StudentLayout = () => {
               <p className={linkTextClass}>Viestit</p>
             </NavLink>
           </div>
+
+          {/* new journal entry button */}
           <div className="flex justify-center">
-            <button
-              className="bg-bgkSecondary border-headerPrimary text-headerPrimary
-       shadow-upper-shadow absolute bottom-6 z-10 size-16 rounded-full border-t-2
-        text-3xl drop-shadow-xl duration-100 active:scale-110"
+            <NavLink
+              to="/merkinnat/uusi"
+              className="absolute bottom-6 flex justify z-10"
             >
-              +
-            </button>
+              <button
+                className="bg-bgkSecondary border-headerPrimary text-headerPrimary
+       shadow-upper-shadow size-16 rounded-full border-t-2
+        text-3xl drop-shadow-xl duration-100 active:scale-110"
+              >
+                +
+              </button>
+            </NavLink>
           </div>
+
+          {/* right of navigation bar */}
           <div className=" grid grid-cols-2 ">
             <button
               className={linkClass}
