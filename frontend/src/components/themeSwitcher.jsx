@@ -6,13 +6,24 @@ const ThemeSwitcher = () => {
   const { theme, toggleTheme } = useMainContext();
 
   return (
-    <div className="flex w-full h-full">
-      <button
-        className={` text-textPrimary rounded-full text-xl`}
-        onClick={toggleTheme}
+    <div
+      className={`flex w-[26px] h-[56px] border border-btnGray rounded-t-full rounded-b-full justify-center relative transition-all duration-300 ease-in-out hover:cursor-pointer
+      bg-bgkPrimary shadow-md ${theme === "light" ? "" : ""}`}
+      onClick={() => toggleTheme()}
+    >
+      <div
+        className={`flex bg-headerPrimary rounded-full justify-center items-center w-[26px] h-[28px] absolute transition-transform duration-300 ease-in-out ${
+          theme === "light"
+            ? "transform translate-y-0"
+            : "transform translate-y-full bg-headerSecondary"
+        }`}
       >
-        {theme === "dark" ? <FiSun /> : <FiMoon />}
-      </button>
+        {theme === "dark" ? (
+          <FiMoon className="text-white" />
+        ) : (
+          <FiSun className="text-white" />
+        )}
+      </div>
     </div>
   );
 };
