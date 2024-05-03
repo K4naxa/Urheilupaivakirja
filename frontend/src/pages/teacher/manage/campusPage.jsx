@@ -97,12 +97,17 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
           />
           <div className="flex gap-4 text-sm">
             <button
+              data-testid="saveBtn"
               onClick={() => handleSave(newName)}
               className="Button bg-btnGreen"
             >
               Tallenna
             </button>{" "}
-            <button onClick={() => handleEdit()} className="Button bg-btnGray">
+            <button
+              onClick={() => handleEdit()}
+              data-testid="cancelBtn"
+              className="Button bg-btnGray"
+            >
               Peruuta
             </button>
           </div>
@@ -226,7 +231,7 @@ const CampusPage = () => {
             }}
           />
         </div>
-        <div className="flex flex-col gap-2" id="campusContainer">
+        <div className="flex flex-col gap-2" id="campusesContainer">
           <div className="grid grid-cols-toimipaikat w-full text-textSecondary px-4">
             <p className="">Toimipaikka</p>
             <p className="text-center">Opiskelijat</p>

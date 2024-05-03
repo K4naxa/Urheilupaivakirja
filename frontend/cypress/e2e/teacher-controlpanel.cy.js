@@ -98,4 +98,63 @@ describe("Teacher basic functionalitys", () => {
       .click();
     cy.get("#groupsContainer").should("not.contain", "CypressTestInputEdit");
   });
+
+  // CAMPUS TESTS ----------------------------------------------------------------------------------------------------------------
+  it("should navigate to hallinta and create new campus", () => {
+    cy.get("#desktop-header").contains("Hallinta").click();
+    cy.get("#manage-nav").contains("Toimipaikat").click();
+    cy.get("[data-testid = newCampusInput]").type("CypressTestInput{enter}");
+    cy.get("[data-testid = newCampusInput]").clear();
+    cy.get("#campusesContainer").contains("CypressTestInput");
+  });
+
+  it("should navigate to hallinta and check for duplicate error", () => {
+    cy.get("#desktop-header").contains("Hallinta").click();
+    cy.get("#manage-nav").contains("Toimipaikat").click();
+    cy.get("[data-testid = newCampusInput]").type("CypressTestInput{enter}");
+    cy.get("#errorHeader").contains("Toimipaikka on jo olemassa");
+  });
+
+  it("should navigate to Toimipaikat and check canceling edit campus", () => {
+    cy.get("#desktop-header").contains("Hallinta").click();
+    cy.get("#manage-nav").contains("Toimipaikat").click();
+    cy.get("#campusesContainer").contains("CypressTestInput");
+    cy.contains("CypressTestInput")
+
+      .parent()
+      .find("[data-testid=editBtn]")
+      .click();
+    cy.get("[data-testid=editCampus]").clear();
+    cy.get("[data-testid=editCampus]").type("CypressCancelTestInput");
+    cy.get("[data-testid=cancelBtn]").click();
+    cy.get("#campusesContainer").should(
+      "not.contain",
+      "CypressCancelTestInput"
+    );
+    cy.get("#campusesContainer").should("contain", "CypressTestInput");
+  });
+
+  it("should navigate to hallinta and edit a campus", () => {
+    cy.get("#desktop-header").contains("Hallinta").click();
+    cy.get("#manage-nav").contains("Toimipaikat").click();
+    cy.get("#campusesContainer").contains("CypressTestInput");
+    cy.contains("CypressTestInput")
+      .parent()
+      .find("[data-testid=editBtn]")
+      .click();
+    cy.get("[data-testid=editCampus]").clear();
+    cy.get("[data-testid=editCampus]").type("CypressTestInputEdit{enter}");
+    cy.get("#campusesContainer").contains("CypressTestInputEdit");
+  });
+
+  it("should navigate to hallinta and delete a campus", () => {
+    cy.get("#desktop-header").contains("Hallinta").click();
+    cy.get("#manage-nav").contains("Toimipaikat").click();
+    cy.get("#campusesContainer").contains("CypressTestInputEdit");
+    cy.contains("CypressTestInputEdit")
+      .parent()
+      .find("[data-testid=deleteBtn]")
+      .click();
+    cy.get("#campusesContainer").should("not.contain", "CypressTestInputEdit");
+  });
 });
