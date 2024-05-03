@@ -29,7 +29,7 @@ export default {
         mainPage: "repeat(3, 330px))",
         mHeader: "1fr 64px 1fr",
         regGrid: "1fr 1fr",
-        toimipaikat: "2fr 1fr auto",
+        controlpanel3: "2fr 1fr auto",
         teacherMobHeader: "1fr 1fr 1fr 1fr 1fr",
       },
       boxShadow: {

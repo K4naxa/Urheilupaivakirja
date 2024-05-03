@@ -121,6 +121,12 @@ router.get("/campuses", async (req, res, next) => {
     .groupBy("campuses.id")
     .then((rows) => {
       res.json(rows);
+    })
+    .catch((err) => {
+      console.log("Error fetching campuses data", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while fetching campuses data" });
     });
 });
 
@@ -180,11 +186,9 @@ router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
       console.log("Error deleting campus", err);
 
       if (err.code === "ER_ROW_IS_REFERENCED_2") {
-        return res
-          .status(400)
-          .json({
-            error: "Poisto epäonnistui, koska toimipaikalla on opiskelijoita",
-          });
+        return res.status(400).json({
+          error: "Poisto epäonnistui, koska toimipaikalla on opiskelijoita",
+        });
       }
       res
         .status(500)

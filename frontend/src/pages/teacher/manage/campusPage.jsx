@@ -119,7 +119,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
     return (
       <div className="flex flex-col">
         {/* main Container */}
-        <div className="grid grid-cols-toimipaikat hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
+        <div className="grid grid-cols-controlpanel3 hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
           <p className="">{campus.name}</p>
           <p className="text-center">{campus.student_count}</p>
           <div className="flex gap-4 text-xl">
@@ -232,7 +232,7 @@ const CampusPage = () => {
           />
         </div>
         <div className="flex flex-col gap-2" id="campusesContainer">
-          <div className="grid grid-cols-toimipaikat w-full text-textSecondary px-4">
+          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-4">
             <p className="">Toimipaikka</p>
             <p className="text-center">Opiskelijat</p>
             <div className="w-16" />
