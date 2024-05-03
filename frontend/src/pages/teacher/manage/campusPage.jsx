@@ -4,16 +4,35 @@ import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
 // renders a container for a campus while checking if it is being edited
-const CreateCampusContainer = ({ campus, setCampuses }) => {
+const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
   const [newName, setNewName] = useState(campus.name);
+  const [error, setError] = useState("");
+
+  // sets a timeout for the error message
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        setError("");
+      }, 5000);
+    }
+  }, [error]);
+
   // checks if campus has edit value and removes it if it does, otherwise creates a edit value
   const handleEdit = () => {
     setCampuses((prevCampuses) =>
       prevCampuses.map((prevCampus) => {
         if (prevCampus.id === campus.id) {
           {
-            if (campus.isEditing) return { id: campus.id, name: campus.name };
-            else return { ...prevCampus, isEditing: true };
+            if (campus.isEditing) {
+              setNewName(campus.name);
+              return {
+                id: campus.id,
+                student_count: campus.student_count,
+                name: campus.name,
+              };
+            } else {
+              return { ...prevCampus, isEditing: true };
+            }
           }
         } else {
           return prevCampus;
@@ -22,8 +41,21 @@ const CreateCampusContainer = ({ campus, setCampuses }) => {
     );
   };
 
-  const handleSave = (newName) => {
-    const newCampus = { id: campus.id, name: newName };
+  const handleSave = () => {
+    if (newName === "") {
+      setError("Toimipaikan nimi puuttuu");
+      return;
+    }
+    if (campuses.some((campus) => campus.name === newName)) {
+      setError("Toimipaikka on jo olemassa");
+      return;
+    }
+
+    const newCampus = {
+      id: campus.id,
+      student_count: campus.student_count,
+      name: newName,
+    };
     publicService.editCampus(newCampus).then(() => {
       setCampuses((prevCampuses) =>
         prevCampuses.map((prevCampus) =>
@@ -34,22 +66,27 @@ const CreateCampusContainer = ({ campus, setCampuses }) => {
   };
 
   const handleDelete = () => {
-    publicService.deleteCampus(campus.id).then(() => {
-      setCampuses((prevCampuses) =>
-        prevCampuses.filter((prevCampus) => prevCampus.id !== campus.id)
-      );
-    });
+    publicService
+      .deleteCampus(campus.id)
+      .then(() => {
+        setCampuses((prevCampuses) =>
+          prevCampuses.filter((prevCampus) => prevCampus.id !== campus.id)
+        );
+      })
+      .catch((error) => {
+        setError(error.response.data.error);
+      });
   };
 
   if (campus.isEditing) {
     return (
       <div className="flex flex-col">
-        <div>
+        <div className="flex justify-between rounded-md gap-8 px-4 py-2 bg-bgkPrimary">
           <input
             autoFocus
             type="text"
-            className="campus-edit-input"
-            id="campus-edit-input"
+            className="flex w-full text-textPrimary border-headerPrimary bg-bgkPrimary focus-visible:outline-none  border-b"
+            data-testid="editCampus"
             defaultValue={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => {
@@ -58,42 +95,56 @@ const CreateCampusContainer = ({ campus, setCampuses }) => {
               }
             }}
           />
-          <div className="flex">
-            <button onClick={() => handleSave(newName)}>Save</button>{" "}
-            <button onClick={() => handleEdit()}>Cancel</button>
+          <div className="flex gap-4 text-sm">
+            <button
+              onClick={() => handleSave(newName)}
+              className="Button bg-btnGreen"
+            >
+              Tallenna
+            </button>{" "}
+            <button onClick={() => handleEdit()} className="Button bg-btnGray">
+              Peruuta
+            </button>
           </div>
         </div>
+        {error && <p className="text-btnRed px-4">{error}</p>}
       </div>
     );
   } else {
     return (
-      <div className="grid grid-cols-3 hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
-        <p className="">{campus.name}</p>
-        <p className="text-center">{campus.student_count}</p>
-        <div className="flex gap-4 text-xl">
-          <button
-            className="IconButton text-textSecondary"
-            data-testid="editBtn"
-            onClick={() => handleEdit()}
-          >
-            <FiEdit3 />
-          </button>
-          <button
-            className="IconButton text-btnRed "
-            data-testid="deleteBtn"
-            onClick={() => handleDelete()}
-          >
-            <FiTrash2 />
-          </button>
+      <div className="flex flex-col">
+        {/* main Container */}
+        <div className="grid grid-cols-toimipaikat hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
+          <p className="">{campus.name}</p>
+          <p className="text-center">{campus.student_count}</p>
+          <div className="flex gap-4 text-xl">
+            <button
+              className="IconButton text-textSecondary"
+              data-testid="editBtn"
+              onClick={() => handleEdit()}
+            >
+              <FiEdit3 />
+            </button>
+            <button
+              className="IconButton text-btnRed "
+              data-testid="deleteBtn"
+              onClick={() => handleDelete()}
+            >
+              <FiTrash2 />
+            </button>
+          </div>
         </div>
+
+        {/* error container */}
+        {error && <p className="text-btnRed px-4">{error}</p>}
       </div>
     );
   }
 };
 
 const handleNewCampus = (newCampus, setCampuses) => {
-  publicService.addCampus(newCampus).then((data) => {
-    setCampuses((prevCampuses) => [...prevCampuses, data]);
+  publicService.addCampus(newCampus).then(() => {
+    publicService.getCampuses().then((data) => setCampuses(data));
   });
 };
 
@@ -176,14 +227,16 @@ const CampusPage = () => {
           />
         </div>
         <div className="flex flex-col gap-2" id="campusContainer">
-          <div className="grid grid-cols-3 w-full text-textSecondary px-4">
+          <div className="grid grid-cols-toimipaikat w-full text-textSecondary px-4">
             <p className="">Toimipaikka</p>
             <p className="text-center">Opiskelijat</p>
+            <div className="w-16" />
           </div>
           <div className="flex flex-col gap-2">
             {campuses.map((campus) => (
               <CreateCampusContainer
                 campus={campus}
+                campuses={campuses}
                 setCampuses={setCampuses}
                 key={campus.id}
               />
