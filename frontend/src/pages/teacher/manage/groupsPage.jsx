@@ -74,7 +74,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
           <input
             type="text"
             id="editInput"
-            className="flex w-full text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
+            className="flex text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
             defaultValue={group.group_identifier}
             onChange={(e) => setEditedGroup(e.target.value)}
             onKeyDown={(e) => {

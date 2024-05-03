@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import publicService from "../../../services/publicService";
+import { FiEdit3 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses }) => {
@@ -41,8 +43,8 @@ const CreateCampusContainer = ({ campus, setCampuses }) => {
 
   if (campus.isEditing) {
     return (
-      <div className="campus-cell">
-        <div className="campus-name">
+      <div className="flex flex-col">
+        <div>
           <input
             autoFocus
             type="text"
@@ -56,21 +58,33 @@ const CreateCampusContainer = ({ campus, setCampuses }) => {
               }
             }}
           />
-        </div>
-        <div className="campus-buttons">
-          <button onClick={() => handleSave(newName)}>Save</button>{" "}
-          <button onClick={() => handleEdit()}>Cancel</button>
+          <div className="flex">
+            <button onClick={() => handleSave(newName)}>Save</button>{" "}
+            <button onClick={() => handleEdit()}>Cancel</button>
+          </div>
         </div>
       </div>
     );
   } else {
     return (
-      <div className="campus-cell">
-        <div className="campus-name">{campus.name}</div>
-        <div className="campus-student-count">{campus.student_count}</div>
-        <div className="campus-buttons">
-          <button onClick={() => handleEdit()}>Edit</button>
-          <button onClick={() => handleDelete()}>Delete</button>
+      <div className="grid grid-cols-3 hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
+        <p className="">{campus.name}</p>
+        <p className="text-center">{campus.student_count}</p>
+        <div className="flex gap-4 text-xl">
+          <button
+            className="IconButton text-textSecondary"
+            data-testid="editBtn"
+            onClick={() => handleEdit()}
+          >
+            <FiEdit3 />
+          </button>
+          <button
+            className="IconButton text-btnRed "
+            data-testid="deleteBtn"
+            onClick={() => handleDelete()}
+          >
+            <FiTrash2 />
+          </button>
         </div>
       </div>
     );
@@ -104,7 +118,7 @@ const handleInputError = (input, setError, campuses) => {
 const CampusPage = () => {
   const [campuses, setCampuses] = useState([]);
   const [newCampus, setNewCampus] = useState("");
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     publicService.getCampuses().then((data) => setCampuses(data));
@@ -112,46 +126,69 @@ const CampusPage = () => {
 
   return (
     <div className="flex flex-col w-full items-center bg-bgkSecondary rounded-md">
-      <div className="campus-page-header">
-        <h1 className="campus-header-title">Toimipaikat</h1>
+      {/* header for mobile*/}
+      <div
+        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+       rounded-b-md shadow-md"
+      >
+        Toimipaikat
       </div>
-      <div className="campus-list-container">
-        {/* input field for new sports */}
-        <div>
-          <span className="error-message">{error}</span> <br />
+      {/* Error Header */}
+      {errorMessage && (
+        <div
+          id="errorHeader"
+          className="bg-btnRed w-full text-textPrimary text-center text-lg p-2
+          mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
+        >
+          <button
+            onClick={() => setErrorMessage("")}
+            className="absolute right-4 bottom-1/2 translate-y-1/2"
+          >
+            X
+          </button>
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Campus Container */}
+      <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8">
+        {/* New campus input */}
+        <div className="flex text-textPrimary text-xl justify-center">
           <input
-            className="new-campus-input"
+            className="text-lg text-textPrimary border-btnGreen bg-bgkSecondary h-10 focus-visible:outline-none border-b p-1"
             type="text"
-            placeholder="Lisää uusi toimipaikka"
+            data-testid="newCampusInput"
+            placeholder="Lisää toimipaikka.."
             onChange={(e) => setNewCampus(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 try {
-                  if (!handleInputError(newCampus, setError, campuses)) {
+                  if (!handleInputError(newCampus, setErrorMessage, campuses)) {
                     return;
                   }
                   handleNewCampus(newCampus, setCampuses);
                   e.target.value = "";
                 } catch (error) {
-                  console.log(error.response.data);
+                  setErrorMessage(error.response.data);
                 }
               }
             }}
           />
         </div>
-        <div className="campus-list">
-          <div className="campus-cell campus-list-header">
-            <div className="name">Toimipaikka</div>
-            <div className="count">Opiskelijat</div>
-            <div className="buttons">Toiminnot</div>
+        <div className="flex flex-col gap-2" id="campusContainer">
+          <div className="grid grid-cols-3 w-full text-textSecondary px-4">
+            <p className="">Toimipaikka</p>
+            <p className="text-center">Opiskelijat</p>
           </div>
-          {campuses.map((campus) => (
-            <CreateCampusContainer
-              campus={campus}
-              setCampuses={setCampuses}
-              key={campus.id}
-            />
-          ))}
+          <div className="flex flex-col gap-2">
+            {campuses.map((campus) => (
+              <CreateCampusContainer
+                campus={campus}
+                setCampuses={setCampuses}
+                key={campus.id}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

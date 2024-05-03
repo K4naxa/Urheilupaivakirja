@@ -75,7 +75,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
        px-4 py-2 items-center "
         >
           <input
-            className="flex w-full text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
+            className="flex text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
             type="text"
             id="editSport"
             autoFocus
@@ -216,11 +216,11 @@ const SportsPage = () => {
       {/* sports container */}
       <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8 ">
         {/* New Sport input */}
-        <div className=" flex text-textPrimary text-xl center justify-center">
+        <div className=" flex text-textPrimary text-xl justify-center">
           <input
             className="text-lg text-textPrimary border-btnGreen bg-bgkSecondary h-10 focus-visible:outline-none border-b p-1"
             type="text"
-            id="newSport"
+            data-testid="newSportInput"
             placeholder="Uusi laji..."
             onChange={(e) => setNewSport(e.target.value)}
             onKeyDown={(e) => {

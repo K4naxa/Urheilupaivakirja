@@ -23,15 +23,15 @@ describe("Teacher basic functionalitys", () => {
   it("should navigate to Sports and create new sport", () => {
     cy.get("#desktop-header").contains("Hallinta").click();
     cy.get("#manage-nav").contains("Lajit").click();
-    cy.get("input#newSport").type("CypressTestInput{enter}");
-    cy.get("input#newSport").clear();
+    cy.get("[data-testid=newSportInput]").type("CypressTestInput{enter}");
+    cy.get("[data-testid=newSportInput]").clear();
     cy.get("#sportsContainer").contains("CypressTestInput");
   });
 
   it("should navigate to Sports and check for duplicate error", () => {
     cy.get("#desktop-header").contains("Hallinta").click();
     cy.get("#manage-nav").contains("Lajit").click();
-    cy.get("input#newSport").type("CypressTestInput{enter}");
+    cy.get("[data-testid=newSportInput]").type("CypressTestInput{enter}");
     cy.get("#errorHeader").contains("Laji on jo olemassa");
   });
 
