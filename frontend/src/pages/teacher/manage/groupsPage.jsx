@@ -71,29 +71,31 @@ function CreateGroupContainer({ group, setGroups, groups }) {
           className="flex justify-between text-lg rounded-md
        px-4 py-2 items-center "
         >
-          <div>
-            <input
-              type="text"
-              className="flex w-full text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
-              defaultValue={group.group_identifier}
-              onChange={(e) => setEditedGroup(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSave(editedGroup);
-                }
-              }}
-            />
-          </div>
+          <input
+            type="text"
+            id="editInput"
+            className="flex w-full text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
+            defaultValue={group.group_identifier}
+            onChange={(e) => setEditedGroup(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSave(editedGroup);
+              }
+            }}
+          />
+
           <div className="flex gap-4">
             <button
               className="w-16 py-1 bg-btnGreen border border-borderPrimary rounded-md "
               onClick={() => handleSave()}
+              id="saveBtn"
             >
               Save
             </button>{" "}
             <button
               className="w-16 py-1 bg-btnGray border border-borderPrimary rounded-md "
               onClick={() => handleEdit()}
+              id="cancelBtn"
             >
               Cancel
             </button>
@@ -113,19 +115,19 @@ function CreateGroupContainer({ group, setGroups, groups }) {
         key={group.id}
         className="flex justify-between text-lg hover:bg-bgkPrimary rounded-md px-4 py-2 items-center"
       >
-        <div>
-          <span>{group.group_identifier}</span>
-        </div>
+        <span>{group.group_identifier}</span>
         <div className="flex gap-4">
           <button
             className="w-16 py-1 bg-btnGray border border-borderPrimary rounded-md "
             onClick={() => handleEdit()}
+            id="editBtn"
           >
             Edit
           </button>{" "}
           <button
             className="w-16 py-1 bg-btnRed border border-borderPrimary rounded-md "
             onClick={() => handleDelete()}
+            id="deleteBtn"
           >
             Delete
           </button>
@@ -185,6 +187,7 @@ const GroupsPage = () => {
       {/* Error Header */}
       {errorMessage && (
         <div
+          id="errorHeader"
           className="bg-btnRed w-full text-textPrimary text-center text-lg p-2
           mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
         >
@@ -216,7 +219,7 @@ const GroupsPage = () => {
           />
         </div>
         {/* container for group list */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2" id="groupsContainer">
           {groups.map((group) => (
             <CreateGroupContainer
               group={group}

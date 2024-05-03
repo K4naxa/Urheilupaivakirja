@@ -6,11 +6,12 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
+    "plugin:cypress/recommended",
   ],
   ignorePatterns: ["dist", ".eslintrc.cjs"],
   parserOptions: { ecmaVersion: "latest", sourceType: "module" },
   settings: { react: { version: "18.2" } },
-  plugins: ["react-refresh"],
+  plugins: ["react-refresh", "cypress"],
   rules: {
     "no-unused-vars": "warn",
     "no-undef": "warn",
@@ -20,5 +21,14 @@ module.exports = {
       "warn",
       { allowConstantExport: true },
     ],
+
+    // Cypress rules
+    "cypress/no-assigning-return-values": "error",
+    "cypress/no-unnecessary-waiting": "error",
+    "cypress/assertion-before-screenshot": "warn",
+    "cypress/no-force": "warn",
+    "cypress/no-async-tests": "error",
+    "cypress/no-async-before": "error",
+    "cypress/no-pause": "error",
   },
 };

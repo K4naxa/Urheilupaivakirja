@@ -31,10 +31,10 @@ const StudentLayout = () => {
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-8">
             <p className="items-center flex">Urheilupäiväkirja</p>
-            <NavLink to="/" className={linkClass}>
+            <NavLink to="/" id="etusivuBtn" className={linkClass}>
               Etusivu
             </NavLink>
-            <NavLink to="/tiedotteet/" className={linkClass}>
+            <NavLink to="/tiedotteet/" id="tiedotteetBtn" className={linkClass}>
               Tiedotteet
             </NavLink>
             <UnreadNewsIndicator />
@@ -42,7 +42,7 @@ const StudentLayout = () => {
         </nav>
 
         <div className="flex items-center gap-8">
-          <NavLink to="/merkinnat/uusi">
+          <NavLink to="/merkinnat/uusi" id="newJournalBtn">
             <button className="bg-graphPrimary text-textPrimary hover:text-white hover:bg-headerSecondary  text-lg rounded-md px-3 py-2 drop-shadow-lg ">
               + Uusi Merkintä
             </button>
@@ -57,6 +57,7 @@ const StudentLayout = () => {
               className={
                 "flex flex-col items-center text-textPrimary py-2 gap-2 rounded-md  text-xl"
               }
+              id="userMenuBtn"
             >
               <FiUser />
               <p className="text-[12px] px-2 leading-none select-none">
@@ -78,6 +79,7 @@ const StudentLayout = () => {
                     {({ active }) => (
                       <NavLink
                         to="/profiili"
+                        id="profileBtn"
                         className={`${
                           active
                             ? "bg-headerPrimary text-bgkSecondary"
@@ -93,6 +95,7 @@ const StudentLayout = () => {
                     {({ active }) => (
                       <NavLink
                         to="/asetukset"
+                        id="settingsBtn"
                         className={`${
                           active
                             ? "bg-headerPrimary text-bgkSecondary"
@@ -112,6 +115,7 @@ const StudentLayout = () => {
                         onClick={() => {
                           logout();
                         }}
+                        id="logoutBtn"
                         className={`${
                           active
                             ? "bg-headerPrimary text-bgkSecondary"
@@ -133,6 +137,7 @@ const StudentLayout = () => {
 
       <header
         className={`bg-bgkPrimary shadow-upper-shadow fixed left-0  bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
+        id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-mHeader gap-4 grid w-full">
           {/* left of navigation bar */}
