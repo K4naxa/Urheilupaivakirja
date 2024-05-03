@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import "./newJournalEntryPage.css";
-import trainingService from "../../../../services/trainingService.js";
+import trainingService from "../../../services/trainingService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ConfirmModal } from "../../../../components/confirm-modal/confirmModal.jsx";
-import  { useToast }  from "../../../../hooks/toast-messages/useToast.jsx";
+import { ConfirmModal } from "../../../components/confirm-modal/confirmModal.jsx";
+import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 
 const NewJournalEntryPage = () => {
   const queryClient = useQueryClient();
@@ -27,7 +26,11 @@ const NewJournalEntryPage = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
-  const [conflict, setConflict] = useState({ value: false, message: "", messageShort: "" });
+  const [conflict, setConflict] = useState({
+    value: false,
+    message: "",
+    messageShort: "",
+  });
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const navigate = useNavigate();
@@ -235,7 +238,7 @@ const NewJournalEntryPage = () => {
     );
 
     setSubmitButtonIsDisabled(false);
-    setConflict({ value: false, message: "", messageShort: ""});
+    setConflict({ value: false, message: "", messageShort: "" });
     // Check if there are any existing entries on the same date
     const conflictEntry = existingEntries.find(
       (entry) => entry.date === inputDate
@@ -257,48 +260,53 @@ const NewJournalEntryPage = () => {
 
     if (conflictEntry.entry_type_id == entry_type && entry_type != "1") {
       setSubmitButtonIsDisabled(true);
-    
-    }      
+    }
 
     // {existing_entry: {new_entry: {message, messageShort}}}
     const conflictMessages = {
       1: {
         // 1: this option does not exist as 1:1 conflict is handled above
         2: {
-          message: "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen lepopäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.",
-          messageShort: "Päivälle on merkitty yksi tai useampi harjoitus."
+          message:
+            "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen lepopäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.",
+          messageShort: "Päivälle on merkitty yksi tai useampi harjoitus.",
         },
         3: {
-          message: "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen sairauspäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.",
-          messageShort: "Päivälle on merkitty yksi tai useampi harjoitus."
+          message:
+            "Päivälle on merkitty yksi tai useampi harjoitus. Päivän merkitseminen sairauspäiväksi poistaa päivälle tehdyt harjoitusmerkinnät.",
+          messageShort: "Päivälle on merkitty yksi tai useampi harjoitus.",
         },
       },
       2: {
         1: {
-          message: "Päivä on merkitty lepopäiväksi. Tämän merkinnän lisääminen merkitsee päivän harjoituspäiväksi.",
-          messageShort: "Päivä on merkitty lepopäiväksi."
+          message:
+            "Päivä on merkitty lepopäiväksi. Tämän merkinnän lisääminen merkitsee päivän harjoituspäiväksi.",
+          messageShort: "Päivä on merkitty lepopäiväksi.",
         },
         2: {
           message: "Päivä on jo merkitty lepopäiväksi.",
-          messageShort: "Päivä on jo merkitty lepopäiväksi."
+          messageShort: "Päivä on jo merkitty lepopäiväksi.",
         },
         3: {
-          message: "Päivä on merkitty lepopäiväksi. Tämän merkinnän lisääminen merkitsee päivän sairauspäiväksi.",
-          messageShort: "Päivä on merkitty lepopäiväksi."
+          message:
+            "Päivä on merkitty lepopäiväksi. Tämän merkinnän lisääminen merkitsee päivän sairauspäiväksi.",
+          messageShort: "Päivä on merkitty lepopäiväksi.",
         },
       },
       3: {
         1: {
-          message: "Päivä on merkitty sairauspäiväksi. Tämän merkinnän lisääminen merkitsee päivän harjoituspäiväksi.",
-          messageShort: "Päivä on merkitty sairauspäiväksi."
+          message:
+            "Päivä on merkitty sairauspäiväksi. Tämän merkinnän lisääminen merkitsee päivän harjoituspäiväksi.",
+          messageShort: "Päivä on merkitty sairauspäiväksi.",
         },
         2: {
-          message: "Päivä on merkitty sairauspäiväksi. Tämän merkinnän lisääminen merkitsee päivän lepopäiväksi.",
-          messageShort: "Päivä on merkitty sairauspäiväksi."
+          message:
+            "Päivä on merkitty sairauspäiväksi. Tämän merkinnän lisääminen merkitsee päivän lepopäiväksi.",
+          messageShort: "Päivä on merkitty sairauspäiväksi.",
         },
         3: {
           message: "Päivä on jo merkitty sairauspäiväksi.",
-          messageShort: "Päivä on jo merkitty sairauspäiväksi."
+          messageShort: "Päivä on jo merkitty sairauspäiväksi.",
         },
       },
     };
@@ -308,19 +316,17 @@ const NewJournalEntryPage = () => {
       conflictMessages[conflictEntry.entry_type_id] &&
       conflictMessages[conflictEntry.entry_type_id][entry_type]
     ) {
-      const conflictData = conflictMessages[conflictEntry.entry_type_id][entry_type];
+      const conflictData =
+        conflictMessages[conflictEntry.entry_type_id][entry_type];
       setConflict({
         value: true,
         message: conflictData.message,
-        messageShort: conflictData.messageShort
+        messageShort: conflictData.messageShort,
       });
-      console.log(
-        "Conflict detected:",
-        conflictData.message
-      );
+      console.log("Conflict detected:", conflictData.message);
     }
-  }
-  
+  };
+
   const renderRadioButton = (name, value, label, onChangeHandler) => {
     return (
       <div className="journal-entry-radio-button" key={`${name}-${value}`}>

@@ -7,15 +7,15 @@ import TeacherRoute from "./components/TeacherRoute";
 import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
 
 //student
-import StudentLayout from "./layouts/student-layout/StudentLayout";
-import StudentHome from "./pages/student/student-home/StudentHome";
-import NewJournalEntryPage from "./pages/student/journal-entry/new/NewJournalEntryPage";
+import StudentLayout from "./layouts/StudentLayout";
+import StudentHome from "./pages/student/StudentHome";
+import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPage";
 import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
-import StudentNewsPage from "./pages/student/news/StudentNewsPage";
+import StudentNewsPage from "./pages/student/StudentNewsPage";
 
 //teacher
-import TeacherLayout from "./layouts/teacher-layout/TeacherLayout";
-import TeacherHome from "./pages/teacher/teacher-home/TeacherHome";
+import TeacherLayout from "./layouts/TeacherLayout";
+import TeacherHome from "./pages/teacher/TeacherHome";
 import Verify from "./pages/teacher/verify/Verify";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
@@ -24,13 +24,13 @@ import Visitors from "./pages/teacher/manage/VisitorsPage";
 import GroupsPage from "./pages/teacher/manage/groupsPage";
 import CampusPage from "./pages/teacher/manage/campusPage";
 
-import ManageStudentsLayout from "./layouts/manageStudents-layout/manageStudentsLayout";
-import ManageActiveStudentsPage from "./pages/teacher/manage/students/activeStudents/ManageActiveStudentsPage";
-import ManageArchivedStudentsPage from "./pages/teacher/manage/students/archivedStudents/ManageArchivedStudentsPage";
+import ManageStudentsLayout from "./layouts/manage-layout/manageStudentsLayout";
+import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
+import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
 //misc
 import NoPage from "./pages/NoPage";
-import LoginPage from "./pages/login/LoginPage";
-import RegistrationPage from "./pages/registration/RegistrationPage";
+import LoginPage from "./pages/LoginPage";
+import RegistrationPage from "./pages/RegistrationPage";
 
 export const router = createBrowserRouter([
   {

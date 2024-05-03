@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import publicService from "../../../services/publicService";
-import { useQuery, } from '@tanstack/react-query';
+import publicService from "../../services/publicService";
+import { useQuery } from "@tanstack/react-query";
 
 const renderSingleNews = (news) => {
   return (
@@ -12,7 +12,10 @@ const renderSingleNews = (news) => {
 };
 
 const StudentNewsPage = () => {
-  const {data, isLoading, error} = useQuery({queryKey: ["news"], queryFn: () => publicService.getNews()});
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["news"],
+    queryFn: () => publicService.getNews(),
+  });
 
   if (isLoading) return <p>Loading...</p>;
 

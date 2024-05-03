@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import trainingService from "../../services/trainingService";
+import trainingService from "../services/trainingService";
 import { useNavigate } from "react-router-dom";
 import { FiEdit3 } from "react-icons/fi";
 
@@ -107,17 +107,18 @@ const RecentJournalEntry = ({ entry }) => {
 };
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
-const RecentJournalEntries = ({journal}) => {
+const RecentJournalEntries = ({ journal }) => {
   if (!journal) {
-    return ;
+    return;
   }
 
   return (
     <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
       <h2 className="text-lg">Viimeisimmät merkinnät</h2>
       <div
-        className="flex w-full snap-y scroll-m-1 flex-col gap-4 overflow-y-auto
-        overscroll-none scroll-smooth rounded-md"
+        className="flex w-full 
+        flex-col gap-4 overflow-y-auto
+        overscroll-none rounded-md scroll-smooth"
       >
         {journal.map((entry) => (
           <RecentJournalEntry key={entry.id} entry={entry} />

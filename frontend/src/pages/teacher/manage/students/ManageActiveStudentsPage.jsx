@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import userService from "../../../../../services/userService";
-import "./ManageStudentsPage.css";
+import userService from "../../../../services/userService";
 
 const createStudentContainer = (student, students, setStudents) => {
   const handleDelete = async () => {
@@ -10,7 +9,6 @@ const createStudentContainer = (student, students, setStudents) => {
   };
 
   const handleArchive = async () => {
-    console.log(student.id);
     await userService.toggleStudentArchive(student.id);
     const newStudents = students.filter((s) => s.user_id !== student.user_id);
     setStudents(newStudents);
@@ -26,19 +24,19 @@ const createStudentContainer = (student, students, setStudents) => {
       <div className="student-info-group">{student.group}</div>
       <div className="student-info-campus">{student.campus}</div>
       <div className="student-info-buttons">
-        <button onClick={handleDelete}>Poista</button>
-        <button onClick={handleArchive}>Aktivoi</button>
+        <button onClick={handleDelete}>Delete</button>
+        <button onClick={handleArchive}>Archive</button>
       </div>
     </div>
   );
 };
 
-const ManageArchivedStudentsPage = () => {
+const ManageActiveStudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    userService.getArchivedStudents().then((data) => {
+    userService.getStudents().then((data) => {
       setStudents(data);
       setLoading(false);
     });
@@ -63,4 +61,4 @@ const ManageArchivedStudentsPage = () => {
   );
 };
 
-export default ManageArchivedStudentsPage;
+export default ManageActiveStudentsPage;

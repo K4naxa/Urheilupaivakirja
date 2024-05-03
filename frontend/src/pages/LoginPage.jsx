@@ -1,8 +1,8 @@
-import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
-import userService from "../../services/userService";
+import ThemeSwitcher from "../components/themeSwitcher";
+import userService from "../services/userService";
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 function LoginPage() {
   const [errors, setErrors] = useState({
     errorMessage: "",
@@ -61,8 +61,7 @@ function LoginPage() {
     return isValid;
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setError("");
     if (!errorCheckLogin()) {
       return;
@@ -94,6 +93,26 @@ function LoginPage() {
               {errors.errorMessage}
             </div>
           )}
+          <div className="flex w-full justify-center gap-8">
+            <button
+              onClick={() => {
+                setEmail("student@example.com");
+                setPassword("salasana");
+              }}
+              className="Button  w-24"
+            >
+              Student
+            </button>
+            <button
+              onClick={() => {
+                setEmail("teacher@example.com");
+                setPassword("salasana");
+              }}
+              className="Button w-24"
+            >
+              Teacher
+            </button>
+          </div>
           <div className=" flex w-full flex-col gap-1 relative">
             <input
               type="email"
@@ -106,9 +125,6 @@ function LoginPage() {
                 if (e.key === "Enter") {
                   passwordInput.current.focus();
                 }
-              }}
-              onBlur={() => {
-                checkEmail();
               }}
             />
             {errors.emailError && (
@@ -127,9 +143,6 @@ function LoginPage() {
               value={password}
               ref={passwordInput}
               required
-              onBlur={() => {
-                checkPassword();
-              }}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {

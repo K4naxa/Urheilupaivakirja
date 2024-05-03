@@ -1,9 +1,9 @@
-import ThemeSwitcher from "../../components/themeSwitcher/themeSwitcher";
+import ThemeSwitcher from "../components/themeSwitcher";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import { Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
@@ -16,6 +16,8 @@ import { PiStudent } from "react-icons/pi";
 import { PiBuildings } from "react-icons/pi";
 import { MdOutlineSportsFootball } from "react-icons/md";
 import { GrUserNew } from "react-icons/gr";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
 const TeacherLayout = () => {
   const { logout } = useAuth();
@@ -25,16 +27,16 @@ const TeacherLayout = () => {
   const linkClass =
     "flex flex-col items-center text-textPrimary hover:underline py-2 rounded-md hover:text-headerSecondary text-xl";
   const linkTextClass =
-    "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px]";
+    "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px] leading-none mt-2";
   return (
     <div className="flex w-screen flex-col text-textPrimary flex-wrap lg:content-center ">
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden 
-          border-b-2 px-4 py-2 text-xl shadow-md z-10 lg:flex`}
+          border-b-2 px-4 py-2 text-xl shadow-md max-h-20 lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-8 ">
-            <>Urheilupäiväkirja</>
+            <div className="items-center flex">Urheilupäiväkirja</div>
             <NavLink to="/opettaja/" id="homeLink" className={linkClass}>
               Etusivu
             </NavLink>
@@ -64,27 +66,85 @@ const TeacherLayout = () => {
             </NavLink>
           </div>
         </nav>
-        <div className="grid grid-cols-3 place-items-center">
+        <div className="flex items-center gap-8">
           <ThemeSwitcher />
-          <NavLink
-            to="/profiili"
-            className={
-              "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary flex flex-col items-center px-2"
-            }
-          >
-            <FiUser />
-            <p className={linkTextClass}>Käyttäjä</p>
-          </NavLink>
 
-          <button
-            className={linkClass}
-            onClick={() => {
-              logout();
-            }}
-          >
-            <FiLogOut />
-            <p className={linkTextClass}>Logout</p>
-          </button>
+          {/* Profile button */}
+          <Menu as="div" className="relative text-textPrimary">
+            <Menu.Button
+              className={
+                "flex flex-col items-center text-textPrimary py-2 gap-2 rounded-md  text-xl"
+              }
+            >
+              <FiUser />
+              <p className="text-[12px] leading-none px-2 select-none">
+                Käyttäjä
+              </p>
+            </Menu.Button>{" "}
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgkSecondary text-lg divide-y divide-headerSecondary rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="px-1 py-1 ">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <NavLink
+                        to="/profiili"
+                        className={`${
+                          active
+                            ? "bg-headerPrimary text-bgkSecondary"
+                            : "text-textPrimary"
+                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                      >
+                        <FiUser />
+                        <p className={"text-[12px]"}>Profiili</p>
+                      </NavLink>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <NavLink
+                        to="/asetukset"
+                        className={`${
+                          active
+                            ? "bg-headerPrimary text-bgkSecondary"
+                            : "text-textPrimary"
+                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                      >
+                        <FiSettings />
+                        <p className={"text-[12px]"}>Asetukset</p>
+                      </NavLink>
+                    )}
+                  </Menu.Item>
+                </div>
+                <div className="px-1 py-1">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={() => {
+                          logout();
+                        }}
+                        className={`${
+                          active
+                            ? "bg-headerPrimary text-bgkSecondary"
+                            : "text-textPrimary"
+                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                      >
+                        <FiLogOut />
+                        <p className={"text-[12px]"}>Kirjaudu ulos</p>
+                      </button>
+                    )}
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
       </header>
       {/* header for mobile */}

@@ -1,5 +1,5 @@
-import trainingService from "../../../services/trainingService.js";
-import HeatMap_Year from "../../../components/HeatMap_Year.jsx";
+import trainingService from "../../services/trainingService.js";
+import HeatMap_Year from "../../components/HeatMap_Year.jsx";
 
 import { useEffect, useState } from "react";
 
