@@ -281,7 +281,7 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <main className="max-w-[1480px] lg:mx-4 lg:mt-20 pb-16">
+      <main className="max-w-[1480px] lg:mx-4 lg:mt-24 pb-16">
         <Outlet />
       </main>
     </div>

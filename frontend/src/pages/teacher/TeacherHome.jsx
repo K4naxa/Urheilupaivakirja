@@ -26,12 +26,27 @@ function TeacherHome() {
     }
   }, [journals]);
 
+  console.log(journals);
+
   if (loading) {
     return (
       <>
         <LoadingScreen />
       </>
     );
-  } else return <div className="teacherHomeContainer">Teacher home</div>;
+  } else
+    return (
+      <div className="flex flex-col w-full ">
+        <div className="bg-bgkSecondary">
+          <input
+            type="text"
+            name="nameFilter"
+            id="nameFilter"
+            placeholder="Hae Opiskelija"
+          />
+        </div>
+        <div></div>
+      </div>
+    );
 }
 export default TeacherHome;
