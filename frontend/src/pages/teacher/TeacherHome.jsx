@@ -1,5 +1,7 @@
 import trainingService from "../../services/trainingService.js";
 import HeatMap_Year from "../../components/HeatMap_Year.jsx";
+import HeatMap_Month from "../../components/HeatMap_Month.jsx";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 
 import { useEffect, useState } from "react";
 
@@ -25,14 +27,11 @@ function TeacherHome() {
   }, [journals]);
 
   if (loading) {
-    return <div>Loading...</div>;
-  } else
     return (
-      <div className="teacherHomeContainer">
-        <div className="teacherHomeContent">
-          <h1>Teacher Home</h1>
-        </div>
-      </div>
+      <>
+        <LoadingScreen />
+      </>
     );
+  } else return <div className="teacherHomeContainer">Teacher home</div>;
 }
 export default TeacherHome;
