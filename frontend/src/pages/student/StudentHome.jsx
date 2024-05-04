@@ -6,6 +6,7 @@ import RecentJournalEntries from "../../components/RecentJournalEntries";
 import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";
 import WorkoutActivityChart from "../../components/WorkoutActivityChart";
 import trainingService from "../../services/trainingService";
+import LoadingScreen from "../../components/LoadingScreen";
 import { useEffect } from "react";
 
 function StudentHome() {
@@ -27,7 +28,7 @@ function StudentHome() {
   if (studentJournalDataLoading) {
     return (
       <div className="flex justify-center items-center">
-        <h1>Ladataan...</h1>
+        <LoadingScreen />
       </div>
     );
   }
