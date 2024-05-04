@@ -121,6 +121,12 @@ router.get("/campuses", async (req, res, next) => {
     .groupBy("campuses.id")
     .then((rows) => {
       res.json(rows);
+    })
+    .catch((err) => {
+      console.log("Error fetching campuses data", err);
+      res
+        .status(500)
+        .json({ error: "An error occurred while fetching campuses data" });
     });
 });
 
@@ -178,6 +184,12 @@ router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
     })
     .catch((err) => {
       console.log("Error deleting campus", err);
+
+      if (err.code === "ER_ROW_IS_REFERENCED_2") {
+        return res.status(400).json({
+          error: "Poisto epäonnistui, koska toimipaikalla on opiskelijoita",
+        });
+      }
       res
         .status(500)
         .json({ error: "An error occurred while deleting the campus" });
@@ -186,7 +198,6 @@ router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
 
 // Get all news
 router.get("/news", async (req, res, next) => {
-  
   knex("news")
     .select("*")
     .orderBy("created_at", "desc")
@@ -218,18 +229,17 @@ router.get("/news/unread", async (req, res, next) => {
     }
     const hasUnreadNews = await knex("news")
       .where("created_at", ">", student.news_last_viewed_at)
-      .first();  // We only need to check if at least one exists, not count them all
+      .first(); // We only need to check if at least one exists, not count them all
 
     // Return true if there are unread news, false otherwise
-    res.json({ hasUnreadNews: !!hasUnreadNews });  // !! converts the object to boolean true, undefined to false
+    res.json({ hasUnreadNews: !!hasUnreadNews }); // !! converts the object to boolean true, undefined to false
   } catch (error) {
     console.error("Database query error:", error);
     res.status(500).json({
       error: "An error occurred while fetching unread news status",
-      details: error.message
+      details: error.message,
     });
   }
 });
-
 
 module.exports = router;

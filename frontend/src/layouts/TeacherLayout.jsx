@@ -31,6 +31,7 @@ const TeacherLayout = () => {
   return (
     <div className="flex w-screen flex-col text-textPrimary flex-wrap lg:content-center ">
       <header
+        id="desktop-header"
         className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden 
           border-b-2 px-4 py-2 text-xl shadow-md max-h-20 lg:flex`}
       >
@@ -151,6 +152,7 @@ const TeacherLayout = () => {
 
       <header
         className={`bg-bgkPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
+        id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
           <NavLink to="/opettaja" className={linkClass}>

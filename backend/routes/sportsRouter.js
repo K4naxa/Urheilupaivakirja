@@ -13,12 +13,15 @@ const { getRole } = require("../middleware/auth");
 // Get all sports
 router.get("/", (req, res, next) => {
   knex("sports")
-    .select("*")
+    .select("sports.*")
+    .leftJoin("students", "sports.id", "students.sport_id")
+    .count("students.id as student_count")
+    .groupBy("sports.id")
     .then((rows) => {
       res.json(rows);
     })
     .catch((err) => {
-      console.log("SELECT * FROM `sports` failed");
+      console.log("Error fetching sports data:", err);
       res.status(500).json({ error: err });
     });
 });
@@ -118,6 +121,17 @@ router.delete("/:id", (req, res, next) => {
     .del()
     .then(() => {
       res.json({ message: `Sport with id ${id} deleted` });
+    })
+    .catch((err) => {
+      if (err.code === "ER_ROW_IS_REFERENCED_2") {
+        return res
+          .status(400)
+          .json({
+            error: "Laji ei voitu poistaa, koska laji sisältää oppilaita",
+          });
+      }
+      console.log("Error deleting sport:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
