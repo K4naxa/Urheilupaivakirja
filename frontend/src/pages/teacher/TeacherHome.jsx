@@ -1,6 +1,6 @@
 import trainingService from "../../services/trainingService.js";
 import dayjs from "dayjs";
-import HeatMap_Year from "../../components/HeatMap_Year.jsx";
+import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
 import HeatMap_Month from "../../components/HeatMap_Month_Teacher.jsx";
 import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
@@ -65,7 +65,7 @@ const RenderWeeks = ({ journals }) => {
             className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
             id="studentCard"
           >
-            <div className="flex gap-8">
+            <div className="flex gap-8 leading-none items-end">
               <p className="text-lg">
                 {journal.first_name} {journal.last_name}
               </p>
@@ -160,6 +160,73 @@ const RenderMonths = ({ journals }) => {
               <p>Laji: {journal.sport}</p>
             </div>
             <HeatMap_Month journal={journal} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// RenderYears component
+const RenderYears = ({ journals }) => {
+  const { showDate, setShowDate } = useMainContext();
+
+  const handlePreviousYearClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate);
+    newDate.setFullYear(showDate.getFullYear() - 1);
+    setShowDate(newDate);
+  };
+
+  const handleNextYearClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate);
+    newDate.setFullYear(showDate.getFullYear() + 1);
+    setShowDate(newDate);
+  };
+
+  return (
+    <div className="flex flex-col justify-center">
+      <div className="flex flex-col text-center mb-8">
+        <div className="hover: flex justify-center gap-4">
+          <button className="hover:underline" onClick={handlePreviousYearClick}>
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronLeft />
+            </IconContext.Provider>
+          </button>
+          <p className="text-xl">{showDate.getFullYear()}</p>
+          <button
+            className="hover:fill-blue-500 hover:underline"
+            onClick={handleNextYearClick}
+          >
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronRight />
+            </IconContext.Provider>
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
+        {journals.map((journal) => (
+          <div
+            key={journal.user_id}
+            className="flex flex-col gap-2 rounded-md bg-bgkSecondary p-4 border
+             border-headerPrimary shadow-md hover:shadow-headerPrimary"
+            id="studentCard"
+          >
+            <div className="flex gap-4  leading-none items-end">
+              <p className="text-lg text-center leading-none">
+                {journal.first_name} {journal.last_name}
+              </p>
+
+              <p className="text-textSecondary">Toimipiste: {journal.campus}</p>
+              <p className="text-textSecondary">ryhmä: {journal.group}</p>
+              <p className="flex text-textSecondary">Laji: {journal.sport}</p>
+            </div>
+            <HeatMap_Year_Teacher journal={journal} />
           </div>
         ))}
       </div>
@@ -290,6 +357,7 @@ function TeacherHome() {
 
           {showWeeks && <RenderWeeks journals={journals} />}
           {showMonths && <RenderMonths journals={journals} />}
+          {showYears && <RenderYears journals={journals} />}
         </div>
       </div>
     );
