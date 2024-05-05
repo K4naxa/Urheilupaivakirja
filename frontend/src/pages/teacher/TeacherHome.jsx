@@ -35,8 +35,9 @@ const RenderWeeks = ({ journals }) => {
     setShowDate(newDate);
   };
   return (
-    <div>
-      <div className="flex w-full flex-col text-center mb-8">
+    <div className="flex flex-col justify-center">
+      {/* Date controls */}
+      <div className="flex w-full flex-col text-center mb-4">
         <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
         <div className="hover: flex justify-center gap-4">
           <button className="hover:underline" onClick={handlePreviousWeekClick}>
@@ -59,20 +60,30 @@ const RenderWeeks = ({ journals }) => {
           </button>
         </div>
       </div>
+      {/* Student list */}
       <div className="flex flex-col gap-4">
         {journals.map((journal) => (
+          // Student card
           <div
             key={journal.user_id}
-            className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
+            className="flex flex-col rounded-md j bg-bgkSecondary p-3 gap-2 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
             id="studentCard"
           >
-            <div className="flex flex-wrap lg:gap-6 text-textSecondary text-xs">
-              <p className=" hidden lg:flex">Toimipaikka: {journal.campus}</p>
+            <div className="flex lg:gap-6 text-textSecondary text-xs">
+              <p className="hidden lg:flex">Toimipaikka: {journal.campus}</p>
+              <p>Ryhmä: {journal.group}</p>
+              <p>Laji: {journal.sport}</p>
             </div>
+            <div className="flex justify-between gap-2">
+              <div className="flex gap-1">
+                {" "}
+                <p> {journal.first_name}</p>
+                <p>{journal.last_name}</p>
+              </div>
 
-            <div className="flex">
-              {journal.first_name} {journal.last_name}
-              <HeatMap_Weeks journal={journal} />
+              <div>
+                <HeatMap_Weeks journal={journal} />
+              </div>
             </div>
           </div>
         ))}
@@ -150,12 +161,16 @@ const RenderMonths = ({ journals }) => {
                 {journal.first_name} {journal.last_name}
               </p>
             </div>
-            <div className="flex flex-col text-textSecondary text-sm">
-              <p className="align-bottom hidden lg:flex">
-                Toimipiste: {journal.campus}
+            <div className="flex flex-col text-textSecondary text-xs">
+              <p className="flex gap-1 ">
+                Toimipiste: <p className="text-textPrimary">{journal.campus}</p>
               </p>
-              <p>ryhmä: {journal.group}</p>
-              <p>Laji: {journal.sport}</p>
+              <p className="flex gap-1 ">
+                ryhmä: <p className="text-textPrimary">{journal.group}</p>
+              </p>
+              <p className="flex gap-1 ">
+                Laji: <p className="text-textPrimary">{journal.sport}</p>
+              </p>
             </div>
             <HeatMap_Month journal={journal} />
           </div>
@@ -348,7 +363,7 @@ function TeacherHome() {
         {/* student list */}
         <div
           id="studentList"
-          className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 "
+          className="flex lg:ml-72 gap-8 rounded-md bg-bgkSecondary p-4 "
         >
           {showWeeks && <RenderWeeks journals={journals} />}
           {showMonths && <RenderMonths journals={journals} />}

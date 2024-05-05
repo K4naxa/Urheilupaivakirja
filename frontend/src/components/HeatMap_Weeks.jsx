@@ -38,11 +38,10 @@ const HeatMap_Weeks = ({ journal }) => {
 
     const theme = document.documentElement.getAttribute("data-theme");
 
-    let range = 4;
+    let range = 3;
 
-    if (screenWidth < 900) range = 3;
     if (screenWidth < 700) range = 2;
-    if (screenWidth < 535) range = 0;
+    if (screenWidth < 535) range = 1;
 
     cal.paint(
       {
@@ -79,18 +78,16 @@ const HeatMap_Weeks = ({ journal }) => {
 
         domain: {
           type: "week",
-          gutter: 20,
+          gutter: 10,
           label: {
-            text: function (date) {
-              return dayjs(date).format("MM/YY");
-            },
+            text: null,
           },
         },
         subDomain: {
           type: "day",
-          width: 17,
-          height: 17,
-          gutter: 5,
+          width: 20,
+          height: 20,
+          gutter: 3,
           radius: 2,
           label: function (date) {
             return dayjs(date).format("D");
