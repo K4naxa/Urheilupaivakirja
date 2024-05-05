@@ -1,9 +1,10 @@
 import trainingService from "../../services/trainingService.js";
-import dayjs from "dayjs";
+
 import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
 import HeatMap_Month from "../../components/HeatMap_Month_Teacher.jsx";
 import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
+import StudentComboBox from "../../components/ComboBoxes/StudentsComboBox.jsx";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
@@ -45,7 +46,7 @@ const RenderWeeks = ({ journals }) => {
               <FiChevronLeft />
             </IconContext.Provider>
           </button>
-          <p className="text-xl">{getWeekNumber(showDate)}</p>
+          <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
           <button
             className="hover:fill-blue-500 hover:underline"
             onClick={handleNextWeekClick}
@@ -65,17 +66,14 @@ const RenderWeeks = ({ journals }) => {
             className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
             id="studentCard"
           >
-            <div className="flex gap-8 leading-none items-end">
-              <p className="text-lg">
-                {journal.first_name} {journal.last_name}
-              </p>
-              <div className="flex flex-wrap lg:gap-6 text-textSecondary text-sm">
-                <p className=" hidden lg:flex">Toimipiste: {journal.campus}</p>
-                <p>ryhmä: {journal.group}</p>
-                <p>Laji: {journal.sport}</p>
-              </div>
+            <div className="flex flex-wrap lg:gap-6 text-textSecondary text-xs">
+              <p className=" hidden lg:flex">Toimipaikka: {journal.campus}</p>
             </div>
-            <HeatMap_Weeks journal={journal} />
+
+            <div className="flex">
+              {journal.first_name} {journal.last_name}
+              <HeatMap_Weeks journal={journal} />
+            </div>
           </div>
         ))}
       </div>
@@ -241,6 +239,7 @@ function TeacherHome() {
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState("");
 
   useEffect(() => {
     trainingService
@@ -249,6 +248,7 @@ function TeacherHome() {
         setJournals(response);
         console.log(response);
       })
+
       .catch((error) => {
         console.log(error);
       });
@@ -274,62 +274,14 @@ function TeacherHome() {
           className="bg-bgkSecondary flex flex-wrap align-middle lg:justify-center rounded-md
          h-fit w-full p-4 justify-between lg:p-8 lg:gap-8 lg:fixed lg:flex-col lg:w-64 lg:top-1/2 lg:transform lg:-translate-y-1/2 shadow-md"
         >
-          <div className="w-2/5 lg:w-full">
-            <input
-              type="text"
-              name="nameFilter"
-              id="nameFilter"
-              className="w-full"
-              placeholder="Hae Opiskelija"
-            />
-          </div>
-          <div className="w-2/5 lg:w-full">
-            <input
-              type="text"
-              name="groupFilter"
-              id="groupFilter"
-              className="w-full"
-              placeholder="Hae Ryhmä"
-            />
-          </div>
-          <div className="w-2/5 lg:w-full">
-            <input
-              type="text"
-              name="sportFilter"
-              id="sportFilter"
-              className="w-full"
-              placeholder="Hae Laji"
-            />
-          </div>
-          <div className="w-2/5 lg:w-full">
-            <input
-              type="text"
-              name="campusFilter"
-              id="campusFilter"
-              className="w-full"
-              placeholder="Hae Kampus"
-            />
-          </div>
-          <div className="flex lg:gap-8 justify-center text-sm">
-            <button className="Button">Filtteröi</button>{" "}
-            <button className="Button bg-btnGray">Nollaa</button>
-          </div>
-        </div>
-
-        {/* student list */}
-        <div
-          id="studentList"
-          className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 "
-        >
-          {/* Which time to render  */}
-          <div className="flex gap-2 ">
+          <div className="flex text-textSecondary text-sm">
             <p
               onClick={() => {
                 setShowWeeks(true);
                 setShowMonths(false);
                 setShowYears(false);
               }}
-              className="cursor-pointer"
+              className={`cursor-pointer mx-2 ${showWeeks && "text-headerPrimary border-b border-headerPrimary"}`}
             >
               Viikko
             </p>
@@ -339,7 +291,7 @@ function TeacherHome() {
                 setShowMonths(true);
                 setShowYears(false);
               }}
-              className="cursor-pointer"
+              className={`cursor-pointer mx-2 ${showMonths && "text-headerPrimary border-b border-headerPrimary"}`}
             >
               Kuukausi
             </p>
@@ -349,12 +301,55 @@ function TeacherHome() {
                 setShowMonths(false);
                 setShowYears(true);
               }}
-              className="cursor-pointer"
+              className={`cursor-pointer mx-2 ${showYears && "text-headerPrimary border-b border-headerPrimary"}`}
             >
               Vuosi
             </p>
           </div>
+          <StudentComboBox
+            journals={journals}
+            selectedStudent={selectedStudent}
+            setSelectedStudent={setSelectedStudent}
+          />
+          <div className="w-2/5 lg:w-full">
+            <input
+              type="text"
+              name="groupFilter"
+              id="groupFilter"
+              className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1"
+              placeholder="Hae Ryhmä"
+            />
+          </div>
+          <div className="w-2/5 lg:w-full">
+            <select
+              name="sportFilter"
+              id="sportFilter"
+              className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1"
+              placeholder="Hae Laji"
+            >
+              <option value="">Valitse ryhmä</option>
+            </select>
+          </div>
+          <div className="w-2/5 lg:w-full">
+            <input
+              type="text"
+              name="campusFilter"
+              id="campusFilter"
+              className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1"
+              placeholder="Hae Kampus"
+            />
+          </div>
+          <div className="flex lg:gap-8 justify-center text-sm">
+            <button className="Button">Hae</button>{" "}
+            <button className="Button bg-btnGray">Nollaa</button>
+          </div>
+        </div>
 
+        {/* student list */}
+        <div
+          id="studentList"
+          className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 "
+        >
           {showWeeks && <RenderWeeks journals={journals} />}
           {showMonths && <RenderMonths journals={journals} />}
           {showYears && <RenderYears journals={journals} />}

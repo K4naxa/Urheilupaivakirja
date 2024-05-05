@@ -38,13 +38,11 @@ const HeatMap_Weeks = ({ journal }) => {
 
     const theme = document.documentElement.getAttribute("data-theme");
 
-    let range = 6;
+    let range = 4;
 
-    if (screenWidth < 1300) range = 5;
-    if (screenWidth < 1200 && screenWidth > 1023) range = 4;
-    if (screenWidth < 900) range = 4;
-    if (screenWidth < 700) range = 3;
-    if (screenWidth < 535) range = 2;
+    if (screenWidth < 900) range = 3;
+    if (screenWidth < 700) range = 2;
+    if (screenWidth < 535) range = 0;
 
     cal.paint(
       {
@@ -81,19 +79,22 @@ const HeatMap_Weeks = ({ journal }) => {
 
         domain: {
           type: "week",
-          gutter: 10,
+          gutter: 20,
+          label: {
+            text: function (date) {
+              return dayjs(date).format("MM/YY");
+            },
+          },
         },
         subDomain: {
           type: "day",
-          label: {
-            position: "top",
-            align: "center",
-          },
-
           width: 17,
           height: 17,
           gutter: 5,
           radius: 2,
+          label: function (date) {
+            return dayjs(date).format("D");
+          },
         },
       },
       [
@@ -131,18 +132,6 @@ const HeatMap_Weeks = ({ journal }) => {
                   "</div>"
                 );
             },
-          },
-        ],
-
-        [
-          CalendarLabel,
-          {
-            position: "top",
-            key: "top",
-            text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
-            padding: [0, 5, 0, 0],
-            height: 17,
-            gutter: 5,
           },
         ],
       ]
