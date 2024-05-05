@@ -328,9 +328,8 @@ const RegistrationPage = () => {
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgkSecondary focus-visible:outline-none focus-visible:border-headerPrimary";
 
-  // TODO: Fix bug regarding overwriting the error message to instantly green, currently gets first gray then green
   return (
-    <div className="bg-bgkPrimary text-textPrimary grid place-items-center border-none   h-screen w-screen">
+    <div className="bg-bgkPrimary text-textPrimary grid place-items-center border-none h-screen w-screen">
       <div
         className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"

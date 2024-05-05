@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import trainingService from "../../../../services/trainingService.js";
 
-const NewJournalEntryPage = () => {
+const NewJournalEntryPage = ({entry_id}) => {
   //TODO: new date = today (from other branch)
   const [journalData, setJournalData] = useState({
     entry_id: "",
@@ -22,8 +22,6 @@ const NewJournalEntryPage = () => {
   const [conflict, setConflict] = useState({ value: false, message: "" });
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
   const [existingEntries, setExistingEntries] = useState([]);
-
-  const { entry_id } = useParams();
 
   useEffect(() => {
     const fetchJournalEntry = async () => {

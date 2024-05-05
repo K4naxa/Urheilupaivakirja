@@ -22,6 +22,8 @@ export default {
         btnGray: "rgb(var(--color-gray) / <alpha-value>)",
         btnGreen: "rgb(var(--color-green) / <alpha-value>)",
         btnRed: "rgb(var(--color-red) / <alpha-value>)",
+
+        modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",
       },
 
       gridTemplateColumns: {
