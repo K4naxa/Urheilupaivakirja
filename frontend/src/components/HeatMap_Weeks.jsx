@@ -10,6 +10,7 @@ import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 const HeatMap_Weeks = ({ journal }) => {
   const { showDate, screenWidth } = useMainContext();
   const [data, setData] = useState([]);
+  const cal = new CalHeatmap();
 
   useEffect(() => {
     // clean up the data for the heatmap
@@ -30,10 +31,13 @@ const HeatMap_Weeks = ({ journal }) => {
   console.log(journal.user_id);
 
   useEffect(() => {
-    const cal = new CalHeatmap();
+    const container = document.getElementById(
+      `cal-heatmapWeeks${journal.user_id}`
+    );
+    if (!container) return;
+    container.innerHTML = "";
+
     const theme = document.documentElement.getAttribute("data-theme");
-    document.getElementById(`cal-heatmapWeeks${journal.user_id}`).innerHTML =
-      "";
 
     let range = 6;
 

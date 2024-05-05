@@ -9,6 +9,15 @@ import { useEffect, useState } from "react";
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [nameFilter, setNameFilter] = useState("");
+  const [groupFilter, setGroupFilter] = useState("");
+  const [sportFilter, setSportFilter] = useState("");
+  const [campusFilter, setCampusFilter] = useState("");
+
+  const [showWeeks, setShowWeeks] = useState(true);
+  const [showMonths, setShowMonths] = useState(false);
+  const [showYears, setShowYears] = useState(false);
+
   useEffect(() => {
     trainingService
       .getJournalEntries()
@@ -82,10 +91,44 @@ function TeacherHome() {
             <button className="Button bg-btnGray">Nollaa</button>
           </div>
         </div>
+
+        {/* student list */}
         <div
           id="studentList"
-          className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 w-full"
+          className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 "
         >
+          <div className="flex gap-2 divide-x">
+            <p
+              onClick={() => {
+                setShowWeeks(true);
+                setShowMonths(false);
+                setShowYears(false);
+              }}
+              className="cursor-pointer"
+            >
+              Viikko
+            </p>
+            <p
+              onClick={() => {
+                setShowWeeks(false);
+                setShowMonths(true);
+                setShowYears(false);
+              }}
+              className="cursor-pointer"
+            >
+              Kuukausi
+            </p>
+            <p
+              onClick={() => {
+                setShowWeeks(false);
+                setShowMonths(false);
+                setShowYears(true);
+              }}
+              className="cursor-pointer"
+            >
+              Vuosi
+            </p>
+          </div>
           {journals.map((journal) => (
             <div
               key={journal.user_id}
@@ -104,7 +147,9 @@ function TeacherHome() {
                   <p>Laji: {journal.sport}</p>
                 </div>
               </div>
-              <HeatMap_Weeks journal={journal} />
+              {showWeeks && <HeatMap_Weeks journal={journal} />}
+              {showMonths && <HeatMap_Month journal={journal} />}
+              {showYears && <HeatMap_Year journal={journal} />}
             </div>
           ))}
         </div>
