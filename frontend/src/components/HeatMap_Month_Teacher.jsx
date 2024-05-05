@@ -1,16 +1,43 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
-
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
+import { FiChevronLeft } from "react-icons/fi";
+import { FiChevronRight } from "react-icons/fi";
+import { IconContext } from "react-icons/lib";
 
-const HeatMap_Weeks = ({ journal }) => {
-  const { showDate, screenWidth } = useMainContext();
+const HeatMap_Month = ({ journal }) => {
+  const { showDate, setShowDate } = useMainContext();
   const [data, setData] = useState([]);
-  const cal = new CalHeatmap();
+  const monthNames = [
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
+  ];
+
+  const handlePreviousMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
+    setShowDate(newDate);
+  };
+
+  const handleNextMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
+    setShowDate(newDate);
+  };
 
   useEffect(() => {
     // clean up the data for the heatmap
@@ -31,40 +58,36 @@ const HeatMap_Weeks = ({ journal }) => {
 
   useEffect(() => {
     const container = document.getElementById(
-      `cal-heatmapWeeks${journal.user_id}`
+      `cal-heatmapMonth${journal.user_id}`
     );
     if (!container) return;
     container.innerHTML = "";
 
-    const theme = document.documentElement.getAttribute("data-theme");
+    const theme = document.querySelector("html").getAttribute("data-theme");
 
-    let range = 6;
-
-    if (screenWidth < 1300) range = 5;
-    if (screenWidth < 1200 && screenWidth > 1023) range = 4;
-    if (screenWidth < 900) range = 4;
-    if (screenWidth < 700) range = 3;
-    if (screenWidth < 535) range = 2;
-
+    const cal = new CalHeatmap();
     cal.paint(
       {
-        itemSelector: `#cal-heatmapWeeks${journal.user_id}`,
-        animationDuration: 0,
+        itemSelector: `#cal-heatmapMonth${journal.user_id}`,
         theme: theme,
 
         date: {
-          start: dayjs(showDate)
-            .subtract(range - 1, "week")
-            .toDate(),
-          end: showDate,
+          start: dayjs(
+            new Date(showDate.getFullYear(), showDate.getMonth(), 5)
+          ).format("YYYY-MM-DD"),
           highlight: new Date(),
           name: "x-pseudo",
           locale: {
             weekStart: 1,
             timezone: "Europe/Helsinki",
+            months:
+              "Tammikuu_Helmikuu_Maaliskuu_Huhtikuu_Toukokuu_Kesäkuu_Heinäkuu_Elokuu_Syyskuu_Lokakuu_Marraskuu_Joulukuu".split(
+                "_"
+              ),
           },
         },
-        range: range,
+        animationDuration: 0,
+        range: 1,
         data: {
           source: data,
           x: "date",
@@ -80,20 +103,19 @@ const HeatMap_Weeks = ({ journal }) => {
         },
 
         domain: {
-          type: "week",
+          type: "month",
           gutter: 10,
+          label: {
+            text: null,
+          },
         },
         subDomain: {
-          type: "day",
-          label: {
-            position: "top",
-            align: "center",
-          },
-
-          width: 17,
-          height: 17,
+          type: "xDay",
+          width: 25,
+          height: 25,
           gutter: 5,
-          radius: 2,
+          radius: 5,
+          label: "D",
         },
       },
       [
@@ -138,23 +160,32 @@ const HeatMap_Weeks = ({ journal }) => {
           CalendarLabel,
           {
             position: "top",
-            key: "top",
+            key: "weekdays",
+            height: 20,
+            gutter: 7,
+            width: 45,
             text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
-            padding: [0, 5, 0, 0],
-            height: 17,
-            gutter: 5,
           },
         ],
       ]
     );
-  }, [data, showDate, screenWidth]);
+
+    return () => {
+      const cal = document.querySelector("#cal-heatmapMonth");
+      if (cal) cal.innerHTML = "";
+    };
+  }, [data, showDate]);
 
   return (
-    <div
-      id={`cal-heatmapWeeks${journal.user_id}`}
-      className="flex w-full"
-    ></div>
+    <div className="flex w-full flex-col gap-4 text-center">
+      {/* heatmap */}
+
+      <div
+        id={`cal-heatmapMonth${journal.user_id}`}
+        className="flex w-full justify-center"
+      ></div>
+    </div>
   );
 };
 
-export default HeatMap_Weeks;
+export default HeatMap_Month;

@@ -1,18 +1,175 @@
 import trainingService from "../../services/trainingService.js";
+import dayjs from "dayjs";
 import HeatMap_Year from "../../components/HeatMap_Year.jsx";
-import HeatMap_Month from "../../components/HeatMap_Month.jsx";
+import HeatMap_Month from "../../components/HeatMap_Month_Teacher.jsx";
 import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
+import { useMainContext } from "../../hooks/mainContext.jsx";
+import { FiChevronLeft } from "react-icons/fi";
+import { FiChevronRight } from "react-icons/fi";
+import { IconContext } from "react-icons/lib";
 
 import { useEffect, useState } from "react";
+
+const RenderWeeks = ({ journals }) => {
+  const { showDate, setShowDate } = useMainContext();
+
+  const getWeekNumber = (date) => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date - firstDayOfYear) / 86400000; // 1 day in milliseconds
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
+
+  const handlePreviousWeekClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate);
+    newDate.setDate(showDate.getDate() - 7); // Subtract 7 days to go to the previous week
+    setShowDate(newDate);
+  };
+
+  const handleNextWeekClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate);
+    newDate.setDate(showDate.getDate() + 7); // Add 7 days to go to the next week
+    setShowDate(newDate);
+  };
+  return (
+    <div>
+      <div className="flex w-full flex-col text-center mb-8">
+        <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+        <div className="hover: flex justify-center gap-4">
+          <button className="hover:underline" onClick={handlePreviousWeekClick}>
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronLeft />
+            </IconContext.Provider>
+          </button>
+          <p className="text-xl">{getWeekNumber(showDate)}</p>
+          <button
+            className="hover:fill-blue-500 hover:underline"
+            onClick={handleNextWeekClick}
+          >
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronRight />
+            </IconContext.Provider>
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        {journals.map((journal) => (
+          <div
+            key={journal.user_id}
+            className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md"
+            id="studentCard"
+          >
+            <div className="flex gap-8">
+              <p className="text-lg">
+                {journal.first_name} {journal.last_name}
+              </p>
+              <div className="flex flex-wrap lg:gap-6 text-textSecondary text-sm">
+                <p className=" hidden lg:flex">Toimipiste: {journal.campus}</p>
+                <p>ryhmä: {journal.group}</p>
+                <p>Laji: {journal.sport}</p>
+              </div>
+            </div>
+            <HeatMap_Weeks journal={journal} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const RenderMonths = ({ journals }) => {
+  const { showDate, setShowDate } = useMainContext();
+  const handlePreviousMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
+    setShowDate(newDate);
+  };
+
+  const handleNextMonthClick = (e) => {
+    e.preventDefault();
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
+    setShowDate(newDate);
+  };
+
+  const monthNames = [
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
+  ];
+
+  return (
+    <div>
+      <div className="flex w-full flex-col text-center mb-8">
+        <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+        <div className="hover: flex justify-center gap-4">
+          <button
+            className="hover:underline"
+            onClick={handlePreviousMonthClick}
+          >
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronLeft />
+            </IconContext.Provider>
+          </button>
+          <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
+          <button
+            className="hover:fill-blue-500 hover:underline"
+            onClick={handleNextMonthClick}
+          >
+            <IconContext.Provider
+              value={{ className: "hover:text-graphPrimary" }}
+            >
+              <FiChevronRight />
+            </IconContext.Provider>
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-col lg:gap-8 gap-4">
+        {journals.map((journal) => (
+          <div
+            key={journal.user_id}
+            className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md"
+            id="studentCard"
+          >
+            <div className="flex gap-8">
+              <p className="text-lg">
+                {journal.first_name} {journal.last_name}
+              </p>
+              <div className="flex flex-wrap lg:gap-4 align-bottom text-textSecondary text-sm">
+                <p className="align-bottom hidden lg:flex">
+                  Toimipiste: {journal.campus}
+                </p>
+                <p>ryhmä: {journal.group}</p>
+                <p>Laji: {journal.sport}</p>
+              </div>
+            </div>
+            <HeatMap_Month journal={journal} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [nameFilter, setNameFilter] = useState("");
-  const [groupFilter, setGroupFilter] = useState("");
-  const [sportFilter, setSportFilter] = useState("");
-  const [campusFilter, setCampusFilter] = useState("");
 
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
@@ -97,6 +254,7 @@ function TeacherHome() {
           id="studentList"
           className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 "
         >
+          {/* Which time to render  */}
           <div className="flex gap-2 divide-x">
             <p
               onClick={() => {
@@ -129,29 +287,9 @@ function TeacherHome() {
               Vuosi
             </p>
           </div>
-          {journals.map((journal) => (
-            <div
-              key={journal.user_id}
-              className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md"
-              id="studentCard"
-            >
-              <div className="flex gap-8">
-                <p className="text-lg">
-                  {journal.first_name} {journal.last_name}
-                </p>
-                <div className="flex flex-wrap lg:gap-4 align-bottom text-textSecondary text-sm">
-                  <p className="align-bottom hidden lg:flex">
-                    Toimipiste: {journal.campus}
-                  </p>
-                  <p>ryhmä: {journal.group}</p>
-                  <p>Laji: {journal.sport}</p>
-                </div>
-              </div>
-              {showWeeks && <HeatMap_Weeks journal={journal} />}
-              {showMonths && <HeatMap_Month journal={journal} />}
-              {showYears && <HeatMap_Year journal={journal} />}
-            </div>
-          ))}
+
+          {showWeeks && <RenderWeeks journals={journals} />}
+          {showMonths && <RenderMonths journals={journals} />}
         </div>
       </div>
     );
