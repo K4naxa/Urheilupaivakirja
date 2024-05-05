@@ -23,7 +23,7 @@ const StudentLayout = () => {
   const linkTextClass =
     "text-textPrimary items-center text-[12px] leading-none mt-2";
   return (
-    <>
+    <div className="text-textPrimary">
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
     border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
@@ -231,10 +231,12 @@ const StudentLayout = () => {
           )}
         </div>
       </header>
-      <main className="mx-1 max-w-[1480px] lg:mx-4 lg:mt-20">
-        <Outlet />
-      </main>
-    </>
+      <div className="flex w-full  lg:mt-24 box-content">
+        <main className="flex w-full mx-auto max-w-[1480px] pb-16 ">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 };
 

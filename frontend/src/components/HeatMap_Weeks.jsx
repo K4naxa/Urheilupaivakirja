@@ -8,14 +8,12 @@ import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Weeks = ({ journal }) => {
-  const { showDate } = useMainContext();
-
+  const { showDate, screenWidth } = useMainContext();
   const [data, setData] = useState([]);
-  const cal = new CalHeatmap();
 
   useEffect(() => {
     // clean up the data for the heatmap
-    const entries = journal.map((entry) => {
+    const entries = journal.journal_entries.map((entry) => {
       const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
       let value = entry.length_in_minutes;
 
@@ -29,19 +27,33 @@ const HeatMap_Weeks = ({ journal }) => {
     });
     setData(entries);
   }, [journal]);
+  console.log(journal.user_id);
 
   useEffect(() => {
-    document.getElementById("cal-heatmapWeeks").innerHTML = "";
+    const cal = new CalHeatmap();
     const theme = document.documentElement.getAttribute("data-theme");
+    document.getElementById(`cal-heatmapWeeks${journal.user_id}`).innerHTML =
+      "";
+
+    let range = 6;
+
+    if (screenWidth < 1300) range = 5;
+    if (screenWidth < 1200 && screenWidth > 1023) range = 4;
+
+    if (screenWidth < 900) range = 4;
+
+    if (screenWidth < 700) range = 3;
+
+    if (screenWidth < 535) range = 2;
 
     cal.paint(
       {
-        itemSelector: "#cal-heatmapWeeks",
+        itemSelector: `#cal-heatmapWeeks${journal.user_id}`,
         animationDuration: 0,
         theme: theme,
 
         date: {
-          start: new Date(showDate - 1000 * 60 * 60 * 24 * 14),
+          start: dayjs(showDate).subtract(range, "week").toDate(),
           highlight: new Date(),
           name: "x-pseudo",
           locale: {
@@ -49,7 +61,7 @@ const HeatMap_Weeks = ({ journal }) => {
             timezone: "Europe/Helsinki",
           },
         },
-        range: 2,
+        range: range,
         data: {
           source: data,
           x: "date",
@@ -67,14 +79,14 @@ const HeatMap_Weeks = ({ journal }) => {
         domain: {
           type: "week",
           gutter: 10,
-          label: {
-            position: "top",
-            align: "center",
-            width: 20,
-          },
         },
         subDomain: {
           type: "day",
+          label: {
+            position: "top",
+            align: "center",
+          },
+
           width: 17,
           height: 17,
           gutter: 5,
@@ -124,7 +136,7 @@ const HeatMap_Weeks = ({ journal }) => {
           {
             position: "top",
             key: "top",
-            text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
+            text: () => ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
             padding: [0, 5, 0, 0],
             height: 17,
             gutter: 5,
@@ -132,9 +144,14 @@ const HeatMap_Weeks = ({ journal }) => {
         ],
       ]
     );
-  }, [data, showDate]);
+  }, [data, showDate, screenWidth]);
 
-  return <div id="cal-heatmapWeeks" className="flex w-full"></div>;
+  return (
+    <div
+      id={`cal-heatmapWeeks${journal.user_id}`}
+      className="flex w-full"
+    ></div>
+  );
 };
 
 export default HeatMap_Weeks;

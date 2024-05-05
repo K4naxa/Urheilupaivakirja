@@ -48,9 +48,6 @@
 
   body {
     background-color: rgb(var(--color-bg-primary));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 }
 
@@ -130,7 +127,7 @@ a.active {
 }
 
 .ch-subdomain-bg:hover {
-  stroke: #000;
+  stroke: rgb(var(--color-header-primary));
   stroke-width: 1px;
 }
 [data-theme="dark"] .ch-subdomain-bg {
@@ -146,6 +143,11 @@ a.active {
   color: rgb(var(--color-text-primary));
 }
 
+#studentCard {
+  & .ch-subdomain-bg {
+    fill: rgb(var(--color-bg-primary));
+  }
+}
 /* Scrollbar Settings */
 ::-webkit-scrollbar {
   margin: 10px;
