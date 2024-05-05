@@ -62,7 +62,7 @@ const RenderWeeks = ({ journals }) => {
         {journals.map((journal) => (
           <div
             key={journal.user_id}
-            className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md"
+            className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
             id="studentCard"
           >
             <div className="flex gap-8">
@@ -113,8 +113,8 @@ const RenderMonths = ({ journals }) => {
   ];
 
   return (
-    <div>
-      <div className="flex w-full flex-col text-center mb-8">
+    <div className="flex flex-col justify-center">
+      <div className="flex flex-col text-center mb-8">
         <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
         <div className="hover: flex justify-center gap-4">
           <button
@@ -140,24 +140,24 @@ const RenderMonths = ({ journals }) => {
           </button>
         </div>
       </div>
-      <div className="flex flex-col lg:gap-8 gap-4">
+      <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
         {journals.map((journal) => (
           <div
             key={journal.user_id}
-            className="rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md"
+            className="flex flex-col gap-2 w-60 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
             id="studentCard"
           >
-            <div className="flex gap-8">
-              <p className="text-lg">
+            <div className="flex flex-col">
+              <p className="text-lg text-center">
                 {journal.first_name} {journal.last_name}
               </p>
-              <div className="flex flex-wrap lg:gap-4 align-bottom text-textSecondary text-sm">
-                <p className="align-bottom hidden lg:flex">
-                  Toimipiste: {journal.campus}
-                </p>
-                <p>ryhmä: {journal.group}</p>
-                <p>Laji: {journal.sport}</p>
-              </div>
+            </div>
+            <div className="flex flex-col text-textSecondary text-sm">
+              <p className="align-bottom hidden lg:flex">
+                Toimipiste: {journal.campus}
+              </p>
+              <p>ryhmä: {journal.group}</p>
+              <p>Laji: {journal.sport}</p>
             </div>
             <HeatMap_Month journal={journal} />
           </div>
@@ -201,7 +201,7 @@ function TeacherHome() {
     );
   } else
     return (
-      <div className="flex gap-8 flex-col lg:m-8 lg:flex-row w-full text-textPrimary">
+      <div className="flex gap-8 flex-col lg:m-8 lg:flex-row text-textPrimary">
         {/* filters */}
         <div
           className="bg-bgkSecondary flex flex-wrap align-middle lg:justify-center rounded-md
@@ -255,7 +255,7 @@ function TeacherHome() {
           className="flex lg:ml-72 flex-col gap-8 rounded-md bg-bgkSecondary p-4 "
         >
           {/* Which time to render  */}
-          <div className="flex gap-2 divide-x">
+          <div className="flex gap-2 ">
             <p
               onClick={() => {
                 setShowWeeks(true);
