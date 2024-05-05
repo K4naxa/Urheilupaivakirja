@@ -1,16 +1,21 @@
+import { useEffect, useState } from "react";
 import trainingService from "../../services/trainingService.js";
+import publicService from "../../services/publicService.js";
+import { useMainContext } from "../../hooks/mainContext.jsx";
 
 import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
 import HeatMap_Month from "../../components/HeatMap_Month_Teacher.jsx";
 import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
+
 import StudentComboBox from "../../components/ComboBoxes/StudentsComboBox.jsx";
-import { useMainContext } from "../../hooks/mainContext.jsx";
+import SportComboBox from "../../components/ComboBoxes/SportsComboBox.jsx";
+import StudentGroupComboBox from "../../components/ComboBoxes/GroupComboBox.jsx";
+import CampusComboBox from "../../components/ComboBoxes/CampusComboBox.jsx";
+
 import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-
-import { useEffect, useState } from "react";
 
 const RenderWeeks = ({ journals }) => {
   const { showDate, setShowDate } = useMainContext();
@@ -249,12 +254,17 @@ const RenderYears = ({ journals }) => {
 
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
+  const [options, setOptions] = useState([]); // [campuses, sports, students
   const [loading, setLoading] = useState(true);
 
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
+
   const [selectedStudent, setSelectedStudent] = useState("");
+  const [selectedSport, setSelectedSport] = useState("");
+  const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
+  const [selectedCampus, setSelectedCampus] = useState("");
 
   useEffect(() => {
     trainingService
@@ -267,6 +277,11 @@ function TeacherHome() {
       .catch((error) => {
         console.log(error);
       });
+
+    publicService.getOptions().then((response) => {
+      setOptions(response);
+      console.log(response);
+    });
   }, []);
 
   useEffect(() => {
@@ -289,6 +304,7 @@ function TeacherHome() {
           className="bg-bgkSecondary flex flex-wrap align-middle lg:justify-center rounded-md
          h-fit w-full p-4 justify-between lg:p-8 lg:gap-8 lg:fixed lg:flex-col lg:w-64 lg:top-1/2 lg:transform lg:-translate-y-1/2 shadow-md"
         >
+          {/* Aika filtteri */}
           <div className="flex text-textSecondary text-sm">
             <p
               onClick={() => {
@@ -326,34 +342,21 @@ function TeacherHome() {
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
           />
-          <div className="w-2/5 lg:w-full">
-            <input
-              type="text"
-              name="groupFilter"
-              id="groupFilter"
-              className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1"
-              placeholder="Hae Ryhmä"
-            />
-          </div>
-          <div className="w-2/5 lg:w-full">
-            <select
-              name="sportFilter"
-              id="sportFilter"
-              className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1"
-              placeholder="Hae Laji"
-            >
-              <option value="">Valitse ryhmä</option>
-            </select>
-          </div>
-          <div className="w-2/5 lg:w-full">
-            <input
-              type="text"
-              name="campusFilter"
-              id="campusFilter"
-              className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1"
-              placeholder="Hae Kampus"
-            />
-          </div>
+          <SportComboBox
+            sports={options.sports}
+            selectedSport={selectedSport}
+            setSelectedSport={setSelectedSport}
+          />
+          <StudentGroupComboBox
+            groups={options.student_groups}
+            selectedStudentGroup={selectedStudentGroup}
+            setSelectedStudentGroup={setSelectedStudentGroup}
+          />
+          <CampusComboBox
+            campuses={options.campuses}
+            selectedCampus={selectedCampus}
+            setSelectedCampus={setSelectedCampus}
+          />
           <div className="flex lg:gap-8 justify-center text-sm">
             <button className="Button">Hae</button>{" "}
             <button className="Button bg-btnGray">Nollaa</button>
