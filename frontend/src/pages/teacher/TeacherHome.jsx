@@ -203,6 +203,9 @@ const RenderYears = ({ journals }) => {
     setShowDate(newDate);
   };
 
+  if (journals.length === 0) {
+    return <div className="flex justify-center w-full">Ei Oppilaita</div>;
+  }
   return (
     <div className="flex flex-col justify-center">
       <div className="flex flex-col text-center mb-8">
@@ -254,6 +257,7 @@ const RenderYears = ({ journals }) => {
 
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
+  const [filteredJournals, setFilteredJournals] = useState([]);
   const [options, setOptions] = useState([]); // [campuses, sports, students
   const [loading, setLoading] = useState(true);
 
@@ -266,11 +270,47 @@ function TeacherHome() {
   const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
   const [selectedCampus, setSelectedCampus] = useState("");
 
+  const handleFilter = () => {
+    let filtJournals = journals;
+
+    if (selectedCampus) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.campus === selectedCampus.name
+      );
+    }
+    if (selectedSport) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.sport === selectedSport.name
+      );
+    }
+    if (selectedStudentGroup) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.group === selectedStudentGroup.group_identifier
+      );
+    }
+    if (selectedStudent) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.user_id === selectedStudent.id
+      );
+    }
+    setFilteredJournals(filtJournals);
+  };
+
+  const handleFilterReset = () => {
+    setSelectedCampus("");
+    setSelectedSport("");
+    setSelectedStudentGroup("");
+    setSelectedStudent("");
+    setFilteredJournals(journals);
+  };
+
   useEffect(() => {
+    // Get journal entries for all students
     trainingService
       .getJournalEntries()
       .then((response) => {
         setJournals(response);
+        setFilteredJournals(response);
         console.log(response);
       })
 
@@ -278,12 +318,14 @@ function TeacherHome() {
         console.log(error);
       });
 
+    // Get options for filters ( campuses, sports, students )
     publicService.getOptions().then((response) => {
       setOptions(response);
       console.log(response);
     });
   }, []);
 
+  // set loading screen until journals are loaded
   useEffect(() => {
     if (journals.length > 0) {
       setLoading(false);
@@ -358,8 +400,12 @@ function TeacherHome() {
             setSelectedCampus={setSelectedCampus}
           />
           <div className="flex lg:gap-8 justify-center text-sm">
-            <button className="Button">Hae</button>{" "}
-            <button className="Button bg-btnGray">Nollaa</button>
+            <button className="Button" onClick={handleFilter}>
+              Hae
+            </button>
+            <button className="Button bg-btnGray" onClick={handleFilterReset}>
+              Nollaa
+            </button>
           </div>
         </div>
 
@@ -368,9 +414,9 @@ function TeacherHome() {
           id="studentList"
           className="flex lg:ml-72 gap-8 rounded-md bg-bgkSecondary p-4 "
         >
-          {showWeeks && <RenderWeeks journals={journals} />}
-          {showMonths && <RenderMonths journals={journals} />}
-          {showYears && <RenderYears journals={journals} />}
+          {showWeeks && <RenderWeeks journals={filteredJournals} />}
+          {showMonths && <RenderMonths journals={filteredJournals} />}
+          {showYears && <RenderYears journals={filteredJournals} />}
         </div>
       </div>
     );

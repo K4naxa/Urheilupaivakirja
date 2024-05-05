@@ -25,6 +25,12 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
           return person.name.toLowerCase().includes(query.toLowerCase());
         });
 
+  useEffect(() => {
+    if (selectedStudent === null) {
+      return;
+    }
+    console.log(selectedStudent);
+  }, [selectedStudent]);
   return (
     <div className="text-textPrimary">
       <Combobox value={selectedStudent} onChange={setSelectedStudent}>
@@ -39,7 +45,9 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
                 focus-visible:outline-none bg-bgkSecondary"
               displayValue={(person) => person.name}
               placeholder="Hae opiskelija"
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+              }}
             />
             {/* button to list all options */}
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
