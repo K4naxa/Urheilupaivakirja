@@ -340,13 +340,12 @@ function TeacherHome() {
     );
   } else
     return (
-      <div className="flex gap-8 flex-col lg:m-8 lg:flex-row text-textPrimary">
+      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
         {/* filters */}
-        <div
+        {/* <div
           className="bg-bgkSecondary flex flex-wrap align-middle lg:justify-center rounded-md
          h-fit w-full p-4 justify-between lg:p-8 lg:gap-8 lg:fixed lg:flex-col lg:w-64 lg:top-1/2 lg:transform lg:-translate-y-1/2 shadow-md"
         >
-          {/* Aika filtteri */}
           <div className="flex text-textSecondary text-sm">
             <p
               onClick={() => {
@@ -407,12 +406,85 @@ function TeacherHome() {
               Nollaa
             </button>
           </div>
+        </div> */}
+
+        <div
+          className="bg-bgkSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
+           rounded-md p-4 justify-between lg:p-8 lg:gap-8 shadow-md"
+        >
+          {/* Aika filtteri */}
+          <div className="flex text-textSecondary text-sm justify-center">
+            <p
+              onClick={() => {
+                setShowWeeks(true);
+                setShowMonths(false);
+                setShowYears(false);
+              }}
+              className={`cursor-pointer mx-2 ${showWeeks && "text-headerPrimary border-b border-headerPrimary"}`}
+            >
+              Viikko
+            </p>
+            <p
+              onClick={() => {
+                setShowWeeks(false);
+                setShowMonths(true);
+                setShowYears(false);
+              }}
+              className={`cursor-pointer mx-2 ${showMonths && "text-headerPrimary border-b border-headerPrimary"}`}
+            >
+              Kuukausi
+            </p>
+            <p
+              onClick={() => {
+                setShowWeeks(false);
+                setShowMonths(false);
+                setShowYears(true);
+              }}
+              className={`cursor-pointer mx-2 ${showYears && "text-headerPrimary border-b border-headerPrimary"}`}
+            >
+              Vuosi
+            </p>
+          </div>
+          <div className="flex gap-8">
+            <StudentComboBox
+              journals={journals}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            />
+            <SportComboBox
+              sports={options.sports}
+              selectedSport={selectedSport}
+              setSelectedSport={setSelectedSport}
+            />
+            <StudentGroupComboBox
+              groups={options.student_groups}
+              selectedStudentGroup={selectedStudentGroup}
+              setSelectedStudentGroup={setSelectedStudentGroup}
+            />
+            <CampusComboBox
+              campuses={options.campuses}
+              selectedCampus={selectedCampus}
+              setSelectedCampus={setSelectedCampus}
+            />
+            <div className="flex lg:gap-8 justify-center text-sm">
+              <button className="Button" onClick={handleFilter}>
+                Hae
+              </button>
+              <button className="Button bg-btnGray" onClick={handleFilterReset}>
+                Nollaa
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* student list */}
-        <div
+        {/* <div
           id="studentList"
           className="flex lg:ml-72 gap-8 rounded-md bg-bgkSecondary p-4 "
+        > */}
+        <div
+          id="studentList"
+          className="flex w-fit gap-8 rounded-md bg-bgkSecondary p-4 mx-auto "
         >
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
           {showMonths && <RenderMonths journals={filteredJournals} />}

@@ -281,8 +281,8 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <div className="flex w-full  lg:mt-24 box-content">
-        <main className="flex w-full mx-auto max-w-[1480px] pb-16 ">
+      <div className="flex w-full  lg:mt-20">
+        <main className="flex w-full mx-auto max-w-[1480px] justify-center pb-16 ">
           <Outlet />
         </main>
       </div>
