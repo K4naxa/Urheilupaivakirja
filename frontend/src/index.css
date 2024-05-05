@@ -181,3 +181,15 @@ a.active {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.right-neg-one-point-five {
+  right: -0.375rem;
+}
+
+.right-neg-one {
+  right: -0.25rem;
+}
+
+.top-neg-one {
+  top: -0.25rem;
+}

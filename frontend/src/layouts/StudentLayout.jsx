@@ -5,14 +5,10 @@ import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 import { FiMessageSquare } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
-import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
-import CentralModal from "../components/newJournalEntryModal";
-
-import EditJournalEntryPage from "../pages/student/journal-entry/edit/EditJournalEntryPage";
-import NewJournalEntryPage from "../pages/student/journal-entry/NewJournalEntryPage";
-import NewJournalEntryModal from "../components/newJournalEntryModal";
+import  UnreadNewsIndicator from "../components/UnreadNewsIndicator";
+import { useBigJournal } from "../hooks/useBigJournal";
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -22,40 +18,7 @@ import ThemeSwitcher from "../components/themeSwitcher";
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-
-  const [isBigModalOpen, setBigModalOpen] = useState(false);
-  const [bigModalContent, setBigModalContent] = useState(null);
-
-  useEffect(() => {
-    // browser history popstate event listener for closing the big modal on pressing back button
-    const handlePopState = (event) => {
-      if (isBigModalOpen && (event.state === null || !event.state?.modalOpen)) {
-        closeBigModal();
-      }
-    };
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [isBigModalOpen]);
-
-
-  const openBigModal = (content) => {
-    setBigModalContent(content);
-    setBigModalOpen(true);
-    window.history.pushState({ modalOpen: true }, "");
-};
-
-const closeBigModal = () => {
-  setBigModalOpen(false);
-  setBigModalContent(null);
-  if (window.history.state?.modalOpen) {
-    window.history.back();
-  } else {
-    window.history.replaceState(null, "");
-  }
-};
+  const { openBigModal } = useBigJournal();
 
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-headerPrimary ";
@@ -63,7 +26,6 @@ const closeBigModal = () => {
     "text-textPrimary items-center text-[12px] leading-none mt-2";
   return (
     <>
-      <CentralModal />
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
     border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
@@ -71,20 +33,28 @@ const closeBigModal = () => {
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-8">
             <p className="items-center flex">Urheilupäiväkirja</p>
+
             <NavLink to="/" id="etusivuBtn" className={linkClass}>
               Etusivu
             </NavLink>
-            <NavLink to="/tiedotteet/" id="tiedotteetBtn" className={linkClass}>
-              Tiedotteet
-            </NavLink>
-            <UnreadNewsIndicator />
+            <div className="relative">
+              <NavLink
+                to="/tiedotteet/"
+                id="tiedotteetBtn"
+                className={linkClass}
+              >
+                Tiedotteet
+              </NavLink>
+
+                <UnreadNewsIndicator type="desktop"/>
+            </div>
           </div>
         </nav>
 
         <div className="flex items-center gap-8">
           <button
             id="newJournalBtn"
-            onClick={() => openBigModal(<NewJournalEntryPage onClose={closeBigModal}  />)}
+            onClick={() => openBigModal("new")}
             className="bg-graphPrimary text-textPrimary hover:text-white hover:bg-headerSecondary  text-lg rounded-md px-3 py-2 drop-shadow-lg "
           >
             + Uusi Merkintä
@@ -189,10 +159,15 @@ const closeBigModal = () => {
               <FiHome />
               <p className={linkTextClass}>Etusivu</p>
             </NavLink>
+
             <NavLink to="/tiedotteet/" className={linkClass}>
+            <div className="relative">
               <FiMessageSquare />
+              <UnreadNewsIndicator type="phone" />
+              </div>
               <p className={linkTextClass}>Viestit</p>
             </NavLink>
+
           </div>
 
           {/* new journal entry button */}
@@ -202,7 +177,7 @@ const closeBigModal = () => {
                 className="bg-bgkSecondary border-headerPrimary text-headerPrimary
        shadow-upper-shadow size-16 rounded-full border-t-2
         text-3xl drop-shadow-xl duration-100 active:scale-110"
-                onClick={() => openBigModal(<NewJournalEntryPage onClose={closeBigModal}  />)}
+                onClick={() => openBigModal("new")}
               >
                 +
               </button>
@@ -274,13 +249,6 @@ const closeBigModal = () => {
       </header>
       <main className="mx-1 max-w-[1480px] lg:mx-4 lg:mt-20">
         <Outlet />
-        {isBigModalOpen && (
-          <NewJournalEntryModal
-            isOpen={isBigModalOpen}
-            onClose={closeBigModal}
-            content={bigModalContent}
-          />
-        )}
       </main>
     </>
   );
