@@ -128,7 +128,7 @@ exports.seed = async function (knex) {
       news_last_viewed_at: new Date(2024, 1, 1),
     },
     {
-      user_id: 13,
+      user_id: 14,
       first_name: "Jessica",
       last_name: "Jaxu",
       phone: "0401234567",

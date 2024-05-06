@@ -7,7 +7,8 @@ import { FiMessageSquare } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
-import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
+import  UnreadNewsIndicator from "../components/UnreadNewsIndicator";
+import { useJournalModal } from "../hooks/useJournalModal";
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -17,6 +18,7 @@ import ThemeSwitcher from "../components/themeSwitcher";
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { openBigModal } = useJournalModal();
 
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-headerPrimary ";
@@ -31,22 +33,33 @@ const StudentLayout = () => {
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-8">
             <p className="items-center flex">Urheilupäiväkirja</p>
+
             <NavLink to="/" id="etusivuBtn" className={linkClass}>
               Etusivu
             </NavLink>
-            <NavLink to="/tiedotteet/" id="tiedotteetBtn" className={linkClass}>
-              Tiedotteet
-            </NavLink>
-            <UnreadNewsIndicator />
+            <div className="relative">
+              <NavLink
+                to="/tiedotteet/"
+                id="tiedotteetBtn"
+                className={linkClass}
+              >
+                Tiedotteet
+              </NavLink>
+
+                <UnreadNewsIndicator type="desktop"/>
+            </div>
           </div>
         </nav>
 
         <div className="flex items-center gap-8">
-          <NavLink to="/merkinnat/uusi" id="newJournalBtn">
-            <button className="bg-graphPrimary text-textPrimary hover:text-white hover:bg-headerSecondary  text-lg rounded-md px-3 py-2 drop-shadow-lg ">
-              + Uusi Merkintä
-            </button>
-          </NavLink>
+          <button
+            id="newJournalBtn"
+            onClick={() => openBigModal("new")}
+            className="bg-graphPrimary text-textPrimary hover:text-white hover:bg-headerSecondary  text-lg rounded-md px-3 py-2 drop-shadow-lg "
+          >
+            + Uusi Merkintä
+          </button>
+
           <div>
             <ThemeSwitcher />
           </div>
@@ -146,22 +159,25 @@ const StudentLayout = () => {
               <FiHome />
               <p className={linkTextClass}>Etusivu</p>
             </NavLink>
+
             <NavLink to="/tiedotteet/" className={linkClass}>
+            <div className="relative">
               <FiMessageSquare />
+              <UnreadNewsIndicator type="phone" />
+              </div>
               <p className={linkTextClass}>Viestit</p>
             </NavLink>
+
           </div>
 
           {/* new journal entry button */}
           <div className="flex justify-center">
-            <NavLink
-              to="/merkinnat/uusi"
-              className="absolute bottom-6 flex justify z-10"
-            >
+            <NavLink className="absolute bottom-6 flex justify z-10">
               <button
                 className="bg-bgkSecondary border-headerPrimary text-headerPrimary
        shadow-upper-shadow size-16 rounded-full border-t-2
         text-3xl drop-shadow-xl duration-100 active:scale-110"
+                onClick={() => openBigModal("new")}
               >
                 +
               </button>

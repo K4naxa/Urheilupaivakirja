@@ -22,6 +22,21 @@ export default {
         btnGray: "rgb(var(--color-gray) / <alpha-value>)",
         btnGreen: "rgb(var(--color-green) / <alpha-value>)",
         btnRed: "rgb(var(--color-red) / <alpha-value>)",
+
+        modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",
+
+        //ALTERNATIVE COLORS
+        bgPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
+        bgSecondary:  "rgb(var(--color-bg-secondary) / <alpha-value>)",
+
+        //textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
+        //textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",
+
+        //borderPrimary: "rgb(var(--color-border-primary) / <alpha-value>)",
+
+        primary: "rgb(var(--color-header-primary) / <alpha-value>)",
+        secondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
+
       },
 
       gridTemplateColumns: {

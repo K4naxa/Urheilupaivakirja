@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import trainingService from "../../../../services/trainingService.js";
 
-const NewJournalEntryPage = () => {
+const NewJournalEntryPage = ({entryId}) => {
   //TODO: new date = today (from other branch)
   const [journalData, setJournalData] = useState({
     entry_id: "",
@@ -23,12 +23,10 @@ const NewJournalEntryPage = () => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
   const [existingEntries, setExistingEntries] = useState([]);
 
-  const { entry_id } = useParams();
-
   useEffect(() => {
     const fetchJournalEntry = async () => {
       try {
-        const journalEntry = await trainingService.getJournalEntry(entry_id);
+        const journalEntry = await trainingService.getJournalEntry(entryId);
         const stringifiedData = {
           entry_id: journalEntry.entry_id
             ? journalEntry.entry_id.toString()
@@ -153,8 +151,6 @@ const NewJournalEntryPage = () => {
       }));
     }
   }, [journalData.workout_type]);
-
-  const navigate = useNavigate();
 
   function formatDateString(isoDateString) {
     const date = new Date(isoDateString);
@@ -349,7 +345,6 @@ const NewJournalEntryPage = () => {
         console.error("Error creating a new journal entry:", error);
       }
     }
-    navigate("/");
   };
 
   const deleteEntryHandler = async () => {
@@ -358,7 +353,6 @@ const NewJournalEntryPage = () => {
     } catch (error) {
       console.error("Error deleting journal entry:", error);
     }
-    navigate("/");
   };
 
   const renderRadioButton = (name, value, label) => {

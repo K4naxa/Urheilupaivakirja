@@ -8,13 +8,10 @@
     border: 1px solid black;
     z-index: 1;
   }
-  
-  .modal-overlay.show {
-    display: block;
-  }
+
   
   .modal-overlay {
-    display: none;
+    display: fixed;
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.2);
