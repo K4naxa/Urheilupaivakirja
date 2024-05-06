@@ -10,8 +10,41 @@ const HeatMap_Month = ({ journal }) => {
   const { showDate } = useMainContext();
   const calRef = useRef(null);
 
+  // change the date of the heatmap
   useEffect(() => {
-    if (calRef.current) calRef.current.destroy();
+    if (calRef.current) {
+      const updatedDate = new Date(
+        showDate.getFullYear(),
+        showDate.getMonth(),
+        5
+      );
+      calRef.current.jumpTo(updatedDate);
+    }
+  }, [showDate]);
+
+  // Update if the CalHeatmap instance exists
+  useEffect(() => {
+    if (!calRef.current) return; // Dont run if the heatmap is not created yet
+
+    const entries = journal.journal_entries.map((entry) => {
+      const date = dayjs(entry.date).format("YYYY-MM-DD");
+      let value = entry.length_in_minutes;
+      if (entry.entry_type_id === 3) value = -99;
+      return {
+        date: date,
+        value: value,
+        entry_type: entry.entry_type_id,
+      };
+    });
+    const data = entries;
+
+    // "fill" updates the data in the heatmap
+    calRef.current.fill(data);
+  }, [journal]);
+
+  // create new Heatmap if it does not exist
+  useEffect(() => {
+    if (calRef.current) return;
 
     // clean up the data for the heatmap
     const data = journal.journal_entries.map((entry) => {
@@ -27,8 +60,8 @@ const HeatMap_Month = ({ journal }) => {
       };
     });
 
+    const newDate = new Date(showDate.getFullYear(), showDate.getMonth(), 5);
     const theme = document.querySelector("html").getAttribute("data-theme");
-
     calRef.current = new CalHeatmap();
     calRef.current.paint(
       {
@@ -36,9 +69,7 @@ const HeatMap_Month = ({ journal }) => {
         theme: theme,
 
         date: {
-          start: dayjs(
-            new Date(showDate.getFullYear(), showDate.getMonth(), 5)
-          ).format("YYYY-MM-DD"),
+          start: newDate,
           highlight: new Date(),
           name: "x-pseudo",
           locale: {
