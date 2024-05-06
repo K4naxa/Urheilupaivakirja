@@ -185,7 +185,7 @@ function TeacherHome() {
                 </p>
               </div>
               <div className="flex flex-col text-textSecondary text-xs">
-                <p className="flex gap-1 ">
+                <div className="flex gap-1 ">
                   Toimipiste:{" "}
                   <p
                     onClick={() => {
@@ -195,13 +195,13 @@ function TeacherHome() {
                   >
                     {journal.campus}
                   </p>
-                </p>
-                <p className="flex gap-1 ">
+                </div>
+                <div className="flex gap-1 ">
                   ryhmä: <p className="text-textPrimary">{journal.group}</p>
-                </p>
-                <p className="flex gap-1 ">
+                </div>
+                <div className="flex gap-1 ">
                   Laji: <p className="text-textPrimary">{journal.sport}</p>
-                </p>
+                </div>
               </div>
               <HeatMap_Month journal={journal} />
             </div>
@@ -233,7 +233,7 @@ function TeacherHome() {
       return <div className="flex justify-center w-full">Ei Oppilaita</div>;
     }
     return (
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center overflow-x-auto">
         <div className="flex flex-col text-center mb-8">
           <div className="hover: flex justify-center gap-4">
             <button
@@ -287,7 +287,6 @@ function TeacherHome() {
   };
 
   useEffect(() => {
-    console.log(selectedCampus);
     let filtJournals = [...journals];
 
     if (selectedCampus) {
@@ -443,7 +442,7 @@ function TeacherHome() {
         > */}
         <div
           id="studentList"
-          className="flex w-fit gap-8 rounded-md bg-bgkSecondary p-4 mx-auto "
+          className="flex w-fit gap-8 rounded-md bg-bgkSecondary p-4 mx-auto"
         >
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
           {showMonths && <RenderMonths journals={filteredJournals} />}

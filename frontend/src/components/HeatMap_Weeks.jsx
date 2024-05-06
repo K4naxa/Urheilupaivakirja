@@ -11,7 +11,34 @@ const HeatMap_Weeks = ({ journal }) => {
   const calRef = useRef(null);
 
   useEffect(() => {
-    if (calRef.current) calRef.current.destroy();
+    if (calRef.current) {
+      calRef.current.jumpTo(showDate);
+    }
+  }, [showDate]);
+  // Update if the CalHeatmap instance exists
+  useEffect(() => {
+    if (!calRef.current) return; // Dont run if the heatmap is not created yet
+
+    const entries = journal.journal_entries.map((entry) => {
+      const date = dayjs(entry.date).format("YYYY-MM-DD");
+      let value = entry.length_in_minutes;
+      if (entry.entry_type_id === 3) value = -99;
+      return {
+        date: date,
+        value: value,
+        entry_type: entry.entry_type_id,
+      };
+    });
+    const data = entries;
+
+    // "fill" updates the data in the heatmap
+    calRef.current.fill(data);
+  }, [journal, screenWidth]);
+  // create new Heatmap
+  useEffect(() => {
+    if (calRef.current) {
+      return;
+    }
 
     // clean up the data for the heatmap
     const entries = journal.journal_entries.map((entry) => {
@@ -41,11 +68,11 @@ const HeatMap_Weeks = ({ journal }) => {
         theme: theme,
 
         date: {
-          start: dayjs(showDate)
+          start: dayjs(new Date())
             .subtract(range - 1, "week")
             .toDate(),
-          end: showDate,
-          highlight: new Date(),
+          highlight: dayjs(new Date()).toDate(),
+
           name: "x-pseudo",
           locale: {
             weekStart: 1,
@@ -124,7 +151,7 @@ const HeatMap_Weeks = ({ journal }) => {
         ],
       ]
     );
-  }, [journal, showDate, screenWidth]);
+  }, [journal, screenWidth]);
 
   return (
     <div
