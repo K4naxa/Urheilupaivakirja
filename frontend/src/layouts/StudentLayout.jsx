@@ -7,7 +7,7 @@ import { FiMessageSquare } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
-import  UnreadNewsIndicator from "../components/UnreadNewsIndicator";
+import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
 import { useJournalModal } from "../hooks/useJournalModal";
 
 import { Menu, Transition } from "@headlessui/react";
@@ -46,7 +46,7 @@ const StudentLayout = () => {
                 Tiedotteet
               </NavLink>
 
-                <UnreadNewsIndicator type="desktop"/>
+              <UnreadNewsIndicator type="desktop" />
             </div>
           </div>
         </nav>
@@ -55,7 +55,7 @@ const StudentLayout = () => {
           <button
             id="newJournalBtn"
             onClick={() => openBigModal("new")}
-            className="bg-graphPrimary text-textPrimary hover:text-white hover:bg-headerSecondary  text-lg rounded-md px-3 py-2 drop-shadow-lg "
+            className="bg-graphPrimary text-white hover:underline  text-lg rounded-md px-3 py-2 drop-shadow-lg active:scale-95 transition-transform duration-90"
           >
             + Uusi Merkintä
           </button>
@@ -161,13 +161,12 @@ const StudentLayout = () => {
             </NavLink>
 
             <NavLink to="/tiedotteet/" className={linkClass}>
-            <div className="relative">
-              <FiMessageSquare />
-              <UnreadNewsIndicator type="phone" />
+              <div className="relative">
+                <FiMessageSquare />
+                <UnreadNewsIndicator type="phone" />
               </div>
               <p className={linkTextClass}>Viestit</p>
             </NavLink>
-
           </div>
 
           {/* new journal entry button */}
@@ -248,7 +247,7 @@ const StudentLayout = () => {
         </div>
       </header>
       <div className="flex w-full  lg:mt-24 box-content">
-        <main className="flex w-full mx-auto max-w-[1480px] pb-16 ">
+        <main className="flex w-full mx-auto max-w-[1480px] pb-16 lg:pb-0">
           <Outlet />
         </main>
       </div>

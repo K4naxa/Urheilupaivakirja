@@ -8,15 +8,15 @@ import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft } from "react-icons/fi";
 
 //const headerContainer = "bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
-const inputContainer = "flex flex-col items-center gap-1 w-full";
-const inputLabel = "text-lg text-textPrimary";
-const optionContainer = "flex flex-row justify-between";
+const inputContainer = "flex flex-col items-center gap-3 w-full";
+const inputLabel = "text-textPrimary font-medium";
+const optionContainer = "flex flex-row gap-6 justify-between";
 
 const NewJournalEntryPage = ({ onClose, date }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
-  console.log(date)
+  console.log(date);
   console.log("Initial date:", initialDate);
 
   const [newJournalEntryData, setNewJournalEntryData] = useState({
@@ -34,7 +34,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
   const [conflict, setConflict] = useState({
     value: false,
     message: "",
@@ -336,7 +336,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   const renderRadioButton = (name, value, label, onChangeHandler) => {
     return (
-      <div className="relative mr-1 ml-1 w-[110px]" key={`${name}-${value}`}>
+      <div className="relative mr-1 ml-1 w-24" key={`${name}-${value}`}>
         <input
           type="radio"
           name={name}
@@ -349,7 +349,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:bg-headerPrimary peer-focus:ring-2 peer-focus:ring-headerSecondary py-1 block rounded border-2 border-gray-400 text-textPrimary text-md text-center cursor-pointer"
+          className="peer-checked:border-headerPrimary peer-checked:text-headerPrimary
+           peer-focus:ring-2 peer-focus:ring-headerSecondary py-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
+           active:scale-95 transition-transform duration-75"
         >
           {label}
         </label>
@@ -417,18 +419,18 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         declineButton="Peruuta"
         closeOnOutsideClick={false}
       />
-      <div className="flex flex-col h-full sm:border-2 sm:border-borderPrimary sm:rounded-lg overflow-auto hide-scrollbar">
-        <div className="relative bg-headerPrimary border-borderPrimary border-b p-3 sm:p-5 text-center text-xl shadow-md sm:rounded-t-md">
+      <div className="flex flex-col h-full sm:border  sm:border-borderPrimary sd:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
+        <div className="relative bg-headerPrimary p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
           <p>Uusi merkintä</p>
           <button
             onClick={onClose}
-            className="absolute bottom-1/2 translate-y-1/2 left-5 text-3xl"
+            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl"
           >
             <FiArrowLeft />
           </button>
         </div>
         <form
-          className="flex flex-col items-center gap-4 p-2 sm:p-8 bg-bgkSecondary rounded-md flex-grow"
+          className="flex flex-col items-center gap-4 p-4 pt-6 sm:p-8 bg-bgkSecondary sm:rounded-b-md flex-grow"
           onSubmit={newJournalEntryHandler}
         >
           <div className={inputContainer}>
@@ -449,7 +451,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               Päivämäärä
             </label>
             <input
-              className=" text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none  border-b p-1 "
+              className="  text-textPrimary border-borderPrimary h-10 w-full bg-bgSecondary focus-visible:outline-none  border-b p-1 "
               type="date"
               name="date"
               value={newJournalEntryData.date}
@@ -468,16 +470,35 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 Kesto: {convertTime(newJournalEntryData.length_in_minutes)}
               </label>
               <input
-                className=" border-borderPrimary bg-bgkSecondary h-10 w-full p-1 "
+                className="bg-bgkPrimary  w-full p-1 "
                 type="range"
                 min="30"
                 max="180"
                 value={newJournalEntryData.length_in_minutes}
-                step="30"
+                step="15"
                 id="length_in_minutes"
                 onChange={changeHandler}
                 name="length_in_minutes"
               />
+            </div>
+          )}
+          {newJournalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${
+                errors.time_of_day ? "border-l-4 border-red-500" : ""
+              }`}
+            >
+              <label className={inputLabel}>Ajankohta</label>
+              <div className={optionContainer}>
+                {optionsData.time_of_day.map((time) =>
+                  renderRadioButton(
+                    "time_of_day",
+                    time.id.toString(),
+                    time.name,
+                    changeHandler
+                  )
+                )}
+              </div>
             </div>
           )}
 
@@ -512,7 +533,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   Harjoituskategoria
                 </label>
                 <select
-                  className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full  border-b p-1"
+                  className="text-lg text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full  border-b p-1"
                   id="workoutCategory"
                   name="workout_category"
                   value={newJournalEntryData.workout_category}
@@ -527,26 +548,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 </select>
               </div>
             )}
-
-          {newJournalEntryData.entry_type === "1" && (
-            <div
-              className={`${inputContainer} ${
-                errors.time_of_day ? "border-l-4 border-red-500" : ""
-              }`}
-            >
-              <label className={inputLabel}>Ajankohta</label>
-              <div className={optionContainer}>
-                {optionsData.time_of_day.map((time) =>
-                  renderRadioButton(
-                    "time_of_day",
-                    time.id.toString(),
-                    time.name,
-                    changeHandler
-                  )
-                )}
-              </div>
-            </div>
-          )}
 
           {newJournalEntryData.entry_type === "1" && (
             <div
@@ -574,11 +575,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               htmlFor="details-textarea"
               onClick={() => setShowDetails((prevState) => !prevState)}
             >
-              Lisätiedot V
+              Lisätiedot
             </label>
             {showDetails && (
               <textarea
-                className="w-full h-18 border-borderPrimary border rounded-lg p-1 text-textPrimary"
+                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
                 onChange={changeHandler}
                 onKeyDown={(event) => {
                   console.log(event.key);
@@ -594,10 +595,10 @@ const NewJournalEntryPage = ({ onClose, date }) => {
             )}
           </div>
 
-          <div className="flex flex-col items-center gap-4 w-full p-4 mt-auto">
+          <div className="flex flex-col text-red-400 items-center gap-4 w-full p-4 mt-auto">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
             <button
-              className={`text-textPrimary w-44 h-14 rounded-lg bg-headerPrimary border-borderPrimary
+              className={`text-white w-44 h-14 rounded-md bg-headerPrimary border-borderPrimary active:scale-95 transition-transform duration-75
     ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
               type="submit"
               disabled={submitButtonIsDisabled}

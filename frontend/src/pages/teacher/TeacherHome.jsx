@@ -54,65 +54,70 @@ function TeacherHome() {
       newDate.setDate(showDate.getDate() + 7); // Add 7 days to go to the next week
       setShowDate(newDate);
     };
-    return (
-      <div className="flex flex-col justify-center">
-        {/* Date controls */}
-        <div className="flex w-full flex-col text-center mb-4">
-          <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-          <div className="hover: flex justify-center gap-4">
-            <button
-              className="hover:underline"
-              onClick={handlePreviousWeekClick}
-            >
-              <IconContext.Provider
-                value={{ className: "hover:text-graphPrimary" }}
+    if (journals.length === 0) {
+      return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
+    } else
+      return (
+        <div className="flex flex-col justify-center">
+          {/* Date controls */}
+          <div className="flex w-full flex-col text-center mb-4">
+            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+            <div className="hover: flex justify-center gap-4">
+              <button
+                className="hover:underline"
+                onClick={handlePreviousWeekClick}
               >
-                <FiChevronLeft />
-              </IconContext.Provider>
-            </button>
-            <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
-            <button
-              className="hover:fill-blue-500 hover:underline"
-              onClick={handleNextWeekClick}
-            >
-              <IconContext.Provider
-                value={{ className: "hover:text-graphPrimary" }}
+                <IconContext.Provider
+                  value={{ className: "hover:text-graphPrimary" }}
+                >
+                  <FiChevronLeft />
+                </IconContext.Provider>
+              </button>
+              <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
+              <button
+                className="hover:fill-blue-500 hover:underline"
+                onClick={handleNextWeekClick}
               >
-                <FiChevronRight />
-              </IconContext.Provider>
-            </button>
+                <IconContext.Provider
+                  value={{ className: "hover:text-graphPrimary" }}
+                >
+                  <FiChevronRight />
+                </IconContext.Provider>
+              </button>
+            </div>
+          </div>
+          {/* Student list */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {journals.map((journal) => (
+              // Student card
+              <div
+                key={journal.user_id}
+                className="flex flex-col rounded-md j bg-bgkSecondary p-3 gap-2 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
+                id="studentCard"
+              >
+                <div className="flex lg:gap-6 text-textSecondary text-xs">
+                  <p className="hidden lg:flex">
+                    Toimipaikka: {journal.campus}
+                  </p>
+                  <p>Ryhmä: {journal.group}</p>
+                  <p>Laji: {journal.sport}</p>
+                </div>
+                <div className="flex flex-wrap justify-between gap-2">
+                  <div className="flex gap-1">
+                    {" "}
+                    <p> {journal.first_name}</p>
+                    <p>{journal.last_name}</p>
+                  </div>
+
+                  <div>
+                    <HeatMap_Weeks journal={journal} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        {/* Student list */}
-        <div className="flex flex-col gap-4">
-          {journals.map((journal) => (
-            // Student card
-            <div
-              key={journal.user_id}
-              className="flex flex-col rounded-md j bg-bgkSecondary p-3 gap-2 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
-              id="studentCard"
-            >
-              <div className="flex lg:gap-6 text-textSecondary text-xs">
-                <p className="hidden lg:flex">Toimipaikka: {journal.campus}</p>
-                <p>Ryhmä: {journal.group}</p>
-                <p>Laji: {journal.sport}</p>
-              </div>
-              <div className="flex justify-between gap-2">
-                <div className="flex gap-1">
-                  {" "}
-                  <p> {journal.first_name}</p>
-                  <p>{journal.last_name}</p>
-                </div>
-
-                <div>
-                  <HeatMap_Weeks journal={journal} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+      );
   };
 
   const RenderMonths = ({ journals }) => {
@@ -144,71 +149,74 @@ function TeacherHome() {
       "Joulukuu",
     ];
 
-    return (
-      <div className="flex flex-col justify-center">
-        <div className="flex flex-col text-center mb-8">
-          <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-          <div className="hover: flex justify-center gap-4">
-            <button
-              className="hover:underline"
-              onClick={handlePreviousMonthClick}
-            >
-              <IconContext.Provider
-                value={{ className: "hover:text-graphPrimary" }}
+    if (journals.length === 0) {
+      return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
+    } else
+      return (
+        <div className="flex flex-col justify-center">
+          <div className="flex flex-col text-center mb-8">
+            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+            <div className="hover: flex justify-center gap-4">
+              <button
+                className="hover:underline"
+                onClick={handlePreviousMonthClick}
               >
-                <FiChevronLeft />
-              </IconContext.Provider>
-            </button>
-            <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
-            <button
-              className="hover:fill-blue-500 hover:underline"
-              onClick={handleNextMonthClick}
-            >
-              <IconContext.Provider
-                value={{ className: "hover:text-graphPrimary" }}
+                <IconContext.Provider
+                  value={{ className: "hover:text-graphPrimary" }}
+                >
+                  <FiChevronLeft />
+                </IconContext.Provider>
+              </button>
+              <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
+              <button
+                className="hover:fill-blue-500 hover:underline"
+                onClick={handleNextMonthClick}
               >
-                <FiChevronRight />
-              </IconContext.Provider>
-            </button>
+                <IconContext.Provider
+                  value={{ className: "hover:text-graphPrimary" }}
+                >
+                  <FiChevronRight />
+                </IconContext.Provider>
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
-          {journals.map((journal) => (
-            <div
-              key={journal.user_id}
-              className="flex flex-col gap-2 w-60 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
-              id="studentCard"
-            >
-              <div className="flex flex-col">
-                <p className="text-lg text-center">
-                  {journal.first_name} {journal.last_name}
-                </p>
-              </div>
-              <div className="flex flex-col text-textSecondary text-xs">
-                <div className="flex gap-1 ">
-                  Toimipiste:{" "}
-                  <p
-                    onClick={() => {
-                      setSelectedCampus(journal.campus);
-                    }}
-                    className="text-textPrimary hover:cursor-pointer"
-                  >
-                    {journal.campus}
+          <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
+            {journals.map((journal) => (
+              <div
+                key={journal.user_id}
+                className="flex flex-col gap-2 w-60 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
+                id="studentCard"
+              >
+                <div className="flex flex-col">
+                  <p className="text-lg text-center">
+                    {journal.first_name} {journal.last_name}
                   </p>
                 </div>
-                <div className="flex gap-1 ">
-                  ryhmä: <p className="text-textPrimary">{journal.group}</p>
+                <div className="flex flex-col text-textSecondary text-xs">
+                  <div className="flex gap-1 ">
+                    Toimipiste:{" "}
+                    <p
+                      onClick={() => {
+                        setSelectedCampus(journal.campus);
+                      }}
+                      className="text-textPrimary hover:cursor-pointer"
+                    >
+                      {journal.campus}
+                    </p>
+                  </div>
+                  <div className="flex gap-1 ">
+                    ryhmä: <p className="text-textPrimary">{journal.group}</p>
+                  </div>
+                  <div className="flex gap-1 ">
+                    Laji: <p className="text-textPrimary">{journal.sport}</p>
+                  </div>
                 </div>
-                <div className="flex gap-1 ">
-                  Laji: <p className="text-textPrimary">{journal.sport}</p>
-                </div>
+                <HeatMap_Month journal={journal} />
               </div>
-              <HeatMap_Month journal={journal} />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    );
+      );
   };
 
   // RenderYears component
@@ -218,72 +226,83 @@ function TeacherHome() {
     const handlePreviousYearClick = (e) => {
       e.preventDefault();
       const newDate = new Date(showDate);
-      newDate.setFullYear(showDate.getFullYear() - 1);
+      newDate.setFullYear(
+        showDate.getFullYear() - 1,
+        showDate.getMonth(),
+        showDate.getDate()
+      );
       setShowDate(newDate);
     };
 
     const handleNextYearClick = (e) => {
       e.preventDefault();
       const newDate = new Date(showDate);
-      newDate.setFullYear(showDate.getFullYear() + 1);
+      newDate.setFullYear(
+        showDate.getFullYear() + 1,
+        showDate.getMonth(),
+        showDate.getDate()
+      );
+
       setShowDate(newDate);
     };
 
     if (journals.length === 0) {
-      return <div className="flex justify-center w-full">Ei Oppilaita</div>;
-    }
-    return (
-      <div className="flex flex-col justify-center overflow-x-auto">
-        <div className="flex flex-col text-center mb-8">
-          <div className="hover: flex justify-center gap-4">
-            <button
-              className="hover:underline"
-              onClick={handlePreviousYearClick}
-            >
-              <IconContext.Provider
-                value={{ className: "hover:text-graphPrimary" }}
+      return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
+    } else
+      return (
+        <div className="flex flex-col justify-center overflow-x-auto">
+          <div className="flex flex-col text-center mb-8">
+            <div className="hover: flex justify-center gap-4">
+              <button
+                className="hover:underline"
+                onClick={handlePreviousYearClick}
               >
-                <FiChevronLeft />
-              </IconContext.Provider>
-            </button>
-            <p className="text-xl">{showDate.getFullYear()}</p>
-            <button
-              className="hover:fill-blue-500 hover:underline"
-              onClick={handleNextYearClick}
-            >
-              <IconContext.Provider
-                value={{ className: "hover:text-graphPrimary" }}
+                <IconContext.Provider
+                  value={{ className: "hover:text-graphPrimary" }}
+                >
+                  <FiChevronLeft />
+                </IconContext.Provider>
+              </button>
+              <p className="text-xl">{showDate.getFullYear()}</p>
+              <button
+                className="hover:fill-blue-500 hover:underline"
+                onClick={handleNextYearClick}
               >
-                <FiChevronRight />
-              </IconContext.Provider>
-            </button>
+                <IconContext.Provider
+                  value={{ className: "hover:text-graphPrimary" }}
+                >
+                  <FiChevronRight />
+                </IconContext.Provider>
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
+            {journals.map((journal) => (
+              <div
+                key={journal.user_id}
+                className="flex flex-col gap-2 rounded-md bg-bgkSecondary p-4 border
+               border-headerPrimary shadow-md hover:shadow-headerPrimary"
+                id="studentCard"
+              >
+                <div className="flex gap-4  leading-none items-end">
+                  <p className="text-lg text-center leading-none">
+                    {journal.first_name} {journal.last_name}
+                  </p>
+
+                  <p className="text-textSecondary">
+                    Toimipiste: {journal.campus}
+                  </p>
+                  <p className="text-textSecondary">ryhmä: {journal.group}</p>
+                  <p className="flex text-textSecondary">
+                    Laji: {journal.sport}
+                  </p>
+                </div>
+                <HeatMap_Year_Teacher journal={journal} />
+              </div>
+            ))}
           </div>
         </div>
-        <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
-          {journals.map((journal) => (
-            <div
-              key={journal.user_id}
-              className="flex flex-col gap-2 rounded-md bg-bgkSecondary p-4 border
-               border-headerPrimary shadow-md hover:shadow-headerPrimary"
-              id="studentCard"
-            >
-              <div className="flex gap-4  leading-none items-end">
-                <p className="text-lg text-center leading-none">
-                  {journal.first_name} {journal.last_name}
-                </p>
-
-                <p className="text-textSecondary">
-                  Toimipiste: {journal.campus}
-                </p>
-                <p className="text-textSecondary">ryhmä: {journal.group}</p>
-                <p className="flex text-textSecondary">Laji: {journal.sport}</p>
-              </div>
-              <HeatMap_Year_Teacher journal={journal} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+      );
   };
 
   useEffect(() => {
@@ -442,7 +461,7 @@ function TeacherHome() {
         > */}
         <div
           id="studentList"
-          className="flex w-fit gap-8 rounded-md bg-bgkSecondary p-4 mx-auto"
+          className="flex w-full gap-8 rounded-md bg-bgkSecondary p-4 mx-auto"
         >
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
           {showMonths && <RenderMonths journals={filteredJournals} />}
