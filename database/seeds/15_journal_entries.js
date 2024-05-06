@@ -4,10 +4,10 @@
  */
 
 formatDate = (date) => {
-date.setUTCHours(0, 0, 0, 0);
-console.log("date: ", date);
-return date
-}
+  date.setUTCHours(0, 0, 0, 0);
+  console.log("date: ", date);
+  return date;
+};
 
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
@@ -415,6 +415,114 @@ exports.seed = async function (knex) {
     },
     {
       user_id: 3,
+      entry_type_id: 1,
+      workout_type_id: 3,
+      workout_category_id: 1,
+      length_in_minutes: 60,
+      time_of_day_id: 2,
+      intensity: 3,
+      details: "Treeni 1",
+      date: formatDate(new Date(2024, 1, 7, 0, 0)),
+      created_at: new Date(2024, 1, 7, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 1,
+      length_in_minutes: 90,
+      time_of_day_id: 1,
+      intensity: 1,
+      details: "Treeni #2",
+      date: formatDate(new Date(2024, 1, 4, 0, 0)),
+      created_at: new Date(2024, 1, 4, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 1,
+      length_in_minutes: 120,
+      time_of_day_id: 1,
+      intensity: 1,
+      details: "Treeni #1",
+      date: formatDate(new Date(2024, 1, 5, 0, 0)),
+      created_at: new Date(2024, 1, 5, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 1,
+      length_in_minutes: 150,
+      time_of_day_id: 2,
+      intensity: 2,
+      details: "Treeni #2",
+      date: formatDate(new Date(2024, 1, 5, 0, 0)),
+      created_at: new Date(2024, 1, 5, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 3,
+      length_in_minutes: 90,
+      time_of_day_id: 3,
+      intensity: 2,
+      details: "Treenipäivä",
+      date: formatDate(new Date(2024, 4, 18, 0, 0)),
+      created_at: new Date(2024, 4, 17, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 3,
+      length_in_minutes: 90,
+      time_of_day_id: 3,
+      intensity: 2,
+      details: "Treenipäivä",
+      date: formatDate(new Date(2024, 4, 21, 0, 0)),
+      created_at: new Date(2024, 4, 17, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 3,
+      length_in_minutes: 90,
+      time_of_day_id: 3,
+      intensity: 2,
+      details: "Treenipäivä",
+      date: formatDate(new Date(2024, 4, 17, 0, 0)),
+      created_at: new Date(2024, 4, 17, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 3,
+      length_in_minutes: 300,
+      time_of_day_id: 3,
+      intensity: 2,
+      details: "Treenipäivä",
+      date: formatDate(new Date(2024, 4, 1, 0, 0)),
+      created_at: new Date(2024, 4, 17, 0, 0),
+    },
+    {
+      user_id: 7,
+      entry_type_id: 1,
+      workout_type_id: 1,
+      workout_category_id: 3,
+      length_in_minutes: 90,
+      time_of_day_id: 3,
+      intensity: 2,
+      details: "Treenipäivä",
+      date: formatDate(new Date(2024, 4, 20, 0, 0)),
+      created_at: new Date(2024, 4, 17, 0, 0),
+    },
+    {
+      user_id: 7,
       entry_type_id: 1,
       workout_type_id: 3,
       workout_category_id: 1,

@@ -6,11 +6,18 @@ const MainContext = createContext();
 export const MainContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
   const [showDate, setShowDate] = useState(new Date());
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   useEffect(() => {
     const localTheme = localStorage.getItem("theme") || "light";
     setTheme(localTheme);
     document.documentElement.setAttribute("data-theme", localTheme);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -31,6 +38,7 @@ export const MainContextProvider = ({ children }) => {
         toggleTheme,
         showDate,
         setShowDate,
+        screenWidth,
       }}
     >
       {children}

@@ -31,8 +31,10 @@ const ManageLayout = () => {
         </NavLink>
       </nav>
 
-      <div className="w-full shadow-md">
-        <Outlet />
+      <div className="flex w-full">
+        <div className="flex w-full mx-auto max-w-[720px] pb-16 ">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
