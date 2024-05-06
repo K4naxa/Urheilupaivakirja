@@ -8,7 +8,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import  UnreadNewsIndicator from "../components/UnreadNewsIndicator";
-import { useBigJournal } from "../hooks/useBigJournal";
+import { useJournalModal } from "../hooks/useJournalModal";
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -18,7 +18,7 @@ import ThemeSwitcher from "../components/themeSwitcher";
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { openBigModal } = useBigJournal();
+  const { openBigModal } = useJournalModal();
 
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-headerPrimary ";

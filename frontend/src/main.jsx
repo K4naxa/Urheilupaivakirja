@@ -7,31 +7,31 @@ import { MainContextProvider } from "./hooks/mainContext.jsx";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 //import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
-import { BigJournalProvider } from "./hooks/useBigJournal.jsx";
+import { JournalModalProvider } from "./hooks/useJournalModal.jsx";
+import { DateModalProvider } from "./hooks/useDateModal.jsx";
 
 import App from "./App.jsx";
 import "./index.css";
 
 // TODO: CSS TO TAILWIND
 import "./hooks/toast-messages/toast.css";
-import "./components/confirm-modal/confirmModal.css";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <MainContextProvider>
         <ToastProvider>
-          <BigJournalProvider>
-            <RouterProvider router={router}>
-              <AuthProvider>
-                <App />
-              </AuthProvider>
-            </RouterProvider>
-          </BigJournalProvider>
+          <JournalModalProvider>
+            <DateModalProvider>
+              <RouterProvider router={router}>
+                <AuthProvider>
+                  <App />
+                </AuthProvider>
+              </RouterProvider>
+            </DateModalProvider>
+          </JournalModalProvider>
         </ToastProvider>
       </MainContextProvider>
     </QueryClientProvider>
-  </React.StrictMode>
 );

@@ -12,10 +12,13 @@ const inputContainer = "flex flex-col items-center gap-1 w-full";
 const inputLabel = "text-lg text-textPrimary";
 const optionContainer = "flex flex-row justify-between";
 
-const NewJournalEntryPage = ({ onClose }) => {
+const NewJournalEntryPage = ({ onClose, date }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  //TODO: new date = today (from other branch)
+  const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
+  console.log(date)
+  console.log("Initial date:", initialDate);
+
   const [newJournalEntryData, setNewJournalEntryData] = useState({
     entry_type: "1",
     workout_type: "",
@@ -23,7 +26,7 @@ const NewJournalEntryPage = ({ onClose }) => {
     length_in_minutes: "60",
     time_of_day: "",
     intensity: "",
-    date: dayjs(new Date()).format("YYYY-MM-DD"),
+    date: initialDate,
     details: "",
   });
 

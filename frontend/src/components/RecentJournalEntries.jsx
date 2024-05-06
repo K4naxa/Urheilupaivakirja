@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import trainingService from "../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
-import { useBigJournal } from "../hooks/useBigJournal";
+import { useJournalModal } from "../hooks/useJournalModal";
 
 const convertTime = (totalMinutes) => {
   const hours = Math.floor(totalMinutes / 60);
@@ -35,7 +35,7 @@ const dataContainerClass = "grid grid-cols-merkInfo gap-2";
 const labelClass = "text-textSecondary min-w-16";
 
 const RecentJournalEntry = ({ entry }) => {
-  const { openBigModal } = useBigJournal();
+  const { openBigModal } = useJournalModal();
   return (
     <div className=" bg-bgkSecondary flex w-full snap-start flex-col rounded-md p-2 shadow-md shadow-gray-700 ">
       {/* Header */}
@@ -52,7 +52,7 @@ const RecentJournalEntry = ({ entry }) => {
           </p>
         )}
         <button
-          onClick={() => openBigModal('edit', entry.id)}
+          onClick={() => openBigModal('edit', { entryId: entry.id })}
           className="col-start-3 mx-4 justify-self-end"
         >
           <FiEdit3 />
