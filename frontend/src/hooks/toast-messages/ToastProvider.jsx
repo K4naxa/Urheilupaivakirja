@@ -1,13 +1,14 @@
 import { createContext, useState } from "react";
 import { createPortal } from "react-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 export const ToastContext = createContext(null);
 
 const DEFAULT_OPTIONS = {
-  style: "info", // or success, error, warning
+  style: "info", // info, success, error, warning
   autoDismiss: true,
   autoDismissTimeout: 5000,
-  position: "top-right",
+  position: "top-right", //top-right, top-center, top-left, bottom-right, bottom-center, bottom-left
 };
 
 export function ToastProvider({ children }) {
@@ -15,7 +16,7 @@ export function ToastProvider({ children }) {
 
   function addToast(
     text,
-    { id = crypto.randomUUID(), ...userDefinedOptions } = {}
+    { id = uuidv4(), ...userDefinedOptions } = {}
   ) {
     const options = { ...DEFAULT_OPTIONS, ...userDefinedOptions };
     setToasts((currentToasts) => {

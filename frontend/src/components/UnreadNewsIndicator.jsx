@@ -4,24 +4,28 @@ import { useLocation } from "react-router-dom";
 import publicService from "../services/publicService";
 
 // Assuming publicService is accessible and has the relevant methods
-function UnreadNewsIndicator() {
+const UnreadNewsIndicator = ({ type }) => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [hasUnreadNews, setHasUnreadNews] = useState(false);
 
   // check unread news every 5 minutes
-  const { data: unreadNews, isSuccess, isLoading} = useQuery({
-      queryKey: ['checkUnreadNews'],
-      queryFn: publicService.checkUnreadNews,
-      refetchInterval: 300000,
+  const {
+    data: unreadNews,
+    isSuccess,
+    isLoading,
+  } = useQuery({
+    queryKey: ["checkUnreadNews"],
+    queryFn: publicService.checkUnreadNews,
+    refetchInterval: 300000,
   });
 
   // onSuccess
   useEffect(() => {
-      if (isSuccess) {
-          setHasUnreadNews(unreadNews.hasUnreadNews);
-          console.log("Unread news checked successfully")
-      }
+    if (isSuccess) {
+      setHasUnreadNews(unreadNews.hasUnreadNews);
+      console.log("Unread news checked successfully");
+    }
   }, [isSuccess]);
 
   const updateNewsLastViewedAtMutation = useMutation({
@@ -33,28 +37,31 @@ function UnreadNewsIndicator() {
 
   // update news_last_viewed_at and mark news as read when students visits the news page
   useEffect(() => {
-      if (location.pathname === '/tiedotteet/') {
-          updateNewsLastViewedAtMutation.mutate();
-          setHasUnreadNews(false);
-          queryClient.invalidateQueries(['checkUnreadNews']);
-      }
+    if (location.pathname === "/tiedotteet/") {
+      updateNewsLastViewedAtMutation.mutate();
+      setHasUnreadNews(false);
+      queryClient.invalidateQueries(["checkUnreadNews"]);
+    }
   }, [location]);
 
-
   if (isLoading) {
-    return <span></span>;
-}
+    return null;
+  }
+
+  const size = type === "phone" ? "w-2 h-2" : "w-1.5 h-1.5";
+
+  const position =
+    type === "phone"
+      ? "top-neg-one right-neg-one"
+      : "top-2.5 right-neg-one-point-five";
 
   return (
-    <>
-      {hasUnreadNews ? (
-        //TODO: TYYLITTELY
-        <span style={{ color: "red" }}>Uusia viestejä</span>
-      ) : (
-        <span style={{ color: "blue" }}>Ei uusia viestejä</span>
-      )}
-    </>
+    hasUnreadNews && (
+      <div className={`absolute ${position}`}>
+        <span className={`block ${size} bg-red-500 rounded-full`}></span>
+      </div>
+    )
   );
-}
+};
 
 export default UnreadNewsIndicator;

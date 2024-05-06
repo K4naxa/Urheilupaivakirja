@@ -1,24 +1,15 @@
-import { useState, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import trainingService from "../../../services/trainingService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ConfirmModal } from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
-import { FiArrowLeft } from "react-icons/fi";
 
-//const headerContainer = "bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
-const inputContainer = "flex flex-col items-center gap-1 w-full";
-const inputLabel = "text-lg text-textPrimary";
-const optionContainer = "flex flex-row justify-between";
-
-const NewJournalEntryPage = ({ onClose, date }) => {
+const NewJournalEntryPage = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
-  console.log(date)
-  console.log("Initial date:", initialDate);
-
+  //TODO: new date = today (from other branch)
   const [newJournalEntryData, setNewJournalEntryData] = useState({
     entry_type: "1",
     workout_type: "",
@@ -26,7 +17,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     length_in_minutes: "60",
     time_of_day: "",
     intensity: "",
-    date: initialDate,
+    date: dayjs(new Date()).format("YYYY-MM-DD"),
     details: "",
   });
 
@@ -42,6 +33,8 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   });
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
+  const navigate = useNavigate();
+
   const addJournalEntry = useMutation({
     mutationFn: () => trainingService.postJournalEntry(newJournalEntryData),
     // If the mutation fails, roll back to the previous value
@@ -54,7 +47,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
       queryClient.invalidateQueries(["studentJournal"]);
       // Navigate to the next page after the mutation succeeds
       addToast("Merkintä lisätty", { style: "success" });
-      onClose();
+      navigate("/");
     },
   });
 
@@ -93,7 +86,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   }, [journalEntriesData, newJournalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
-  useLayoutEffect(() => {
+  useEffect(() => {
     checkForConflicts(
       newJournalEntryData.entry_type,
       newJournalEntryData.date,
@@ -336,7 +329,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   const renderRadioButton = (name, value, label, onChangeHandler) => {
     return (
-      <div className="relative mr-1 ml-1 w-[110px]" key={`${name}-${value}`}>
+      <div className="relative mr-1 ml-1 w-[120px] h-10" key={`${name}-${value}`}>
         <input
           type="radio"
           name={name}
@@ -344,12 +337,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           checked={newJournalEntryData[name] === value}
           id={`${name}-${value}`}
           onChange={onChangeHandler}
-          className="absolute opacity-0 w-0 h-0 peer"
-          tabIndex="0" // Make sure it's focusable
+          className="hidden peer" // 'peer' class for controlling sibling label
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:bg-headerPrimary peer-focus:ring-2 peer-focus:ring-headerSecondary py-1 block rounded border-2 border-gray-400 text-textPrimary text-md text-center cursor-pointer"
+          className="peer-checked:bg-[#20b8be] block absolute top-0 left-0 right-0 bottom-0 rounded border-2 border-gray-400 text-center cursor-pointer leading-7"
         >
           {label}
         </label>
@@ -417,195 +409,178 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         declineButton="Peruuta"
         closeOnOutsideClick={false}
       />
-      <div className="flex flex-col h-full sm:border-2 sm:border-borderPrimary sm:rounded-lg overflow-auto hide-scrollbar">
-        <div className="relative bg-headerPrimary border-borderPrimary border-b p-3 sm:p-5 text-center text-xl shadow-md sm:rounded-t-md">
-          <p>Uusi merkintä</p>
-          <button
-            onClick={onClose}
-            className="absolute bottom-1/2 translate-y-1/2 left-5 text-3xl"
+
+      <div className="mainArea overflow-x-auto pb-14">
+        <div className="flex flex-col border-4 border-borderPrimary rounded-md w-[600px]">
+          <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+            <p>Uusi harjoitus</p>
+          </div>
+          <form
+            className="relative flex h-full flex-col gap-4 p-2 sm:p-4"
+            onSubmit={newJournalEntryHandler}
           >
-            <FiArrowLeft />
-          </button>
-        </div>
-        <form
-          className="flex flex-col items-center gap-4 p-2 sm:p-8 bg-bgkSecondary rounded-md flex-grow"
-          onSubmit={newJournalEntryHandler}
-        >
-          <div className={inputContainer}>
-            <div className={optionContainer}>
-              {optionsData.journal_entry_types.map((entry) =>
-                renderRadioButton(
-                  "entry_type",
-                  entry.id.toString(),
-                  entry.name,
-                  entryTypeChangeHandler
-                )
-              )}
-            </div>
-          </div>
-
-          <div className={inputContainer}>
-            <label className={inputLabel} htmlFor="date-picker">
-              Päivämäärä
-            </label>
-            <input
-              className=" text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none  border-b p-1 "
-              type="date"
-              name="date"
-              value={newJournalEntryData.date}
-              onChange={changeHandler}
-              id="date-picker"
-            />
-          </div>
-
-          {newJournalEntryData.entry_type === "1" && (
-            <div
-              className={`${inputContainer} ${
-                errors.length_in_minutes ? "border-l-4 border-red-500" : ""
-              }`}
-            >
-              <label className={inputLabel} htmlFor="length_in_minutes">
-                Kesto: {convertTime(newJournalEntryData.length_in_minutes)}
-              </label>
-              <input
-                className=" border-borderPrimary bg-bgkSecondary h-10 w-full p-1 "
-                type="range"
-                min="30"
-                max="180"
-                value={newJournalEntryData.length_in_minutes}
-                step="30"
-                id="length_in_minutes"
-                onChange={changeHandler}
-                name="length_in_minutes"
-              />
-            </div>
-          )}
-
-          {newJournalEntryData.entry_type === "1" && (
-            <div
-              className={`${inputContainer} ${
-                errors.workout_type ? "border-l-4 border-red-500" : ""
-              }`}
-            >
-              <label className={inputLabel}>Harjoitustyyppi</label>
-              <div className={optionContainer}>
-                {optionsData.workout_types.map((type) =>
+            <div className="flex flex-col items-center gap-1">
+              <label>Merkintätyyppi</label>
+              <div className="flex justify-between">
+                {optionsData.journal_entry_types.map((entry) =>
                   renderRadioButton(
-                    "workout_type",
-                    type.id.toString(),
-                    type.name,
-                    workoutTypeChangeHandler
+                    "entry_type",
+                    entry.id.toString(),
+                    entry.name,
+                    entryTypeChangeHandler
                   )
                 )}
               </div>
             </div>
-          )}
 
-          {newJournalEntryData.entry_type === "1" &&
-            newJournalEntryData.workout_type === "3" && (
+            <div className="flex flex-col items-center gap-1">
+              <label htmlFor="date-picker">Päivämäärä</label>
+              <input
+                type="date"
+                name="date"
+                value={newJournalEntryData.date}
+                onChange={changeHandler}
+                id="date-picker"
+              />
+            </div>
+
+            {newJournalEntryData.entry_type === "1" && (
               <div
-                className={`${inputContainer} ${
-                  errors.workout_category ? "border-l-4 border-red-500" : ""
+                className={`flex flex-col items-center gap-1 ${
+                  errors.length_in_minutes ? "border-l-4 border-red-500" : ""
                 }`}
               >
-                <label className={inputLabel} htmlFor="workout-category">
-                  Harjoituskategoria
+                <label htmlFor="length_in_minutes">
+                  Kesto: {convertTime(newJournalEntryData.length_in_minutes)}
                 </label>
-                <select
-                  className="text-lg  text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full  border-b p-1"
-                  id="workoutCategory"
-                  name="workout_category"
-                  value={newJournalEntryData.workout_category}
+                <input
+                  type="range"
+                  min="30"
+                  max="180"
+                  value={newJournalEntryData.length_in_minutes}
+                  step="30"
+                  id="length_in_minutes"
                   onChange={changeHandler}
-                  disabled={newJournalEntryData.workout_type != "3"}
+                  name="length_in_minutes"
+                />
+              </div>
+            )}
+
+            {newJournalEntryData.entry_type === "1" && (
+              <div
+                className={`flex flex-col items-center gap-1 ${
+                  errors.workout_type ? "border-l-4 border-red-500" : ""
+                }`}
+              >
+                <label>Harjoitustyyppi</label>
+                <div className="flex justify-between">
+                  {optionsData.workout_types.map((type) =>
+                    renderRadioButton(
+                      "workout_type",
+                      type.id.toString(),
+                      type.name,
+                      workoutTypeChangeHandler
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            {newJournalEntryData.entry_type === "1" &&
+              newJournalEntryData.workout_type === "3" && (
+                <div
+                  className={`flex flex-col items-center gap-1 ${
+                    errors.workout_category ? "border-l-4 border-red-500" : ""
+                  }`}
                 >
-                  {optionsData.workout_categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                  <label htmlFor="workout-category">Harjoituskategoria</label>
+                  <select
+                    id="workoutCategory"
+                    name="workout_category"
+                    value={newJournalEntryData.workout_category}
+                    onChange={changeHandler}
+                    disabled={newJournalEntryData.workout_type != "3"}
+                  >
+                    {optionsData.workout_categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+            {newJournalEntryData.entry_type === "1" && (
+              <div
+                className={`flex flex-col ${
+                  errors.time_of_day ? "border-l-4 border-red-500" : ""
+                }`}
+              >
+                <label className="self-center">Ajankohta</label>
+                <div className="flex justify-between ">
+                  {optionsData.time_of_day.map((time) =>
+                    renderRadioButton(
+                      "time_of_day",
+                      time.id.toString(),
+                      time.name,
+                      changeHandler
+                    )
+                  )}
+                </div>
               </div>
             )}
 
-          {newJournalEntryData.entry_type === "1" && (
-            <div
-              className={`${inputContainer} ${
-                errors.time_of_day ? "border-l-4 border-red-500" : ""
-              }`}
-            >
-              <label className={inputLabel}>Ajankohta</label>
-              <div className={optionContainer}>
-                {optionsData.time_of_day.map((time) =>
-                  renderRadioButton(
-                    "time_of_day",
-                    time.id.toString(),
-                    time.name,
-                    changeHandler
-                  )
-                )}
+            {newJournalEntryData.entry_type === "1" && (
+              <div
+                className={`flex flex-col items-center gap-1 ${
+                  errors.intensity ? "border-l-4 border-red-500" : ""
+                }`}
+              >
+                <label>Rankkuus</label>
+                <div className="flex justify-between ">
+                  {[1, 2, 3].map((intensity) =>
+                    renderRadioButton(
+                      "intensity",
+                      intensity.toString(),
+                      intensity.toString(),
+                      changeHandler
+                    )
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-
-          {newJournalEntryData.entry_type === "1" && (
-            <div
-              className={`${inputContainer} ${
-                errors.intensity ? "border-l-4 border-red-500" : ""
-              }`}
-            >
-              <label className={inputLabel}>Rankkuus</label>
-              <div className={optionContainer}>
-                {[1, 2, 3].map((intensity) =>
-                  renderRadioButton(
-                    "intensity",
-                    intensity.toString(),
-                    intensity.toString(),
-                    changeHandler
-                  )
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className={inputContainer}>
-            <label
-              className={inputLabel}
-              htmlFor="details-textarea"
-              onClick={() => setShowDetails((prevState) => !prevState)}
-            >
-              Lisätiedot V
-            </label>
-            {showDetails && (
-              <textarea
-                className="w-full h-18 border-borderPrimary border rounded-lg p-1 text-textPrimary"
-                onChange={changeHandler}
-                onKeyDown={(event) => {
-                  console.log(event.key);
-                  if (event.key === "Enter") {
-                    event.stopPropagation();
-                  }
-                }}
-                type="text"
-                name="details"
-                id="details-textarea"
-                value={newJournalEntryData.details}
-              />
             )}
-          </div>
 
-          <div className="flex flex-col items-center gap-4 w-full p-4 mt-auto">
+            <div className="flex flex-col items-center gap-1">
+              <label
+                htmlFor="details-textarea"
+                onClick={() => setShowDetails((prevState) => !prevState)}
+              >
+                Lisätiedot V
+              </label>
+              {showDetails && (
+                <textarea
+                  onChange={changeHandler}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={newJournalEntryData.details}
+                />
+              )}
+            </div>
+            <div className="flex flex-col items-center gap-1 align-center">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
-            <button
-              className={`text-textPrimary w-44 h-14 rounded-lg bg-headerPrimary border-borderPrimary
-    ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
-              type="submit"
-              disabled={submitButtonIsDisabled}
-            >
-              {getSubmitButtonText(newJournalEntryData.entry_type)}
-            </button>
-          </div>
-        </form>
+
+              <button
+                className={`text-white text-base w-44 h-14 p-2 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer
+              ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray-300 border-gray-300 cursor-not-allowed" : ""}`}
+                type="submit"
+                disabled={submitButtonIsDisabled}
+              >
+                {getSubmitButtonText(newJournalEntryData.entry_type)}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </>
   );

@@ -31,6 +31,7 @@ import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageAr
 import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
+import TestPage from "./pages/testPage";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
           },
 
           { path: "/kirjaudu", element: <LoginPage /> },
+          {path: "/test" , element: <TestPage/>},
           { path: "/rekisteroidy", element: <RegistrationPage /> },
           {
             path: "/opettaja",
