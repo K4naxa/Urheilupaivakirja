@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 
@@ -9,41 +9,33 @@ import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Weeks = ({ journal }) => {
   const { showDate, screenWidth } = useMainContext();
-  const [data, setData] = useState([]);
-  const cal = new CalHeatmap();
+  const calRef = useRef(null);
 
   useEffect(() => {
+    if (calRef.current) calRef.current.destroy();
+
     // clean up the data for the heatmap
     const entries = journal.journal_entries.map((entry) => {
       const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
       let value = entry.length_in_minutes;
-
       if (entry.entry_type_id === 3) value = -99; // color value for sick day
-
       return {
         date: date,
         value: value,
         entry_type: entry.entry_type_id,
       };
     });
-    setData(entries);
-  }, [journal]);
+    const data = entries;
 
-  useEffect(() => {
-    const container = document.getElementById(
-      `cal-heatmapWeeks${journal.user_id}`
-    );
-    if (!container) return;
-    container.innerHTML = "";
-
-    const theme = document.documentElement.getAttribute("data-theme");
-
+    // set the range of the heatmap based on the screen width
     let range = 3;
-
     if (screenWidth < 700) range = 2;
     if (screenWidth < 535) range = 1;
 
-    cal.paint(
+    const theme = document.documentElement.getAttribute("data-theme");
+
+    calRef.current = new CalHeatmap();
+    calRef.current.paint(
       {
         itemSelector: `#cal-heatmapWeeks${journal.user_id}`,
         animationDuration: 0,
@@ -133,7 +125,7 @@ const HeatMap_Weeks = ({ journal }) => {
         ],
       ]
     );
-  }, [data, showDate, screenWidth]);
+  }, [journal, showDate, screenWidth]);
 
   return (
     <div

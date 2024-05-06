@@ -15,7 +15,7 @@ function SportComboBox({ sports, selectedSport, setSelectedSport }) {
 
   return (
     <div className="text-textPrimary">
-      <Combobox value={selectedSport} onChange={setSelectedSport}>
+      <Combobox value={selectedSport} onChange={setSelectedSport} nullable>
         <div className="relative mt-1">
           <div
             className="relative w-full cursor-default overflow-hidden border-b
@@ -25,7 +25,7 @@ function SportComboBox({ sports, selectedSport, setSelectedSport }) {
             <Combobox.Input
               className="w-full border-none p-2
                 focus-visible:outline-none bg-bgkSecondary"
-              displayValue={(sport) => sport.name}
+              displayValue={(sport) => sport?.name}
               placeholder="Hae Laji"
               onChange={(event) => setQuery(event.target.value)}
             />

@@ -33,7 +33,7 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
   }, [selectedStudent]);
   return (
     <div className="text-textPrimary">
-      <Combobox value={selectedStudent} onChange={setSelectedStudent}>
+      <Combobox value={selectedStudent} onChange={setSelectedStudent} nullable>
         <div className="relative mt-1">
           <div
             className="relative w-full cursor-default overflow-hidden border-b
@@ -43,7 +43,7 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
             <Combobox.Input
               className="w-full border-none p-2
                 focus-visible:outline-none bg-bgkSecondary"
-              displayValue={(person) => person.name}
+              displayValue={(person) => person?.name}
               placeholder="Hae opiskelija"
               onChange={(event) => {
                 setQuery(event.target.value);

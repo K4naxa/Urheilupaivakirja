@@ -17,244 +17,6 @@ import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
 
-const RenderWeeks = ({ journals }) => {
-  const { showDate, setShowDate } = useMainContext();
-
-  const getWeekNumber = (date) => {
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date - firstDayOfYear) / 86400000; // 1 day in milliseconds
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-  };
-
-  const handlePreviousWeekClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate);
-    newDate.setDate(showDate.getDate() - 7); // Subtract 7 days to go to the previous week
-    setShowDate(newDate);
-  };
-
-  const handleNextWeekClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate);
-    newDate.setDate(showDate.getDate() + 7); // Add 7 days to go to the next week
-    setShowDate(newDate);
-  };
-  return (
-    <div className="flex flex-col justify-center">
-      {/* Date controls */}
-      <div className="flex w-full flex-col text-center mb-4">
-        <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-        <div className="hover: flex justify-center gap-4">
-          <button className="hover:underline" onClick={handlePreviousWeekClick}>
-            <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
-            >
-              <FiChevronLeft />
-            </IconContext.Provider>
-          </button>
-          <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
-          <button
-            className="hover:fill-blue-500 hover:underline"
-            onClick={handleNextWeekClick}
-          >
-            <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
-            >
-              <FiChevronRight />
-            </IconContext.Provider>
-          </button>
-        </div>
-      </div>
-      {/* Student list */}
-      <div className="flex flex-col gap-4">
-        {journals.map((journal) => (
-          // Student card
-          <div
-            key={journal.user_id}
-            className="flex flex-col rounded-md j bg-bgkSecondary p-3 gap-2 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
-            id="studentCard"
-          >
-            <div className="flex lg:gap-6 text-textSecondary text-xs">
-              <p className="hidden lg:flex">Toimipaikka: {journal.campus}</p>
-              <p>Ryhmä: {journal.group}</p>
-              <p>Laji: {journal.sport}</p>
-            </div>
-            <div className="flex justify-between gap-2">
-              <div className="flex gap-1">
-                {" "}
-                <p> {journal.first_name}</p>
-                <p>{journal.last_name}</p>
-              </div>
-
-              <div>
-                <HeatMap_Weeks journal={journal} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const RenderMonths = ({ journals }) => {
-  const { showDate, setShowDate } = useMainContext();
-  const handlePreviousMonthClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
-    setShowDate(newDate);
-  };
-
-  const handleNextMonthClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
-    setShowDate(newDate);
-  };
-
-  const monthNames = [
-    "Tammikuu",
-    "Helmikuu",
-    "Maaliskuu",
-    "Huhtikuu",
-    "Toukokuu",
-    "Kesäkuu",
-    "Heinäkuu",
-    "Elokuu",
-    "Syyskuu",
-    "Lokakuu",
-    "Marraskuu",
-    "Joulukuu",
-  ];
-
-  return (
-    <div className="flex flex-col justify-center">
-      <div className="flex flex-col text-center mb-8">
-        <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-        <div className="hover: flex justify-center gap-4">
-          <button
-            className="hover:underline"
-            onClick={handlePreviousMonthClick}
-          >
-            <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
-            >
-              <FiChevronLeft />
-            </IconContext.Provider>
-          </button>
-          <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
-          <button
-            className="hover:fill-blue-500 hover:underline"
-            onClick={handleNextMonthClick}
-          >
-            <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
-            >
-              <FiChevronRight />
-            </IconContext.Provider>
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
-        {journals.map((journal) => (
-          <div
-            key={journal.user_id}
-            className="flex flex-col gap-2 w-60 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
-            id="studentCard"
-          >
-            <div className="flex flex-col">
-              <p className="text-lg text-center">
-                {journal.first_name} {journal.last_name}
-              </p>
-            </div>
-            <div className="flex flex-col text-textSecondary text-xs">
-              <p className="flex gap-1 ">
-                Toimipiste: <p className="text-textPrimary">{journal.campus}</p>
-              </p>
-              <p className="flex gap-1 ">
-                ryhmä: <p className="text-textPrimary">{journal.group}</p>
-              </p>
-              <p className="flex gap-1 ">
-                Laji: <p className="text-textPrimary">{journal.sport}</p>
-              </p>
-            </div>
-            <HeatMap_Month journal={journal} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// RenderYears component
-const RenderYears = ({ journals }) => {
-  const { showDate, setShowDate } = useMainContext();
-
-  const handlePreviousYearClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate);
-    newDate.setFullYear(showDate.getFullYear() - 1);
-    setShowDate(newDate);
-  };
-
-  const handleNextYearClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate);
-    newDate.setFullYear(showDate.getFullYear() + 1);
-    setShowDate(newDate);
-  };
-
-  if (journals.length === 0) {
-    return <div className="flex justify-center w-full">Ei Oppilaita</div>;
-  }
-  return (
-    <div className="flex flex-col justify-center">
-      <div className="flex flex-col text-center mb-8">
-        <div className="hover: flex justify-center gap-4">
-          <button className="hover:underline" onClick={handlePreviousYearClick}>
-            <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
-            >
-              <FiChevronLeft />
-            </IconContext.Provider>
-          </button>
-          <p className="text-xl">{showDate.getFullYear()}</p>
-          <button
-            className="hover:fill-blue-500 hover:underline"
-            onClick={handleNextYearClick}
-          >
-            <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
-            >
-              <FiChevronRight />
-            </IconContext.Provider>
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
-        {journals.map((journal) => (
-          <div
-            key={journal.user_id}
-            className="flex flex-col gap-2 rounded-md bg-bgkSecondary p-4 border
-             border-headerPrimary shadow-md hover:shadow-headerPrimary"
-            id="studentCard"
-          >
-            <div className="flex gap-4  leading-none items-end">
-              <p className="text-lg text-center leading-none">
-                {journal.first_name} {journal.last_name}
-              </p>
-
-              <p className="text-textSecondary">Toimipiste: {journal.campus}</p>
-              <p className="text-textSecondary">ryhmä: {journal.group}</p>
-              <p className="flex text-textSecondary">Laji: {journal.sport}</p>
-            </div>
-            <HeatMap_Year_Teacher journal={journal} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
   const [filteredJournals, setFilteredJournals] = useState([]);
@@ -270,13 +32,275 @@ function TeacherHome() {
   const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
   const [selectedCampus, setSelectedCampus] = useState("");
 
-  const handleFilter = () => {
-    let filtJournals = journals;
+  const RenderWeeks = ({ journals }) => {
+    const { showDate, setShowDate } = useMainContext();
+
+    const getWeekNumber = (date) => {
+      const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+      const pastDaysOfYear = (date - firstDayOfYear) / 86400000; // 1 day in milliseconds
+      return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    };
+
+    const handlePreviousWeekClick = (e) => {
+      e.preventDefault();
+      const newDate = new Date(showDate);
+      newDate.setDate(showDate.getDate() - 7); // Subtract 7 days to go to the previous week
+      setShowDate(newDate);
+    };
+
+    const handleNextWeekClick = (e) => {
+      e.preventDefault();
+      const newDate = new Date(showDate);
+      newDate.setDate(showDate.getDate() + 7); // Add 7 days to go to the next week
+      setShowDate(newDate);
+    };
+    return (
+      <div className="flex flex-col justify-center">
+        {/* Date controls */}
+        <div className="flex w-full flex-col text-center mb-4">
+          <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+          <div className="hover: flex justify-center gap-4">
+            <button
+              className="hover:underline"
+              onClick={handlePreviousWeekClick}
+            >
+              <IconContext.Provider
+                value={{ className: "hover:text-graphPrimary" }}
+              >
+                <FiChevronLeft />
+              </IconContext.Provider>
+            </button>
+            <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
+            <button
+              className="hover:fill-blue-500 hover:underline"
+              onClick={handleNextWeekClick}
+            >
+              <IconContext.Provider
+                value={{ className: "hover:text-graphPrimary" }}
+              >
+                <FiChevronRight />
+              </IconContext.Provider>
+            </button>
+          </div>
+        </div>
+        {/* Student list */}
+        <div className="flex flex-col gap-4">
+          {journals.map((journal) => (
+            // Student card
+            <div
+              key={journal.user_id}
+              className="flex flex-col rounded-md j bg-bgkSecondary p-3 gap-2 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
+              id="studentCard"
+            >
+              <div className="flex lg:gap-6 text-textSecondary text-xs">
+                <p className="hidden lg:flex">Toimipaikka: {journal.campus}</p>
+                <p>Ryhmä: {journal.group}</p>
+                <p>Laji: {journal.sport}</p>
+              </div>
+              <div className="flex justify-between gap-2">
+                <div className="flex gap-1">
+                  {" "}
+                  <p> {journal.first_name}</p>
+                  <p>{journal.last_name}</p>
+                </div>
+
+                <div>
+                  <HeatMap_Weeks journal={journal} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const RenderMonths = ({ journals }) => {
+    const { showDate, setShowDate } = useMainContext();
+    const handlePreviousMonthClick = (e) => {
+      e.preventDefault();
+      const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
+      setShowDate(newDate);
+    };
+
+    const handleNextMonthClick = (e) => {
+      e.preventDefault();
+      const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
+      setShowDate(newDate);
+    };
+
+    const monthNames = [
+      "Tammikuu",
+      "Helmikuu",
+      "Maaliskuu",
+      "Huhtikuu",
+      "Toukokuu",
+      "Kesäkuu",
+      "Heinäkuu",
+      "Elokuu",
+      "Syyskuu",
+      "Lokakuu",
+      "Marraskuu",
+      "Joulukuu",
+    ];
+
+    return (
+      <div className="flex flex-col justify-center">
+        <div className="flex flex-col text-center mb-8">
+          <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+          <div className="hover: flex justify-center gap-4">
+            <button
+              className="hover:underline"
+              onClick={handlePreviousMonthClick}
+            >
+              <IconContext.Provider
+                value={{ className: "hover:text-graphPrimary" }}
+              >
+                <FiChevronLeft />
+              </IconContext.Provider>
+            </button>
+            <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
+            <button
+              className="hover:fill-blue-500 hover:underline"
+              onClick={handleNextMonthClick}
+            >
+              <IconContext.Provider
+                value={{ className: "hover:text-graphPrimary" }}
+              >
+                <FiChevronRight />
+              </IconContext.Provider>
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
+          {journals.map((journal) => (
+            <div
+              key={journal.user_id}
+              className="flex flex-col gap-2 w-60 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
+              id="studentCard"
+            >
+              <div className="flex flex-col">
+                <p className="text-lg text-center">
+                  {journal.first_name} {journal.last_name}
+                </p>
+              </div>
+              <div className="flex flex-col text-textSecondary text-xs">
+                <p className="flex gap-1 ">
+                  Toimipiste:{" "}
+                  <p
+                    onClick={() => {
+                      handleFilterReset();
+                      setSelectedCampus(journal.campus);
+                    }}
+                    className="text-textPrimary hover:cursor-pointer"
+                  >
+                    {journal.campus}
+                  </p>
+                </p>
+                <p className="flex gap-1 ">
+                  ryhmä: <p className="text-textPrimary">{journal.group}</p>
+                </p>
+                <p className="flex gap-1 ">
+                  Laji: <p className="text-textPrimary">{journal.sport}</p>
+                </p>
+              </div>
+              <HeatMap_Month journal={journal} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // RenderYears component
+  const RenderYears = ({ journals }) => {
+    const { showDate, setShowDate } = useMainContext();
+
+    const handlePreviousYearClick = (e) => {
+      e.preventDefault();
+      const newDate = new Date(showDate);
+      newDate.setFullYear(showDate.getFullYear() - 1);
+      setShowDate(newDate);
+    };
+
+    const handleNextYearClick = (e) => {
+      e.preventDefault();
+      const newDate = new Date(showDate);
+      newDate.setFullYear(showDate.getFullYear() + 1);
+      setShowDate(newDate);
+    };
+
+    if (journals.length === 0) {
+      return <div className="flex justify-center w-full">Ei Oppilaita</div>;
+    }
+    return (
+      <div className="flex flex-col justify-center">
+        <div className="flex flex-col text-center mb-8">
+          <div className="hover: flex justify-center gap-4">
+            <button
+              className="hover:underline"
+              onClick={handlePreviousYearClick}
+            >
+              <IconContext.Provider
+                value={{ className: "hover:text-graphPrimary" }}
+              >
+                <FiChevronLeft />
+              </IconContext.Provider>
+            </button>
+            <p className="text-xl">{showDate.getFullYear()}</p>
+            <button
+              className="hover:fill-blue-500 hover:underline"
+              onClick={handleNextYearClick}
+            >
+              <IconContext.Provider
+                value={{ className: "hover:text-graphPrimary" }}
+              >
+                <FiChevronRight />
+              </IconContext.Provider>
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
+          {journals.map((journal) => (
+            <div
+              key={journal.user_id}
+              className="flex flex-col gap-2 rounded-md bg-bgkSecondary p-4 border
+               border-headerPrimary shadow-md hover:shadow-headerPrimary"
+              id="studentCard"
+            >
+              <div className="flex gap-4  leading-none items-end">
+                <p className="text-lg text-center leading-none">
+                  {journal.first_name} {journal.last_name}
+                </p>
+
+                <p className="text-textSecondary">
+                  Toimipiste: {journal.campus}
+                </p>
+                <p className="text-textSecondary">ryhmä: {journal.group}</p>
+                <p className="flex text-textSecondary">Laji: {journal.sport}</p>
+              </div>
+              <HeatMap_Year_Teacher journal={journal} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    console.log(selectedCampus);
+    let filtJournals = [...journals];
 
     if (selectedCampus) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.campus === selectedCampus.name
-      );
+      if (selectedCampus.name) {
+        filtJournals = filtJournals.filter(
+          (journal) => journal.campus === selectedCampus.name
+        );
+      } else {
+        filtJournals = filtJournals.filter(
+          (journal) => journal.campus === selectedCampus
+        );
+      }
     }
     if (selectedSport) {
       filtJournals = filtJournals.filter(
@@ -294,7 +318,7 @@ function TeacherHome() {
       );
     }
     setFilteredJournals(filtJournals);
-  };
+  }, [selectedCampus, selectedSport, selectedStudentGroup, selectedStudent]);
 
   const handleFilterReset = () => {
     setSelectedCampus("");
@@ -341,73 +365,6 @@ function TeacherHome() {
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
-        {/* filters */}
-        {/* <div
-          className="bg-bgkSecondary flex flex-wrap align-middle lg:justify-center rounded-md
-         h-fit w-full p-4 justify-between lg:p-8 lg:gap-8 lg:fixed lg:flex-col lg:w-64 lg:top-1/2 lg:transform lg:-translate-y-1/2 shadow-md"
-        >
-          <div className="flex text-textSecondary text-sm">
-            <p
-              onClick={() => {
-                setShowWeeks(true);
-                setShowMonths(false);
-                setShowYears(false);
-              }}
-              className={`cursor-pointer mx-2 ${showWeeks && "text-headerPrimary border-b border-headerPrimary"}`}
-            >
-              Viikko
-            </p>
-            <p
-              onClick={() => {
-                setShowWeeks(false);
-                setShowMonths(true);
-                setShowYears(false);
-              }}
-              className={`cursor-pointer mx-2 ${showMonths && "text-headerPrimary border-b border-headerPrimary"}`}
-            >
-              Kuukausi
-            </p>
-            <p
-              onClick={() => {
-                setShowWeeks(false);
-                setShowMonths(false);
-                setShowYears(true);
-              }}
-              className={`cursor-pointer mx-2 ${showYears && "text-headerPrimary border-b border-headerPrimary"}`}
-            >
-              Vuosi
-            </p>
-          </div>
-          <StudentComboBox
-            journals={journals}
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
-          />
-          <SportComboBox
-            sports={options.sports}
-            selectedSport={selectedSport}
-            setSelectedSport={setSelectedSport}
-          />
-          <StudentGroupComboBox
-            groups={options.student_groups}
-            selectedStudentGroup={selectedStudentGroup}
-            setSelectedStudentGroup={setSelectedStudentGroup}
-          />
-          <CampusComboBox
-            campuses={options.campuses}
-            selectedCampus={selectedCampus}
-            setSelectedCampus={setSelectedCampus}
-          />
-          <div className="flex lg:gap-8 justify-center text-sm">
-            <button className="Button" onClick={handleFilter}>
-              Hae
-            </button>
-            <button className="Button bg-btnGray" onClick={handleFilterReset}>
-              Nollaa
-            </button>
-          </div>
-        </div> */}
-
         <div
           className="bg-bgkSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
            rounded-md p-4 justify-between lg:p-8 lg:gap-8 shadow-md"
@@ -467,9 +424,6 @@ function TeacherHome() {
               setSelectedCampus={setSelectedCampus}
             />
             <div className="flex lg:gap-8 justify-center text-sm">
-              <button className="Button" onClick={handleFilter}>
-                Hae
-              </button>
               <button className="Button bg-btnGray" onClick={handleFilterReset}>
                 Nollaa
               </button>

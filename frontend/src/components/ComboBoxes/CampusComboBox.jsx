@@ -15,7 +15,7 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
 
   return (
     <div className="text-textPrimary">
-      <Combobox value={selectedCampus} onChange={setSelectedCampus}>
+      <Combobox value={selectedCampus} onChange={setSelectedCampus} nullable>
         <div className="relative mt-1">
           <div
             className="relative w-full cursor-default overflow-hidden border-b
@@ -25,7 +25,7 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
             <Combobox.Input
               className="w-full border-none p-2
                 focus-visible:outline-none bg-bgkSecondary"
-              displayValue={(campus) => campus.name}
+              displayValue={(campus) => campus?.name}
               placeholder="Hae Toimipiste"
               onChange={(event) => setQuery(event.target.value)}
             />

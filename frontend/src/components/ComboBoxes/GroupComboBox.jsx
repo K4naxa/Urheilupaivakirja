@@ -21,7 +21,11 @@ function StudentGroupComboBox({
 
   return (
     <div className="text-textPrimary">
-      <Combobox value={selectedStudentGroup} onChange={setSelectedStudentGroup}>
+      <Combobox
+        value={selectedStudentGroup}
+        onChange={setSelectedStudentGroup}
+        nullable
+      >
         <div className="relative mt-1">
           <div
             className="relative w-full cursor-default overflow-hidden border-b
@@ -31,7 +35,7 @@ function StudentGroupComboBox({
             <Combobox.Input
               className="w-full border-none p-2
                 focus-visible:outline-none bg-bgkSecondary"
-              displayValue={(group) => group.group_identifier}
+              displayValue={(group) => group?.group_identifier}
               placeholder="Hae Ryhmä"
               onChange={(event) => setQuery(event.target.value)}
             />
