@@ -1,21 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
-import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Year_Teacher = ({ journal }) => {
   const { showDate } = useMainContext();
-
-  const [data, setData] = useState([]);
-  const cal = new CalHeatmap();
+  const calRef = useRef(null);
 
   useEffect(() => {
+    if (calRef.current) calRef.current.destroy();
     // clean up the data for the heatmap
-    const entries = journal.journal_entries.map((entry) => {
+    const data = journal.journal_entries.map((entry) => {
       const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
       let value = entry.length_in_minutes;
 
@@ -27,19 +25,10 @@ const HeatMap_Year_Teacher = ({ journal }) => {
         entry_type: entry.entry_type_id,
       };
     });
-    setData(entries);
-  }, [journal]);
-
-  useEffect(() => {
-    const container = document.getElementById(
-      `cal-heatmapYear${journal.user_id}`
-    );
-    if (!container) return;
-    container.innerHTML = "";
 
     const theme = document.documentElement.getAttribute("data-theme");
-
-    cal.paint(
+    calRef.current = new CalHeatmap();
+    calRef.current.paint(
       {
         itemSelector: `#cal-heatmapYear${journal.user_id}`,
         animationDuration: 0,
@@ -129,21 +118,9 @@ const HeatMap_Year_Teacher = ({ journal }) => {
             },
           },
         ],
-
-        [
-          CalendarLabel,
-          {
-            position: "left",
-            key: "left",
-            text: () => ["", "Ma", "", "Ke", "", "Pe", "", "Su"],
-            padding: [0, 5, 0, 0],
-            height: 10,
-            gutter: 3,
-          },
-        ],
       ]
     );
-  }, [data, showDate.getFullYear()]);
+  }, [journal, showDate]);
 
   return (
     <div id={`cal-heatmapYear${journal.user_id}`} className="flex w-full"></div>

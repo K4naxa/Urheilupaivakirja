@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 import CalHeatmap from "cal-heatmap";

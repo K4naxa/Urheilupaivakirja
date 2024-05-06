@@ -1,11 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
-import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 
 const HeatMap_Weeks = ({ journal }) => {
   const { showDate, screenWidth } = useMainContext();

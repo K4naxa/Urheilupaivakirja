@@ -317,7 +317,13 @@ function TeacherHome() {
       );
     }
     setFilteredJournals(filtJournals);
-  }, [selectedCampus, selectedSport, selectedStudentGroup, selectedStudent]);
+  }, [
+    journals,
+    selectedCampus,
+    selectedSport,
+    selectedStudentGroup,
+    selectedStudent,
+  ]);
 
   const handleFilterReset = () => {
     setSelectedCampus("");
