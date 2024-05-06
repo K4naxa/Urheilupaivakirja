@@ -72,13 +72,13 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
                ring-1 ring-black/5 focus:outline-none sm:text-sm"
             >
               {/* if nothing is found */}
-              {filteredPeople.length === 0 && query !== "" ? (
+              {filteredPeople?.length === 0 && query !== "" ? (
                 <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                   Nothing found.
                 </div>
               ) : (
                 // if something is found > list them
-                filteredPeople.map((person) => (
+                filteredPeople?.map((person) => (
                   <Combobox.Option
                     key={person.id}
                     className={({ active }) =>

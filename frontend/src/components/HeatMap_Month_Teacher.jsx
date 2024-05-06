@@ -1,47 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import dayjs from "dayjs";
 import { useMainContext } from "../hooks/mainContext";
 import CalHeatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import Tooltip from "cal-heatmap/plugins/Tooltip";
 import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
-import { FiChevronLeft } from "react-icons/fi";
-import { FiChevronRight } from "react-icons/fi";
-import { IconContext } from "react-icons/lib";
 
 const HeatMap_Month = ({ journal }) => {
-  const { showDate, setShowDate } = useMainContext();
-  const [data, setData] = useState([]);
-  const monthNames = [
-    "Tammikuu",
-    "Helmikuu",
-    "Maaliskuu",
-    "Huhtikuu",
-    "Toukokuu",
-    "Kesäkuu",
-    "Heinäkuu",
-    "Elokuu",
-    "Syyskuu",
-    "Lokakuu",
-    "Marraskuu",
-    "Joulukuu",
-  ];
-
-  const handlePreviousMonthClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
-    setShowDate(newDate);
-  };
-
-  const handleNextMonthClick = (e) => {
-    e.preventDefault();
-    const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
-    setShowDate(newDate);
-  };
+  const { showDate } = useMainContext();
+  const calRef = useRef(null);
 
   useEffect(() => {
+    if (calRef.current) calRef.current.destroy();
+
     // clean up the data for the heatmap
-    const entries = journal.journal_entries.map((entry) => {
+    const data = journal.journal_entries.map((entry) => {
       const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
       let value = entry.length_in_minutes;
 
@@ -53,20 +26,11 @@ const HeatMap_Month = ({ journal }) => {
         entry_type: entry.entry_type_id,
       };
     });
-    setData(entries);
-  }, [journal]);
-
-  useEffect(() => {
-    const container = document.getElementById(
-      `cal-heatmapMonth${journal.user_id}`
-    );
-    if (!container) return;
-    container.innerHTML = "";
 
     const theme = document.querySelector("html").getAttribute("data-theme");
 
-    const cal = new CalHeatmap();
-    cal.paint(
+    calRef.current = new CalHeatmap();
+    calRef.current.paint(
       {
         itemSelector: `#cal-heatmapMonth${journal.user_id}`,
         theme: theme,
@@ -169,12 +133,7 @@ const HeatMap_Month = ({ journal }) => {
         ],
       ]
     );
-
-    return () => {
-      const cal = document.querySelector("#cal-heatmapMonth");
-      if (cal) cal.innerHTML = "";
-    };
-  }, [data, showDate]);
+  }, [journal, showDate]);
 
   return (
     <div className="flex w-full flex-col gap-4 text-center">

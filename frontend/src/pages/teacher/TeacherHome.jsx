@@ -189,7 +189,6 @@ function TeacherHome() {
                   Toimipiste:{" "}
                   <p
                     onClick={() => {
-                      handleFilterReset();
                       setSelectedCampus(journal.campus);
                     }}
                     className="text-textPrimary hover:cursor-pointer"
