@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-function Toast({ text, onDone, style }) {
+const Toast = ({ text, onDone, style }) => {
     const [isVisible, setIsVisible] = useState(true);
   
     const hideToast = () => {
@@ -31,6 +31,4 @@ function Toast({ text, onDone, style }) {
     );
   }
   
-  
-  
-    export default Toast;
+export default Toast;

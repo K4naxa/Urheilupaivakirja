@@ -81,15 +81,15 @@
 @keyframes fadeIn {
   from {
     opacity: 0.2;
-    transform: translateY(-20%); /* Starts slightly above its natural position */
+    transform: translateY(-20%);
   }
   to {
     opacity: 1;
-    transform: translateY(0); /* Settles at its natural position */
+    transform: translateY(0);
   }
 }
 
-/* Animation for sliding and fading out */
+
 .toast.fade-out {
   animation: fadeOut 0.5s ease-out forwards;
 }
@@ -97,11 +97,11 @@
 @keyframes fadeOut {
   from {
     opacity: 1;
-    transform: translateY(0); /* Starts at its natural position */
+    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(20%); /* Moves slightly below its natural position */
+    transform: translateY(20%);
   }
 }
 
