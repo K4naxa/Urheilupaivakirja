@@ -1,8 +1,13 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
+import dayjs from "dayjs";
 import trainingService from "../../../../services/trainingService.js";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ConfirmModal } from "../../../../components/confirm-modal/confirmModal.jsx";
+import { useToast } from "../../../../hooks/toast-messages/useToast.jsx";
+import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import "../EditJournalEntryPage.css";
 
-const NewJournalEntryPage = ({entryId}) => {
+const EditJournalEntryPage = ({ entryId }) => {
   //TODO: new date = today (from other branch)
   const [journalData, setJournalData] = useState({
     entry_id: "",
@@ -19,7 +24,11 @@ const NewJournalEntryPage = ({entryId}) => {
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [showDetails, setShowDetails] = useState(false);
-  const [conflict, setConflict] = useState({ value: false, message: "" });
+  const [conflict, setConflict] = useState({
+    value: false,
+    message: "",
+    messageShort: "",
+  });
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
   const [existingEntries, setExistingEntries] = useState([]);
 
@@ -581,4 +590,4 @@ const NewJournalEntryPage = ({entryId}) => {
   );
 };
 
-export default NewJournalEntryPage;
+export default EditJournalEntryPage;

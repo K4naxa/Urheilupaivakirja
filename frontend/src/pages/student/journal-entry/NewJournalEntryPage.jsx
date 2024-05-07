@@ -79,9 +79,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     queryFn: () => trainingService.getJournalEntryOptions(),
   });
 
-  useEffect(() => {
-    console.log("Errors:", errors);
-  }, [errors]);
 
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {

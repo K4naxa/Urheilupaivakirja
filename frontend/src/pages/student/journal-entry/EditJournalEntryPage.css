@@ -1,0 +1,164 @@
+
+.journal-entry-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--dark-primary-backgroundcolor);
+    border: 1px solid var(--dark-primary-filler-linecolor);
+    border-radius: 10px;
+    background: white;
+  }
+  
+  .journal-entry-header-container {
+    color: var(--dark-primary-textcolor);
+    background-color: var(--dark-secondary-backgroundcolor);
+    border-radius: 10px 10px 0px 0px;
+    border: 1px solid var(--dark-primary-filler-linecolor);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 73px;
+    width: 559px;
+    font-size: 24px;
+    margin-bottom: 2rem;
+  }
+  
+  .journal-entry-form {
+    width: 559px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .journal-entry-input-container {
+    color: var(--dark-primary-textcolor);
+    font-size: 16px;
+    width: 386px;
+    margin: 1.5rem 0;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .upper-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0px 0 40px 0;
+  }
+  
+  .journal-entry-input-container > input {
+    color: var(--dark-primary-inputtextcolor);
+    padding: 0.5rem;
+    width: 100%;
+    height: 30px;
+    font-size: 20px;
+    margin-top: 5px;
+    border-radius: 10px;
+    background-color: var(--dark-secondary-backgroundcolor);
+    border: 1px solid var(--dark-primary-filler-linecolor);
+  }
+  
+  .button-container .buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .submit-button {
+    color: var(--primary-textcolor);
+    font-size: 16px;
+    width: 178px;
+    height: 54px;
+    padding: 0.5rem;
+    border-radius: 10px;
+    background-color: rgb(63, 63, 63);
+    border: 1px solid var(--dark-primary-filler-linecolor);
+    cursor: pointer;
+  }
+  
+  .submit-button:disabled {
+    background-color:rgba(112, 112, 112, 0.2);
+    color: rgba(211, 211, 211, 0.2);
+    border: 1px solid rgba(211, 211, 211, 0.1);
+    cursor: not-allowed;
+  
+  
+  }
+  
+  .journal-entry-button {
+    background-color: var(--dark-lightblue-buttoncolor);
+    color: black;
+  }
+  
+  .radio-option-horizontal-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .journal-entry-radio-button {
+    float: left;
+    margin: 0 5px 0 0;
+    width: 100px;
+    height: 40px;
+    position: relative;
+  }
+  
+  .journal-entry-radio-button label,
+  .journal-entry-radio-button input {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 4px;
+    border: 2px solid grey;
+  }
+  
+  .journal-entry-radio-button input[type="radio"] {
+   display: none;
+  }
+  
+  .journal-entry-radio-button input[type="radio"]:checked + label {
+    background: #20b8be;
+    border-radius: 4px;
+    border: 2px solid grey;
+  }
+  
+  .journal-entry-radio-button label {
+    text-align: center;
+    cursor: pointer;
+    line-height: 1.8em;
+  }
+  
+  .missing-input {
+    border-left: 5px solid rgba(255, 0, 0, 0.7);
+  }
+  
+  .journal-entry-button-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 386px;
+    margin: 1rem 0;
+  }
+  
+  .journal-entry-delete-button {
+      position: absolute;
+      color: var(--primary-textcolor);
+      right: 20px;
+      font-size: 16px;
+      width: 42px;
+      height: 42px;
+      padding: 0.5rem;
+      border-radius: 10px;
+      background-color: maroon;
+      border: 1px solid var(--dark-primary-filler-linecolor);
+      cursor: pointer;
+  }
