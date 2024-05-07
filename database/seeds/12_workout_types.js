@@ -8,6 +8,6 @@ exports.seed = async function(knex) {
   await knex('workout_types').insert([
     {name: 'Akatemia'},
     {name: 'Seura'},
-    {name: 'Oma harjoitus'},
+    {name: 'Oma'},
   ]);
 };

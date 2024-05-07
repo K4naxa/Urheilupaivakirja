@@ -5,7 +5,6 @@
 
 formatDate = (date) => {
   date.setUTCHours(0, 0, 0, 0);
-  console.log("date: ", date);
   return date;
 };
 

@@ -1,7 +1,7 @@
 .toast-container {
   position: fixed;
   z-index: 999;
-  width: 200px;
+  width: 250px;
   padding: 0.5rem;
   display: flex;
   flex-direction: column;
@@ -14,6 +14,8 @@
   padding: 1rem;
   cursor: pointer;
   overflow: hidden;
+  text-align: center;
+  border-width: 1px;
 }
 
 .toast-container.top-left {
@@ -49,21 +51,57 @@
 }
 
 .toast-success {
+  border-color: #c3e6cb;
   background: #d4edda;
   color: #155724;
 }
 
 .toast-error {
+  border-color: #f5c6cb;
   background: #f8d7da;
   color: #721c24;
 }
 
 .toast-info {
+  border-color: #bee5eb;
   background: #cce5ff;
   color: black;
 }
 
 .toast-warning {
+  border-color: #ffeeba;
   background: #fff3cd;
   color: #856404;
 }
+
+.toast.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.2;
+    transform: translateY(-20%); /* Starts slightly above its natural position */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* Settles at its natural position */
+  }
+}
+
+/* Animation for sliding and fading out */
+.toast.fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0); /* Starts at its natural position */
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20%); /* Moves slightly below its natural position */
+  }
+}
+

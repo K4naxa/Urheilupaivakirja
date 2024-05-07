@@ -1,9 +1,11 @@
 /** @type {import('tailwindcss').Config} */
+
 export default {
   mode: "jit",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      
       colors: {
         bgkPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
         bgkSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
@@ -36,7 +38,14 @@ export default {
 
         primary: "rgb(var(--color-header-primary) / <alpha-value>)",
         secondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
+        sickday: "rgb(var(--color-sick) / <alpha-value>)",
+        restday: "rgb(var(--color-rest) / <alpha-value>)",
 
+        sickdayLight: "rgb(var(--color-sick-light) / <alpha-value>)",
+        restdayLight: "rgb(var(--color-rest-light) / <alpha-value>)",
+
+        sickdayDark: "rgb(var(--color-sick-dark) / <alpha-value>)",
+        restdayDark: "rgb(var(--color-rest-dark) / <alpha-value>)",
       },
 
       gridTemplateColumns: {
@@ -49,7 +58,7 @@ export default {
       },
       boxShadow: {
         "upper-shadow": "0 -10px 10px -10px rgba(0, 0, 0, 0.2)",
-      },
+        'error': 'inset 4px 0 0 -2px #ef4444'},
       animation: {
         "spin-slow": "spin 3s linear infinite",
         "menu-appear-right": "slideInFromRight 0.3s forwards",
@@ -90,7 +99,13 @@ export default {
             opacity: "1",
           },
         },
+          ringWidth: ['focus-visible'],
+          ringColor: ['focus-visible'],
+
+          
       },
+
+      
     },
   },
   plugins: [],

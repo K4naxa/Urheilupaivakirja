@@ -129,9 +129,9 @@ const HeatMap_Month = ({ journal }) => {
           y: "value",
           groupY: "sum",
         },
-        scale: {
+        scale: {  
           color: {
-            range: ["#CCA700", "gray", "lightgreen", "green", "darkgreen"],
+            range: ["rgb(231, 154, 63)", "rgb(93, 148, 205)", "lightgreen", "green", "darkgreen"],
             type: "linear",
             domain: [-99, 0, 60, 120, 180],
           },
