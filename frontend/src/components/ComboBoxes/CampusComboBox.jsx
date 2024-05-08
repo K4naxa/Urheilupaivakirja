@@ -24,7 +24,7 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
             {/* default input field */}
             <Combobox.Input
               className="w-full border-none p-2
-                focus-visible:outline-none bg-bgkSecondary"
+                focus-visible:outline-none bg-bgkSecondary z-0"
               displayValue={(campus) => campus?.name}
               placeholder="Hae Toimipiste"
               onChange={(event) => setQuery(event.target.value)}

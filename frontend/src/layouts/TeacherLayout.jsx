@@ -32,7 +32,7 @@ const TeacherLayout = () => {
     <div className="text-textPrimary">
       <header
         id="desktop-header"
-        className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden 
+        className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden z-10
           border-b-2 px-4 py-2 text-xl shadow-md max-h-20 lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">

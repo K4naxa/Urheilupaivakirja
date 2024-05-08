@@ -35,10 +35,9 @@ const HeatMap_Weeks = ({ journal }) => {
     calRef.current.fill(data);
   }, [journal, screenWidth]);
   // create new Heatmap
+
   useEffect(() => {
-    if (calRef.current) {
-      return;
-    }
+    if (calRef.current) return;
 
     // clean up the data for the heatmap
     const entries = journal.journal_entries.map((entry) => {

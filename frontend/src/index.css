@@ -33,13 +33,9 @@
     --color-rest: 93 148 205;
     --color-sick: 231 154 63;
 
-
-
-    --color-rest-light: 143, 198, 255;
-    --color-sick-light: 255, 178, 87; 
-
-    --color-rest-dark: 43, 98, 155; 
-    --color-sick-dark: 181, 104, 13;
+    --color-list-exercice: 240 250 240;
+    --color-list-sick: 250 240 240;
+    --color-list-rest: 240 240 250;
   }
 
   :root[data-theme="dark"] {
@@ -58,6 +54,10 @@
     --color-gray: 100 100 100;
     --color-green: 0 128 0;
     --color-red: 128 0 0;
+
+    --color-list-exercice: 40 50 40;
+    --color-list-sick: 50 35 35;
+    --color-list-rest: 40 40 50;
   }
 
   body {
