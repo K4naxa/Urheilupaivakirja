@@ -5,7 +5,6 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      
       colors: {
         bgkPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
         bgkSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
@@ -25,11 +24,15 @@ export default {
         btnGreen: "rgb(var(--color-green) / <alpha-value>)",
         btnRed: "rgb(var(--color-red) / <alpha-value>)",
 
+        listExercise: "rgb(var(--color-list-exercice) / <alpha-value>)",
+        listRest: "rgb(var(--color-list-rest) / <alpha-value>)",
+        listSick: "rgb(var(--color-list-sick) / <alpha-value>)",
+
         modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",
 
         //ALTERNATIVE COLORS
         bgPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
-        bgSecondary:  "rgb(var(--color-bg-secondary) / <alpha-value>)",
+        bgSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
 
         //textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
         //textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",
@@ -58,7 +61,8 @@ export default {
       },
       boxShadow: {
         "upper-shadow": "0 -10px 10px -10px rgba(0, 0, 0, 0.2)",
-        'error': 'inset 4px 0 0 -2px #ef4444'},
+        error: "inset 4px 0 0 -2px #ef4444",
+      },
       animation: {
         "spin-slow": "spin 3s linear infinite",
         "menu-appear-right": "slideInFromRight 0.3s forwards",
@@ -99,13 +103,9 @@ export default {
             opacity: "1",
           },
         },
-          ringWidth: ['focus-visible'],
-          ringColor: ['focus-visible'],
-
-          
+        ringWidth: ["focus-visible"],
+        ringColor: ["focus-visible"],
       },
-
-      
     },
   },
   plugins: [],

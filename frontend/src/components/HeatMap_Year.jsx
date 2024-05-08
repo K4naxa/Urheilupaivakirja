@@ -64,7 +64,14 @@ const HeatMap_Year = ({ journal }) => {
         },
         scale: {
           color: {
-            range: ["#CCA700", "gray", "lightgreen", "green", "darkgreen"],
+            range: [
+              "rgb(231, 154, 63)",
+              "gray",
+              "lightgreen",
+              "green",
+              "darkgreen",
+            ],
+
             type: "linear",
             domain: [-99, 0, 60, 120, 180],
           },

@@ -36,10 +36,20 @@ const labelClass = "text-textSecondary min-w-16";
 
 const RecentJournalEntry = ({ entry }) => {
   const { openBigModal } = useJournalModal();
+
+  let bgColor = "";
+  if (entry.entry_type === "Sairaana") bgColor = "bg-listSick";
+  if (entry.entry_type === "Lepo") bgColor = "bg-listRest";
+  if (entry.entry_type_id === 1) bgColor = "bg-listExercise";
+
+  console.log(entry);
+
   return (
-    <div className=" bg-bgkSecondary flex w-full snap-start flex-col rounded-md p-2 shadow-md shadow-gray-700 ">
+    <div
+      className={` bg-bgkSecondary flex w-full flex-col rounded-md p-2 shadow-md ${bgColor}`}
+    >
       {/* Header */}
-      <div className="bg-bgkSecondary border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
+      <div className=" border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
         {entry.entry_type &&
           (entry.entry_type === "Lepo" || entry.entry_type === "Sairaana") && (
             <p className="text-textPrimary col-start-1 mx-2 justify-self-start">
@@ -52,7 +62,7 @@ const RecentJournalEntry = ({ entry }) => {
           </p>
         )}
         <button
-          onClick={() => openBigModal('edit', { entryId: entry.id })}
+          onClick={() => openBigModal("edit", { entryId: entry.id })}
           className="col-start-3 mx-4 justify-self-end"
         >
           <FiEdit3 />
@@ -108,24 +118,34 @@ const RecentJournalEntry = ({ entry }) => {
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
 const RecentJournalEntries = ({ journal }) => {
-  if (!journal) {
-    return;
-  }
-
-  return (
-    <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
-      <h2 className="text-lg">Viimeisimmät merkinnät</h2>
-      <div
-        className="flex w-full 
+  if (journal.length === 0) {
+    return (
+      <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
+        <h2 className="text-lg">Viimeisimmät merkinnät</h2>
+        <div
+          className="flex w-full 
+        flex-col gap-4 overflow-y-auto
+        overscroll-none rounded-md scroll-smooth text-center bg-bgkSecondary h-full"
+        >
+          Ei merkintöjä
+        </div>
+      </div>
+    );
+  } else
+    return (
+      <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
+        <h2 className="text-lg">Viimeisimmät merkinnät</h2>
+        <div
+          className="flex w-full 
         flex-col gap-4 overflow-y-auto
         overscroll-none rounded-md scroll-smooth"
-      >
-        {journal.map((entry) => (
-          <RecentJournalEntry key={entry.id} entry={entry} />
-        ))}
+        >
+          {journal.map((entry) => (
+            <RecentJournalEntry key={entry.id} entry={entry} />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default RecentJournalEntries;

@@ -34,30 +34,30 @@ const HeatMap_Month = ({ journal }) => {
   const handleDateClick = (event, date) => {
     const targetElement = event.target;
     const rect = targetElement.getBoundingClientRect();
-  
+
     const modalWidth = 228;
     const verticalMargin = 5;
     const arrowWidth = -10;
 
-    const idealLeft = rect.left + rect.width / 2 - modalWidth / 2 + window.scrollX; // Perfect center position
+    const idealLeft =
+      rect.left + rect.width / 2 - modalWidth / 2 + window.scrollX; // Perfect center position
     const screenWidth = window.innerWidth;
-  
+
     // Adjusted for screen overflow
     let left = Math.max(0, Math.min(screenWidth - modalWidth, idealLeft));
-    let top = rect.top + rect.height + window.scrollY + verticalMargin;  // Added vertical margin
-  
+    let top = rect.top + rect.height + window.scrollY + verticalMargin; // Added vertical margin
+
     // Calculate arrow position based on the modal's actual position
-    let arrowLeft = modalWidth / 2;  // Center arrow in modal by default
+    let arrowLeft = modalWidth / 2; // Center arrow in modal by default
     if (left !== idealLeft) {
       // Calculate offset if modal was moved due to boundary constraints
-      arrowLeft += (idealLeft - left);
+      arrowLeft += idealLeft - left;
     }
     arrowLeft += arrowWidth;
     console.log("arrowLeft in heatmap", arrowLeft);
     // Pass to the modal display function
     showDateModal(left, top, arrowLeft, date);
   };
-  
 
   const handlePreviousMonthClick = (e) => {
     e.preventDefault();
@@ -129,9 +129,15 @@ const HeatMap_Month = ({ journal }) => {
           y: "value",
           groupY: "sum",
         },
-        scale: {  
+        scale: {
           color: {
-            range: ["rgb(231, 154, 63)", "rgb(93, 148, 205)", "lightgreen", "green", "darkgreen"],
+            range: [
+              "rgb(231, 154, 63)",
+              "gray",
+              "lightgreen",
+              "green",
+              "darkgreen",
+            ],
             type: "linear",
             domain: [-99, 0, 60, 120, 180],
           },
