@@ -28,6 +28,18 @@
     --color-red: 230 0 0;
 
     --color-modal-bg-primary: 75 75 75;
+
+    /*NEW COLORS HERE*/
+    --color-rest: 93 148 205;
+    --color-sick: 231 154 63;
+
+
+
+    --color-rest-light: 143, 198, 255;
+    --color-sick-light: 255, 178, 87; 
+
+    --color-rest-dark: 43, 98, 155; 
+    --color-sick-dark: 181, 104, 13;
   }
 
   :root[data-theme="dark"] {
@@ -72,9 +84,8 @@
     &:active {
       scale: 0.95;
     }
-  }ö
-
-  .IconButton {
+  }
+  ö .IconButton {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -180,8 +191,8 @@ a.active {
   }
 
   /* Hide scrollbar for IE, Edge, and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .right-neg-one-point-five {

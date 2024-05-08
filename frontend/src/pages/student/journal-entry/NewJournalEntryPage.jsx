@@ -1,22 +1,21 @@
-import { useState, useLayoutEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import dayjs from "dayjs";
 import trainingService from "../../../services/trainingService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ConfirmModal } from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 
 //const headerContainer = "bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
-const inputContainer = "flex flex-col items-center gap-3 w-full";
+const inputContainer =
+  "flex flex-col items-center gap-0.5 sm:gap-1 w-full max-w-[370px] p-1";
 const inputLabel = "text-textPrimary font-medium";
-const optionContainer = "flex flex-row gap-6 justify-between";
+const optionContainer = "flex justify-between w-full p-2";
 
 const NewJournalEntryPage = ({ onClose, date }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
-  console.log(date);
   console.log("Initial date:", initialDate);
 
   const [newJournalEntryData, setNewJournalEntryData] = useState({
@@ -34,7 +33,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
-  const [showDetails, setShowDetails] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
     value: false,
     message: "",
@@ -79,6 +78,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     queryKey: ["options"],
     queryFn: () => trainingService.getJournalEntryOptions(),
   });
+
 
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
@@ -148,12 +148,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
   };
 
-  const entryTypeChangeHandler = (e) => {
-    const { value } = e.target;
-
+  const entryTypeChangeHandler = (type) => {
+    const newType = newJournalEntryData.entry_type === type ? "1" : type;
     setNewJournalEntryData((prevState) => ({
       ...prevState,
-      entry_type: value,
+      entry_type: newType,
     }));
   };
 
@@ -196,13 +195,26 @@ const NewJournalEntryPage = ({ onClose, date }) => {
       return false;
     };
 
+    const validateDateFormat = (date, fieldName) => {
+      const regex = /^\d{4}-\d{2}-\d{2}$/; //YYYY-MM-DD
+      if (!regex.test(date)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [fieldName]: true,
+        }));
+        return true;
+      }
+      return false;
+    };
+
     // if entry type is not 1, 2 or 3
     if (![1, 2, 3].includes(Number(newJournalEntryData.entry_type))) {
       setErrors((prevErrors) => ({ ...prevErrors, entry_type: true }));
       hasMissingInputs = true;
     }
 
-    hasMissingInputs |= checkIfEmpty(newJournalEntryData.date, "date"); // Using bitwise OR to update hasMissingInputs
+    hasMissingInputs |= checkIfEmpty(newJournalEntryData.date, "date");
+    hasMissingInputs |= validateDateFormat(newJournalEntryData.date, "date");
 
     if (newJournalEntryData.entry_type === "1") {
       hasMissingInputs |= checkIfEmpty(
@@ -336,7 +348,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   const renderRadioButton = (name, value, label, onChangeHandler) => {
     return (
-      <div className="relative mr-1 ml-1 w-24" key={`${name}-${value}`}>
+      <div className="relative w-24" key={`${name}-${value}`}>
         <input
           type="radio"
           name={name}
@@ -349,9 +361,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:border-headerPrimary peer-checked:text-headerPrimary
-           peer-focus:ring-2 peer-focus:ring-headerSecondary py-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
-           active:scale-95 transition-transform duration-75"
+          className="peer-checked:border-headerPrimary  peer-checked:text-bgkSecondary peer-checked:bg-headerPrimary bg-bgkSecondary
+          peer-focus-visible:ring-2 peer-focus-visible:ring-headerSecondary p-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
+          active:scale-95 transition-transform duration-75 hover:border-headerPrimary hover:text-headerPrimary"
         >
           {label}
         </label>
@@ -419,9 +431,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         declineButton="Peruuta"
         closeOnOutsideClick={false}
       />
-      <div className="flex flex-col h-full sm:border  sm:border-borderPrimary sd:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
+      <div className="flex flex-col h-full sm:border  sm:border-borderPrimary sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
         <div className="relative bg-headerPrimary p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
-          <p>Uusi merkintä</p>
+          <p className="sm:min-w-[400px] cursor-default	">Uusi merkintä</p>
           <button
             onClick={onClose}
             className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl"
@@ -430,28 +442,39 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           </button>
         </div>
         <form
-          className="flex flex-col items-center gap-4 p-4 pt-6 sm:p-8 bg-bgkSecondary sm:rounded-b-md flex-grow"
+          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgkSecondary sm:rounded-b-md flex-grow"
           onSubmit={newJournalEntryHandler}
         >
-          <div className={inputContainer}>
-            <div className={optionContainer}>
-              {optionsData.journal_entry_types.map((entry) =>
-                renderRadioButton(
-                  "entry_type",
-                  entry.id.toString(),
-                  entry.name,
-                  entryTypeChangeHandler
-                )
-              )}
+          <div className="flex flex-col items-center w-full p-1">
+            <div className="flex flex-row gap-12 justify-between">
+              <button
+                type="button"
+                onClick={() => entryTypeChangeHandler("2")}
+                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
+              border-2 ${newJournalEntryData.entry_type === "2" ? "border-restday bg-restday" : "border-restday bg-bgkSecondary"}
+              `}
+              >
+                Lepopäivä
+              </button>
+
+              <button
+                type="button"
+                onClick={() => entryTypeChangeHandler("3")}
+                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
+              border-2 ${newJournalEntryData.entry_type === "3" ? "border-sickday bg-sickday" : "border-sickday bg-bgkSecondary"}
+              `}
+              >
+                Sairauspäivä
+              </button>
             </div>
           </div>
 
-          <div className={inputContainer}>
+          <div className={`${inputContainer} px-2.5`}>
             <label className={inputLabel} htmlFor="date-picker">
               Päivämäärä
             </label>
             <input
-              className="  text-textPrimary border-borderPrimary h-10 w-full bg-bgSecondary focus-visible:outline-none  border-b p-1 "
+              className={`text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b p-1 ${errors.date ? "border-red-500" : "border-borderPrimary"} text-center`}
               type="date"
               name="date"
               value={newJournalEntryData.date}
@@ -462,31 +485,29 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           {newJournalEntryData.entry_type === "1" && (
             <div
-              className={`${inputContainer} ${
-                errors.length_in_minutes ? "border-l-4 border-red-500" : ""
-              }`}
+              className={`${inputContainer} ${errors.length_in_minutes ? "shadow-error" : ""}`}
             >
               <label className={inputLabel} htmlFor="length_in_minutes">
                 Kesto: {convertTime(newJournalEntryData.length_in_minutes)}
               </label>
-              <input
-                className="bg-bgkPrimary  w-full p-1 "
-                type="range"
-                min="30"
-                max="180"
-                value={newJournalEntryData.length_in_minutes}
-                step="15"
-                id="length_in_minutes"
-                onChange={changeHandler}
-                name="length_in_minutes"
-              />
+              <div className="w-full p-1">
+                <input
+                  className="bg-bgkPrimary w-full"
+                  type="range"
+                  min="30"
+                  max="180"
+                  value={newJournalEntryData.length_in_minutes}
+                  step="15"
+                  id="length_in_minutes"
+                  onChange={changeHandler}
+                  name="length_in_minutes"
+                />
+              </div>
             </div>
           )}
           {newJournalEntryData.entry_type === "1" && (
             <div
-              className={`${inputContainer} ${
-                errors.time_of_day ? "border-l-4 border-red-500" : ""
-              }`}
+              className={`${inputContainer} ${errors.time_of_day ? "shadow-error" : ""}`}
             >
               <label className={inputLabel}>Ajankohta</label>
               <div className={optionContainer}>
@@ -504,9 +525,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           {newJournalEntryData.entry_type === "1" && (
             <div
-              className={`${inputContainer} ${
-                errors.workout_type ? "border-l-4 border-red-500" : ""
-              }`}
+            className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
             >
               <label className={inputLabel}>Harjoitustyyppi</label>
               <div className={optionContainer}>
@@ -525,15 +544,13 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           {newJournalEntryData.entry_type === "1" &&
             newJournalEntryData.workout_type === "3" && (
               <div
-                className={`${inputContainer} ${
-                  errors.workout_category ? "border-l-4 border-red-500" : ""
-                }`}
+                className={`${inputContainer} px-2.5 ${errors.workout_category ? "shadow-error" : ""}`}
               >
                 <label className={inputLabel} htmlFor="workout-category">
                   Harjoituskategoria
                 </label>
                 <select
-                  className="text-lg text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full  border-b p-1"
+                  className={`text-md text-textPrimary bg-bgkSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
                   id="workoutCategory"
                   name="workout_category"
                   value={newJournalEntryData.workout_category}
@@ -551,9 +568,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           {newJournalEntryData.entry_type === "1" && (
             <div
-              className={`${inputContainer} ${
-                errors.intensity ? "border-l-4 border-red-500" : ""
-              }`}
+              className={`${inputContainer} ${errors.intensity ? "shadow-error" : ""}`}
             >
               <label className={inputLabel}>Rankkuus</label>
               <div className={optionContainer}>
@@ -571,11 +586,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           <div className={inputContainer}>
             <label
-              className={inputLabel}
+              className={`${inputLabel} cursor-pointer flex items-center gap-1`}
               htmlFor="details-textarea"
               onClick={() => setShowDetails((prevState) => !prevState)}
             >
-              Lisätiedot
+              Lisätiedot {(showDetails && <FiChevronUp className="text-lg"/>) || <FiChevronDown className="text-lg"/>}
             </label>
             {showDetails && (
               <textarea
@@ -595,10 +610,10 @@ const NewJournalEntryPage = ({ onClose, date }) => {
             )}
           </div>
 
-          <div className="flex flex-col text-red-400 items-center gap-4 w-full p-4 mt-auto">
+          <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
             <button
-              className={`text-white w-44 h-14 rounded-md bg-headerPrimary border-borderPrimary active:scale-95 transition-transform duration-75
+              className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-headerPrimary border-borderPrimary active:scale-95 transition-transform duration-75
     ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
               type="submit"
               disabled={submitButtonIsDisabled}

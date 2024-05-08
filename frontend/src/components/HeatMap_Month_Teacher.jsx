@@ -91,7 +91,7 @@ const HeatMap_Month = ({ journal }) => {
         },
         scale: {
           color: {
-            range: ["#CCA700", "gray", "lightgreen", "green", "darkgreen"],
+            range: ["blue", "gray", "lightgreen", "green", "darkgreen"],
             type: "linear",
             domain: [-99, 0, 60, 120, 180],
           },

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 const ConfirmModal = ({
@@ -44,13 +44,13 @@ const ConfirmModal = ({
       onClick={closeOnOutsideClick ? onDecline : undefined}
     >
       <div
-        className="flex max-w-[420px] flex-col bg-bgkSecondary gap-2 p-8 m-4 rounded-md shadow-md"
+        className="flex max-w-[420px] flex-col bg-bgkSecondary gap-4 p-6 m-4 rounded-md shadow-lg border border-borderPrimary"
         onClick={(e) => {
           e.stopPropagation();
         }}
       >
-        <p>{text}</p>
-        <div className="flex justify-center gap-8 mt-4">
+        <p className="text-center">{text}</p>
+        <div className="flex justify-center gap-8">
         <button className="w-20 py-1.5 border rounded-md border-borderPrimary bg-headerPrimary" onClick={onAgree}>{agreeButton}</button>
         <button className="w-20 py-1.5 border rounded-md border-borderPrimary bg-btnGray" onClick={onDecline}>{declineButton}</button>
         </div>

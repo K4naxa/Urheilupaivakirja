@@ -17,13 +17,16 @@ const NewJournalEntryModal = ({ isOpen, onClose, content }) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-2 overflow-hidden">
-      <div className="w-full h-full sm:w-auto sm:h-auto sm:rounded-md sm:shadow-lg overflow-hidden flex flex-col">
-        {content}
+    <div className="fixed inset-0 flex items-start justify-center bg-black bg-opacity-50 z-2 overflow-hidden">
+      <div className="w-full h-full sm:w-auto sm:h-auto sm:rounded-md sm:shadow-lg overflow-hidden flex flex-col sm:mt-[5vh]">
+        <div className="flex flex-col h-full max-h-full sm:max-h-[90vh] overflow-auto">
+          {content}
+        </div>
       </div>
     </div>,
     document.getElementById("big-modal-container")
   );
+  
 };
 
 export default NewJournalEntryModal;
