@@ -4,11 +4,11 @@ import trainingService from "../services/trainingService";
 import formatDate from "../utils/formatDate";
 import { cc } from "../utils/cc";
 import {
-  StartOfWeekOptions,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   isSameMonth,
+  isToday,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
@@ -22,11 +22,12 @@ function CalendarDay({ day, showWeekName, showDate }) {
     <div
       className={cc(
         "MonthDate relative",
-        !isSameMonth(day, showDate) && "bg-bgPrimary "
+        !isSameMonth(day, showDate) && "bg-bgPrimary ",
+        isToday(day) && "border  border-headerPrimary"
       )}
     >
       {showWeekName && (
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-textSecondary ">
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-textSecondary text-xs">
           {formatDate(day, { weekday: "short" })}
         </div>
       )}
@@ -36,7 +37,7 @@ function CalendarDay({ day, showWeekName, showDate }) {
   );
 }
 
-function MonthCalendar() {
+function MonthCalendar({ journal }) {
   const { showDate } = useMainContext();
 
   // create an array for the month
@@ -45,8 +46,10 @@ function MonthCalendar() {
       weekStartsOn: 1,
     });
     const lastWeekEnd = endOfWeek(endOfMonth(showDate));
-    return eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd });
-  }, [showDate]);
+    let days = eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd });
+    console.log(journal);
+    return days;
+  }, [showDate, journal]);
 
   return (
     <div className="MonthGrid   w-full h-full  gap-1 p-8">
@@ -70,9 +73,9 @@ function Testisivu() {
   });
 
   return (
-    <div className="flex flex-col max-w-96 w-full gap-80">
-      <MonthCalendar />
-      <HeatMap_Month journal={studentJournalData} />
+    <div className="flex flex-col max-w-96 w-full gap-24">
+      <MonthCalendar journal={studentJournalData} />
+      {/* <HeatMap_Month journal={studentJournalData} /> */}
     </div>
   );
 }

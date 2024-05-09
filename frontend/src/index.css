@@ -89,8 +89,11 @@
   .MonthDate {
     aspect-ratio: 1;
     border-radius: 5px;
-    justify-items: center;
+    font-size: 10px;
+    text-align: center;
+    justify-content: center;
     align-content: center;
+    color: rgb(var(--color-text-secondary));
     background-color: rgb(var(--color-bg-secondary));
   }
 
