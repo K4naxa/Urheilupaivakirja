@@ -85,6 +85,20 @@
       scale: 0.95;
     }
   }
+
+  .MonthDate {
+    aspect-ratio: 1;
+    border-radius: 5px;
+    justify-items: center;
+    align-content: center;
+    background-color: rgb(var(--color-bg-secondary));
+  }
+
+  .MonthGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
   ö .IconButton {
     display: flex;
     justify-content: center;

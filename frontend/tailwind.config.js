@@ -50,7 +50,6 @@ export default {
         sickdayDark: "rgb(var(--color-sick-dark) / <alpha-value>)",
         restdayDark: "rgb(var(--color-rest-dark) / <alpha-value>)",
       },
-
       gridTemplateColumns: {
         merkInfo: "auto 1fr",
         mainPage: "repeat(3, 330px))",
