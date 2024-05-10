@@ -3,7 +3,6 @@ import {
   eachDayOfInterval,
   eachMonthOfInterval,
   endOfMonth,
-  endOfWeek,
   endOfYear,
   isSameDay,
   isSameMonth,
@@ -14,11 +13,19 @@ import {
   startOfYear,
 } from "date-fns";
 
+import { useAuth } from "../../hooks/useAuth";
+
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
 
 export default function HeatMap_Year({ journal }) {
+  const { user } = useAuth();
+
+  if (user.role === 1) {
+    journal = journal.journal_entries;
+  }
+
   const { showDate } = useMainContext();
 
   const calendaryYear = useMemo(() => {
@@ -70,6 +77,8 @@ export default function HeatMap_Year({ journal }) {
 }
 
 function CalendarDay({ day, journal, month, showDate }) {
+  const { user } = useAuth();
+
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 
@@ -98,6 +107,7 @@ function CalendarDay({ day, journal, month, showDate }) {
       className={cc(
         "YearDate border relative rounded-sm hover:border-headerPrimary",
         !isSameMonth(day, month[10]) && "invisible",
+        user.role === 1 && "bg-bgPrimary",
         isToday(day) && "border-headerPrimary",
         handleColor(minutes)
       )}

@@ -4,6 +4,7 @@ import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 
 import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
+import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/HeatMap_Month_Teacher.jsx";
 import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
@@ -297,7 +298,7 @@ function TeacherHome() {
                     Laji: {journal.sport}
                   </p>
                 </div>
-                <HeatMap_Year_Teacher journal={journal} />
+                <HeatMap_Year journal={journal} />
               </div>
             ))}
           </div>
