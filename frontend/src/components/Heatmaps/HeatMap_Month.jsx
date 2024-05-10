@@ -67,13 +67,13 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
     <div
       className={cc(
         "MonthDate relative border",
-        !isSameMonth(day, showDate) && "bg-bgPrimary hover:border-none",
+        !isSameMonth(day, showDate) && "invisible",
         isToday(day) && "border  border-headerPrimary",
         handleColor(minutes)
       )}
     >
       {showWeekName && (
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-textSecondary text-xs">
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-textSecondary visible text-xs">
           {formatDate(day, { weekday: "short" })}
         </div>
       )}
