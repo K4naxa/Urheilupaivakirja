@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import PractiseBoxes from "../../components/PractiseBoxes";
-import HeatMap_Month from "../../components/HeatMap_Month";
+import HeatMap_Month from "../../components/cal-HeatMap_Month";
 import HeatMap_Year from "../../components/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
 import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";

@@ -28,6 +28,13 @@ export default {
         listRest: "rgb(var(--color-list-rest) / <alpha-value>)",
         listSick: "rgb(var(--color-list-sick) / <alpha-value>)",
 
+        heatmapExercise1: "rgb(var(--color-heatmap-exercise1) / <alpha-value>)",
+        heatmapExercise2: "rgb(var(--color-heatmap-exercise2) / <alpha-value>)",
+        heatmapExercise3: "rgb(var(--color-heatmap-exercise3) / <alpha-value>)",
+
+        heatmapRest: "rgb(var(--color-heatmap-rest) / <alpha-value>)",
+        heatmapSick: "rgb(var(--color-heatmap-sick) / <alpha-value>)",
+
         modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",
 
         //ALTERNATIVE COLORS
