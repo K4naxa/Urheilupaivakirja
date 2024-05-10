@@ -41,10 +41,7 @@ function HeatMap_Month({ journal }) {
   });
 
   return (
-    <div
-      {...handlers}
-      className="MonthGrid   w-full h-full max-w-96  gap-1 p-8"
-    >
+    <div {...handlers} className="MonthGrid   w-full h-full max-w-96  gap-1">
       {calendarDays.map((day, index) => (
         <CalendarDay
           key={day.getTime()}

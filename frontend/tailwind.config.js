@@ -24,7 +24,7 @@ export default {
         btnGreen: "rgb(var(--color-green) / <alpha-value>)",
         btnRed: "rgb(var(--color-red) / <alpha-value>)",
 
-        listExercise: "rgb(var(--color-list-exercice) / <alpha-value>)",
+        listExercise: "rgb(var(--color-list-exercise) / <alpha-value>)",
         listRest: "rgb(var(--color-list-rest) / <alpha-value>)",
         listSick: "rgb(var(--color-list-sick) / <alpha-value>)",
 

@@ -40,14 +40,14 @@ export default function HeatMap_Year({ journal }) {
   }, [calendaryYear]);
 
   return (
-    <div className="YearGrid p-4 overflow-x-auto">
+    <div className="YearGrid overflow-x-auto pl-2 pb-2">
       {calendarMonths.map((month, index) => {
         return (
           <div key={month[index].getTime()}>
             <div className="text-center text-xs text-textSecondary">
               {formatDate(month[index], { month: "long" })}
             </div>
-            <div className="YearMonthGrid gap-[2px] lg:gap-1">
+            <div className="relative YearMonthGrid gap-[2px] lg:gap-1">
               {month.map((day) => {
                 return (
                   <CalendarDay
