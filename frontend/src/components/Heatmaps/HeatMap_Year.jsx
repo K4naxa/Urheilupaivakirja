@@ -39,9 +39,6 @@ export default function HeatMap_Year({ journal }) {
     return days;
   }, [calendaryYear]);
 
-  console.log(calendaryYear);
-  console.log(calendarMonths);
-
   return (
     <div className="YearGrid p-4 overflow-x-auto">
       {calendarMonths.map((month, index) => {
@@ -73,7 +70,6 @@ export default function HeatMap_Year({ journal }) {
 }
 
 function CalendarDay({ day, journal, month, showDate }) {
-  console.log(journal);
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 

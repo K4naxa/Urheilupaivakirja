@@ -9,13 +9,14 @@ import {
   startOfWeek,
 } from "date-fns";
 import { useMemo } from "react";
+import { useSwipeable } from "react-swipeable";
 
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
 
 function HeatMap_Month({ journal }) {
-  const { showDate } = useMainContext();
+  const { showDate, setShowDate } = useMainContext();
 
   // create an array for the month
   const calendarDays = useMemo(() => {
@@ -26,8 +27,24 @@ function HeatMap_Month({ journal }) {
     return eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd });
   }, [showDate]);
 
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      const previousMonth = new Date(showDate);
+      previousMonth.setMonth(previousMonth.getMonth() + 1);
+      setShowDate(previousMonth);
+    },
+    onSwipedRight: () => {
+      const nextMonth = new Date(showDate);
+      nextMonth.setMonth(nextMonth.getMonth() - 1);
+      setShowDate(nextMonth);
+    },
+  });
+
   return (
-    <div className="MonthGrid   w-full h-full max-w-96  gap-1 p-8">
+    <div
+      {...handlers}
+      className="MonthGrid   w-full h-full max-w-96  gap-1 p-8"
+    >
       {calendarDays.map((day, index) => (
         <CalendarDay
           key={day.getTime()}
