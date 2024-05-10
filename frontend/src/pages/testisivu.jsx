@@ -4,12 +4,14 @@ import { IconContext } from "react-icons/lib";
 
 import HeatMap_Month from "../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../components/Heatmaps/HeatMap_Year";
+import HeatMap_Weeks from "../components/Heatmaps/HeatMap_Weeks";
 import trainingService from "../services/trainingService";
 import formatDate from "../utils/formatDate";
 
 import { useQuery } from "@tanstack/react-query";
 
 import { useMainContext } from "../hooks/mainContext";
+import { addMonths, subMonths } from "date-fns";
 
 function Testisivu() {
   const { showDate, setShowDate } = useMainContext();
@@ -27,10 +29,7 @@ function Testisivu() {
           <button
             className="hover:underline"
             onClick={() => {
-              // Subtract one month from the current showDate
-              const previousMonth = new Date(showDate);
-              previousMonth.setMonth(previousMonth.getMonth() - 1);
-              setShowDate(previousMonth); // Update showDate
+              setShowDate(subMonths(showDate, 1)); // Update showDate
             }}
           >
             <IconContext.Provider
@@ -45,10 +44,7 @@ function Testisivu() {
           <button
             className="hover:fill-blue-500 hover:underline"
             onClick={() => {
-              // Subtract one month from the current showDate
-              const previousMonth = new Date(showDate);
-              previousMonth.setMonth(previousMonth.getMonth() + 1);
-              setShowDate(previousMonth); // Update showDate
+              setShowDate(addMonths(showDate, 1)); // Update showDate
             }}
           >
             <IconContext.Provider
@@ -62,7 +58,7 @@ function Testisivu() {
       <div>
         <HeatMap_Month journal={studentJournalData} />
       </div>
-      <HeatMap_Year journal={studentJournalData} />
+      <HeatMap_Weeks journal={studentJournalData} />
     </div>
   );
 }
