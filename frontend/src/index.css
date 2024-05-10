@@ -110,10 +110,12 @@
 
   .YearDate {
     aspect-ratio: 1;
+    height: auto;
     justify-content: center;
     align-items: center;
     color: rgb(var(--color-text-secondary));
     background-color: rgb(var(--color-bg-secondary));
+    border-color: rgb(var(--color-bg-secondary));
   }
 
   .YearMonthGrid {

@@ -23,8 +23,7 @@ function HeatMap_Month({ journal }) {
       weekStartsOn: 1,
     });
     const lastWeekEnd = endOfWeek(endOfMonth(showDate));
-    let days = eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd });
-    return days;
+    return eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd });
   }, [showDate]);
 
   return (
@@ -49,12 +48,17 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
     if (!isSameMonth(day, showDate)) return;
     if (!journal) return;
 
-    if (minutes > 30 && minutes <= 60) return "bg-heatmapExercise1";
-    if (minutes > 60 && minutes <= 120) return "bg-heatmapExercise2 text-white";
-    if (minutes > 120) return "bg-heatmapExercise3 text-white";
+    if (minutes > 30 && minutes <= 60)
+      return "bg-heatmapExercise1 border-heatmapExercise1";
+    if (minutes > 60 && minutes <= 120)
+      return "bg-heatmapExercise2 border-heatmapExercise2 text-white";
+    if (minutes > 120)
+      return "bg-heatmapExercise3 border-heatmapExercise3  text-white";
 
-    if (journal[0]?.entry_type_id === 2) return "bg-heatmapRest text-white";
-    if (journal[0]?.entry_type_id === 3) return "bg-heatmapSick text-white";
+    if (journal[0]?.entry_type_id === 2)
+      return "bg-heatmapRest border-heatmapRest text-white";
+    if (journal[0]?.entry_type_id === 3)
+      return "bg-heatmapSick border-heatmapSick text-white";
 
     return null;
   }
@@ -62,8 +66,8 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
   return (
     <div
       className={cc(
-        "MonthDate relative",
-        !isSameMonth(day, showDate) && "bg-bgPrimary",
+        "MonthDate relative border",
+        !isSameMonth(day, showDate) && "bg-bgPrimary hover:border-none",
         isToday(day) && "border  border-headerPrimary",
         handleColor(minutes)
       )}

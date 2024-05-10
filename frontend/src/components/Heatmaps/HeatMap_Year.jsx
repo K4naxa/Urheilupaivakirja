@@ -82,12 +82,17 @@ function CalendarDay({ day, journal, month, showDate }) {
     if (!isSameYear(day, showDate)) return;
     if (!journal) return;
 
-    if (minutes > 30 && minutes <= 60) return "bg-heatmapExercise1";
-    if (minutes > 60 && minutes <= 120) return "bg-heatmapExercise2 text-white";
-    if (minutes > 120) return "bg-heatmapExercise3 text-white";
+    if (minutes > 30 && minutes <= 60)
+      return "bg-heatmapExercise1 border-heatmapExercise1";
+    if (minutes > 60 && minutes <= 120)
+      return "bg-heatmapExercise2 text-white border-heatmapExercise2";
+    if (minutes > 120)
+      return "bg-heatmapExercise3 text-white border-heatmapExercise3";
 
-    if (journal[0]?.entry_type_id === 2) return "bg-heatmapRest text-white";
-    if (journal[0]?.entry_type_id === 3) return "bg-heatmapSick text-white";
+    if (journal[0]?.entry_type_id === 2)
+      return "bg-heatmapRest text-white border-heatmapRest";
+    if (journal[0]?.entry_type_id === 3)
+      return "bg-heatmapSick text-white border-heatmapSick";
 
     return null;
   }
@@ -95,9 +100,9 @@ function CalendarDay({ day, journal, month, showDate }) {
   return (
     <div
       className={cc(
-        "YearDate relative rounded-sm",
-        !isSameMonth(day, month[10]) && "bg-bgPrimary",
-        isToday(day) && "shadow-inner shadow-headerPrimary",
+        "YearDate border relative rounded-sm hover:border-headerPrimary",
+        !isSameMonth(day, month[10]) && "invisible",
+        isToday(day) && "border-headerPrimary",
         handleColor(minutes)
       )}
     ></div>
