@@ -5,7 +5,7 @@ import { useMainContext } from "../../hooks/mainContext.jsx";
 
 import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
-import HeatMap_Month from "../../components/HeatMap_Month_Teacher.jsx";
+import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
 import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
@@ -17,6 +17,8 @@ import CampusComboBox from "../../components/ComboBoxes/CampusComboBox.jsx";
 import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
+import { addMonths, subMonths } from "date-fns";
+import formatDate from "../../utils/formatDate.ts";
 
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
@@ -123,32 +125,6 @@ function TeacherHome() {
 
   const RenderMonths = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
-    const handlePreviousMonthClick = (e) => {
-      e.preventDefault();
-      const newDate = new Date(showDate.getFullYear(), showDate.getMonth() - 1);
-      setShowDate(newDate);
-    };
-
-    const handleNextMonthClick = (e) => {
-      e.preventDefault();
-      const newDate = new Date(showDate.getFullYear(), showDate.getMonth() + 1);
-      setShowDate(newDate);
-    };
-
-    const monthNames = [
-      "Tammikuu",
-      "Helmikuu",
-      "Maaliskuu",
-      "Huhtikuu",
-      "Toukokuu",
-      "Kesäkuu",
-      "Heinäkuu",
-      "Elokuu",
-      "Syyskuu",
-      "Lokakuu",
-      "Marraskuu",
-      "Joulukuu",
-    ];
 
     if (journals.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
@@ -160,7 +136,9 @@ function TeacherHome() {
             <div className="hover: flex justify-center gap-4">
               <button
                 className="hover:underline"
-                onClick={handlePreviousMonthClick}
+                onClick={() => {
+                  setShowDate(subMonths(showDate, 1));
+                }}
               >
                 <IconContext.Provider
                   value={{ className: "hover:text-graphPrimary" }}
@@ -168,10 +146,14 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl">{monthNames[showDate.getMonth()]}</p>
+              <p className="text-xl w-24">
+                {formatDate(showDate, { month: "long" })}
+              </p>
               <button
                 className="hover:fill-blue-500 hover:underline"
-                onClick={handleNextMonthClick}
+                onClick={() => {
+                  setShowDate(addMonths(showDate, 1));
+                }}
               >
                 <IconContext.Provider
                   value={{ className: "hover:text-graphPrimary" }}
@@ -185,7 +167,7 @@ function TeacherHome() {
             {journals.map((journal) => (
               <div
                 key={journal.user_id}
-                className="flex flex-col gap-2 w-60 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
+                className="flex flex-col gap-2 w-64 rounded-md bg-bgkSecondary p-4 border border-headerPrimary shadow-md hover:shadow-headerPrimary"
                 id="studentCard"
               >
                 <div className="flex flex-col">

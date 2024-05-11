@@ -11,12 +11,15 @@ import {
 import { useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
 
+import { useAuth } from "../../hooks/useAuth";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
 
 function HeatMap_Month({ journal }) {
   const { showDate, setShowDate } = useMainContext();
+
+  if (journal.journal_entries) journal = journal.journal_entries;
 
   // create an array for the month
   const calendarDays = useMemo(() => {
@@ -41,7 +44,7 @@ function HeatMap_Month({ journal }) {
   });
 
   return (
-    <div {...handlers} className="MonthGrid   w-full h-full max-w-96  gap-1">
+    <div {...handlers} className="MonthGrid w-full h-full pt-6  gap-1">
       {calendarDays.map((day, index) => (
         <CalendarDay
           key={day.getTime()}
@@ -55,6 +58,7 @@ function HeatMap_Month({ journal }) {
   );
 }
 function CalendarDay({ day, showWeekName, journal, showDate }) {
+  const { user } = useAuth();
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 
@@ -82,6 +86,7 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
       className={cc(
         "MonthDate relative border",
         !isSameMonth(day, showDate) && "invisible",
+        user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-headerPrimary",
         handleColor(minutes)
       )}

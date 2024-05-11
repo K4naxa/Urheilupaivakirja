@@ -95,13 +95,14 @@
   .MonthDate {
     display: block;
     aspect-ratio: 1;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 10px;
     text-align: center;
     justify-content: center;
     align-content: center;
     color: rgb(var(--color-text-secondary));
     background-color: rgb(var(--color-bg-secondary));
+    border-color: rgb(var(--color-bg-secondary));
 
     &:hover {
       border: 1px solid rgb(var(--color-header-primary));
@@ -135,8 +136,9 @@
 
   .MonthGrid {
     display: grid;
+    width: 100%;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-row: auto;
   }
 
   ö .IconButton {

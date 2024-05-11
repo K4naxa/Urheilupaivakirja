@@ -47,14 +47,14 @@ export default function HeatMap_Year({ journal }) {
   }, [calendaryYear]);
 
   return (
-    <div className="YearGrid overflow-x-auto pl-2 pb-2">
+    <div className="YearGrid overflow-x-auto gap-1 pb-2">
       {calendarMonths.map((month, index) => {
         return (
           <div key={month[index].getTime()}>
             <div className="text-center text-xs text-textSecondary">
               {formatDate(month[index], { month: "long" })}
             </div>
-            <div className="relative YearMonthGrid gap-[2px] lg:gap-1">
+            <div className="relative YearMonthGrid gap-[2px]">
               {month.map((day) => {
                 return (
                   <CalendarDay
@@ -107,7 +107,7 @@ function CalendarDay({ day, journal, month, showDate }) {
       className={cc(
         "YearDate border relative rounded-sm hover:border-headerPrimary",
         !isSameMonth(day, month[10]) && "invisible",
-        user.role === 1 && "bg-bgPrimary",
+        user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border-headerPrimary",
         handleColor(minutes)
       )}

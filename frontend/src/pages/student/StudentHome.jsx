@@ -74,7 +74,7 @@ function StudentHome() {
                     <FiChevronLeft />
                   </IconContext.Provider>
                 </button>
-                <p className="text-xl">
+                <p className="text-xl w-24">
                   {formatDate(showDate, { month: "long" })}
                 </p>
                 <button
