@@ -6,7 +6,7 @@ import { useMainContext } from "../../hooks/mainContext.jsx";
 import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
-import HeatMap_Weeks from "../../components/HeatMap_Weeks.jsx";
+import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
 import StudentComboBox from "../../components/ComboBoxes/StudentsComboBox.jsx";
@@ -17,7 +17,7 @@ import CampusComboBox from "../../components/ComboBoxes/CampusComboBox.jsx";
 import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-import { addMonths, subMonths } from "date-fns";
+import { addMonths, addWeeks, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 
 function TeacherHome() {
@@ -44,19 +44,6 @@ function TeacherHome() {
       return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
     };
 
-    const handlePreviousWeekClick = (e) => {
-      e.preventDefault();
-      const newDate = new Date(showDate);
-      newDate.setDate(showDate.getDate() - 7); // Subtract 7 days to go to the previous week
-      setShowDate(newDate);
-    };
-
-    const handleNextWeekClick = (e) => {
-      e.preventDefault();
-      const newDate = new Date(showDate);
-      newDate.setDate(showDate.getDate() + 7); // Add 7 days to go to the next week
-      setShowDate(newDate);
-    };
     if (journals.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
@@ -68,7 +55,9 @@ function TeacherHome() {
             <div className="hover: flex justify-center gap-4">
               <button
                 className="hover:underline"
-                onClick={handlePreviousWeekClick}
+                onClick={() => {
+                  setShowDate(subWeeks(showDate, 1));
+                }}
               >
                 <IconContext.Provider
                   value={{ className: "hover:text-graphPrimary" }}
@@ -79,7 +68,9 @@ function TeacherHome() {
               <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
               <button
                 className="hover:fill-blue-500 hover:underline"
-                onClick={handleNextWeekClick}
+                onClick={() => {
+                  setShowDate(addWeeks(showDate, 1));
+                }}
               >
                 <IconContext.Provider
                   value={{ className: "hover:text-graphPrimary" }}
@@ -95,7 +86,7 @@ function TeacherHome() {
               // Student card
               <div
                 key={journal.user_id}
-                className="flex flex-col rounded-md j bg-bgkSecondary p-3 gap-2 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
+                className="flex flex-col rounded-md j bg-bgkSecondary p-3 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
                 id="studentCard"
               >
                 <div className="flex lg:gap-6 text-textSecondary text-xs">
@@ -105,16 +96,14 @@ function TeacherHome() {
                   <p>Ryhmä: {journal.group}</p>
                   <p>Laji: {journal.sport}</p>
                 </div>
-                <div className="flex flex-wrap justify-between gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex gap-1">
                     {" "}
                     <p> {journal.first_name}</p>
                     <p>{journal.last_name}</p>
                   </div>
 
-                  <div>
-                    <HeatMap_Weeks journal={journal} />
-                  </div>
+                  <HeatMap_Weeks journal={journal} />
                 </div>
               </div>
             ))}
@@ -444,7 +433,7 @@ function TeacherHome() {
         > */}
         <div
           id="studentList"
-          className="flex w-full gap-8 rounded-md bg-bgkSecondary p-4 mx-auto"
+          className="flex w-full gap-8 rounded-md bg-bgkSecondary p-4 justify-center"
         >
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
           {showMonths && <RenderMonths journals={filteredJournals} />}

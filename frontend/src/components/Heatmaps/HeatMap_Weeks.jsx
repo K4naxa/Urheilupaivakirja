@@ -15,12 +15,14 @@ import {
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function HeatMap_Weeks({ journal }) {
   const { showDate } = useMainContext();
+  if (journal.journal_entries) journal = journal.journal_entries;
 
   let calendarWeeks = useMemo(() => {
-    const firstWeekStart = startOfWeek(subWeeks(showDate, 1)); // start from 2 weeks ago
+    const firstWeekStart = startOfWeek(showDate); // start from 2 weeks ago
     const lastWeekEnd = endOfWeek(addWeeks(showDate, 1));
     return eachWeekOfInterval({ start: firstWeekStart, end: lastWeekEnd });
   }, [showDate]);
@@ -44,10 +46,10 @@ export default function HeatMap_Weeks({ journal }) {
   console.log(calendar);
   return (
     <div className="px-2">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-4">
         {calendar.map((week, index) => (
           <div key={index}>
-            <div className="grid grid-cols-7 max-w-60 gap-1">
+            <div className="grid grid-cols-7 gap-1">
               {week.map((day) => (
                 <CalendarDay
                   key={day.getTime()}
@@ -59,9 +61,6 @@ export default function HeatMap_Weeks({ journal }) {
                 />
               ))}
             </div>
-            <div className="text-xs text-secondary">
-              {formatDate(week[0], { month: "long" })}
-            </div>
           </div>
         ))}
       </div>
@@ -69,6 +68,7 @@ export default function HeatMap_Weeks({ journal }) {
   );
 
   function CalendarDay({ day, journal }) {
+    const { user } = useAuth();
     let minutes = 0;
     journal?.forEach((entry) => (minutes += entry.length_in_minutes));
 
@@ -93,7 +93,8 @@ export default function HeatMap_Weeks({ journal }) {
     return (
       <div
         className={cc(
-          "MonthDate relative border",
+          "MonthDate relative border w-5 lg:w-7",
+          user.role === 1 && "bg-bgPrimary border-bgPrimary",
           isToday(day) && "border  border-headerPrimary",
           handleColor(minutes)
         )}
