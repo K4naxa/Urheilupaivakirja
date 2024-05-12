@@ -50,7 +50,6 @@ function StudentHome() {
       </div>
     );
   }
-  console.log("studentJournal", studentJournalData);
   return (
     <div className="mainArea overflow-x-auto">
       <div
