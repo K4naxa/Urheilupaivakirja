@@ -33,9 +33,15 @@
     --color-rest: 93 148 205;
     --color-sick: 231 154 63;
 
-    --color-list-exercice: 240 250 240;
+    --color-list-exercise: 240 250 240;
     --color-list-sick: 250 240 240;
     --color-list-rest: 240 240 250;
+
+    --color-heatmap-exercise1: 144 238 144;
+    --color-heatmap-exercise2: 72 183 72;
+    --color-heatmap-exercise3: 0 107 0;
+    --color-heatmap-sick: 231 154 63;
+    --color-heatmap-rest: 128 128 128;
   }
 
   :root[data-theme="dark"] {
@@ -55,9 +61,9 @@
     --color-green: 0 128 0;
     --color-red: 128 0 0;
 
-    --color-list-exercice: 40 50 40;
+    --color-list-exercise: 40 60 40;
     --color-list-sick: 50 35 35;
-    --color-list-rest: 40 40 50;
+    --color-list-rest: 40 40 60;
   }
 
   body {
@@ -85,6 +91,61 @@
       scale: 0.95;
     }
   }
+
+  .MonthDate {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    font-size: 10px;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    color: rgb(var(--color-text-secondary));
+    background-color: rgb(var(--color-bg-secondary));
+    border-color: rgb(var(--color-bg-secondary));
+
+    &:hover {
+      border: 1px solid rgb(var(--color-header-primary));
+      cursor: pointer;
+    }
+  }
+
+  .YearDate {
+    aspect-ratio: 1;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    color: rgb(var(--color-text-secondary));
+    background-color: rgb(var(--color-bg-secondary));
+    border-color: rgb(var(--color-bg-secondary));
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .YearMonthGrid {
+    display: grid;
+    min-width: 95px;
+    grid-template-rows: repeat(7, auto);
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-flow: column;
+  }
+
+  .YearGrid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 1fr;
+    width: 100%;
+  }
+
+  .MonthGrid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(7, 1fr);
+    grid-row: auto;
+  }
+
   ö .IconButton {
     display: flex;
     justify-content: center;
@@ -170,12 +231,13 @@ a.active {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #d6d6d6;
+  background: rgb(var(--color-bg-secondary));
+  border-radius: 5px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--color-graph-primary));
+  background: rgb(var(--color-header-primary));
   border-radius: 5px;
 }
 
