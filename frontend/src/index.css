@@ -106,6 +106,7 @@
 
     &:hover {
       border: 1px solid rgb(var(--color-header-primary));
+      cursor: pointer;
     }
   }
 
@@ -117,6 +118,10 @@
     color: rgb(var(--color-text-secondary));
     background-color: rgb(var(--color-bg-secondary));
     border-color: rgb(var(--color-bg-secondary));
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .YearMonthGrid {

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   addWeeks,
   eachDayOfInterval,
@@ -6,11 +6,9 @@ import {
   endOfDay,
   endOfWeek,
   isSameDay,
-  isSameMonth,
   isToday,
   startOfDay,
   startOfWeek,
-  subWeeks,
 } from "date-fns";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
@@ -43,7 +41,6 @@ export default function HeatMap_Weeks({ journal }) {
     return newCalendar;
   }, [calendarWeeks]);
 
-  console.log(calendar);
   return (
     <div className="px-2">
       <div className="grid grid-cols-2 gap-4">

@@ -97,8 +97,7 @@ function TeacherHome() {
                   <p>Laji: {journal.sport}</p>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex gap-1">
-                    {" "}
+                  <div className="flex gap-1 hover:cursor-pointer hover:underline">
                     <p> {journal.first_name}</p>
                     <p>{journal.last_name}</p>
                   </div>
@@ -160,7 +159,7 @@ function TeacherHome() {
                 id="studentCard"
               >
                 <div className="flex flex-col">
-                  <p className="text-lg text-center">
+                  <p className="text-lg text-center hover:cursor-pointer hover:underline">
                     {journal.first_name} {journal.last_name}
                   </p>
                 </div>
@@ -257,7 +256,7 @@ function TeacherHome() {
                 id="studentCard"
               >
                 <div className="flex gap-4  leading-none items-end">
-                  <p className="text-lg text-center leading-none">
+                  <p className="text-lg text-center leading-none hover:cursor-pointer hover:underline">
                     {journal.first_name} {journal.last_name}
                   </p>
 
