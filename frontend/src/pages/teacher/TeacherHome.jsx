@@ -21,6 +21,7 @@ import { addMonths, addWeeks, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 
 function TeacherHome() {
+  const { setStudents } = useMainContext();
   const [journals, setJournals] = useState([]);
   const [filteredJournals, setFilteredJournals] = useState([]);
   const [options, setOptions] = useState([]); // [campuses, sports, students
@@ -329,7 +330,6 @@ function TeacherHome() {
       .then((response) => {
         setJournals(response);
         setFilteredJournals(response);
-        console.log(response);
       })
 
       .catch((error) => {
