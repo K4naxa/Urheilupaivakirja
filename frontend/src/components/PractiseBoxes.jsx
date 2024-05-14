@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useMainContext } from "../hooks/mainContext";
 import dayjs from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
+import { isSameMonth, isSameYear } from "date-fns";
 
 const PractiseBoxes = ({ journalEntries }) => {
   if (journalEntries.journal_entries)
@@ -25,14 +26,12 @@ const PractiseBoxes = ({ journalEntries }) => {
 
       // filter out by month or year based on showDate
       if (showMonth) {
-        filteredEntries = filteredEntries.filter(
-          (entry) =>
-            dayjs(entry.date).month() === dayjs(showDate).month() &&
-            dayjs(entry.date).year() === dayjs(showDate).year()
+        filteredEntries = filteredEntries.filter((entry) =>
+          isSameMonth(entry.date, showDate)
         );
       } else {
-        filteredEntries = filteredEntries.filter(
-          (entry) => dayjs(entry.date).year() === dayjs(showDate).year()
+        filteredEntries = filteredEntries.filter((entry) =>
+          isSameYear(entry.date, showDate)
         );
       }
 
