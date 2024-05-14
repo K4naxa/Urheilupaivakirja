@@ -86,7 +86,7 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
       className={cc(
         "MonthDate relative border",
         !isSameMonth(day, showDate) && "invisible",
-        user.role === 1 && "bg-bgPrimary border-bgPrimary",
+        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-headerPrimary",
         handleColor(minutes)
       )}

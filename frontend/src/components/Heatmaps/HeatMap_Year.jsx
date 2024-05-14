@@ -31,15 +31,16 @@ export default function HeatMap_Year({ journal }) {
   }, [showDate]);
 
   const calendarMonths = useMemo(() => {
-    let days = [];
+    const months = [];
     calendaryYear.forEach((month) => {
-      const firstWeekStart = startOfWeek(startOfMonth(month), {
-        weekStartsOn: 1,
+      const daysOfMonth = eachDayOfInterval({
+        start: startOfWeek(startOfMonth(month), { weekStartsOn: 1 }),
+        end: endOfMonth(month),
       });
-      const lastWeekEnd = endOfMonth(month);
-      days.push(eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd }));
+      months.push(daysOfMonth);
     });
-    return days;
+    console.log(months);
+    return months;
   }, [calendaryYear]);
 
   return (
@@ -103,7 +104,7 @@ function CalendarDay({ day, journal, month, showDate }) {
       className={cc(
         "YearDate border relative rounded-sm hover:border-headerPrimary",
         !isSameMonth(day, month[10]) && "invisible",
-        user.role === 1 && "bg-bgPrimary border-bgPrimary",
+        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border-headerPrimary",
         handleColor(minutes)
       )}
