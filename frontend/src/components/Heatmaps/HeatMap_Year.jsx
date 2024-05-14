@@ -20,11 +20,7 @@ import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
 
 export default function HeatMap_Year({ journal }) {
-  const { user } = useAuth();
-
-  if (user.role === 1) {
-    journal = journal.journal_entries;
-  }
+  if (journal.journal_entries) journal = journal.journal_entries;
 
   const { showDate } = useMainContext();
 

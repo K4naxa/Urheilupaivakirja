@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useMainContext } from "../hooks/mainContext";
 import CreateGraphCell from "./CreateGraphCell";
 import dayjs from "dayjs";
+import { isSameMonth, isSameYear } from "date-fns";
 
 export default function WorkoutActivityChart({ journal }) {
   if (journal.journal_entries) journal = journal.journal_entries;
@@ -21,12 +22,12 @@ export default function WorkoutActivityChart({ journal }) {
 
     let filteredEntries = [...journal];
     if (showMonth) {
-      filteredEntries = filteredEntries.filter(
-        (entry) => dayjs(entry.date).month() === dayjs(showDate).month()
+      filteredEntries = filteredEntries.filter((entry) =>
+        isSameMonth(entry, showDate)
       );
     } else {
-      filteredEntries = filteredEntries.filter(
-        (entry) => dayjs(entry.date).year() === dayjs(showDate).year()
+      filteredEntries = filteredEntries.filter((entry) =>
+        isSameYear(entry, showDate)
       );
     }
 
