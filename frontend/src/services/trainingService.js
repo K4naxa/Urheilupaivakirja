@@ -26,7 +26,6 @@ const getJournalEntries = async () => {
 
 const getUserJournalEntriesByUserId = async (user_id) => {
   const response = await axios.get(`/journal/user/${user_id}`, makeHeader());
-  console.log(response);
   return response.data;
 };
 

@@ -19,6 +19,7 @@ import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
 import { addMonths, addWeeks, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
+import { Link } from "react-router-dom";
 
 function TeacherHome() {
   const { setStudents } = useMainContext();
@@ -98,10 +99,13 @@ function TeacherHome() {
                   <p>Laji: {journal.sport}</p>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex gap-1 hover:cursor-pointer hover:underline">
+                  <Link
+                    to={`/opettaja/opiskelijat/${journal.user_id}`}
+                    className="flex gap-1 hover:cursor-pointer hover:underline"
+                  >
                     <p> {journal.first_name}</p>
                     <p>{journal.last_name}</p>
-                  </div>
+                  </Link>
 
                   <HeatMap_Weeks journal={journal} />
                 </div>

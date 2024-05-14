@@ -50,48 +50,49 @@ router.get("/user", async (req, res, next) => {
     });
 });
 
-//get all user journals by id
+//get all user journals by id for Teacher
 router.get("/user/:id", async (req, res, next) => {
   const user_id = req.params.id;
-  knex("journal_entries")
-    .select(
-      "journal_entries.id",
-      "journal_entries.length_in_minutes",
-      "journal_entries.date",
-      "journal_entries.intensity",
-      "journal_entries.details",
-      "journal_entries.entry_type_id",
-      "journal_entry_types.name as entry_type",
-      "workout_types.name as workout_type",
-      "workout_categories.name as workout_category",
-      "time_of_day.name as time_of_day"
-    )
-    .where("journal_entries.user_id", "=", user_id)
-    .join(
-      "journal_entry_types",
-      "journal_entries.entry_type_id",
-      "journal_entry_types.id"
-    )
-    .leftJoin(
-      "workout_types",
-      "journal_entries.workout_type_id",
-      "workout_types.id"
-    )
-    .leftJoin(
-      "workout_categories",
-      "journal_entries.workout_category_id",
-      "workout_categories.id"
-    )
-    .leftJoin("time_of_day", "journal_entries.time_of_day_id", "time_of_day.id")
-    .orderBy("journal_entries.date", "desc")
-    .then((rows) => {
-      console.log(rows);
-      res.json(rows);
-    })
-    .catch((err) => {
-      console.error("SELECT * FROM `journal_entries` failed", err);
-      res.status(500).json({ error: err });
-    });
+  try {
+    // Get all journal entries
+    const allEntries = await knex
+      .select("*")
+      .from("journal_entries")
+      .where("user_id", "=", user_id);
+    // Get all students
+    const studentInfo = await knex
+      .select(
+        "user_id",
+        "first_name",
+        "last_name",
+        "sports.name as sport",
+        "student_groups.group_identifier",
+        "campuses.name as campus"
+      )
+      .from("students")
+      .where("user_id", "=", user_id)
+      .leftJoin("sports", "students.sport_id", "sports.id")
+      .leftJoin("student_groups", "students.group_id", "student_groups.id")
+      .leftJoin("campuses", "students.campus_id", "campuses.id");
+
+    console.log(studentInfo);
+
+    // Map all students to include their journal entries
+    const student = studentInfo.map((info) => ({
+      user_id: info.user_id,
+      first_name: info.first_name,
+      last_name: info.last_name,
+      sport: info.sport,
+      group: info.group_identifier,
+      campus: info.campus,
+      journal_entries: allEntries,
+    }));
+
+    res.json(student[0]);
+  } catch (err) {
+    console.error("Failed to fetch data", err);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
 });
 
 // Get all journal entries

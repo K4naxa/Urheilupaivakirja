@@ -4,6 +4,8 @@ import dayjs from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 
 const PractiseBoxes = ({ journalEntries }) => {
+  if (journalEntries.journal_entries)
+    journalEntries = journalEntries.journal_entries;
   const { showDate } = useMainContext();
   const [showMonth, setShowMonth] = useState(true);
   const [trainingData, setTrainingData] = useState({
@@ -18,7 +20,7 @@ const PractiseBoxes = ({ journalEntries }) => {
   useEffect(() => {
     if (journalEntries) {
       let filteredEntries = journalEntries.filter(
-        (entry) => entry.intensity !== null,
+        (entry) => entry.intensity !== null
       );
 
       // filter out by month or year based on showDate
@@ -26,11 +28,11 @@ const PractiseBoxes = ({ journalEntries }) => {
         filteredEntries = filteredEntries.filter(
           (entry) =>
             dayjs(entry.date).month() === dayjs(showDate).month() &&
-            dayjs(entry.date).year() === dayjs(showDate).year(),
+            dayjs(entry.date).year() === dayjs(showDate).year()
         );
       } else {
         filteredEntries = filteredEntries.filter(
-          (entry) => dayjs(entry.date).year() === dayjs(showDate).year(),
+          (entry) => dayjs(entry.date).year() === dayjs(showDate).year()
         );
       }
 
@@ -42,18 +44,18 @@ const PractiseBoxes = ({ journalEntries }) => {
 
       // get unique days of the month or year that have exercises
       const uniqueDays = new Set(
-        filteredEntries.map((entry) => dayjs(entry.date).date()),
+        filteredEntries.map((entry) => dayjs(entry.date).date())
       );
 
       // Calculate activity as a percentage
       dayjs.extend(dayOfYear);
       if (showMonth) {
         activity = Math.floor(
-          (uniqueDays.size / dayjs(showDate).daysInMonth()) * 100,
+          (uniqueDays.size / dayjs(showDate).daysInMonth()) * 100
         );
       } else {
         activity = Math.floor(
-          (uniqueDays.size / dayjs(showDate).dayOfYear()) * 100,
+          (uniqueDays.size / dayjs(showDate).dayOfYear()) * 100
         );
       }
 

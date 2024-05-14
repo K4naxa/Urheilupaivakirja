@@ -4,6 +4,7 @@ import CreateGraphCell from "./CreateGraphCell";
 import dayjs from "dayjs";
 
 export default function WorkoutActivityChart({ journal }) {
+  if (journal.journal_entries) journal = journal.journal_entries;
   const [data, setData] = useState({});
   const [showMonth, setShowMonth] = useState(true);
   const { showDate } = useMainContext();

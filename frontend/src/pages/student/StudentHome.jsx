@@ -56,7 +56,7 @@ function StudentHome() {
         className={`bg-bgkPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-12`}
       >
         <div className=" flex flex-col justify-between gap-4 align-middle">
-          <div className="grid place-items-center  gap-8">
+          <div className="grid place-items-center  gap-4">
             <div className="flex w-full flex-col justify-center text-center">
               {/* controls */}
               <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>

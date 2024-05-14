@@ -116,6 +116,7 @@ const RecentJournalEntry = ({ entry }) => {
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
 const RecentJournalEntries = ({ journal }) => {
+  if (journal.journal_entries) journal = journal.journal_entries;
   if (journal.length === 0) {
     return (
       <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
