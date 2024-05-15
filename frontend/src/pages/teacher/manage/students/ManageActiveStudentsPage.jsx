@@ -4,6 +4,8 @@ import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 import StudentsComboBox from "../../../../components/ComboBoxes/StudentsComboBox.jsx";
 import { Link } from "react-router-dom";
 
+import { FiChevronUp } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
 import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
@@ -160,42 +162,61 @@ const ManageActiveStudentsPage = () => {
   else
     return (
       <div className="bg-bgSecondary rounded-md p-4">
-        <div className="flex justify-between mb-4">
+        <div className="flex flex-wrap gap-4 justify-center sm:justify-between mb-4">
           <StudentsComboBox
             journals={students}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
           />
-          <div className="flex gap-2">
-            <p>Lajittele</p>
-            <button
+          <div className="flex gap-2 flex-wrap text-sm text-textSecondary">
+            <div
+              className="flex items-center hover:underline hover:cursor-pointer"
               onClick={() => {
                 handleNameSorting();
               }}
             >
-              Nimi
-            </button>
-            <button
+              Nimi{" "}
+              <p className="w-6">
+                {sorting.name === 1 && <FiChevronUp />}
+                {sorting.name === -1 && <FiChevronDown />}
+              </p>
+            </div>
+            <div
+              className="flex items-center hover:underline hover:cursor-pointer"
               onClick={() => {
                 handleSportSorting();
               }}
             >
               Laji
-            </button>
-            <button
+              <p className="w-6">
+                {sorting.sport === 1 && <FiChevronUp />}
+                {sorting.sport === -1 && <FiChevronDown />}
+              </p>
+            </div>
+            <div
+              className="flex items-center hover:underline hover:cursor-pointer"
               onClick={() => {
                 handleGroupSorting();
               }}
             >
               Ryhmä
-            </button>
-            <button
+              <p className="w-6">
+                {sorting.group === 1 && <FiChevronUp />}
+                {sorting.group === -1 && <FiChevronDown />}
+              </p>
+            </div>
+            <div
+              className="flex items-center hover:underline hover:cursor-pointer"
               onClick={() => {
                 handleCampusSorting();
               }}
             >
               Toimipaikka
-            </button>
+              <p className="w-6">
+                {sorting.campus === 1 && <FiChevronUp />}
+                {sorting.campus === -1 && <FiChevronDown />}
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-4">

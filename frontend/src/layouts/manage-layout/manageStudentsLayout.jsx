@@ -3,6 +3,12 @@ import { NavLink, Outlet } from "react-router-dom";
 const ManageStudentsLayout = () => {
   return (
     <div className="flex flex-col gap-4 w-full">
+      <div
+        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+       rounded-b-md shadow-md"
+      >
+        Opiskelija Hallinta
+      </div>
       <div className="pt-3 flex flex-col w-full items-center">
         <nav
           id="manage-students-nav"
