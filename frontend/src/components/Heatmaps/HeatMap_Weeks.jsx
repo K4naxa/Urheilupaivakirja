@@ -72,7 +72,7 @@ export default function HeatMap_Weeks({ journal }) {
     function handleColor(minutes) {
       if (!journal) return;
 
-      if (minutes > 30 && minutes <= 60)
+      if (minutes > 1 && minutes <= 60)
         return "bg-heatmapExercise1 border-heatmapExercise1";
       if (minutes > 60 && minutes <= 120)
         return "bg-heatmapExercise2 border-heatmapExercise2 text-white";

@@ -44,7 +44,7 @@ export default function HeatMap_Year({ journal }) {
 
   return (
     <div className="YearGrid overflow-x-auto gap-1 pb-2">
-      {calendarMonths.map((month, index) => {
+      {calendarMonths.map((month) => {
         // Get the 5th day of the month
         const fifthDayOfMonth = month.find((day) => day.getDate() === 5);
 
@@ -84,7 +84,7 @@ function CalendarDay({ day, journal, month, showDate }) {
     if (!isSameYear(day, showDate)) return;
     if (!journal) return;
 
-    if (minutes > 30 && minutes <= 60)
+    if (minutes > 1 && minutes <= 60)
       return "bg-heatmapExercise1 border-heatmapExercise1";
     if (minutes > 60 && minutes <= 120)
       return "bg-heatmapExercise2 text-white border-heatmapExercise2";

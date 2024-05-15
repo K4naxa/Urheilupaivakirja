@@ -51,15 +51,49 @@ router.get("/user", async (req, res, next) => {
 });
 
 //get all user journals by id for Teacher
+//get all user journals by id for Teacher
 router.get("/user/:id", async (req, res, next) => {
   const user_id = req.params.id;
   try {
-    // Get all journal entries
+    // Get all journal entries along with related information
     const allEntries = await knex
-      .select("*")
+      .select(
+        "journal_entries.id",
+        "journal_entries.length_in_minutes",
+        "journal_entries.date",
+        "journal_entries.intensity",
+        "journal_entries.details",
+        "journal_entries.entry_type_id",
+        "journal_entry_types.name as entry_type",
+        "workout_types.name as workout_type",
+        "workout_categories.name as workout_category",
+        "time_of_day.name as time_of_day"
+      )
       .from("journal_entries")
-      .where("user_id", "=", user_id);
-    // Get all students
+      .where("user_id", "=", user_id)
+      .leftJoin(
+        "journal_entry_types",
+        "journal_entries.entry_type_id",
+        "journal_entry_types.id"
+      )
+      .leftJoin(
+        "workout_types",
+        "journal_entries.workout_type_id",
+        "workout_types.id"
+      )
+      .leftJoin(
+        "workout_categories",
+        "journal_entries.workout_category_id",
+        "workout_categories.id"
+      )
+      .leftJoin(
+        "time_of_day",
+        "journal_entries.time_of_day_id",
+        "time_of_day.id"
+      )
+      .orderBy("journal_entries.date", "desc");
+
+    // Get student information
     const studentInfo = await knex
       .select(
         "user_id",
