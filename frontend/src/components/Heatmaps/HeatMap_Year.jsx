@@ -39,17 +39,19 @@ export default function HeatMap_Year({ journal }) {
       });
       months.push(daysOfMonth);
     });
-    console.log(months);
     return months;
   }, [calendaryYear]);
 
   return (
     <div className="YearGrid overflow-x-auto gap-1 pb-2">
       {calendarMonths.map((month, index) => {
+        // Get the 5th day of the month
+        const fifthDayOfMonth = month.find((day) => day.getDate() === 5);
+
         return (
-          <div key={month[index].getTime()}>
+          <div key={fifthDayOfMonth.getTime()}>
             <div className="text-center text-xs text-textSecondary">
-              {formatDate(month[index], { month: "long" })}
+              {formatDate(fifthDayOfMonth, { month: "long" })}
             </div>
             <div className="relative YearMonthGrid gap-[2px]">
               {month.map((day) => {
@@ -74,8 +76,6 @@ export default function HeatMap_Year({ journal }) {
 }
 
 function CalendarDay({ day, journal, month, showDate }) {
-  const { user } = useAuth();
-
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 
