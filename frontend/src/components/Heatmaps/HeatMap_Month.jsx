@@ -10,8 +10,6 @@ import {
 } from "date-fns";
 import { useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
-
-import { useAuth } from "../../hooks/useAuth";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
@@ -58,7 +56,6 @@ function HeatMap_Month({ journal }) {
   );
 }
 function CalendarDay({ day, showWeekName, journal, showDate }) {
-  const { user } = useAuth();
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 

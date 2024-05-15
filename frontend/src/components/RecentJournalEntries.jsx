@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import trainingService from "../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
 import { useJournalModal } from "../hooks/useJournalModal";
 import { useAuth } from "../hooks/useAuth";

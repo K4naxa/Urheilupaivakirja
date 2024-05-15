@@ -3,7 +3,6 @@ import trainingService from "../../services/trainingService.js";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 
-import HeatMap_Year_Teacher from "../../components/HeatMap_Year_Teacher.jsx";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
 import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
@@ -22,7 +21,6 @@ import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 
 function TeacherHome() {
-  const { setStudents } = useMainContext();
   const [journals, setJournals] = useState([]);
   const [filteredJournals, setFilteredJournals] = useState([]);
   const [options, setOptions] = useState([]); // [campuses, sports, students

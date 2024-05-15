@@ -34,7 +34,6 @@ import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import TestPage from "./pages/testPage";
-import Testisivu from "./pages/testisivu";
 
 export const router = createBrowserRouter([
   {
@@ -61,7 +60,6 @@ export const router = createBrowserRouter([
                 path: "tiedotteet",
                 element: <StudentNewsPage />,
               },
-              { path: "testisivu", element: <Testisivu /> },
             ],
           },
 
