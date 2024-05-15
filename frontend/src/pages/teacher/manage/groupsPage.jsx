@@ -8,6 +8,15 @@ import { useState, useEffect } from "react";
 function CreateGroupContainer({ group, setGroups, groups }) {
   const [editedGroup, setEditedGroup] = useState(group.group_identifier);
   const [cellError, setCellError] = useState(false);
+
+  useEffect(() => {
+    if (cellError) {
+      setTimeout(() => {
+        setCellError("");
+      }, 5000);
+    }
+  }, [cellError]);
+
   // saves the edited group to the server and updates the state
   const handleSave = () => {
     if (editedGroup.length < 4) {

@@ -2,20 +2,31 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const ManageStudentsLayout = () => {
   return (
-    <>
-      <div className="manage-students-header">
-        {" "}
-        <h1>Opiskelijoiden hallinta</h1>
-        <nav id="manage-students-nav">
-          <NavLink to="/opettaja/hallitse/opiskelijat/">Aktiiviset</NavLink> /
-          <NavLink to="/opettaja/hallitse/opiskelijat/arkistoidut">
+    <div className="flex flex-col gap-4 w-full">
+      <div className="pt-3 flex flex-col w-full items-center">
+        <nav
+          id="manage-students-nav"
+          className="flex gap-4 text-textSecondary active:text-textPrimary"
+        >
+          <NavLink
+            to="/opettaja/hallitse/opiskelijat/"
+            className="pt-2 border border-borderPrimary rounded-md  p-2 px-4"
+          >
+            Aktiiviset
+          </NavLink>{" "}
+          <NavLink
+            to="/opettaja/hallitse/opiskelijat/arkistoidut"
+            className="pt-2 border border-borderPrimary rounded-md  p-2 px-4"
+          >
             Arkistoidut
           </NavLink>
         </nav>
       </div>
 
-      <Outlet />
-    </>
+      <div>
+        <Outlet />
+      </div>
+    </div>
   );
 };
 
