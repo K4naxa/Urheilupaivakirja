@@ -24,11 +24,15 @@ const getJournalEntries = async () => {
   return response.data;
 };
 
+const getUserJournalEntriesByUserId = async (user_id) => {
+  const response = await axios.get(`/journal/user/${user_id}`, makeHeader());
+  return response.data;
+};
+
 const getAllUserJournalEntries = async () => {
   const response = await axios.get("/journal/user", makeHeader());
   return response.data;
 };
-
 
 // get journal entries by date
 const getUserJournalEntriesByDate = async (date) => {
@@ -47,7 +51,7 @@ const getJournalEntry = async (id) => {
 // post new journal entry
 
 const postJournalEntry = async (journalEntry) => {
-  var entryToSend = {}
+  var entryToSend = {};
   if (journalEntry.entry_type === "1") {
     entryToSend = {
       entry_type_id: journalEntry.entry_type,
@@ -58,15 +62,13 @@ const postJournalEntry = async (journalEntry) => {
       intensity: journalEntry.intensity,
       details: journalEntry.details,
       date: journalEntry.date,
-    }
-  }
-  else
-  {
+    };
+  } else {
     entryToSend = {
       entry_type_id: journalEntry.entry_type,
       details: journalEntry.details,
       date: journalEntry.date,
-    }
+    };
   }
   const response = await axios.post(
     "/journal_entry",
@@ -108,7 +110,7 @@ const editJournalEntry = async (journalEntry) => {
 const deleteJournalEntry = async (id) => {
   const response = await axios.delete(`/journal_entry/${id}`, makeHeader());
   return response.data;
-}
+};
 
 // ................................................................................
 
@@ -149,6 +151,7 @@ const deleteSport = async (id) => {
 
 export default {
   getAllUserJournalEntries,
+  getUserJournalEntriesByUserId,
   getUserJournalEntriesByDate,
   postJournalEntry,
   editJournalEntry,

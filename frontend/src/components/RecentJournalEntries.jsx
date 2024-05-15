@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import trainingService from "../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
 import { useJournalModal } from "../hooks/useJournalModal";
+import { useAuth } from "../hooks/useAuth";
 
 const convertTime = (totalMinutes) => {
   const hours = Math.floor(totalMinutes / 60);
@@ -35,6 +34,8 @@ const dataContainerClass = "grid grid-cols-merkInfo gap-2";
 const labelClass = "text-textSecondary min-w-16";
 
 const RecentJournalEntry = ({ entry }) => {
+  console.log(entry);
+  const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 
   let bgColor = "";
@@ -59,12 +60,14 @@ const RecentJournalEntry = ({ entry }) => {
             {formatDateToDisplay(entry.date)}
           </p>
         )}
-        <button
-          onClick={() => openBigModal("edit", { entryId: entry.id })}
-          className="col-start-3 mx-4 justify-self-end"
-        >
-          <FiEdit3 />
-        </button>
+        {user.role !== 1 && (
+          <button
+            onClick={() => openBigModal("edit", { entryId: entry.id })}
+            className="col-start-3 mx-4 justify-self-end"
+          >
+            <FiEdit3 />
+          </button>
+        )}
       </div>
       {/* content container */}
       <div className="grid w-full grid-cols-2 gap-2 p-2 pb-0">
@@ -116,6 +119,7 @@ const RecentJournalEntry = ({ entry }) => {
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
 const RecentJournalEntries = ({ journal }) => {
+  if (journal.journal_entries) journal = journal.journal_entries;
   if (journal.length === 0) {
     return (
       <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">

@@ -10,8 +10,6 @@ import {
 } from "date-fns";
 import { useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
-
-import { useAuth } from "../../hooks/useAuth";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
@@ -58,7 +56,6 @@ function HeatMap_Month({ journal }) {
   );
 }
 function CalendarDay({ day, showWeekName, journal, showDate }) {
-  const { user } = useAuth();
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 
@@ -66,7 +63,7 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
     if (!isSameMonth(day, showDate)) return;
     if (!journal) return;
 
-    if (minutes > 30 && minutes <= 60)
+    if (minutes > 1 && minutes <= 60)
       return "bg-heatmapExercise1 border-heatmapExercise1";
     if (minutes > 60 && minutes <= 120)
       return "bg-heatmapExercise2 border-heatmapExercise2 text-white";
@@ -86,7 +83,7 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
       className={cc(
         "MonthDate relative border",
         !isSameMonth(day, showDate) && "invisible",
-        user.role === 1 && "bg-bgPrimary border-bgPrimary",
+        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-headerPrimary",
         handleColor(minutes)
       )}

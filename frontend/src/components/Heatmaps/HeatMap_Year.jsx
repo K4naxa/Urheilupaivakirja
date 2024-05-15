@@ -20,11 +20,7 @@ import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
 
 export default function HeatMap_Year({ journal }) {
-  const { user } = useAuth();
-
-  if (user.role === 1) {
-    journal = journal.journal_entries;
-  }
+  if (journal.journal_entries) journal = journal.journal_entries;
 
   const { showDate } = useMainContext();
 
@@ -35,24 +31,27 @@ export default function HeatMap_Year({ journal }) {
   }, [showDate]);
 
   const calendarMonths = useMemo(() => {
-    let days = [];
+    const months = [];
     calendaryYear.forEach((month) => {
-      const firstWeekStart = startOfWeek(startOfMonth(month), {
-        weekStartsOn: 1,
+      const daysOfMonth = eachDayOfInterval({
+        start: startOfWeek(startOfMonth(month), { weekStartsOn: 1 }),
+        end: endOfMonth(month),
       });
-      const lastWeekEnd = endOfMonth(month);
-      days.push(eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd }));
+      months.push(daysOfMonth);
     });
-    return days;
+    return months;
   }, [calendaryYear]);
 
   return (
     <div className="YearGrid overflow-x-auto gap-1 pb-2">
-      {calendarMonths.map((month, index) => {
+      {calendarMonths.map((month) => {
+        // Get the 5th day of the month
+        const fifthDayOfMonth = month.find((day) => day.getDate() === 5);
+
         return (
-          <div key={month[index].getTime()}>
+          <div key={fifthDayOfMonth.getTime()}>
             <div className="text-center text-xs text-textSecondary">
-              {formatDate(month[index], { month: "long" })}
+              {formatDate(fifthDayOfMonth, { month: "long" })}
             </div>
             <div className="relative YearMonthGrid gap-[2px]">
               {month.map((day) => {
@@ -77,8 +76,6 @@ export default function HeatMap_Year({ journal }) {
 }
 
 function CalendarDay({ day, journal, month, showDate }) {
-  const { user } = useAuth();
-
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 
@@ -87,7 +84,7 @@ function CalendarDay({ day, journal, month, showDate }) {
     if (!isSameYear(day, showDate)) return;
     if (!journal) return;
 
-    if (minutes > 30 && minutes <= 60)
+    if (minutes > 1 && minutes <= 60)
       return "bg-heatmapExercise1 border-heatmapExercise1";
     if (minutes > 60 && minutes <= 120)
       return "bg-heatmapExercise2 text-white border-heatmapExercise2";
@@ -107,7 +104,7 @@ function CalendarDay({ day, journal, month, showDate }) {
       className={cc(
         "YearDate border relative rounded-sm hover:border-headerPrimary",
         !isSameMonth(day, month[10]) && "invisible",
-        user.role === 1 && "bg-bgPrimary border-bgPrimary",
+        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border-headerPrimary",
         handleColor(minutes)
       )}

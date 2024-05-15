@@ -42,25 +42,23 @@ export default function HeatMap_Weeks({ journal }) {
   }, [calendarWeeks]);
 
   return (
-    <div className="px-2">
-      <div className="grid grid-cols-2 gap-4">
-        {calendar.map((week, index) => (
-          <div key={index}>
-            <div className="grid grid-cols-7 gap-1">
-              {week.map((day) => (
-                <CalendarDay
-                  key={day.getTime()}
-                  day={day}
-                  showDate={showDate}
-                  journal={journal?.filter((journal) =>
-                    isSameDay(journal.date, day)
-                  )}
-                />
-              ))}
-            </div>
+    <div className="grid grid-cols-2 gap-4">
+      {calendar.map((week, index) => (
+        <div key={index}>
+          <div className="grid grid-cols-7 gap-1">
+            {week.map((day) => (
+              <CalendarDay
+                key={day.getTime()}
+                day={day}
+                showDate={showDate}
+                journal={journal?.filter((journal) =>
+                  isSameDay(journal.date, day)
+                )}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 
@@ -72,7 +70,7 @@ export default function HeatMap_Weeks({ journal }) {
     function handleColor(minutes) {
       if (!journal) return;
 
-      if (minutes > 30 && minutes <= 60)
+      if (minutes > 1 && minutes <= 60)
         return "bg-heatmapExercise1 border-heatmapExercise1";
       if (minutes > 60 && minutes <= 120)
         return "bg-heatmapExercise2 border-heatmapExercise2 text-white";

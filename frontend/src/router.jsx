@@ -18,6 +18,8 @@ import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
 import Verify from "./pages/teacher/verify/Verify";
 
+import StudentPage from "./pages/teacher/Studentpage";
+
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
 import Visitors from "./pages/teacher/manage/VisitorsPage";
@@ -32,7 +34,6 @@ import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import TestPage from "./pages/testPage";
-import Testisivu from "./pages/testisivu";
 
 export const router = createBrowserRouter([
   {
@@ -59,7 +60,6 @@ export const router = createBrowserRouter([
                 path: "tiedotteet",
                 element: <StudentNewsPage />,
               },
-              { path: "testisivu", element: <Testisivu /> },
             ],
           },
 
@@ -76,6 +76,8 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <TeacherHome /> },
               { path: "hyvaksy", element: <Verify /> },
+              { path: "opiskelijat/:id", element: <StudentPage /> },
+
               {
                 path: "hallitse",
                 element: <ManageLayout />,
