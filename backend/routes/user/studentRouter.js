@@ -15,27 +15,43 @@ router.get("/", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const students = await knex("students")
+    // Get all journal entries
+    const allEntries = await knex.select("*").from("journal_entries");
+    // Get all students
+    const allStudents = await knex
       .select(
-        "students.id",
-        "students.user_id",
-        "students.first_name",
-        "students.last_name",
-        "users.email",
+        "user_id",
+        "first_name",
+        "last_name",
         "sports.name as sport",
-        "student_groups.group_identifier as group",
+        "student_groups.group_identifier",
         "campuses.name as campus"
       )
-      .where("students.archived", false)
-      .leftJoin("users", "students.user_id", "users.id")
+      .from("students")
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id");
 
-    res.json(students);
-  } catch (error) {
-    console.error("Error fetching students:", error);
-    res.status(500).json({ error: "Internal server error" });
+    // Map all students to include their journal entries
+    const studentEntries = allStudents.map((student) => {
+      const studentJournalEntries = allEntries.filter(
+        (entry) => entry.user_id === student.user_id
+      );
+      return {
+        user_id: student.user_id,
+        first_name: student.first_name,
+        last_name: student.last_name,
+        sport: student.sport,
+        group: student.group_identifier,
+        campus: student.campus,
+        journal_entries: studentJournalEntries,
+      };
+    });
+
+    res.json(studentEntries);
+  } catch (err) {
+    console.error("Failed to fetch data", err);
+    res.status(500).json({ error: "Failed to fetch data" });
   }
 });
 
@@ -114,7 +130,7 @@ router.put("/archive/:id", async (req, res) => {
 // update student.news_last_viewed_at
 
 router.put("/news", async (req, res) => {
-  const user_id = getUserId(req)
+  const user_id = getUserId(req);
   if (!user_id) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -129,6 +145,6 @@ router.put("/news", async (req, res) => {
     console.error("Error updating news last viewed at:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-})
+});
 
 module.exports = router;

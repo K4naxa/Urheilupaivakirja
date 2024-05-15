@@ -19,11 +19,6 @@ const makeHeader = () => {
 
 // Journal Entries --------------------------------------------------------------------
 
-const getJournalEntries = async () => {
-  const response = await axios.get("/journal", makeHeader());
-  return response.data;
-};
-
 const getUserJournalEntriesByUserId = async (user_id) => {
   const response = await axios.get(`/journal/user/${user_id}`, makeHeader());
   return response.data;
@@ -163,5 +158,4 @@ export default {
   addSport,
   editSport,
   deleteSport,
-  getJournalEntries,
 };

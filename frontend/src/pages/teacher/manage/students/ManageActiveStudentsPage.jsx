@@ -26,7 +26,7 @@ const createStudentContainer = (student, students, setStudents) => {
   return (
     <div
       className="flex justify-between border border-headerPrimary p-2 rounded-md"
-      key={student.id}
+      key={student.user_id}
     >
       <div className="flex flex-col">
         <div className="flex flex-wrap gap-4 items-center">
@@ -38,7 +38,9 @@ const createStudentContainer = (student, students, setStudents) => {
               {student.first_name} {student.last_name}
             </div>
           </Link>
-          <p className="text-textSecondary">{student.email}</p>
+          <div className="text-textSecondary flex text-sm gap-1">
+            <p>inactivity: </p> <p>5</p> <p>days</p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="flex gap-2 text-sm">
@@ -117,6 +119,7 @@ const ManageActiveStudentsPage = () => {
     setSorting(newSorting);
   };
 
+  //useEffect for sorting and filtering students
   useEffect(() => {
     let newFiltered = [...students];
 

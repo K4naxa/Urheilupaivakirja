@@ -19,6 +19,7 @@ import { IconContext } from "react-icons/lib";
 import { addMonths, addWeeks, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
+import userService from "../../services/userService.js";
 
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
@@ -312,8 +313,8 @@ function TeacherHome() {
 
   useEffect(() => {
     // Get journal entries for all students
-    trainingService
-      .getJournalEntries()
+    userService
+      .getStudents()
       .then((response) => {
         setJournals(response);
         setFilteredJournals(response);
