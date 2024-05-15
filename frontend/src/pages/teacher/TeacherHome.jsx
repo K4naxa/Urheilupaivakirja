@@ -86,16 +86,9 @@ function TeacherHome() {
               // Student card
               <div
                 key={journal.user_id}
-                className="flex flex-col rounded-md j bg-bgkSecondary p-3 border border-headerPrimary shadow-md hover:shadow-headerPrimary w-full"
+                className="flex flex-col rounded-md j bg-bgkSecondary p-3 border border-headerPrimary shadow-sm hover:shadow-headerPrimary w-full"
                 id="studentCard"
               >
-                <div className="flex lg:gap-6 text-textSecondary text-xs">
-                  <p className="hidden lg:flex">
-                    Toimipaikka: {journal.campus}
-                  </p>
-                  <p>Ryhmä: {journal.group}</p>
-                  <p>Laji: {journal.sport}</p>
-                </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Link
                     to={`/opettaja/opiskelijat/${journal.user_id}`}
@@ -158,33 +151,18 @@ function TeacherHome() {
             {journals.map((journal) => (
               <div
                 key={journal.user_id}
-                className="flex flex-col gap-2 w-64 rounded-md border border-headerPrimary shadow-md hover:shadow-headerPrimary"
+                className="flex flex-col gap-2 w-64 rounded-md border border-headerPrimary shadow-sm hover:shadow-headerPrimary"
                 id="studentCard"
               >
-                <div className="flex flex-col pt-2">
+                <Link
+                  to={`/opettaja/opiskelijat/${journal.user_id}`}
+                  className="flex flex-col pt-2 "
+                >
                   <p className="text-lg text-center hover:cursor-pointer hover:underline">
                     {journal.first_name} {journal.last_name}
                   </p>
-                </div>
-                <div className="flex flex-col text-textSecondary px-2 text-xs">
-                  <div className="flex gap-1 ">
-                    Toimipiste:{" "}
-                    <p
-                      onClick={() => {
-                        setSelectedCampus(journal.campus);
-                      }}
-                      className="text-textPrimary hover:cursor-pointer"
-                    >
-                      {journal.campus}
-                    </p>
-                  </div>
-                  <div className="flex gap-1 ">
-                    ryhmä: <p className="text-textPrimary">{journal.group}</p>
-                  </div>
-                  <div className="flex gap-1 ">
-                    Laji: <p className="text-textPrimary">{journal.sport}</p>
-                  </div>
-                </div>
+                </Link>
+
                 <div className="bg-bgPrimary p-2 rounded-md">
                   <HeatMap_Month journal={journal} />
                 </div>
@@ -257,13 +235,16 @@ function TeacherHome() {
               <div
                 key={journal.user_id}
                 className="flex flex-col gap-2 rounded-md bg-bgkSecondary border
-               border-headerPrimary shadow-md hover:shadow-headerPrimary"
+               border-headerPrimary shadow-sm hover:shadow-headerPrimary"
                 id="studentCard"
               >
                 <div className="flex gap-4  leading-none items-end p-2">
-                  <p className="text-lg text-center leading-none hover:cursor-pointer hover:underline">
+                  <Link
+                    to={`/opettaja/opiskelijat/${journal.user_id}`}
+                    className="text-lg text-center leading-none hover:cursor-pointer hover:underline"
+                  >
                     {journal.first_name} {journal.last_name}
-                  </p>
+                  </Link>
 
                   <p className="text-textSecondary">
                     Toimipiste: {journal.campus}

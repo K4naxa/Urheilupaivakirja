@@ -42,25 +42,23 @@ export default function HeatMap_Weeks({ journal }) {
   }, [calendarWeeks]);
 
   return (
-    <div className="px-2">
-      <div className="grid grid-cols-2 gap-4">
-        {calendar.map((week, index) => (
-          <div key={index}>
-            <div className="grid grid-cols-7 gap-1">
-              {week.map((day) => (
-                <CalendarDay
-                  key={day.getTime()}
-                  day={day}
-                  showDate={showDate}
-                  journal={journal?.filter((journal) =>
-                    isSameDay(journal.date, day)
-                  )}
-                />
-              ))}
-            </div>
+    <div className="grid grid-cols-2 gap-4">
+      {calendar.map((week, index) => (
+        <div key={index}>
+          <div className="grid grid-cols-7 gap-1">
+            {week.map((day) => (
+              <CalendarDay
+                key={day.getTime()}
+                day={day}
+                showDate={showDate}
+                journal={journal?.filter((journal) =>
+                  isSameDay(journal.date, day)
+                )}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 

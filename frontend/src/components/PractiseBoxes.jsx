@@ -20,9 +20,7 @@ const PractiseBoxes = ({ journalEntries }) => {
 
   useEffect(() => {
     if (journalEntries) {
-      let filteredEntries = journalEntries.filter(
-        (entry) => entry.intensity !== null
-      );
+      let filteredEntries = journalEntries;
 
       // filter out by month or year based on showDate
       if (showMonth) {
@@ -57,6 +55,10 @@ const PractiseBoxes = ({ journalEntries }) => {
           (uniqueDays.size / dayjs(showDate).dayOfYear()) * 100
         );
       }
+
+      filteredEntries = filteredEntries.filter(
+        (entry) => entry.intensity !== null
+      );
 
       // Calculate total hours and minutes
       filteredEntries.forEach((entry) => {
