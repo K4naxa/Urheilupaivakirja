@@ -190,44 +190,6 @@ router.post("/verify-email", async (req, res) => {
   }
 });
 
-/*
-router.post("/change-password", async (req, res) => {
-  const userId = getUserId(req);
-  const { oldPassword, newPassword } = req.body;
-
-  if (!userId || !oldPassword || !newPassword) {
-    return res
-      .status(400)
-      .json({ message: "Old password and new password are required" });
-  }
-
-  try {
-    const user = await knex("users").where({ id: userId }).first();
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const isPasswordValid = await bcrypt.compare(
-      oldPassword,
-      user.password_hash
-    );
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-
-    const passwordHash = await bcrypt.hash(newPassword, Number(saltRounds));
-    await knex("users")
-      .where({ id: userId })
-      .update({ password_hash: passwordHash });
-
-    res.json({ message: "Password changed successfully" });
-  } catch (error) {
-    console.error("Error changing password:", error);
-    res.status(500).json({ message: "Error changing password" });
-  }
-});
-*/
-
 router.post("/request-password-reset", async (req, res) => {
   const { email } = req.body;
   if (!email) {
@@ -371,7 +333,6 @@ router.post("/verify-password-reset", async (req, res) => {
     res.status(500).json({ message: "Error verifying OTP" });
   }
 });
-
 
 router.post("/reset-password", async (req, res) => {
   const { email, resetToken, newPassword } = req.body;
