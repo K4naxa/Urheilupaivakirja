@@ -76,7 +76,6 @@ function CreateSportContainer({ sport, sports, setSports }) {
     );
   };
 
-  console.log(sport);
   if (sport.isEditing) {
     return (
       <div className="flex flex-col">

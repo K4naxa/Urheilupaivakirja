@@ -29,7 +29,6 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
     if (selectedStudent === null) {
       return;
     }
-    console.log(selectedStudent);
   }, [selectedStudent]);
   return (
     <div className="text-textPrimary">

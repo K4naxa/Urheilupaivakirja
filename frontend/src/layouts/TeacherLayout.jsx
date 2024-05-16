@@ -151,7 +151,7 @@ const TeacherLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
+        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden z-10`}
         id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">

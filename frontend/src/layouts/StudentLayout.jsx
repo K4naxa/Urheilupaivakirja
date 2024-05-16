@@ -28,7 +28,7 @@ const StudentLayout = () => {
     <div className="text-textPrimary">
       <header
         className={`bg-bgkPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
-    border-b-2 px-4 py-2 text-xl shadow-md lg:flex`}
+    border-b-2 px-4 py-2 text-xl shadow-md lg:flex z-10`}
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-8">
@@ -149,7 +149,8 @@ const StudentLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0  bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden`}
+        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0  bottom-0 flex 
+        h-16 py-8 w-full items-center text-xl lg:hidden z-10`}
         id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-mHeader gap-4 grid w-full">
@@ -171,7 +172,7 @@ const StudentLayout = () => {
 
           {/* new journal entry button */}
           <div className="flex justify-center">
-            <NavLink className="absolute bottom-6 flex justify z-10">
+            <NavLink className="absolute bottom-6 flex justify z-20">
               <button
                 className="bg-bgkSecondary border-headerPrimary text-headerPrimary
        shadow-upper-shadow size-16 rounded-full border-t-2

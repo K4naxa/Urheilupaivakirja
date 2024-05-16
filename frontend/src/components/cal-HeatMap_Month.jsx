@@ -73,7 +73,7 @@ const HeatMap_Month = ({ journal }) => {
 
   useEffect(() => {
     // clean up the data for the heatmap
-    const entries = journal.map((entry) => {
+    const entries = journal?.map((entry) => {
       const date = dayjs(entry.date).format("YYYY-MM-DD"); // format the date for the heatmap
       let value = entry.length_in_minutes;
 
