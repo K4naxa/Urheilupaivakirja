@@ -7,7 +7,6 @@ let EMAIL_USERNAME = process.env.EMAIL_USERNAME;
 let EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 let EMAIL_HOST = process.env.EMAIL_HOST;
 let FROM_EMAIL = process.env.FROM_EMAIL;
-let CLIENT_URL = process.env.CLIENT_URL;
 
 let DATABASE_OPTIONS = {
   client: process.env.DB_TYPE,
@@ -24,7 +23,6 @@ module.exports = {
   PORT,
   SECRET,
   BCRYPTSALT,
-  CLIENT_URL,
   EMAIL_USERNAME,
   EMAIL_PASSWORD,
   EMAIL_HOST,

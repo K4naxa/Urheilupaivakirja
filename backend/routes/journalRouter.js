@@ -51,7 +51,6 @@ router.get("/user", async (req, res, next) => {
 });
 
 //get all user journals by id for Teacher
-//get all user journals by id for Teacher
 router.get("/user/:id", async (req, res, next) => {
   const user_id = req.params.id;
   try {
