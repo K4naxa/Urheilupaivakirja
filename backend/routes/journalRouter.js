@@ -4,7 +4,7 @@ var router = express.Router();
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
-var { getUserId } = require("../middleware/auth");
+const { getUserId } = require("../middleware/auth");
 
 const { getRole } = require("../middleware/auth");
 

@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
 
 import StudentRoute from "./components/StudentRoute";
 import TeacherRoute from "./components/TeacherRoute";
 
 import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
+import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated";
 
 //student
 import StudentLayout from "./layouts/StudentLayout";
@@ -32,6 +32,10 @@ import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import TestPage from "./pages/testPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
+import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
+import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
+import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordNewPasswordPage";
 
 export const router = createBrowserRouter([
   {
@@ -61,9 +65,13 @@ export const router = createBrowserRouter([
             ],
           },
 
-          { path: "/kirjaudu", element: <LoginPage /> },
-          {path: "/test" , element: <TestPage/>},
-          { path: "/rekisteroidy", element: <RegistrationPage /> },
+          { path: "/kirjaudu", element: <RedirectIfAuthenticated><LoginPage /></RedirectIfAuthenticated> },
+          { path: "/test" , element: <TestPage/>},
+          { path: "/rekisteroidy", element: <RedirectIfAuthenticated><RegistrationPage /></RedirectIfAuthenticated> },
+          { path: "/unohditko-salasanasi", element: <RedirectIfAuthenticated><ForgottenPasswordPage /></RedirectIfAuthenticated> },
+          { path: "/unohditko-salasanasi/vahvista", element: <RedirectIfAuthenticated><ForgottenPasswordConfirmPage/></RedirectIfAuthenticated>},
+          { path: "/unohditko-salasanasi/uusi-salasana", element: <RedirectIfAuthenticated><ForgottenPasswordNewPasswordPage/></RedirectIfAuthenticated>},
+          { path: "/vahvista-sahkoposti", element: <EmailVerificationPage />},
           {
             path: "/opettaja",
             element: (
@@ -87,7 +95,7 @@ export const router = createBrowserRouter([
                     element: <ManageStudentsLayout />,
                     children: [
                       {
-                        index: true, // Set ManageActiveStudentsPage as default
+                        index: true,
                         element: <ManageActiveStudentsPage />,
                       },
                       {

@@ -11,16 +11,20 @@ export const AuthProvider = ({ children }) => {
   const login = async (data) => {
     setUser(data);
     console.log(data);
-    switch (data.role) {
-      case 1:
-        navigate("/opettaja");
-        break;
-      case 2:
-        navigate("/vierailija");
-        break;
-      case 3:
-        navigate("/");
-        break;
+    if (data.email_verified === false) {
+      navigate("/vahvista-sahkoposti");
+    } else {
+      switch (data.role) {
+        case 1:
+          navigate("/opettaja");
+          break;
+        case 2:
+          navigate("/vierailija");
+          break;
+        case 3:
+          navigate("/");
+          break;
+      }
     }
   };
   // call this function to sign out logged in user
