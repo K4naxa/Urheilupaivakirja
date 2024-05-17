@@ -41,7 +41,9 @@ const ConfirmModal = ({
   }, [onAgree, onDecline]);
 
   const defaultStyle = "bg-headerPrimary border-headerPrimary text-white";
-  const redBtnClass = "bg-btnRed border-btnRed hover:bg-red-800 text-white";
+  const redStyleClass = "bg-btnRed border-btnRed hover:bg-red-800 text-white";
+  const grayStyleClass =
+    "bg-btnGray border-btnGray hover:bg-gray-600 text-white";
 
   return (
     isOpen &&
@@ -69,7 +71,8 @@ const ConfirmModal = ({
                 "w-20 py-1.5 border rounded-md border-borderPrimary",
 
                 !agreeStyle && defaultStyle,
-                agreeStyle === "red" && redBtnClass
+                agreeStyle === "red" && redStyleClass,
+                agreeStyle === "gray" && grayStyleClass
               )}
               onClick={onAgree}
             >

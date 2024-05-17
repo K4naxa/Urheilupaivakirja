@@ -7,7 +7,7 @@ const ThemeSwitcher = () => {
 
   return (
     <div
-      className={`flex w-[26px] h-[56px] border border-btnGray rounded-t-full rounded-b-full justify-center relative transition-all duration-300 ease-in-out hover:cursor-pointer
+      className={`flex w-[26px] select-none h-[56px] border border-btnGray rounded-t-full rounded-b-full justify-center relative transition-all duration-300 ease-in-out hover:cursor-pointer
       bg-bgkPrimary shadow-md ${theme === "light" ? "" : ""}`}
       onClick={() => toggleTheme()}
     >

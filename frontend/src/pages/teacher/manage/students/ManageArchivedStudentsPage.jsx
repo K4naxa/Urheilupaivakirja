@@ -8,21 +8,17 @@ import { FiChevronUp } from "react-icons/fi";
 import { FiChevronDown } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
+
 import cc from "../../../../utils/cc.js";
+import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 
-const createStudentContainer = (student, students, setStudents) => {
-  const handleDelete = async () => {
-    await userService.deleteUser(student.user_id);
-    const newStudents = students.filter((s) => s.user_id !== student.user_id);
-    setStudents(newStudents);
-  };
-
-  const handleArchive = async () => {
-    await userService.toggleStudentArchive(student.user_id);
-    const newStudents = students.filter((s) => s.user_id !== student.user_id);
-    setStudents(newStudents);
-  };
-
+const createStudentContainer = (
+  student,
+  students,
+  setStudents,
+  handleActivation,
+  handleDelete
+) => {
   return (
     <div
       className="flex justify-between border border-headerPrimary p-2 rounded-md"
@@ -56,10 +52,20 @@ const createStudentContainer = (student, students, setStudents) => {
       </div>
 
       <div className="flex flex-col justify-center items-center gap-2">
-        <button className="text-btnRed" onClick={handleDelete}>
+        <button
+          className="text-btnRed"
+          onClick={() => {
+            handleDelete(student);
+          }}
+        >
           <FiTrash2 />
         </button>
-        <button className="text-btnGray" onClick={handleArchive}>
+        <button
+          className="text-headerPrimary"
+          onClick={() => {
+            handleActivation(student);
+          }}
+        >
           <FiUserPlus />
         </button>
       </div>
@@ -79,6 +85,15 @@ const ManageArchivedStudentsPage = () => {
     campus: 0,
   });
 
+  // statet Modalia varten
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [continueButton, setContinueButton] = useState("");
+  const [agreeStyle, setAgreeStyle] = useState("");
+  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
+    () => {}
+  );
+
   useEffect(() => {
     userService.getArchivedStudents().then((data) => {
       setStudents(data);
@@ -86,6 +101,43 @@ const ManageArchivedStudentsPage = () => {
       setLoading(false);
     });
   }, []);
+
+  const handleActivation = (student) => {
+    setAgreeStyle("");
+    setModalMessage(
+      `Haluatko varmasti aktivoida opiskelijan: ${student.first_name} ${student.last_name}?`
+    );
+    setContinueButton("Aktivoi");
+
+    const handleUserConfirmation = async () => {
+      await userService.toggleStudentArchive(student.user_id);
+      const newStudents = students.filter((s) => s.user_id !== student.user_id);
+      setStudents(newStudents);
+      setShowConfirmModal(false);
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
+    setShowConfirmModal(true);
+  };
+
+  // handle Delete funtion for students
+  const handleDelete = (student) => {
+    setShowConfirmModal(true);
+    setAgreeStyle("red");
+    setModalMessage(
+      `Haluatko varmasti poistaa opiskelijan ${student.first_name} ${student.last_name}? 
+
+      Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.`
+    );
+    setContinueButton("Poista");
+
+    const handleUserConfirmation = async () => {
+      await userService.deleteUser(student.user_id);
+      const newStudents = students.filter((s) => s.user_id !== student.user_id);
+      setStudents(newStudents);
+      setShowConfirmModal(false);
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
+  };
 
   const handleNameSorting = () => {
     let newSorting = { ...sorting, sport: 0, group: 0, campus: 0, activity: 0 };
@@ -262,12 +314,27 @@ const ManageArchivedStudentsPage = () => {
         <div className="flex flex-col gap-4">
           {students ? (
             filteredStudents.map((student) =>
-              createStudentContainer(student, students, setStudents)
+              createStudentContainer(
+                student,
+                students,
+                setStudents,
+                handleActivation,
+                handleDelete
+              )
             )
           ) : (
             <p>No students found</p>
           )}
         </div>
+        <ConfirmModal
+          isOpen={showConfirmModal}
+          onDecline={() => setShowConfirmModal(false)}
+          onAgree={handleUserConfirmation}
+          text={modalMessage}
+          agreeButton={continueButton}
+          declineButton={"Peruuta"}
+          agreeStyle={agreeStyle}
+        />
       </div>
     );
 };

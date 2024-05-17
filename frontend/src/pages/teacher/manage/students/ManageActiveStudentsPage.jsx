@@ -12,19 +12,15 @@ import { FiTrash2 } from "react-icons/fi";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 
 import cc from "../../../../utils/cc.js";
+import dayjs from "dayjs";
 
 const createStudentContainer = (
   student,
   students,
   setStudents,
-  handleArchive
+  handleArchive,
+  handleDelete
 ) => {
-  const handleDelete = async () => {
-    await userService.deleteUser(student.user_id);
-    const newStudents = students.filter((s) => s.user_id !== student.user_id);
-    setStudents(newStudents);
-  };
-
   const daysSinceLastEntry = () => {
     if (student.journal_entries.length === 0) return "Ei merkintöjä";
     const lastEntry =
@@ -84,7 +80,12 @@ const createStudentContainer = (
       </div>
 
       <div className="flex flex-col justify-center items-center gap-2">
-        <button className="text-btnRed" onClick={handleDelete}>
+        <button
+          className="text-btnRed"
+          onClick={() => {
+            handleDelete(student);
+          }}
+        >
           <FiTrash2 />
         </button>
         <button
@@ -113,6 +114,7 @@ const ManageActiveStudentsPage = () => {
     activity: 0,
   });
 
+  // statet Modalia varten
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [continueButton, setContinueButton] = useState("");
@@ -226,8 +228,7 @@ const ManageActiveStudentsPage = () => {
   }, [selectedStudent, sorting, students]);
 
   const handleArchive = (student) => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
+    setAgreeStyle("gray");
     setModalMessage(
       `Haluatko varmasti arkistoida opiskelijan ${student.first_name} ${student.last_name}?`
     );
@@ -235,6 +236,27 @@ const ManageActiveStudentsPage = () => {
 
     const handleUserConfirmation = async () => {
       await userService.toggleStudentArchive(student.user_id);
+      const newStudents = students.filter((s) => s.user_id !== student.user_id);
+      setStudents(newStudents);
+      setShowConfirmModal(false);
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
+    setShowConfirmModal(true);
+  };
+
+  // handle Delete funtion for students
+  const handleDelete = (student) => {
+    setShowConfirmModal(true);
+    setAgreeStyle("red");
+    setModalMessage(
+      `Haluatko varmasti poistaa opiskelijan ${student.first_name} ${student.last_name}? 
+
+      Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.`
+    );
+    setContinueButton("Poista");
+
+    const handleUserConfirmation = async () => {
+      await userService.deleteUser(student.user_id);
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
       setShowConfirmModal(false);
@@ -342,7 +364,8 @@ const ManageActiveStudentsPage = () => {
                 student,
                 students,
                 setStudents,
-                handleArchive
+                handleArchive,
+                handleDelete
               )
             )
           ) : (
@@ -356,7 +379,7 @@ const ManageActiveStudentsPage = () => {
           text={modalMessage}
           agreeButton={continueButton}
           declineButton={"Peruuta"}
-          // agreeStyle={agreeStyle}
+          agreeStyle={agreeStyle}
         />
       </div>
     );
