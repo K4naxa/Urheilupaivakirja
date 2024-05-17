@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import cc from "../../utils/cc";
 
 const ConfirmModal = ({
   isOpen,
   onDecline,
   onAgree,
   agreeButton,
+  agreeStyle,
   declineButton,
   text,
   closeOnOutsideClick = true,
@@ -38,26 +40,47 @@ const ConfirmModal = ({
     };
   }, [onAgree, onDecline]);
 
-  return isOpen && createPortal(
-    <div
-      className="fixed flex items-center justify-center top-0 left-0 w-screen h-screen bg-modalPrimary bg-opacity-50 text-textPrimary z-150"
-      onClick={closeOnOutsideClick ? onDecline : undefined}
-    >
+  const defaultStyle = "bg-headerPrimary border-headerPrimary text-white";
+  const redBtnClass = "bg-btnRed border-btnRed hover:bg-red-800 text-white";
+
+  return (
+    isOpen &&
+    createPortal(
       <div
-        className="flex max-w-[420px] flex-col bg-bgkSecondary gap-4 p-6 m-4 rounded-md shadow-lg border border-borderPrimary"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
+        className="fixed flex items-center justify-center top-0 left-0 w-screen h-screen bg-modalPrimary bg-opacity-50 text-textPrimary z-150"
+        onClick={closeOnOutsideClick ? onDecline : undefined}
       >
-        <p className="text-center">{text}</p>
-        <div className="flex justify-center gap-8">
-        <button className="w-20 py-1.5 border rounded-md border-borderPrimary bg-headerPrimary" onClick={onAgree}>{agreeButton}</button>
-        <button className="w-20 py-1.5 border rounded-md border-borderPrimary bg-btnGray" onClick={onDecline}>{declineButton}</button>
+        <div
+          className="flex max-w-[420px] flex-col bg-bgkSecondary gap-4 p-6 m-4 rounded-md shadow-lg border border-borderPrimary"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <p className="text-center">{text}</p>
+          <div className="flex justify-center gap-8">
+            <button
+              className="w-20 py-1.5 border rounded-md border-borderPrimary hover:bg-borderPrimary"
+              onClick={onDecline}
+            >
+              {declineButton}
+            </button>
+            <button
+              className={cc(
+                "w-20 py-1.5 border rounded-md border-borderPrimary",
+
+                !agreeStyle && defaultStyle,
+                agreeStyle === "red" && redBtnClass
+              )}
+              onClick={onAgree}
+            >
+              {agreeButton}
+            </button>
+          </div>
         </div>
-      </div>
-    </div>,
-    document.getElementById("confirm-modal-container")
+      </div>,
+      document.getElementById("confirm-modal-container")
+    )
   );
 };
 
-export { ConfirmModal };
+export default ConfirmModal;

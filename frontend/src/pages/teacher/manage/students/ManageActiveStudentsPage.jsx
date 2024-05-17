@@ -8,16 +8,19 @@ import { FiChevronUp } from "react-icons/fi";
 import { FiChevronDown } from "react-icons/fi";
 import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
+
+import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
+
 import cc from "../../../../utils/cc.js";
-const createStudentContainer = (student, students, setStudents) => {
+
+const createStudentContainer = (
+  student,
+  students,
+  setStudents,
+  handleArchive
+) => {
   const handleDelete = async () => {
     await userService.deleteUser(student.user_id);
-    const newStudents = students.filter((s) => s.user_id !== student.user_id);
-    setStudents(newStudents);
-  };
-
-  const handleArchive = async () => {
-    await userService.toggleStudentArchive(student.user_id);
     const newStudents = students.filter((s) => s.user_id !== student.user_id);
     setStudents(newStudents);
   };
@@ -84,7 +87,12 @@ const createStudentContainer = (student, students, setStudents) => {
         <button className="text-btnRed" onClick={handleDelete}>
           <FiTrash2 />
         </button>
-        <button className="text-btnGray" onClick={handleArchive}>
+        <button
+          className="text-btnGray"
+          onClick={() => {
+            handleArchive(student);
+          }}
+        >
           <FiArchive />
         </button>
       </div>
@@ -104,6 +112,14 @@ const ManageActiveStudentsPage = () => {
     campus: 0,
     activity: 0,
   });
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [continueButton, setContinueButton] = useState("");
+  const [agreeStyle, setAgreeStyle] = useState("");
+  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
+    () => {}
+  );
 
   useEffect(() => {
     userService.getStudents().then((data) => {
@@ -209,6 +225,23 @@ const ManageActiveStudentsPage = () => {
     setFilteredStudents(newFiltered);
   }, [selectedStudent, sorting, students]);
 
+  const handleArchive = (student) => {
+    setShowConfirmModal(true);
+    setAgreeStyle("red");
+    setModalMessage(
+      `Haluatko varmasti arkistoida opiskelijan ${student.first_name} ${student.last_name}?`
+    );
+    setContinueButton("Arkistoi");
+
+    const handleUserConfirmation = async () => {
+      await userService.toggleStudentArchive(student.user_id);
+      const newStudents = students.filter((s) => s.user_id !== student.user_id);
+      setStudents(newStudents);
+      setShowConfirmModal(false);
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
+  };
+
   if (loading)
     return (
       <div className="flex w-full items-center p-8">
@@ -305,12 +338,26 @@ const ManageActiveStudentsPage = () => {
         <div className="flex flex-col gap-4">
           {students ? (
             filteredStudents.map((student) =>
-              createStudentContainer(student, students, setStudents)
+              createStudentContainer(
+                student,
+                students,
+                setStudents,
+                handleArchive
+              )
             )
           ) : (
             <p>No students found</p>
           )}
         </div>
+        <ConfirmModal
+          isOpen={showConfirmModal}
+          onDecline={() => setShowConfirmModal(false)}
+          onAgree={handleUserConfirmation}
+          text={modalMessage}
+          agreeButton={continueButton}
+          declineButton={"Peruuta"}
+          // agreeStyle={agreeStyle}
+        />
       </div>
     );
 };
