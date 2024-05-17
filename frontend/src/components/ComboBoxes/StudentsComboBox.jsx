@@ -1,6 +1,7 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { useEffect, useState, Fragment } from "react";
 import { FiCheck } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
 
 function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
   const [people, setPeople] = useState([]);
@@ -50,7 +51,7 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
             />
             {/* button to list all options */}
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-              <FiCheck
+              <FiChevronDown
                 className="h-5 w-5 text-headerPrimary"
                 aria-hidden="true"
               />

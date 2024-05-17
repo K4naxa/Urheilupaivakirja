@@ -1,4 +1,6 @@
 import publicService from "../../../services/publicService";
+import { FiEdit3 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 
 import { useState, useEffect } from "react";
 
@@ -6,6 +8,15 @@ import { useState, useEffect } from "react";
 function CreateGroupContainer({ group, setGroups, groups }) {
   const [editedGroup, setEditedGroup] = useState(group.group_identifier);
   const [cellError, setCellError] = useState(false);
+
+  useEffect(() => {
+    if (cellError) {
+      setTimeout(() => {
+        setCellError("");
+      }, 5000);
+    }
+  }, [cellError]);
+
   // saves the edited group to the server and updates the state
   const handleSave = () => {
     if (editedGroup.length < 4) {
@@ -22,7 +33,11 @@ function CreateGroupContainer({ group, setGroups, groups }) {
       return;
     }
 
-    const newGroup = { id: group.id, group_identifier: editedGroup };
+    const newGroup = {
+      id: group.id,
+      student_count: group.student_count,
+      group_identifier: editedGroup,
+    };
     publicService
       .editGroup(newGroup)
       .then(() => {
@@ -39,11 +54,16 @@ function CreateGroupContainer({ group, setGroups, groups }) {
 
   // deletes the group from the server and updates the state
   const handleDelete = () => {
-    publicService.deleteGroup(group.id).then(() => {
-      setGroups((prevGroups) =>
-        prevGroups.filter((prevGroup) => prevGroup.id !== group.id)
-      );
-    });
+    publicService
+      .deleteGroup(group.id)
+      .then(() => {
+        setGroups((prevGroups) =>
+          prevGroups.filter((prevGroup) => prevGroup.id !== group.id)
+        );
+      })
+      .catch((error) => {
+        setCellError(error.response.data.error);
+      });
   };
 
   // sets the sport's "isEditing" property to "true"
@@ -53,7 +73,11 @@ function CreateGroupContainer({ group, setGroups, groups }) {
         if (prevGroups.id === group.id) {
           {
             if (group.isEditing)
-              return { id: group.id, group_identifier: group.group_identifier };
+              return {
+                id: group.id,
+                student_count: group.student_count,
+                group_identifier: group.group_identifier,
+              };
             else return { ...prevGroups, isEditing: true };
           }
         } else {
@@ -66,72 +90,67 @@ function CreateGroupContainer({ group, setGroups, groups }) {
   if (group.isEditing) {
     return (
       <div className="flex flex-col">
-        <div
-          key={group.id}
-          className="flex justify-between text-lg rounded-md
-       px-4 py-2 items-center "
-        >
+        <div className="flex justify-between rounded-md gap-8 px-4 py-2 bg-bgkPrimary">
           <input
+            autoFocus
             type="text"
-            id="editInput"
-            className="flex text-textPrimary border-headerPrimary bg-bgkSecondary focus-visible:outline-none  border-b"
-            defaultValue={group.group_identifier}
+            className="flex w-full text-textPrimary border-headerPrimary bg-bgkPrimary focus-visible:outline-none  border-b"
+            data-testid="editCampus"
+            defaultValue={editedGroup}
             onChange={(e) => setEditedGroup(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleSave(editedGroup);
+                handleSave(e.target.value);
               }
             }}
           />
-
-          <div className="flex gap-4">
+          <div className="flex gap-4 text-sm">
             <button
-              className="w-16 py-1 bg-btnGreen border border-borderPrimary rounded-md "
-              onClick={() => handleSave()}
-              id="saveBtn"
+              data-testid="saveBtn"
+              onClick={() => handleSave(editedGroup)}
+              className="Button bg-btnGreen"
             >
-              Save
+              Tallenna
             </button>{" "}
             <button
-              className="w-16 py-1 bg-btnGray border border-borderPrimary rounded-md "
               onClick={() => handleEdit()}
-              id="cancelBtn"
+              data-testid="cancelBtn"
+              className="Button bg-btnGray"
             >
-              Cancel
+              Peruuta
             </button>
           </div>
         </div>
-        {/* Error Container */}
-        {cellError && (
-          <div className="bg-bgkSecondary text-red-500 text-center text-lg p-2 mt-2">
-            {cellError}
-          </div>
-        )}
+        {cellError && <p className="text-btnRed px-4">{cellError}</p>}
       </div>
     );
   } else {
     return (
-      <div
-        key={group.id}
-        className="flex justify-between text-lg hover:bg-bgkPrimary rounded-md px-4 py-2 items-center"
-      >
-        <span>{group.group_identifier}</span>
-        <div className="flex gap-4">
-          <button
-            className="w-16 py-1 bg-btnGray border border-borderPrimary rounded-md "
-            onClick={() => handleEdit()}
-            id="editBtn"
-          >
-            Edit
-          </button>{" "}
-          <button
-            className="w-16 py-1 bg-btnRed border border-borderPrimary rounded-md "
-            onClick={() => handleDelete()}
-            id="deleteBtn"
-          >
-            Delete
-          </button>
+      <div className="flex flex-col">
+        {/* main Container */}
+        <div className="grid grid-cols-controlpanel3 hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
+          <p className="">{group.group_identifier}</p>
+          <p className="text-center">{group.student_count}</p>
+          <div className="flex gap-4 text-xl">
+            <button
+              className="IconButton text-textSecondary"
+              data-testid="editBtn"
+              onClick={() => handleEdit()}
+            >
+              <FiEdit3 />
+            </button>
+            <button
+              className="IconButton text-btnRed "
+              data-testid="deleteBtn"
+              onClick={() => handleDelete()}
+            >
+              <FiTrash2 />
+            </button>
+          </div>
         </div>
+
+        {/* error container */}
+        {cellError && <p className="text-btnRed px-4">{cellError}</p>}
       </div>
     );
   }
@@ -174,22 +193,39 @@ const GroupsPage = () => {
     });
   };
 
+  const handleInputError = (input, setError, campuses) => {
+    if (input === "") {
+      setError("Toimipaikan nimi puuttuu");
+      return false;
+    }
+    if (input.length > 20) {
+      setError("Toimipaikan nimi liian pitkä");
+      return false;
+    }
+    if (campuses.some((campus) => campus.name === input)) {
+      setError("Toimipaikka on jo olemassa");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
   return (
     <div className="flex flex-col w-full items-center bg-bgkSecondary rounded-md">
       {/* header for mobile*/}
       <div
         className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
-       rounded-b-md shadow-md"
+     rounded-b-md shadow-md"
       >
-        Ryhmät
+        Toimipaikat
       </div>
-
       {/* Error Header */}
       {errorMessage && (
         <div
           id="errorHeader"
           className="bg-btnRed w-full text-textPrimary text-center text-lg p-2
-          mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
+        mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
         >
           <button
             onClick={() => setErrorMessage("")}
@@ -201,33 +237,47 @@ const GroupsPage = () => {
         </div>
       )}
 
-      {/* Group Container */}
-      <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8 ">
-        {/* new Group Input */}
-        <div className="flex text-textPrimary text-xl center justify-center">
+      {/* Campus Container */}
+      <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8">
+        {/* New campus input */}
+        <div className="flex text-textPrimary text-xl justify-center">
           <input
             className="text-lg text-textPrimary border-btnGreen bg-bgkSecondary h-10 focus-visible:outline-none border-b p-1"
             type="text"
-            placeholder="Uusi ryhmä..."
+            data-testid="newCampusInput"
+            placeholder="Lisää toimipaikka.."
             onChange={(e) => setNewGroup(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleNewGroup();
-                e.target.value = "";
+                try {
+                  if (!handleInputError(newGroup, setErrorMessage, groups)) {
+                    return;
+                  }
+                  handleNewGroup(newGroup, setNewGroup);
+                  e.target.value = "";
+                } catch (error) {
+                  setErrorMessage(error.response.data);
+                }
               }
             }}
           />
         </div>
-        {/* container for group list */}
-        <div className="flex flex-col gap-2" id="groupsContainer">
-          {groups.map((group) => (
-            <CreateGroupContainer
-              group={group}
-              setGroups={setGroups}
-              groups={groups}
-              key={group.id}
-            />
-          ))}
+        <div className="flex flex-col gap-2" id="campusesContainer">
+          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-4">
+            <p className="">Ryhmä</p>
+            <p className="text-center">Opiskelijat</p>
+            <div className="w-16" />
+          </div>
+          <div className="flex flex-col gap-2">
+            {groups.map((group) => (
+              <CreateGroupContainer
+                groups={groups}
+                setGroups={setGroups}
+                group={group}
+                key={group.group_identifier}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

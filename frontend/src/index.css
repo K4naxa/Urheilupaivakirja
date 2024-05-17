@@ -4,10 +4,21 @@
 @tailwind utilities;
 
 @layer base {
+  /* 
+
+  - bg-primary: Background color for the entire page
+  - bg-secondary: Background color for the secondary elements
+
+  - text-primary: Text color for the primary elements
+  - text-secondary: Text color for the secondary elements (like placeholder text)
+
+  - primaryColor: Main accent color for the page
+  - primaryColorHover: Hover color for the primaryColor
+
+  - border-primary: Border color for the primary elements (grayish)
+     */
   :root {
     font-family: roboto, sans-serif;
-    /* --color-bg-primary: 255 255 255;
-    --color-bg-secondary: 235 238 241; */
 
     --color-bg-primary: 235 238 241;
     --color-bg-secondary: 255 255 255;
@@ -23,7 +34,7 @@
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 40 52 78;
 
-    --color-gray: 217 217 217;
+    --color-gray: 140 140 140;
     --color-green: 0 230 0;
     --color-red: 230 0 0;
 
@@ -57,9 +68,9 @@
     --color-graph-primary: 83 131 232;
     --color-graph-secondary: 40 52 78;
 
-    --color-gray: 100 100 100;
-    --color-green: 0 128 0;
-    --color-red: 128 0 0;
+    --color-gray: 180 180 180;
+    --color-green: 0 180 0;
+    --color-red: 180 0 0;
 
     --color-list-exercise: 40 60 40;
     --color-list-sick: 50 35 35;
@@ -143,6 +154,7 @@
     display: grid;
     width: 100%;
     grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
     grid-row: auto;
   }
 

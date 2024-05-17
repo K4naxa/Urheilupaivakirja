@@ -35,7 +35,10 @@ router.get("/options", async (req, res, next) => {
 // get all groups
 router.get("/groups", async (req, res, next) => {
   knex("student_groups")
-    .select("*")
+    .select("student_groups.*")
+    .leftJoin("students", "student_groups.id", "students.group_id")
+    .count("students.id as student_count")
+    .groupBy("student_groups.id")
     .then((rows) => {
       res.json(rows);
     })
@@ -103,10 +106,16 @@ router.delete("/groups/:id", async (req, res, next) => {
       res.status(200).json({ id });
     })
     .catch((err) => {
-      console.log("Error deleting group", err);
+      console.log("Error deleting campus", err);
+
+      if (err.code === "ER_ROW_IS_REFERENCED_2") {
+        return res.status(400).json({
+          error: "Poisto epäonnistui, koska ryhmässä on opiskelijoita.",
+        });
+      }
       res
         .status(500)
-        .json({ error: "An error occurred while deleting the group" });
+        .json({ error: "An error occurred while deleting the campus." });
     });
 });
 

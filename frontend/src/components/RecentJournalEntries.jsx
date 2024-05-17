@@ -34,7 +34,6 @@ const dataContainerClass = "grid grid-cols-merkInfo gap-2";
 const labelClass = "text-textSecondary min-w-16";
 
 const RecentJournalEntry = ({ entry }) => {
-  console.log(entry);
   const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 

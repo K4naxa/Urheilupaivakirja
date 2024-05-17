@@ -19,6 +19,7 @@ import { IconContext } from "react-icons/lib";
 import { addMonths, addWeeks, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
+import userService from "../../services/userService.js";
 
 function TeacherHome() {
   const [journals, setJournals] = useState([]);
@@ -34,6 +35,7 @@ function TeacherHome() {
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
   const [selectedCampus, setSelectedCampus] = useState("");
+  const { setShowDate } = useMainContext();
 
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
@@ -308,12 +310,13 @@ function TeacherHome() {
     setSelectedStudentGroup("");
     setSelectedStudent("");
     setFilteredJournals(journals);
+    setShowDate(new Date());
   };
 
   useEffect(() => {
     // Get journal entries for all students
-    trainingService
-      .getJournalEntries()
+    userService
+      .getStudents()
       .then((response) => {
         setJournals(response);
         setFilteredJournals(response);

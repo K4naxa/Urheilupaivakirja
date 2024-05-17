@@ -124,7 +124,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
           <p className="text-center">{campus.student_count}</p>
           <div className="flex gap-4 text-xl">
             <button
-              className="IconButton text-textSecondary"
+              className="IconButton text-btnGray"
               data-testid="editBtn"
               onClick={() => handleEdit()}
             >

@@ -168,8 +168,8 @@ const SportsPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleNewSport = () => {
-    if (newSport.length < 2) {
-      setErrorMessage("Lajin nimen pituus tulee olla vähintään 2 merkkiä.");
+    if (newSport == "") {
+      setErrorMessage("Lajin nimi puuttuu.");
       return;
     }
     if (
@@ -183,11 +183,9 @@ const SportsPage = () => {
 
     trainingService
       .addSport({ name: newSport })
-      .then((serverSport) => {
-        setSports((prevSports) => [
-          ...prevSports,
-          { name: serverSport.name, id: serverSport.id },
-        ]);
+      .then(() => {
+        trainingService.getSports().then((data) => setSports(data));
+
         setErrorMessage("");
       })
       .catch((error) => {

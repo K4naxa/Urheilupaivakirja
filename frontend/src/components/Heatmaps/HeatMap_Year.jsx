@@ -104,7 +104,6 @@ function CalendarDay({ day, journal, month, showDate }) {
       className={cc(
         "YearDate border relative rounded-sm hover:border-headerPrimary",
         !isSameMonth(day, month[10]) && "invisible",
-        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border-headerPrimary",
         handleColor(minutes)
       )}
