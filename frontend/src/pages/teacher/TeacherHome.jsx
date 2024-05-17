@@ -35,6 +35,7 @@ function TeacherHome() {
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
   const [selectedCampus, setSelectedCampus] = useState("");
+  const { setShowDate } = useMainContext();
 
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
@@ -309,6 +310,7 @@ function TeacherHome() {
     setSelectedStudentGroup("");
     setSelectedStudent("");
     setFilteredJournals(journals);
+    setShowDate(new Date());
   };
 
   useEffect(() => {

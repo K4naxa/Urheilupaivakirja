@@ -62,31 +62,23 @@ function StudentHome() {
               <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
               <div className="hover: flex justify-center gap-4">
                 <button
-                  className="hover:underline"
+                  className="hover:underline hover:text-graphPrimary"
                   onClick={() => {
                     setShowDate(subMonths(showDate, 1));
                   }}
                 >
-                  <IconContext.Provider
-                    value={{ className: "hover:text-graphPrimary" }}
-                  >
-                    <FiChevronLeft />
-                  </IconContext.Provider>
+                  <FiChevronLeft />
                 </button>
                 <p className="text-xl w-24">
                   {formatDate(showDate, { month: "long" })}
                 </p>
                 <button
-                  className="hover:fill-blue-500 hover:underline"
+                  className="hover:fill-blue-500 hover:underline hover:text-graphPrimary"
                   onClick={() => {
                     setShowDate(addMonths(showDate, 1));
                   }}
                 >
-                  <IconContext.Provider
-                    value={{ className: "hover:text-graphPrimary" }}
-                  >
-                    <FiChevronRight />
-                  </IconContext.Provider>
+                  <FiChevronRight />
                 </button>
               </div>
             </div>
