@@ -8,6 +8,11 @@ export const StudentRoute = ({ children }) => {
     return <Navigate to="/kirjaudu" />;
   }
 
+  if (!user.email_verified) {
+    // user has not verified their email
+    return <Navigate to="/vahvista-sahkoposti" />;
+  }
+
   console.log ("user role is " + user.role);
   if (user.role !== 3) {
     //user is not a student but admin/visitor
@@ -20,7 +25,6 @@ export const StudentRoute = ({ children }) => {
     //TODO: else logout and navigate to login with a message
     else {
       return <Navigate to="/kirjaudu" />;
-    
     }
   }
   return children;

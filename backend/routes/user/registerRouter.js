@@ -5,23 +5,24 @@ const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
+const saltRounds = config.BCRYPTSALT;
+const { createToken } = require("../../middleware/auth");
 
 // Register a new student
 router.post("/", async (req, res, next) => {
   const user = req.body;
-  const saltRounds = 10;
 
   try {
     await knex.transaction(async (trx) => {
       // Hash the password
-      const passwordHash = await bcrypt.hash(user.password, saltRounds);
+      const passwordHash = await bcrypt.hash(user.password, Number(saltRounds));
 
       // Prepare new user data
       const newUser = {
         email: user.email,
         password: passwordHash,
         role_id: 3, // Default role for student
-        email_verified: true, // TODO: Implement actual email verification
+        email_verified: false,
         created_at: new Date(),
       };
 
@@ -44,14 +45,24 @@ router.post("/", async (req, res, next) => {
       // Insert the new student
       await trx("students").insert(newStudent);
 
-      // If everything is successful, send a success response
-      res.status(201).json({ success: "Student user created successfully" });
+      const token = await createToken({ ...newUser, id: userId });
+      res
+        .status(201)
+        .json({
+          token,
+          email_verified: newUser.email_verified,
+          email: newUser.email,
+          role: newUser.role_id,
+        });
     });
   } catch (err) {
     console.error("POST /user/register transaction error:", err);
     res
       .status(500)
-      .json({ error: "An error occurred while creating a new student user" });
+      .json({
+        error:
+          "An error occurred while creating a new student user: " + err.message,
+      });
   }
 });
 

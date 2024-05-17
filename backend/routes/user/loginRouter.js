@@ -5,7 +5,7 @@ const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const { createToken } = require("../../middleware/auth");
 
 router.post("/", async (req, res, next) => {
   const user = req.body;
@@ -46,13 +46,7 @@ router.post("/", async (req, res, next) => {
 
     console.log(tempUser);
 
-    const userForToken = {
-      email: tempUser.email,
-      user_id: tempUser.id,
-      role: tempUser.role_id,
-    };
-
-    const token = jwt.sign(userForToken, config.SECRET);
+    token = createToken(tempUser);
 
     // Update last_login_at on successful login
     await knex("users")
@@ -61,6 +55,7 @@ router.post("/", async (req, res, next) => {
 
     res.status(200).send({
       token,
+      email_verified: tempUser.email_verified,
       email: tempUser.email,
       role: tempUser.role_id,
     });

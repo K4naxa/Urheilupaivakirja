@@ -5,8 +5,8 @@ import publicService from "../services/publicService";
 import ThemeSwitcher from "../components/themeSwitcher";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
-import { check } from "prettier"; // TODO: <-- What is this?
 import { useToast } from "../hooks/toast-messages/useToast";
+import { useAuth } from "../hooks/useAuth";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -27,7 +27,8 @@ const RegistrationPage = () => {
     campuses: [],
   });
   const [errors, setErrors] = useState({});
-  const { addToast, removeToast, toasts } = useToast();
+  const { addToast } = useToast();
+  const { login } = useAuth();
   //inputRef = useRef(null);
 
   console.log("Rerendering the whole component");
@@ -128,7 +129,7 @@ const RegistrationPage = () => {
       return;
     }
     try {
-      await userService.register(
+      let user = await userService.register(
         registrationData.email,
         registrationData.password,
         registrationData.firstName,
@@ -139,7 +140,7 @@ const RegistrationPage = () => {
         registrationData.campusId
       );
       addToast("Rekisteröityminen onnistui", { style: "success" });
-      navigate("/login");
+      login(user);
     } catch (error) {
       addToast("Rekisteröityminen epäonnistui", {
         style: "error",

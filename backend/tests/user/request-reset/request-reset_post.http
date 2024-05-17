@@ -1,0 +1,6 @@
+POST http://localhost:3001/user/request-reset HTTP/1.1
+Content-Type: application/json
+
+{
+   "email":"student@example.com"
+}
