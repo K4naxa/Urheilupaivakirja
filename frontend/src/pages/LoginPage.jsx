@@ -171,7 +171,7 @@ function LoginPage() {
               </div>
 
               <div className="text-blue-600 hover:underline">
-                <Link to="/resetPassword">Unohditko salasanasi?</Link>
+                <Link to="/unohditko-salasanasi">Unohditko salasanasi?</Link>
               </div>
             </div>
 

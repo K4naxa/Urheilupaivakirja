@@ -4,7 +4,7 @@ var router = express.Router();
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
-var { getUserId } = require("../middleware/auth");
+const { getUserId } = require("../middleware/auth");
 
 const { getRole } = require("../middleware/auth");
 
@@ -50,7 +50,6 @@ router.get("/user", async (req, res, next) => {
     });
 });
 
-//get all user journals by id for Teacher
 //get all user journals by id for Teacher
 router.get("/user/:id", async (req, res, next) => {
   const user_id = req.params.id;

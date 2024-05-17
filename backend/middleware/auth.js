@@ -33,31 +33,47 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
+const verifyToken = (token) => {
+  try {
+      return jwt.verify(token, config.SECRET);
+  } catch (error) {
+      console.error("Verification error in auth:", error.message);
+      throw new Error("Token verification failed");
+  }
+};
+
 // Get the role from token
 const getRole = (req) => {
   const token = getTokenFrom(req);
-  let role = null;
-  try {
-    const decodedToken = jwt.verify(token, config.SECRET);
-    role = decodedToken.role;
-  } catch (error) {
-    console.error("GetRole Verification error in auth : ", error.message);
-    return res.status(401).json({ error: "Token verification failed" });
-  }
-  return role;
+  if (!token) throw new Error("No token provided");
+  const decodedToken = verifyToken(token);
+  return decodedToken.role;
 };
 
 const getUserId = (req) => {
   const token = getTokenFrom(req);
-  let userId = null;
-  try {
-    const decodedToken = jwt.verify(token, config.SECRET);
-    userId = decodedToken.user_id;
-  } catch (error) {
-    console.error("GetUserId Verification error in auth : ", error.message);
-    return res.status(401).json({ error: "Token verification failed" });
-  }
-  return userId;
+  if (!token) throw new Error("No token provided");
+  const decodedToken = verifyToken(token);
+  return decodedToken.user_id;
 };
 
-module.exports = { isAuthenticated, getRole, getUserId };
+const getEmailVerified = (req) => {
+  const token = getTokenFrom(req);
+  if (!token) throw new Error("No token provided");
+  const decodedToken = verifyToken(token);
+  return decodedToken.email_verified;
+};
+
+const createToken = (user) => {
+
+  const userForToken = {
+    email: user.email,
+    user_id: user.id,
+    role: user.role_id,
+    email_verified: user.email_verified,
+  };
+  return jwt.sign(userForToken, config.SECRET);
+};
+
+
+module.exports = { isAuthenticated, getRole, getUserId, createToken, getEmailVerified };

@@ -35,7 +35,7 @@ const register = async (
   groupId,
   campusId
 ) => {
-  await axios.post("user/register", {
+  const response = await axios.post("user/register", {
     email: email,
     password: password,
     first_name: firstName,
@@ -45,6 +45,47 @@ const register = async (
     group_id: groupId,
     campus_id: campusId,
   });
+  return response.data;
+};
+
+const createEmailVerificationOTP = async () => {
+  const response = await axios.post(
+    "/user/new-email-verification",
+    null,
+    makeHeader()
+  );
+  return response.data;
+};
+
+const sendEmailVerificationOTP = async (otp) => {
+  const response = await axios.post(
+    "/user/verify-email",
+    { otp },
+    makeHeader()
+  );
+  return response.data;
+};
+
+const requestPasswordReset = async (email) => {
+  const response = await axios.post("/user/request-password-reset", { email });
+  return response.data;
+};
+
+const verifyPasswordResetOTP = async (email, otp) => {
+  const response = await axios.post("/user/verify-password-reset", {
+    email,
+    otp,
+  });
+  return response.data;
+};
+
+const resetPassword = async (email, resetToken, newPassword) => {
+  const response = await axios.post("/user/reset-password", {
+    email,
+    resetToken,
+    newPassword,
+  });
+  return response.data;
 };
 
 const logout = () => {
@@ -99,5 +140,10 @@ export default {
   getStudents,
   toggleStudentArchive,
   getArchivedStudents,
+  createEmailVerificationOTP,
+  sendEmailVerificationOTP,
+  requestPasswordReset,
+  verifyPasswordResetOTP,
+  resetPassword,
 };
 // Path: frontEnd/src/services/userService.js
