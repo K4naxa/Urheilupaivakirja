@@ -8,9 +8,8 @@ import { FiChevronUp } from "react-icons/fi";
 import { FiChevronDown } from "react-icons/fi";
 import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
-
+import cc from "../../../../utils/cc.js";
 const createStudentContainer = (student, students, setStudents) => {
-  console.log(student);
   const handleDelete = async () => {
     await userService.deleteUser(student.user_id);
     const newStudents = students.filter((s) => s.user_id !== student.user_id);
@@ -18,34 +17,19 @@ const createStudentContainer = (student, students, setStudents) => {
   };
 
   const handleArchive = async () => {
-    await userService.toggleStudentArchive(student.id);
+    await userService.toggleStudentArchive(student.user_id);
     const newStudents = students.filter((s) => s.user_id !== student.user_id);
     setStudents(newStudents);
   };
 
   const daysSinceLastEntry = () => {
-    if (student.journal_entries.length === 0) return "0";
+    if (student.journal_entries.length === 0) return "Ei merkintöjä";
     const lastEntry =
       student.journal_entries[student.journal_entries.length - 1];
     const lastEntryDate = new Date(lastEntry.created_at);
     const today = new Date();
     const differenceInTime = today.getTime() - lastEntryDate.getTime();
     const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-
-    console.log(
-      student.user_id,
-      " last entry date: ",
-      lastEntryDate,
-      " today: ",
-      today,
-      " ",
-      differenceInDays
-    );
-    console.log(student.user_id, " ", differenceInDays);
-
-    if (lastEntryDate > today) {
-      return "0"; // Return 0 if the last entry is from the future
-    }
 
     if (differenceInDays < 1) return "<24h";
     else if (differenceInDays < 2) return "<48h";
@@ -76,7 +60,8 @@ const createStudentContainer = (student, students, setStudents) => {
             </div>
           </Link>
           <div className="text-textSecondary flex text-sm gap-1">
-            <p>Aktiivisuus: </p> <p>{daysSinceLastEntry()}</p>
+            <p>Aktiivisuus: </p>{" "}
+            <p className="text-textPrimary">{daysSinceLastEntry()}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -241,7 +226,10 @@ const ManageActiveStudentsPage = () => {
           />
           <div className="flex gap-2 flex-wrap text-sm text-textSecondary">
             <div
-              className="flex items-center hover:underline hover:cursor-pointer"
+              className={cc(
+                "flex items-center hover:underline hover:cursor-pointer select-none",
+                sorting.name !== 0 && "text-headerPrimary"
+              )}
               onClick={() => {
                 handleNameSorting();
               }}
@@ -253,7 +241,10 @@ const ManageActiveStudentsPage = () => {
               </p>
             </div>
             <div
-              className="flex items-center hover:underline hover:cursor-pointer"
+              className={cc(
+                "flex items-center hover:underline hover:cursor-pointer select-none",
+                sorting.sport !== 0 && "text-headerPrimary"
+              )}
               onClick={() => {
                 handleSportSorting();
               }}
@@ -265,7 +256,10 @@ const ManageActiveStudentsPage = () => {
               </p>
             </div>
             <div
-              className="flex items-center hover:underline hover:cursor-pointer"
+              className={cc(
+                "flex items-center hover:underline hover:cursor-pointer select-none",
+                sorting.group !== 0 && "text-headerPrimary"
+              )}
               onClick={() => {
                 handleGroupSorting();
               }}
@@ -277,7 +271,10 @@ const ManageActiveStudentsPage = () => {
               </p>
             </div>
             <div
-              className="flex items-center hover:underline hover:cursor-pointer"
+              className={cc(
+                "flex items-center hover:underline hover:cursor-pointer select-none",
+                sorting.campus !== 0 && "text-headerPrimary"
+              )}
               onClick={() => {
                 handleCampusSorting();
               }}
@@ -289,7 +286,10 @@ const ManageActiveStudentsPage = () => {
               </p>
             </div>
             <div
-              className="flex items-center hover:underline hover:cursor-pointer"
+              className={cc(
+                "flex items-center hover:underline hover:cursor-pointer select-none",
+                sorting.activity !== 0 && "text-headerPrimary"
+              )}
               onClick={() => {
                 handleActivitySorting();
               }}

@@ -28,6 +28,7 @@ router.get("/", async (req, res) => {
         "campuses.name as campus"
       )
       .from("students")
+      .where("archived", false)
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id");
@@ -64,27 +65,27 @@ router.get("/archived", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const students = await knex("students")
+    // Get all journal entries
+    // Get all students
+    const allStudents = await knex
       .select(
-        "students.id",
-        "students.user_id",
-        "students.first_name",
-        "students.last_name",
-        "users.email",
+        "user_id",
+        "first_name",
+        "last_name",
         "sports.name as sport",
-        "student_groups.group_identifier as group",
+        "student_groups.group_identifier",
         "campuses.name as campus"
       )
-      .where("students.archived", true)
-      .leftJoin("users", "students.user_id", "users.id")
+      .from("students")
+      .where("archived", true)
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id");
 
-    res.json(students);
-  } catch (error) {
-    console.error("Error fetching students:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.json(allStudents);
+  } catch (err) {
+    console.error("Failed to fetch data", err);
+    res.status(500).json({ error: "Failed to fetch data" });
   }
 });
 
@@ -96,31 +97,24 @@ router.put("/archive/:id", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
+    const studentUserId = req.params.id;
+    const student = await knex("students")
+      .where("user_id", "=", studentUserId)
+      .first();
+
+    if (!student) {
+      console.log(`Student not found: ${studentUserId}`);
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    const newArchivedStatus = !student.archived;
     await knex("students")
-      .where("id", "=", req.params.id)
-      .first() // Retrieve the first matching student
-      .then(async (student) => {
-        if (!student) {
-          console.log("Student not found" + req.params.id);
-          return res.status(404).json({ error: "Student not found" });
-        }
+      .where("user_id", studentUserId)
+      .update({ archived: newArchivedStatus });
 
-        // Toggle the 'archived' status
-        const newArchivedStatus = !student.archived;
-
-        // Update the 'archived' status to the new value
-        await knex("students")
-          .where("id", "=", req.params.id)
-          .update({ archived: newArchivedStatus });
-
-        return res.json({
-          message: "Student archived status updated successfully",
-        });
-      })
-      .catch((error) => {
-        console.error("Error toggling archived status:", error);
-        return res.status(500).json({ error: "Internal server error" });
-      });
+    return res.json({
+      message: "Student archived status updated successfully",
+    });
   } catch (error) {
     console.error("Error toggling archived status:", error);
     return res.status(500).json({ error: "Internal server error" });
