@@ -12,13 +12,7 @@ import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../../utils/cc.js";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 
-const createStudentContainer = (
-  student,
-  students,
-  setStudents,
-  handleActivation,
-  handleDelete
-) => {
+const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
     <div
       className="flex justify-between border border-headerPrimary p-2 rounded-md"
@@ -314,13 +308,7 @@ const ManageArchivedStudentsPage = () => {
         <div className="flex flex-col gap-4">
           {students ? (
             filteredStudents.map((student) =>
-              createStudentContainer(
-                student,
-                students,
-                setStudents,
-                handleActivation,
-                handleDelete
-              )
+              createStudentContainer(student, handleActivation, handleDelete)
             )
           ) : (
             <p>No students found</p>

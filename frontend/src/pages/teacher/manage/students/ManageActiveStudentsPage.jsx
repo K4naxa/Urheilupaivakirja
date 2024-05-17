@@ -12,15 +12,8 @@ import { FiTrash2 } from "react-icons/fi";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 
 import cc from "../../../../utils/cc.js";
-import dayjs from "dayjs";
 
-const createStudentContainer = (
-  student,
-  students,
-  setStudents,
-  handleArchive,
-  handleDelete
-) => {
+const createStudentContainer = (student, handleArchive, handleDelete) => {
   const daysSinceLastEntry = () => {
     if (student.journal_entries.length === 0) return "Ei merkintöjä";
     const lastEntry =
@@ -360,13 +353,7 @@ const ManageActiveStudentsPage = () => {
         <div className="flex flex-col gap-4">
           {students ? (
             filteredStudents.map((student) =>
-              createStudentContainer(
-                student,
-                students,
-                setStudents,
-                handleArchive,
-                handleDelete
-              )
+              createStudentContainer(student, handleArchive, handleDelete)
             )
           ) : (
             <p>No students found</p>
