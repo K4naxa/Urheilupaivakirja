@@ -23,6 +23,43 @@ const createStudentContainer = (student, students, setStudents) => {
     setStudents(newStudents);
   };
 
+  const daysSinceLastEntry = () => {
+    if (student.journal_entries.length === 0) return "0";
+    const lastEntry =
+      student.journal_entries[student.journal_entries.length - 1];
+    const lastEntryDate = new Date(lastEntry.created_at);
+    const today = new Date();
+    const differenceInTime = today.getTime() - lastEntryDate.getTime();
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+
+    console.log(
+      student.user_id,
+      " last entry date: ",
+      lastEntryDate,
+      " today: ",
+      today,
+      " ",
+      differenceInDays
+    );
+    console.log(student.user_id, " ", differenceInDays);
+
+    if (lastEntryDate > today) {
+      return "0"; // Return 0 if the last entry is from the future
+    }
+
+    if (differenceInDays < 1) return "<24h";
+    else if (differenceInDays < 2) return "<48h";
+    else if (differenceInDays < 3) return "<72h";
+    else if (differenceInDays < 7) return "<7vrk";
+    else if (differenceInDays < 14) return "<14vrk";
+    else if (differenceInDays < 30) return "<1kk";
+    else if (differenceInDays < 60) return "<2kk";
+    else if (differenceInDays < 90) return "<3kk";
+    else if (differenceInDays < 180) return "<6kk";
+    else if (differenceInDays < 365) return "<1v";
+    return ">1v";
+  };
+
   return (
     <div
       className="flex justify-between border border-headerPrimary p-2 rounded-md"
@@ -39,7 +76,7 @@ const createStudentContainer = (student, students, setStudents) => {
             </div>
           </Link>
           <div className="text-textSecondary flex text-sm gap-1">
-            <p>inactivity: </p> <p>5</p> <p>days</p>
+            <p>Aktiivisuus: </p> <p>{daysSinceLastEntry()}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -80,6 +117,7 @@ const ManageActiveStudentsPage = () => {
     sport: 0,
     group: 0,
     campus: 0,
+    activity: 0,
   });
 
   useEffect(() => {
@@ -91,31 +129,39 @@ const ManageActiveStudentsPage = () => {
   }, []);
 
   const handleNameSorting = () => {
-    let newSorting = { ...sorting, sport: 0, group: 0, campus: 0 };
+    let newSorting = { ...sorting, sport: 0, group: 0, campus: 0, activity: 0 };
     sorting.name === 0 && (newSorting = { ...newSorting, name: 1 });
     sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
     sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
     setSorting(newSorting);
   };
   const handleSportSorting = () => {
-    let newSorting = { ...sorting, name: 0, group: 0, campus: 0 };
+    let newSorting = { ...sorting, name: 0, group: 0, campus: 0, activity: 0 };
     sorting.sport === 0 && (newSorting = { ...newSorting, sport: 1 });
     sorting.sport === 1 && (newSorting = { ...newSorting, sport: -1 });
     sorting.sport === -1 && (newSorting = { ...newSorting, sport: 0 });
     setSorting(newSorting);
   };
   const handleGroupSorting = () => {
-    let newSorting = { ...sorting, sport: 0, name: 0, campus: 0 };
+    let newSorting = { ...sorting, sport: 0, name: 0, campus: 0, activity: 0 };
     sorting.group === 0 && (newSorting = { ...newSorting, group: 1 });
     sorting.group === 1 && (newSorting = { ...newSorting, group: -1 });
     sorting.group === -1 && (newSorting = { ...newSorting, group: 0 });
     setSorting(newSorting);
   };
   const handleCampusSorting = () => {
-    let newSorting = { ...sorting, sport: 0, group: 0, name: 0 };
+    let newSorting = { ...sorting, sport: 0, group: 0, name: 0, activity: 0 };
     sorting.campus === 0 && (newSorting = { ...newSorting, campus: 1 });
     sorting.campus === 1 && (newSorting = { ...newSorting, campus: -1 });
     sorting.campus === -1 && (newSorting = { ...newSorting, campus: 0 });
+    setSorting(newSorting);
+  };
+
+  const handleActivitySorting = () => {
+    let newSorting = { ...sorting, sport: 0, group: 0, name: 0, campus: 0 };
+    sorting.activity === 0 && (newSorting = { ...newSorting, activity: 1 });
+    sorting.activity === 1 && (newSorting = { ...newSorting, activity: -1 });
+    sorting.activity === -1 && (newSorting = { ...newSorting, activity: 0 });
     setSorting(newSorting);
   };
 
@@ -125,9 +171,9 @@ const ManageActiveStudentsPage = () => {
 
     // Check for sorting settings
     if (sorting.name === 1) {
-      newFiltered.sort((a, b) => (a.name > b.name ? 1 : -1));
+      newFiltered.sort((a, b) => (a.first_name > b.first_name ? 1 : -1));
     } else if (sorting.name === -1) {
-      newFiltered.sort((a, b) => (a.name < b.name ? 1 : -1));
+      newFiltered.sort((a, b) => (a.first_name < b.first_name ? 1 : -1));
     }
 
     if (sorting.sport === 1) {
@@ -146,6 +192,28 @@ const ManageActiveStudentsPage = () => {
       newFiltered.sort((a, b) => (a.campus > b.campus ? 1 : -1));
     } else if (sorting.campus === -1) {
       newFiltered.sort((a, b) => (a.campus < b.campus ? 1 : -1));
+    }
+
+    if (sorting.activity === 1) {
+      newFiltered.sort((a, b) => {
+        const dateA = new Date(
+          a.journal_entries[a.journal_entries.length - 1]?.created_at || 0
+        ).getTime();
+        const dateB = new Date(
+          b.journal_entries[b.journal_entries.length - 1]?.created_at || 0
+        ).getTime();
+        return dateA - dateB;
+      });
+    } else if (sorting.activity === -1) {
+      newFiltered.sort((a, b) => {
+        const dateA = new Date(
+          a.journal_entries[a.journal_entries.length - 1]?.created_at || 0
+        ).getTime();
+        const dateB = new Date(
+          b.journal_entries[b.journal_entries.length - 1]?.created_at || 0
+        ).getTime();
+        return dateB - dateA;
+      });
     }
 
     // check if student is being searched
@@ -218,6 +286,18 @@ const ManageActiveStudentsPage = () => {
               <p className="w-6">
                 {sorting.campus === 1 && <FiChevronUp />}
                 {sorting.campus === -1 && <FiChevronDown />}
+              </p>
+            </div>
+            <div
+              className="flex items-center hover:underline hover:cursor-pointer"
+              onClick={() => {
+                handleActivitySorting();
+              }}
+            >
+              Aktiivisuus
+              <p className="w-6">
+                {sorting.activity === 1 && <FiChevronUp />}
+                {sorting.activity === -1 && <FiChevronDown />}
               </p>
             </div>
           </div>
