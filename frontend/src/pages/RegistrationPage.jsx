@@ -327,12 +327,12 @@ const RegistrationPage = () => {
   const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
-    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgkSecondary focus-visible:outline-none focus-visible:border-headerPrimary";
+    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-headerPrimary";
 
   return (
-    <div className="bg-bgkPrimary text-textPrimary grid place-items-center border-none h-screen w-screen">
+    <div className="bg-bgPrimary text-textPrimary grid place-items-center border-none h-screen w-screen">
       <div
-        className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
+        className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
         <div className=" relative bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">

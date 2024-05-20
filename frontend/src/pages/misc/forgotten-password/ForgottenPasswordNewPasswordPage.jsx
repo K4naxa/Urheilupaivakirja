@@ -15,7 +15,6 @@ const ForgottenPasswordNewPasswordPage = () => {
   const resetToken = location.state?.resetToken;
   const email = location.state?.email;
 
-
   useEffect(() => {
     console.log(errors);
   }, [errors]);
@@ -32,13 +31,16 @@ const ForgottenPasswordNewPasswordPage = () => {
     },
     onSuccess: () => {
       addToast("Salasana vaihdettu onnistuneesti", { style: "success" });
-      navigate("/kirjaudu", {replace: true});
+      navigate("/kirjaudu", { replace: true });
     },
   });
 
   const handleSend = (e) => {
     e.preventDefault();
-    if (errors.password?.value !== "success" || errors.passwordConfirm?.value !== "success") {
+    if (
+      errors.password?.value !== "success" ||
+      errors.passwordConfirm?.value !== "success"
+    ) {
       addToast("Korjaa virheet ennen lähettämistä", { style: "error" });
       return;
     }
@@ -129,12 +131,17 @@ const ForgottenPasswordNewPasswordPage = () => {
   };
 
   const isFormValid = () => {
-    return password.length >= 8 && password === passwordConfirm && errors.password?.value === "success" && errors.passwordConfirm?.value === "success";
+    return (
+      password.length >= 8 &&
+      password === passwordConfirm &&
+      errors.password?.value === "success" &&
+      errors.passwordConfirm?.value === "success"
+    );
   };
 
   return (
-    <div className="bg-bgkPrimary text-textPrimary grid place-items-center  h-screen w-screen">
-      <div className="bg-bgkSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+    <div className="bg-bgPrimary text-textPrimary grid place-items-center  h-screen w-screen">
+      <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Salasanan palautus
         </div>
@@ -149,12 +156,12 @@ const ForgottenPasswordNewPasswordPage = () => {
               value={password}
               required
               placeholder="Salasana"
-              className={`text-lg text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${
+              className={`text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${
                 errors.password?.value === "error"
                   ? "border-red-500"
                   : errors.password?.value === "success"
-                  ? "border-green-500"
-                  : ""
+                    ? "border-green-500"
+                    : ""
               }`}
               onChange={handlePasswordChange}
               onBlur={handlePasswordBlur}
@@ -169,12 +176,12 @@ const ForgottenPasswordNewPasswordPage = () => {
               value={passwordConfirm}
               required
               placeholder="Salasana uudelleen"
-              className={`text-lg text-textPrimary border-borderPrimary bg-bgkSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${
+              className={`text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${
                 errors.passwordConfirm?.value === "error"
                   ? "border-red-500"
                   : errors.passwordConfirm?.value === "success"
-                  ? "border-green-500"
-                  : ""
+                    ? "border-green-500"
+                    : ""
               }`}
               onChange={handlePasswordConfirmChange}
               onBlur={handlePasswordConfirmBlur}
@@ -184,7 +191,7 @@ const ForgottenPasswordNewPasswordPage = () => {
             )}
           </div>
           <button
-            className="bg-headerPrimary text-bgkPrimary w-full h-10 rounded-md"
+            className="bg-headerPrimary text-bgPrimary w-full h-10 rounded-md"
             type="submit"
             disabled={!isFormValid()}
           >

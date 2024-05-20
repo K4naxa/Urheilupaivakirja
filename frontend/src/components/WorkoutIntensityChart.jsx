@@ -61,7 +61,7 @@ export default function WorkoutIntensityChart({ journal }) {
           Vuosi
         </p>
       </div>
-      <div className="flex flex-col gap-1 w-full bg-bgkSecondary rounded-md p-4">
+      <div className="flex flex-col gap-1 w-full bg-bgSecondary rounded-md p-4">
         <CreateGraphCell
           value={data.one}
           max={data.totalEntries}

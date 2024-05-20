@@ -2,7 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const ManageLayout = () => {
   const linkClass =
-    "w-32 py-4 text-lg text-center border rounded-md border-borderPrimary bg-bgkSecondary hover:bg-bgkPrimary hover:text-textPrimary active:bg-graphPrimary active:text-bgkSecondary ";
+    "w-32 py-4 text-lg text-center border rounded-md border-borderPrimary bg-bgSecondary hover:bg-bgPrimary hover:text-textPrimary active:bg-graphPrimary active:text-bgSecondary ";
   return (
     <div className="flex flex-col w-full">
       <nav

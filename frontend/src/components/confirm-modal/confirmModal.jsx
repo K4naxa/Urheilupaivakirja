@@ -53,7 +53,7 @@ const ConfirmModal = ({
         onClick={closeOnOutsideClick ? onDecline : undefined}
       >
         <div
-          className="flex max-w-[420px] flex-col bg-bgkSecondary gap-4 p-6 m-4 rounded-md shadow-lg border border-borderPrimary"
+          className="flex max-w-[420px] flex-col bg-bgSecondary gap-4 p-6 m-4 rounded-md shadow-lg border border-borderPrimary"
           onClick={(e) => {
             e.stopPropagation();
           }}

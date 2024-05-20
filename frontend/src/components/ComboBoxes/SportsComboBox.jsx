@@ -24,7 +24,7 @@ function SportComboBox({ sports, selectedSport, setSelectedSport }) {
             {/* default input field */}
             <Combobox.Input
               className="w-full border-none p-2
-                focus-visible:outline-none bg-bgkSecondary"
+                focus-visible:outline-none bg-bgSecondary"
               displayValue={(sport) => sport?.name}
               placeholder="Hae Laji"
               onChange={(event) => setQuery(event.target.value)}
@@ -48,7 +48,7 @@ function SportComboBox({ sports, selectedSport, setSelectedSport }) {
           >
             {/* list of choises */}
             <Combobox.Options
-              className="absolute mt-1 max-h-60 w-full overflow-auto bg-bgkSecondary rounded-md py-1 text-base shadow-lg
+              className="absolute mt-1 max-h-60 w-full overflow-auto bg-bgSecondary rounded-md py-1 text-base shadow-lg
                ring-1 ring-black/5 focus:outline-none sm:text-sm"
             >
               {/* if nothing is found */}

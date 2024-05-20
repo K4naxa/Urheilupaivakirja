@@ -76,7 +76,7 @@ const PractiseBoxes = ({ journalEntries }) => {
     }
   }, [journalEntries, showMonth, showDate]);
 
-  const boxClass = `bg-bgkSecondary flex flex-col justify-between p-2 rounded-md w-24 h-24`;
+  const boxClass = `bg-bgSecondary flex flex-col justify-between p-2 rounded-md w-24 h-24`;
   const highlightClass = `text-textPrimary self-center justify-self-center font-bold my-auto text-lg`;
   const secondaryText = `text-sm text-textSecondary text-center justify-self-center`;
 

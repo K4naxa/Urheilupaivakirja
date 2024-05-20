@@ -65,7 +65,7 @@ const DateModal = () => {
     <div
       id="date-modal"
       style={modalStyle}
-      className="absolute z-50 p-2.5 bg-bgkSecondary border border-borderPrimary rounded shadow-lg"
+      className="absolute z-50 p-2.5 bg-bgSecondary border border-borderPrimary rounded shadow-lg"
       onClick={(e) => e.stopPropagation()}
     >
       <div style={arrowBackgroundStyle}></div>

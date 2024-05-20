@@ -88,7 +88,7 @@ function TeacherHome() {
               // Student card
               <div
                 key={journal.user_id}
-                className="flex flex-col rounded-md j bg-bgkSecondary p-3 border border-headerPrimary shadow-sm hover:shadow-headerPrimary w-full"
+                className="flex flex-col rounded-md j bg-bgSecondary p-3 border border-headerPrimary shadow-sm hover:shadow-headerPrimary w-full"
                 id="studentCard"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -236,7 +236,7 @@ function TeacherHome() {
             {journals.map((journal) => (
               <div
                 key={journal.user_id}
-                className="flex flex-col gap-2 rounded-md bg-bgkSecondary border
+                className="flex flex-col gap-2 rounded-md bg-bgSecondary border
                border-headerPrimary shadow-sm hover:shadow-headerPrimary"
                 id="studentCard"
               >
@@ -350,7 +350,7 @@ function TeacherHome() {
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
         <div
-          className="bg-bgkSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
+          className="bg-bgSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
            rounded-md p-4 justify-between lg:p-8 lg:gap-8 shadow-md"
         >
           {/* Aika filtteri */}
@@ -418,11 +418,11 @@ function TeacherHome() {
         {/* student list */}
         {/* <div
           id="studentList"
-          className="flex lg:ml-72 gap-8 rounded-md bg-bgkSecondary p-4 "
+          className="flex lg:ml-72 gap-8 rounded-md bg-bgSecondary p-4 "
         > */}
         <div
           id="studentList"
-          className="flex w-full gap-8 rounded-md bg-bgkSecondary p-4 justify-center"
+          className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center"
         >
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
           {showMonths && <RenderMonths journals={filteredJournals} />}

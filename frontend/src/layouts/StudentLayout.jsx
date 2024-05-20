@@ -27,7 +27,7 @@ const StudentLayout = () => {
   return (
     <div className="text-textPrimary">
       <header
-        className={`bg-bgkPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
+        className={`bg-bgPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
     border-b-2 px-4 py-2 text-xl shadow-md lg:flex z-10`}
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
@@ -52,14 +52,6 @@ const StudentLayout = () => {
         </nav>
 
         <div className="flex items-center gap-8">
-          <button
-            id="newJournalBtn"
-            onClick={() => openBigModal("new")}
-            className="bg-graphPrimary text-white hover:underline  text-lg rounded-md px-3 py-2 drop-shadow-lg active:scale-95 transition-transform duration-90"
-          >
-            + Uusi Merkintä
-          </button>
-
           <div>
             <ThemeSwitcher />
           </div>
@@ -86,7 +78,7 @@ const StudentLayout = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgkSecondary text-lg divide-y divide-headerSecondary rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgSecondary text-lg divide-y divide-headerSecondary rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     {({ active }) => (
@@ -95,7 +87,7 @@ const StudentLayout = () => {
                         id="profileBtn"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgkSecondary"
+                            ? "bg-headerPrimary text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -111,7 +103,7 @@ const StudentLayout = () => {
                         id="settingsBtn"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgkSecondary"
+                            ? "bg-headerPrimary text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -131,7 +123,7 @@ const StudentLayout = () => {
                         id="logoutBtn"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgkSecondary"
+                            ? "bg-headerPrimary text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -149,7 +141,7 @@ const StudentLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0  bottom-0 flex 
+        className={`bg-bgPrimary shadow-upper-shadow fixed left-0  bottom-0 flex 
         h-16 py-8 w-full items-center text-xl lg:hidden z-10`}
         id="mobile-header"
       >
@@ -174,7 +166,7 @@ const StudentLayout = () => {
           <div className="flex justify-center">
             <NavLink className="absolute bottom-6 flex justify z-20">
               <button
-                className="bg-bgkSecondary border-headerPrimary text-headerPrimary
+                className="bg-bgSecondary border-headerPrimary text-headerPrimary
        shadow-upper-shadow size-16 rounded-full border-t-2
         text-3xl drop-shadow-xl duration-100 active:scale-110"
                 onClick={() => openBigModal("new")}
@@ -198,7 +190,7 @@ const StudentLayout = () => {
             <button
               className={
                 linkClass +
-                `${showUserMenu ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgkPrimary"}`
+                `${showUserMenu ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgPrimary"}`
               }
               onClick={() => {
                 setShowUserMenu(!showUserMenu);

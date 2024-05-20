@@ -360,7 +360,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:border-headerPrimary  peer-checked:text-bgkSecondary peer-checked:bg-headerPrimary bg-bgkSecondary
+          className="peer-checked:border-headerPrimary  peer-checked:text-bgSecondary peer-checked:bg-headerPrimary bg-bgSecondary
           peer-focus-visible:ring-2 peer-focus-visible:ring-headerSecondary p-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
           active:scale-95 transition-transform duration-75 hover:border-headerPrimary hover:text-headerPrimary"
         >
@@ -441,7 +441,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           </button>
         </div>
         <form
-          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgkSecondary sm:rounded-b-md flex-grow"
+          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
           onSubmit={newJournalEntryHandler}
         >
           <div className="flex flex-col items-center w-full p-1">
@@ -450,7 +450,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 type="button"
                 onClick={() => entryTypeChangeHandler("2")}
                 className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "2" ? "border-restday bg-restday" : "border-restday bg-bgkSecondary"}
+              border-2 ${newJournalEntryData.entry_type === "2" ? "border-restday bg-restday" : "border-restday bg-bgSecondary"}
               `}
               >
                 Lepopäivä
@@ -460,7 +460,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 type="button"
                 onClick={() => entryTypeChangeHandler("3")}
                 className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "3" ? "border-sickday bg-sickday" : "border-sickday bg-bgkSecondary"}
+              border-2 ${newJournalEntryData.entry_type === "3" ? "border-sickday bg-sickday" : "border-sickday bg-bgSecondary"}
               `}
               >
                 Sairauspäivä
@@ -491,7 +491,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               </label>
               <div className="w-full p-1">
                 <input
-                  className="bg-bgkPrimary w-full"
+                  className="bg-bgPrimary w-full"
                   type="range"
                   min="30"
                   max="180"
@@ -549,7 +549,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   Harjoituskategoria
                 </label>
                 <select
-                  className={`text-md text-textPrimary bg-bgkSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
+                  className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
                   id="workoutCategory"
                   name="workout_category"
                   value={newJournalEntryData.workout_category}

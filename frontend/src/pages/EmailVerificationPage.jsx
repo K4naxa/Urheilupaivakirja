@@ -75,8 +75,8 @@ const EmailVerificationPage = () => {
   }, [user, navigate]);
 
   return (
-    <div className="bg-bgkPrimary text-textPrimary grid place-items-center h-screen w-screen">
-      <div className="bg-bgkSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+    <div className="bg-bgPrimary text-textPrimary grid place-items-center h-screen w-screen">
+      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Sähköpostin vahvistus
         </div>

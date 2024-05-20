@@ -61,7 +61,7 @@ function StudentPage() {
         </div>
         <div className="h-[1px] w-full bg-headerPrimary rounded-md"></div>
         <div
-          className={`bg-bgkPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8  lg:grid-cols-3`}
+          className={`bg-bgPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8  lg:grid-cols-3`}
         >
           <div className=" flex flex-col justify-between gap-4 align-middle">
             <div className="grid place-items-center  gap-2">

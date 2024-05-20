@@ -6,8 +6,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        bgkPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
-        bgkSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
+        bgPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
+        bgSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
+        bgGray: "rgb(var(--color-bg-gray) / <alpha-value>)",
 
         textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
         textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",
@@ -36,10 +37,6 @@ export default {
         heatmapSick: "rgb(var(--color-heatmap-sick) / <alpha-value>)",
 
         modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",
-
-        //ALTERNATIVE COLORS
-        bgPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
-        bgSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
 
         //textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
         //textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",

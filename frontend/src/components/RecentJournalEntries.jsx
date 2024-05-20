@@ -1,6 +1,10 @@
 import { FiEdit3 } from "react-icons/fi";
 import { useJournalModal } from "../hooks/useJournalModal";
 import { useAuth } from "../hooks/useAuth";
+import dayjs from "dayjs";
+import cc from "../utils/cc";
+
+import { FootballSoccerBall } from "@vectopus/atlas-icons-react";
 
 const convertTime = (totalMinutes) => {
   const hours = Math.floor(totalMinutes / 60);
@@ -14,22 +18,6 @@ const convertTime = (totalMinutes) => {
   return `${hours}h ${minutes}min`;
 };
 
-function formatDateString(isoDateString) {
-  const date = new Date(isoDateString);
-
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function formatDateToDisplay(isoDateString) {
-  const formattedDate = formatDateString(isoDateString);
-  const [year, month, day] = formattedDate.split("-");
-  return `${day}.${month}.${year}`;
-}
-
 const dataContainerClass = "grid grid-cols-merkInfo gap-2";
 const labelClass = "text-textSecondary min-w-16";
 
@@ -37,17 +25,10 @@ const RecentJournalEntry = ({ entry }) => {
   const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 
-  let bgColor = "";
-  if (entry.entry_type === "Sairaana") bgColor = "bg-listSick";
-  if (entry.entry_type === "Lepo") bgColor = "bg-listRest";
-  if (entry.entry_type_id === 1) bgColor = "bg-listExercise";
-
   return (
-    <div
-      className={` bg-bgkSecondary flex w-full flex-col rounded-md p-2 shadow-md ${bgColor}`}
-    >
-      {/* Header */}
-      <div className=" border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
+    <div className="grid  grid-cols-6 gap-4 p-2 items-center">
+      {/* Header
+      <div className="border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
         {entry.entry_type &&
           (entry.entry_type === "Lepo" || entry.entry_type === "Sairaana") && (
             <p className="text-textPrimary col-start-1 mx-2 justify-self-start">
@@ -56,9 +37,46 @@ const RecentJournalEntry = ({ entry }) => {
           )}
         {entry.date && (
           <p className="text-textPrimary col-start-2 text-center">
-            {formatDateToDisplay(entry.date)}
+            {dayjs(entry.date).format("DD.MM.YYYY")}
           </p>
         )}
+        {user.role !== 1 && (
+
+        )}
+      </div> */}
+
+      {/* Sport */}
+      <div className="flex gap-2">
+        <div className="bg-bgGray p-1 rounded-md ">
+          {" "}
+          <FootballSoccerBall size={20} className="text-headerPrimary" />
+        </div>
+
+        <p>{entry.workout_category}</p>
+      </div>
+      {/* Date */}
+      <p>{dayjs(entry.date).format("DD.MM.YYYY")}</p>
+
+      {/* WorkoutLenght */}
+      <p>
+        {" "}
+        {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
+      </p>
+      {/* Intensity */}
+      <p>{entry.intensity}</p>
+      {/* Type of entry (sick, rest, ..) */}
+      <p
+        className={cc(
+          "flex w-24 h-8 justify-center items-center rounded-md",
+          entry.entry_type_id === 1 && "bg-btnGreen text-green-900",
+          entry.entry_type_id === 2 && "bg-heatmapRest",
+          entry.entry_type_id === 3 && "bg-heatmapSick"
+        )}
+      >
+        {entry.entry_type}
+      </p>
+      {/* Edit button only for student*/}
+      <p className="flex justify-center">
         {user.role !== 1 && (
           <button
             onClick={() => openBigModal("edit", { entryId: entry.id })}
@@ -67,51 +85,7 @@ const RecentJournalEntry = ({ entry }) => {
             <FiEdit3 />
           </button>
         )}
-      </div>
-      {/* content container */}
-      <div className="grid w-full grid-cols-2 gap-2 p-2 pb-0">
-        {/* left Container */}
-        <div>
-          {entry.length_in_minutes && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Kesto:</span>
-              <span className="text-textPrimary">
-                {convertTime(entry.length_in_minutes)}
-              </span>
-            </div>
-          )}
-
-          {entry.intensity && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Rankkuus:</span>
-              <span className="value">{entry.intensity}</span>
-            </div>
-          )}
-        </div>
-        {/* right Container */}
-        <div>
-          {entry.workout_category && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Laji:</span>
-              <span className="value">{entry.workout_category}</span>
-            </div>
-          )}
-          {entry.time_of_day && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Aika:</span>
-              <span className="value">{entry.time_of_day}</span>
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="p-2">
-        {entry.details && (
-          <div className=" flex flex-wrap gap-2">
-            <span className={labelClass}>Lisätiedot:</span>
-            <span className="value">{entry.details}</span>
-          </div>
-        )}
-      </div>
+      </p>
     </div>
   );
 };
@@ -126,7 +100,7 @@ const RecentJournalEntries = ({ journal }) => {
         <div
           className="flex w-full 
         flex-col gap-4 overflow-y-auto
-        overscroll-none rounded-md scroll-smooth text-center bg-bgkSecondary h-full"
+        overscroll-none rounded-md scroll-smooth text-center bg-bgSecondary h-full"
         >
           Ei merkintöjä
         </div>
@@ -134,13 +108,17 @@ const RecentJournalEntries = ({ journal }) => {
     );
   } else
     return (
-      <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
-        <h2 className="text-lg">Viimeisimmät merkinnät</h2>
-        <div
-          className="flex w-full pr-2
-        flex-col gap-4 overflow-y-auto
-        overscroll-none rounded-md scroll-smooth"
-        >
+      <div className="flex w-full h-full flex-col overflow-y-auto rounded-md max-h-[300px] relative">
+        <div className="sticky top-0 grid grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
+          <span>Laji</span>
+          <span>Päivämäärä</span>
+          <span>Kesto</span>
+          <span>Rankkuus</span>
+          <span>Tyyppi</span>
+          <span></span>
+        </div>
+        <div className="divide-y divide-borderPrimary flex flex-col h-full">
+          {" "}
           {journal.map((entry) => (
             <RecentJournalEntry key={entry.id} entry={entry} />
           ))}

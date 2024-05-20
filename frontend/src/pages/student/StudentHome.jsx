@@ -10,13 +10,16 @@ import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { addMonths, subMonths } from "date-fns";
 
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { FiZap } from "react-icons/fi";
+import { FiBarChart2 } from "react-icons/fi";
+import { useJournalModal } from "../../hooks/useJournalModal";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
+  const { openBigModal } = useJournalModal();
 
   const {
     data: studentJournalData,
@@ -49,62 +52,70 @@ function StudentHome() {
     );
   }
 
-  const CircleGraph = ({ percentage }) => {
-    return (
-      <div className="relative w-32 h-32  rounded-lg  flex items-center justify-center">
-        <div
-          className="inset-0 rounded-full w-24 h-24 flex items-center justify-center"
-          style={{
-            background: `conic-gradient(#4f46e5 ${percentage}%, #e5e7eb ${percentage}%)`,
-          }}
-        >
-          <div className="w-20 h-20 flex rounded-full bg-blue-300 text-center justify-center items-center">
-            {" "}
-            <p className="text-2xl text-blue-800">{percentage}%</p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="grid grid-cols-1 w-full m-8  gap-8 overflow-x-auto bg-bgkPrimary text-textPrimary">
+    <div className="grid grid-cols-1 w-full m-8  gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
       {/* first row */}
-      <div className="grid grid-cols-3 gap-8 grid-rows-1 w-full">
+      <div className="grid grid-cols-3 gap-8 grid-rows-1 w-full h-full">
         {/* left Side */}
-        <div className="border border-borderPrimary p-4 bg-bgSecondary rounded-md">
-          <div className="flex gap-4  mb-4 items-center">
-            <p className="p-2 bg-headerPrimary text-white rounded-md text-lg">
-              <FiZap />
-            </p>{" "}
-            <p className="text-lg">Kuukauden aktiivisuus</p>
+        <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
+          <div className="text-textSecondary">{showDate.getFullYear()}</div>
+          <div className="w-full flex justify-center items-center mb-4">
+            <p
+              className="text-textPrimary hover:text-headerPrimary hover:cursor-pointer select-none"
+              onClick={() => {
+                setShowDate(subMonths(showDate, 1));
+              }}
+            >
+              <FiChevronLeft />
+            </p>
+            <p className="w-24 text-lg">
+              {formatDate(showDate, { month: "long" })}
+            </p>
+            <p
+              className="text-textPrimary hover:text-headerPrimary hover:cursor-pointer select-none"
+              onClick={() => {
+                setShowDate(addMonths(showDate, 1));
+              }}
+            >
+              <FiChevronRight />
+            </p>
           </div>
-          <div className="">
+
+          <div>
             <HeatMap_Month journal={studentJournalData} />
           </div>
         </div>
-        {/* rightSode */}
+        {/* rightSide */}
         <div className="col-span-2 flex-col bg-bgSecondary p-4 rounded-md border border-borderPrimary">
           <div className="flex justify-between">
             <div>
               <div className="text-2xl font-medium flex gap-2">
-                <p className="text-textSecondary">Hello</p>
+                <p className="text-textSecondary">Huomenta</p>
                 <p className="text-textPrimary"> Testi Käyttäjä</p>
               </div>
-              <p>Good morning today is the best day to excercise</p>
+              <p className="text-textSecondary">
+                Paras päivä aloittaa urheilu oli eilen
+              </p>
             </div>
             <div className="flex gap-4">
-              <button className="w-24 py-2 border rounded-md">
-                This Month
-              </button>
-              <button className="w-24 py-2 border rounded-md bg-headerPrimary text-white">
-                + Add Excersice
+              <button className="px-4 py-2 border border-borderPrimary rounded-md bg-headerPrimary text-white">
+                <p onClick={() => openBigModal("new")} className="">
+                  + Lisää harjoitus
+                </p>
               </button>
             </div>
           </div>
           <div className=" mt-4">
-            <div className="p-2 rounded-md border ">
-              <RecentJournalEntries journal={studentJournalData} />
+            <div className="p-4 rounded-md border border-borderPrimary">
+              <div className="flex gap-2 items-center mb-4">
+                <p className="IconBox">
+                  <FiBarChart2 />
+                </p>
+                <h2 className="text-lg font-medium">Omat merkinnät</h2>
+              </div>
+              <div className="flex h-full overflow-y-auto">
+                <RecentJournalEntries journal={studentJournalData} />
+              </div>
             </div>
           </div>
         </div>
@@ -120,9 +131,9 @@ function StudentHome() {
       </div>
 
       {/* thrid Row */}
-      <div className="w-full bg-bgSecondary p-4 rounded-md border border-borderPrimary">
+      <div className="flex flex-col divide-y divide-borderPrimary overflow-y-auto rounded-md h-full">
         <div className="flex gap-4  mb-4 items-center">
-          <p className="p-2 bg-headerPrimary text-white rounded-md text-lg">
+          <p className="IconBox">
             <FiZap />
           </p>{" "}
           <p className="text-lg">Vuoden aktiivisuus</p>

@@ -8,6 +8,7 @@
 
   - bg-primary: Background color for the entire page
   - bg-secondary: Background color for the secondary elements
+  - bg-gray: Background for input fields, link:hover ?,  etc.
 
   - text-primary: Text color for the primary elements
   - text-secondary: Text color for the secondary elements (like placeholder text)
@@ -15,13 +16,14 @@
   - primaryColor: Main accent color for the page
   - primaryColorHover: Hover color for the primaryColor
 
-  - border-primary: Border color for the primary elements (grayish)
+  - border-primary: Border color for the primary elements
      */
   :root {
     font-family: roboto, sans-serif;
 
     --color-bg-primary: 249 250 251;
     --color-bg-secondary: 255 255 255;
+    --color-bg-gray: 247 247 252;
 
     --color-text-primary: 0 0 0;
     --color-text-secondary: 103 103 103;
@@ -29,7 +31,7 @@
     --color-header-primary: 49 156 255;
     --color-header-secondary: 40 52 78;
 
-    --color-border-primary: 237 237 237;
+    --color-border-primary: 240 240 240;
 
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 40 52 78;
@@ -52,17 +54,21 @@
     --color-heatmap-exercise2: 72 183 72;
     --color-heatmap-exercise3: 0 107 0;
     --color-heatmap-sick: 231 154 63;
-    --color-heatmap-rest: 128 128 128;
+    --color-heatmap-rest: 180 180 180;
   }
 
   :root[data-theme="dark"] {
     font-family: roboto, sans-serif;
-    --color-bg-primary: 28 28 31;
-    --color-bg-secondary: 49 49 60;
-    --color-text-primary: 255 255 255;
-    --color-text-secondary: 151 149 173;
+    --color-bg-primary: 19 19 26;
+    --color-bg-secondary: 28 28 36;
+    --color-bg-gray: 39 39 47;
 
-    --color-header-primary: 83 131 232;
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 177 177 178;
+
+    --color-border-primary: 40 40 50;
+
+    --color-header-primary: 58 77 249;
     --color-header-secondary: 40 52 78;
 
     --color-graph-primary: 83 131 232;
@@ -103,14 +109,22 @@
     }
   }
 
+  /* IconBox for componentHeader Icons */
+  .IconBox {
+    padding: 0.2rem;
+    background-color: rgb(var(--color-header-primary));
+    color: white;
+    font-size: 20px;
+    border-radius: 3px;
+  }
+
   .MonthDate {
-    display: block;
+    display: flex;
     aspect-ratio: 1;
     border-radius: 4px;
-    font-size: 10px;
-    text-align: center;
+    font-size: 12px;
     justify-content: center;
-    align-content: center;
+    align-items: center;
     color: rgb(var(--color-text-secondary));
     background-color: rgb(var(--color-bg-primary));
     border-color: rgb(var(--color-border-primary));
@@ -196,43 +210,6 @@
 a.active {
   color: rgb(var(--color-header-primary));
   border-color: rgb(var(--color-header-primary));
-}
-
-/* Cal-Heatmap Settings */
-.ch-subdomain-bg {
-  fill: rgb(var(--color-bg-secondary));
-  color: rgb(var(--color-text-primary));
-}
-.ch-subdomain-text {
-  fill: rgb(var(--color-text-secondary));
-}
-
-.ch-subdomain-bg.highlight {
-  stroke: rgb(var(--color-graph-primary));
-  stroke-width: 1px;
-}
-
-.ch-subdomain-bg:hover {
-  stroke: rgb(var(--color-header-primary));
-  stroke-width: 1px;
-}
-[data-theme="dark"] .ch-subdomain-bg {
-  fill: rgb(var(--color-bg-secondary));
-}
-
-[data-theme="dark"] .ch-subdomain-bg.highlight {
-  stroke: rgb(var(--color-graph-primary));
-}
-
-[data-theme="dark"] .ch-subdomain-bg:hover {
-  stroke: #636e7b;
-  color: rgb(var(--color-text-primary));
-}
-
-#studentCard {
-  & .ch-subdomain-bg {
-    fill: rgb(var(--color-bg-primary));
-  }
 }
 /* Scrollbar Settings */
 ::-webkit-scrollbar {
