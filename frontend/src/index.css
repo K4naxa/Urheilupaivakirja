@@ -20,7 +20,7 @@
   :root {
     font-family: roboto, sans-serif;
 
-    --color-bg-primary: 235 238 241;
+    --color-bg-primary: 249 250 251;
     --color-bg-secondary: 255 255 255;
 
     --color-text-primary: 0 0 0;
@@ -29,7 +29,7 @@
     --color-header-primary: 49 156 255;
     --color-header-secondary: 40 52 78;
 
-    --color-border-primary: 143 142 142;
+    --color-border-primary: 237 237 237;
 
     --color-graph-primary: 49 156 255;
     --color-graph-secondary: 40 52 78;
@@ -112,8 +112,8 @@
     justify-content: center;
     align-content: center;
     color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-bg-secondary));
-    border-color: rgb(var(--color-bg-secondary));
+    background-color: rgb(var(--color-bg-primary));
+    border-color: rgb(var(--color-border-primary));
 
     &:hover {
       border: 1px solid rgb(var(--color-header-primary));
@@ -127,8 +127,8 @@
     justify-content: center;
     align-items: center;
     color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-bg-secondary));
-    border-color: rgb(var(--color-bg-secondary));
+    background-color: rgb(var(--color-bg-primary));
+    border-color: rgb(var(--color-border-primary));
 
     &:hover {
       cursor: pointer;
@@ -154,7 +154,7 @@
     display: grid;
     width: 100%;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: repeat(auto, 1fr);
     grid-row: auto;
   }
 
