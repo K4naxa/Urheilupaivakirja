@@ -18,33 +18,12 @@ const convertTime = (totalMinutes) => {
   return `${hours}h ${minutes}min`;
 };
 
-const dataContainerClass = "grid grid-cols-merkInfo gap-2";
-const labelClass = "text-textSecondary min-w-16";
-
 const RecentJournalEntry = ({ entry }) => {
   const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 
   return (
     <div className="grid  grid-cols-6 gap-4 p-2 items-center">
-      {/* Header
-      <div className="border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
-        {entry.entry_type &&
-          (entry.entry_type === "Lepo" || entry.entry_type === "Sairaana") && (
-            <p className="text-textPrimary col-start-1 mx-2 justify-self-start">
-              {entry.entry_type}
-            </p>
-          )}
-        {entry.date && (
-          <p className="text-textPrimary col-start-2 text-center">
-            {dayjs(entry.date).format("DD.MM.YYYY")}
-          </p>
-        )}
-        {user.role !== 1 && (
-
-        )}
-      </div> */}
-
       {/* Sport */}
       <div className="flex gap-2">
         <div className="bg-bgGray p-1 rounded-md ">

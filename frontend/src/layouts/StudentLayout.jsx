@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
@@ -12,6 +12,8 @@ import { useJournalModal } from "../hooks/useJournalModal";
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+
+import { HiOutlineEnvelope } from "react-icons/hi2";
 
 import ThemeSwitcher from "../components/themeSwitcher";
 
@@ -27,47 +29,42 @@ const StudentLayout = () => {
   return (
     <div className="text-textPrimary">
       <header
-        className={`bg-bgPrimary border-graphPrimary fixed-header max-h-20 mb-12 hidden  
-    border-b-2 px-4 py-2 text-xl shadow-md lg:flex z-10`}
+        className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
+    border-b-2 px-4 py-2 lg:flex z-10 "
       >
-        <nav id="top-nav" className="flex justify-center gap-8 ">
-          <div className="text-textPrimary flex justify-center gap-8">
-            <p className="items-center flex">Urheilupäiväkirja</p>
+        <Link to={"/"} className="text-xl">
+          Urheilupäiväkirja
+        </Link>
 
-            <NavLink to="/" id="etusivuBtn" className={linkClass}>
-              Etusivu
-            </NavLink>
-            <div className="relative">
-              <NavLink
-                to="/tiedotteet/"
-                id="tiedotteetBtn"
-                className={linkClass}
-              >
-                Tiedotteet
-              </NavLink>
-
-              <UnreadNewsIndicator type="desktop" />
-            </div>
-          </div>
-        </nav>
-
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-2">
           <div>
             <ThemeSwitcher />
           </div>
 
+          <NavLink
+            to="/tiedotteet/"
+            id="tiedotteetBtn"
+            className="flex flex-col items-center
+            gap-1 p-2 rounded-md
+            select-none 
+            hover:cursor-pointer hover:bg-bgGray"
+          >
+            <HiOutlineEnvelope size={24} />
+            <p className="text-[12px] leading-none">Tiedotteet</p>
+            <UnreadNewsIndicator type="desktop" />
+          </NavLink>
+
           {/* Profile button */}
           <Menu as="div" className="relative text-textPrimary">
             <Menu.Button
-              className={
-                "flex flex-col items-center text-textPrimary py-2 gap-2 rounded-md  text-xl"
-              }
+              className="flex flex-col items-center
+                          gap-1 p-2 rounded-md
+                          select-none 
+                          hover:cursor-pointer hover:bg-bgGray"
               id="userMenuBtn"
             >
-              <FiUser />
-              <p className="text-[12px] px-2 leading-none select-none">
-                Käyttäjä
-              </p>
+              <FiUser size={24} />
+              <p className="text-[12px] leading-none select-none">Käyttäjä</p>
             </Menu.Button>
             <Transition
               as={Fragment}
