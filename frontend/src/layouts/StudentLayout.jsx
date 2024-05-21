@@ -13,7 +13,7 @@ import { useJournalModal } from "../hooks/useJournalModal";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-import { HiOutlineEnvelope } from "react-icons/hi2";
+import { FiInbox } from "react-icons/fi";
 
 import ThemeSwitcher from "../components/themeSwitcher";
 
@@ -49,7 +49,8 @@ const StudentLayout = () => {
             select-none 
             hover:cursor-pointer hover:bg-bgGray"
           >
-            <HiOutlineEnvelope size={24} />
+            <FiInbox size={24} />
+
             <p className="text-[12px] leading-none">Tiedotteet</p>
             <UnreadNewsIndicator type="desktop" />
           </NavLink>

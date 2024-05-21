@@ -83,7 +83,6 @@ const RecentJournalEntries = ({ journal }) => {
   useEffect(() => {
     if (journal) {
       const filteredJournal = journal.filter((entry) => {
-        console.log(entry);
         if (selectedTime === "Month") {
           return isSameMonth(showDate, new Date(entry.date), {
             weekStartsOn: 1,
