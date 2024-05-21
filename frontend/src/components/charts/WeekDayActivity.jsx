@@ -1,5 +1,4 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiBarChart } from "react-icons/fi";
 import {
   Bar,
@@ -11,42 +10,67 @@ import {
   YAxis,
 } from "recharts";
 import { useMainContext } from "../../hooks/mainContext";
-import { isSameMonth, isSameWeek, isSameYear, getDay } from "date-fns";
+import {
+  isSameMonth,
+  isSameWeek,
+  isSameYear,
+  getDay,
+  eachWeekOfInterval,
+  startOfMonth,
+  endOfMonth,
+  getWeek,
+  startOfYear,
+  endOfYear,
+  eachMonthOfInterval,
+  startOfWeek,
+  endOfWeek,
+} from "date-fns";
+import formatDate from "../../utils/formatDate";
 
 function WeekDayActivity({ journal }) {
   const { showDate } = useMainContext();
   const [selectedTime, setSelectedTime] = useState("Month");
-  const [data, setData] = useState([
-    { date: "Ma", hours: 0 },
-    { date: "Ti", hours: 0 },
-    { date: "Ke", hours: 0 },
-    { date: "To", hours: 0 },
-    { date: "Pe", hours: 0 },
-    { date: "La", hours: 0 },
-    { date: "Su", hours: 0 },
-  ]);
+  const [selectedView, setSelectedView] = useState("Day");
+  const [data, setData] = useState([]);
 
+  // Ensure the selected view is compatible with the selected time
   useEffect(() => {
-    if (journal) {
-      const filteredJournal = journal.filter((entry) => {
-        if (selectedTime === "Month") {
-          return isSameMonth(showDate, new Date(entry.date), {
-            weekStartsOn: 1,
-          })
-            ? entry
-            : null;
-        } else if (selectedTime === "Year") {
-          return isSameYear(showDate, new Date(entry.date), {
-            weekStartsOn: 1,
-          })
-            ? entry
-            : null;
-        } else {
-          return entry;
-        }
-      });
+    if (
+      selectedTime === "Month" &&
+      selectedView !== "Day" &&
+      selectedView !== "Week"
+    )
+      setSelectedView("Week");
 
-      const newData = [
+    if (selectedTime === "Year" && selectedView === "Year")
+      setSelectedView("Month");
+  }, [selectedTime, selectedView]);
+
+  // Filter the journal entries based on the selectedTime and selectedView
+  useEffect(() => {
+    // If journal is not fetched yet, return
+    if (!journal) return;
+
+    let newData = [];
+
+    // Filter the journal entries based on the selectedTime
+    const filteredJournal = journal.filter((entry) => {
+      if (selectedTime === "Month") {
+        return isSameMonth(showDate, new Date(entry.date), {
+          weekStartsOn: 1,
+        });
+      } else if (selectedTime === "Year") {
+        return isSameYear(showDate, new Date(entry.date), {
+          weekStartsOn: 1,
+        });
+      } else {
+        return entry;
+      }
+    });
+
+    // Render the data based on the selectedView
+    if (selectedView === "Day") {
+      newData = [
         { date: "Ma", hours: 0 },
         { date: "Ti", hours: 0 },
         { date: "Ke", hours: 0 },
@@ -65,7 +89,110 @@ function WeekDayActivity({ journal }) {
       });
       setData(newData);
     }
-  }, [journal, selectedTime, showDate]);
+
+    if (selectedView === "Week") {
+      newData = [];
+      // Get Renderable Weeks depending on the selectedTime
+      let calendarWeeks = () => {
+        if (selectedTime === "Month") {
+          const firstWeekStart = startOfWeek(startOfMonth(showDate));
+          const lastWeekEnd = endOfWeek(endOfMonth(showDate));
+          return eachWeekOfInterval(
+            {
+              start: firstWeekStart,
+              end: lastWeekEnd,
+            },
+            { weekStartsOn: 1 }
+          );
+        } else if (selectedTime === "Year") {
+          const firstWeekStart = startOfWeek(startOfYear(showDate));
+          const lastWeekEnd = endOfWeek(endOfYear(showDate));
+          return eachWeekOfInterval(
+            {
+              start: firstWeekStart,
+              end: lastWeekEnd,
+            },
+            { weekStartsOn: 1 }
+          );
+        } else if (selectedTime === "AllTime") {
+          const firstWeekStart = startOfWeek(new Date(journal[0].date));
+          const lastWeekEnd = endOfWeek(
+            new Date(journal[journal.length - 1].date)
+          );
+          return eachWeekOfInterval(
+            {
+              start: firstWeekStart,
+              end: lastWeekEnd,
+            },
+            { weekStartsOn: 1 }
+          );
+        }
+      };
+
+      calendarWeeks().forEach((week) => {
+        let totalHours = 0;
+        filteredJournal.forEach((entry) => {
+          if (isSameWeek(new Date(entry.date), week, { weekStartsOn: 1 })) {
+            totalHours += entry.length_in_minutes / 60;
+          }
+        });
+        newData.push({
+          date: getWeek(week),
+          hours: totalHours,
+        });
+      });
+      setData(newData);
+    }
+
+    if (selectedView === "Month") {
+      newData = [];
+      // Get Renderable Months depending on the selectedTime
+      const calendarMonths = () => {
+        if (selectedTime === "Year") {
+          const firstMonthStart = startOfMonth(startOfYear(showDate));
+          const lastMonthEnd = endOfMonth(endOfYear(showDate));
+          return eachMonthOfInterval({
+            start: firstMonthStart,
+            end: lastMonthEnd,
+          });
+        } else if (selectedTime === "AllTime") {
+          const firstMonthStart = startOfMonth(new Date(journal[0].date));
+          const lastMonthEnd = endOfMonth(
+            new Date(journal[journal.length - 1].date)
+          );
+          return eachMonthOfInterval({
+            start: firstMonthStart,
+            end: lastMonthEnd,
+          });
+        }
+      };
+
+      calendarMonths().forEach((month) => {
+        let totalHours = 0;
+        filteredJournal.forEach((entry) => {
+          if (isSameMonth(new Date(entry.date), month)) {
+            totalHours += entry.length_in_minutes / 60;
+          }
+        });
+        newData.push({
+          date: formatDate(month, { month: "narrow" }),
+          hours: totalHours,
+        });
+      });
+      setData(newData);
+    }
+  }, [journal, selectedTime, showDate, selectedView]);
+
+  // Ensure valid view is set before rendering
+  const validateView = () => {
+    if (selectedTime === "Month" && selectedView === "Month") {
+      setSelectedView("Week");
+    } else if (selectedTime === "Year" && selectedView === "Year") {
+      setSelectedView("Month");
+    }
+  };
+
+  validateView();
 
   return (
     <div className="bg-bgSecondary rounded-md p-4 border border-borderPrimary">
@@ -77,7 +204,33 @@ function WeekDayActivity({ journal }) {
           </p>
           <p className="text-lg">Aktiivisuus </p>
         </div>
-        <div>
+
+        {/* Select boxes */}
+        <div className="flex gap-4">
+          {/* Select View */}
+          {selectedTime === "Year" ||
+          selectedTime === "AllTime" ||
+          selectedTime === "Month" ? (
+            <select
+              name="viewSelect"
+              id="selectView"
+              className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+                    hover:cursor-pointer "
+              value={selectedView}
+              onChange={(e) => setSelectedView(e.target.value)}
+            >
+              <option value="Day">Päivä</option>
+              <option value="Week">Viikko</option>
+              {selectedTime === "Year" || selectedTime === "AllTime" ? (
+                <option value="Month">Kuukausi</option>
+              ) : null}
+              {selectedTime === "AllTime" ? (
+                <option value="Year">Vuosi</option>
+              ) : null}
+            </select>
+          ) : null}
+
+          {/* select Time */}
           <select
             name="timeFilter"
             id="selectTimeFilter"

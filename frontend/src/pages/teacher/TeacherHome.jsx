@@ -16,7 +16,7 @@ import CampusComboBox from "../../components/ComboBoxes/CampusComboBox.jsx";
 import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-import { addMonths, addWeeks, subMonths, subWeeks } from "date-fns";
+import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
@@ -40,12 +40,6 @@ function TeacherHome() {
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
 
-    const getWeekNumber = (date) => {
-      const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-      const pastDaysOfYear = (date - firstDayOfYear) / 86400000; // 1 day in milliseconds
-      return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-    };
-
     if (journals.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
@@ -67,7 +61,7 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl">{getWeekNumber(showDate) - 1}</p>
+              <p className="text-xl">{getWeek(showDate)}</p>
               <button
                 className="hover:fill-blue-500 hover:underline"
                 onClick={() => {
