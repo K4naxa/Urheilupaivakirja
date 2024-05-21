@@ -82,7 +82,8 @@ function WeekDayActivity({ journal }) {
           <select
             name="timeFilter"
             id="selectTimeFilter"
-            className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md hover:cursor-pointer"
+            className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+           hover:cursor-pointer "
             value={selectedTime}
             onChange={(e) => setSelectedTime(e.target.value)}
           >

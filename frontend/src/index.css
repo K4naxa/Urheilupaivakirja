@@ -14,14 +14,14 @@
     --color-bg-gray: 247 247 250;
 
     --color-bg-exercise: 0 150 0;
-    --color-bg-rest: 80 80 120;
+    --color-bg-rest: 190 200 250;
     --color-bg-sick: 231 154 63;
 
     --color-hover-default: 230 230 230;
     --color-hover-primary: 30 130 230;
     --color-hover-gray: 220 220 220;
 
-    --color-text-exercise: 0 40 0;
+    --color-text-exercise: 230 255 230;
     --color-text-rest: 8 8 12;
     --color-text-sick: 23 15 6;
 
@@ -55,14 +55,14 @@
     --color-bg-gray: 39 39 47;
 
     --color-bg-exercise: 0 150 0;
-    --color-bg-rest: 80 80 120;
+    --color-bg-rest: 150 170 200;
     --color-bg-sick: 231 154 63;
 
     --color-hover-default: 230 230 230;
     --color-hover-primary: 58 77 200;
     --color-hover-gray: 120 120 120;
 
-    --color-text-exercise: 0 40 0;
+    --color-text-exercise: 210 240 210;
     --color-text-rest: 8 8 12;
     --color-text-sick: 23 15 6;
 
