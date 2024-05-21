@@ -9,7 +9,7 @@ export default function CreateGraphCell({ value, max, text }) {
         className={`flex flex-col-reverse h-44 w-full bg-bgSecondary rounded-md`}
       >
         <div
-          className={`flex  w-full bg-graphPrimary rounded-sm`}
+          className={`flex  w-full bg-primaryColor rounded-sm`}
           style={{ height: `${percentage}%` }}
         ></div>
       </div>

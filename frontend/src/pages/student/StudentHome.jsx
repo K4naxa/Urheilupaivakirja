@@ -66,7 +66,7 @@ function StudentHome() {
           <div className="text-textSecondary">{showDate.getFullYear()}</div>
           <div className="w-full flex justify-center items-center mb-4">
             <p
-              className="text-textPrimary hover:text-headerPrimary hover:cursor-pointer select-none"
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
               onClick={() => {
                 setShowDate(subMonths(showDate, 1));
               }}
@@ -77,7 +77,7 @@ function StudentHome() {
               {formatDate(showDate, { month: "long" })}
             </p>
             <p
-              className="text-textPrimary hover:text-headerPrimary hover:cursor-pointer select-none"
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
               onClick={() => {
                 setShowDate(addMonths(showDate, 1));
               }}
@@ -103,7 +103,10 @@ function StudentHome() {
               </p>
             </div>
             <div className="flex gap-4">
-              <button className="px-4 py-2 border border-borderPrimary rounded-md bg-headerPrimary text-white">
+              <button
+                className="px-4 py-2 border border-borderPrimary rounded-md bg-primaryColor text-white
+              hover:bg-hoverPrimary"
+              >
                 <p onClick={() => openBigModal("new")} className="">
                   + Lisää harjoitus
                 </p>

@@ -94,7 +94,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
           <input
             autoFocus
             type="text"
-            className="flex w-full text-textPrimary border-headerPrimary bg-bgPrimary focus-visible:outline-none  border-b"
+            className="flex w-full text-textPrimary border-primaryColor bg-bgPrimary focus-visible:outline-none  border-b"
             data-testid="editCampus"
             defaultValue={editedGroup}
             onChange={(e) => setEditedGroup(e.target.value)}
@@ -215,7 +215,7 @@ const GroupsPage = () => {
     <div className="flex flex-col w-full items-center bg-bgSecondary rounded-md">
       {/* header for mobile*/}
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
      rounded-b-md shadow-md"
       >
         Toimipaikat

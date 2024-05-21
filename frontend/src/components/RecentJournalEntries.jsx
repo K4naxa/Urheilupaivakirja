@@ -33,7 +33,7 @@ const RecentJournalEntry = ({ entry }) => {
       <div className="flex gap-2">
         <div className="bg-bgGray p-1 rounded-md ">
           {" "}
-          <FootballSoccerBall size={20} className="text-headerPrimary" />
+          <FootballSoccerBall size={20} className="text-primaryColor" />
         </div>
 
         <p>{entry.workout_category}</p>
@@ -50,9 +50,9 @@ const RecentJournalEntry = ({ entry }) => {
       <p
         className={cc(
           "flex w-24 h-8 justify-center items-center rounded-md",
-          entry.entry_type_id === 1 && "bg-btnGreen text-green-900",
-          entry.entry_type_id === 2 && "bg-heatmapRest",
-          entry.entry_type_id === 3 && "bg-heatmapSick"
+          entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+          entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+          entry.entry_type_id === 3 && "bg-bgSick text-textSick"
         )}
       >
         {entry.entry_type}
@@ -132,7 +132,8 @@ const RecentJournalEntries = ({ journal }) => {
             <select
               name="timeFilter"
               id="selectTimeFilter"
-              className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md"
+              className="bg-bgSecondary border border-borderPrimary
+               text-textSecondary p-2 rounded-md hover:cursor-pointer"
               value={selectedTime}
               onChange={(e) => setSelectedTime(e.target.value)}
             >

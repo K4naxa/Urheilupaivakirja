@@ -62,7 +62,7 @@ function TeacherHome() {
                 }}
               >
                 <IconContext.Provider
-                  value={{ className: "hover:text-graphPrimary" }}
+                  value={{ className: "hover:text-primaryColor" }}
                 >
                   <FiChevronLeft />
                 </IconContext.Provider>
@@ -75,7 +75,7 @@ function TeacherHome() {
                 }}
               >
                 <IconContext.Provider
-                  value={{ className: "hover:text-graphPrimary" }}
+                  value={{ className: "hover:text-primaryColor" }}
                 >
                   <FiChevronRight />
                 </IconContext.Provider>
@@ -88,7 +88,7 @@ function TeacherHome() {
               // Student card
               <div
                 key={journal.user_id}
-                className="flex flex-col rounded-md j bg-bgSecondary p-3 border border-headerPrimary shadow-sm hover:shadow-headerPrimary w-full"
+                className="flex flex-col rounded-md j bg-bgSecondary p-3 border border-primaryColor shadow-sm hover:shadow-primaryColor w-full"
                 id="studentCard"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -127,7 +127,7 @@ function TeacherHome() {
                 }}
               >
                 <IconContext.Provider
-                  value={{ className: "hover:text-graphPrimary" }}
+                  value={{ className: "hover:text-primaryColor" }}
                 >
                   <FiChevronLeft />
                 </IconContext.Provider>
@@ -142,7 +142,7 @@ function TeacherHome() {
                 }}
               >
                 <IconContext.Provider
-                  value={{ className: "hover:text-graphPrimary" }}
+                  value={{ className: "hover:text-primaryColor" }}
                 >
                   <FiChevronRight />
                 </IconContext.Provider>
@@ -153,7 +153,7 @@ function TeacherHome() {
             {journals.map((journal) => (
               <div
                 key={journal.user_id}
-                className="flex flex-col gap-2 w-64 rounded-md border border-headerPrimary shadow-sm hover:shadow-headerPrimary"
+                className="flex flex-col gap-2 w-64 rounded-md border border-primaryColor shadow-sm hover:shadow-primaryColor"
                 id="studentCard"
               >
                 <Link
@@ -214,7 +214,7 @@ function TeacherHome() {
                 onClick={handlePreviousYearClick}
               >
                 <IconContext.Provider
-                  value={{ className: "hover:text-graphPrimary" }}
+                  value={{ className: "hover:text-primaryColor" }}
                 >
                   <FiChevronLeft />
                 </IconContext.Provider>
@@ -225,7 +225,7 @@ function TeacherHome() {
                 onClick={handleNextYearClick}
               >
                 <IconContext.Provider
-                  value={{ className: "hover:text-graphPrimary" }}
+                  value={{ className: "hover:text-primaryColor" }}
                 >
                   <FiChevronRight />
                 </IconContext.Provider>
@@ -237,7 +237,7 @@ function TeacherHome() {
               <div
                 key={journal.user_id}
                 className="flex flex-col gap-2 rounded-md bg-bgSecondary border
-               border-headerPrimary shadow-sm hover:shadow-headerPrimary"
+               border-primaryColor shadow-sm hover:shadow-primaryColor"
                 id="studentCard"
               >
                 <div className="flex gap-4  leading-none items-end p-2">
@@ -363,7 +363,7 @@ function TeacherHome() {
                 setShowMonths(false);
                 setShowYears(false);
               }}
-              className={`cursor-pointer mx-2 ${showWeeks && "text-headerPrimary border-b border-headerPrimary"}`}
+              className={`cursor-pointer mx-2 ${showWeeks && "text-primaryColor border-b border-primaryColor"}`}
             >
               Viikko
             </p>
@@ -373,7 +373,7 @@ function TeacherHome() {
                 setShowMonths(true);
                 setShowYears(false);
               }}
-              className={`cursor-pointer mx-2 ${showMonths && "text-headerPrimary border-b border-headerPrimary"}`}
+              className={`cursor-pointer mx-2 ${showMonths && "text-primaryColor border-b border-primaryColor"}`}
             >
               Kuukausi
             </p>
@@ -383,7 +383,7 @@ function TeacherHome() {
                 setShowMonths(false);
                 setShowYears(true);
               }}
-              className={`cursor-pointer mx-2 ${showYears && "text-headerPrimary border-b border-headerPrimary"}`}
+              className={`cursor-pointer mx-2 ${showYears && "text-primaryColor border-b border-primaryColor"}`}
             >
               Vuosi
             </p>
@@ -410,7 +410,10 @@ function TeacherHome() {
               setSelectedCampus={setSelectedCampus}
             />
             <div className="flex lg:gap-8 justify-center text-sm">
-              <button className="Button bg-btnGray" onClick={handleFilterReset}>
+              <button
+                className="Button bg-btnGray hover:bg-hoverGray"
+                onClick={handleFilterReset}
+              >
                 Nollaa
               </button>
             </div>

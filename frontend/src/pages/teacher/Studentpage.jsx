@@ -58,7 +58,7 @@ function StudentPage() {
             <p>{student.sport}</p>
           </div>
         </div>
-        <div className="h-[1px] w-full bg-headerPrimary rounded-md"></div>
+        <div className="h-[1px] w-full bg-primaryColor rounded-md"></div>
         <div
           className={`bg-bgPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8  lg:grid-cols-3`}
         >
@@ -75,7 +75,7 @@ function StudentPage() {
                     }}
                   >
                     <IconContext.Provider
-                      value={{ className: "hover:text-graphPrimary" }}
+                      value={{ className: "hover:text-primaryColor" }}
                     >
                       <FiChevronLeft />
                     </IconContext.Provider>
@@ -90,7 +90,7 @@ function StudentPage() {
                     }}
                   >
                     <IconContext.Provider
-                      value={{ className: "hover:text-graphPrimary" }}
+                      value={{ className: "hover:text-primaryColor" }}
                     >
                       <FiChevronRight />
                     </IconContext.Provider>
@@ -104,7 +104,6 @@ function StudentPage() {
             <PractiseBoxes journalEntries={studentJournalData} />
           </div>
           <div className=" flex flex-col gap-4">
-            <WorkoutActivityChart journal={studentJournalData} />
             <WorkoutIntensityChart journal={studentJournalData} />
           </div>
           <div className="sm:col-span-2 lg:col-span-1">

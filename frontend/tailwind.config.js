@@ -6,53 +6,50 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Primary colors
+        primaryColor: "rgb(var(--color-primary) / <alpha-value>)",
+        secondaryColor: "rgb(var(--color-secondary) / <alpha-value>)",
+
+        // Background colors
         bgPrimary: "rgb(var(--color-bg-primary) / <alpha-value>)",
         bgSecondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
         bgGray: "rgb(var(--color-bg-gray) / <alpha-value>)",
+        // Background colors for different types of days    //Sick / Rest used in heatmaps
+        bgExercise: "rgb(var(--color-bg-exercise) / <alpha-value>)",
+        bgRest: "rgb(var(--color-bg-rest) / <alpha-value>)",
+        bgSick: "rgb(var(--color-bg-sick) / <alpha-value>)",
 
+        // Hover colors
+        hoverDefault: "rgb(var(--color-hover-default) / <alpha-value>)",
+        hoverPrimary: "rgb(var(--color-hover-primary) / <alpha-value>)",
+        hoverGray: "rgb(var(--color-hover-gray) / <alpha-value>)",
+
+        // Text colors
         textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
         textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",
+        // Text colors for different types of days ( used inside of a colored box)
+        textExercise: "rgb(var(--color-text-exercise) / <alpha-value>)",
+        textRest: "rgb(var(--color-text-rest) / <alpha-value>)",
+        textSick: "rgb(var(--color-text-sick) / <alpha-value>)",
 
+        // Border colors
         borderPrimary: "rgb(var(--color-border-primary) / <alpha-value>)",
 
-        graphPrimary: "rgb(var(--color-graph-primary) / <alpha-value>)",
-        graphSecondary: "rgb(var(--color-graph-secondary) / <alpha-value>)",
+        // Button colors
+        btnGray: "rgb(var(--color-button-gray) / <alpha-value>)",
+        btnGreen: "rgb(var(--color-button-green) / <alpha-value>)",
+        btnRed: "rgb(var(--color-button-red) / <alpha-value>)",
 
-        headerPrimary: "rgb(var(--color-header-primary) / <alpha-value>)",
-        headerSecondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
+        iconGray: "rgb(var(--color-icon-gray) / <alpha-value>)",
+        iconRed: "rgb(var(--color-icon-red) / <alpha-value>)",
 
-        btnGray: "rgb(var(--color-gray) / <alpha-value>)",
-        btnGreen: "rgb(var(--color-green) / <alpha-value>)",
-        btnRed: "rgb(var(--color-red) / <alpha-value>)",
-
-        listExercise: "rgb(var(--color-list-exercise) / <alpha-value>)",
-        listRest: "rgb(var(--color-list-rest) / <alpha-value>)",
-        listSick: "rgb(var(--color-list-sick) / <alpha-value>)",
-
+        // Heatmap exercise colors
         heatmapExercise1: "rgb(var(--color-heatmap-exercise1) / <alpha-value>)",
         heatmapExercise2: "rgb(var(--color-heatmap-exercise2) / <alpha-value>)",
         heatmapExercise3: "rgb(var(--color-heatmap-exercise3) / <alpha-value>)",
 
-        heatmapRest: "rgb(var(--color-heatmap-rest) / <alpha-value>)",
-        heatmapSick: "rgb(var(--color-heatmap-sick) / <alpha-value>)",
-
+        // Modal colors
         modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",
-
-        //textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
-        //textSecondary: "rgb(var(--color-text-secondary) / <alpha-value>)",
-
-        //borderPrimary: "rgb(var(--color-border-primary) / <alpha-value>)",
-
-        primary: "rgb(var(--color-header-primary) / <alpha-value>)",
-        secondary: "rgb(var(--color-header-secondary) / <alpha-value>)",
-        sickday: "rgb(var(--color-sick) / <alpha-value>)",
-        restday: "rgb(var(--color-rest) / <alpha-value>)",
-
-        sickdayLight: "rgb(var(--color-sick-light) / <alpha-value>)",
-        restdayLight: "rgb(var(--color-rest-light) / <alpha-value>)",
-
-        sickdayDark: "rgb(var(--color-sick-dark) / <alpha-value>)",
-        restdayDark: "rgb(var(--color-rest-dark) / <alpha-value>)",
       },
       gridTemplateColumns: {
         merkInfo: "auto 1fr",

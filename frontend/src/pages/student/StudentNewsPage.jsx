@@ -27,7 +27,7 @@ const StudentNewsPage = () => {
   return (
     <div className="">
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Tiedotteet

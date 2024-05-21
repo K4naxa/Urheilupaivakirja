@@ -23,7 +23,7 @@ const StudentLayout = () => {
   const { openBigModal } = useJournalModal();
 
   const linkClass =
-    "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-headerPrimary ";
+    "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-primaryColor ";
   const linkTextClass =
     "text-textPrimary items-center text-[12px] leading-none mt-2";
   return (
@@ -75,7 +75,7 @@ const StudentLayout = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgSecondary text-lg divide-y divide-headerSecondary rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgSecondary text-lg divide-y divide-secondaryColor rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     {({ active }) => (
@@ -84,7 +84,7 @@ const StudentLayout = () => {
                         id="profileBtn"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgSecondary"
+                            ? "bg-primaryColor text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -100,7 +100,7 @@ const StudentLayout = () => {
                         id="settingsBtn"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgSecondary"
+                            ? "bg-primaryColor text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -120,7 +120,7 @@ const StudentLayout = () => {
                         id="logoutBtn"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgSecondary"
+                            ? "bg-primaryColor text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -163,7 +163,7 @@ const StudentLayout = () => {
           <div className="flex justify-center">
             <NavLink className="absolute bottom-6 flex justify z-20">
               <button
-                className="bg-bgSecondary border-headerPrimary text-headerPrimary
+                className="bg-bgSecondary border-primaryColor text-primaryColor
        shadow-upper-shadow size-16 rounded-full border-t-2
         text-3xl drop-shadow-xl duration-100 active:scale-110"
                 onClick={() => openBigModal("new")}
@@ -187,7 +187,7 @@ const StudentLayout = () => {
             <button
               className={
                 linkClass +
-                `${showUserMenu ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgPrimary"}`
+                `${showUserMenu ? " bg-primaryColor rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgPrimary"}`
               }
               onClick={() => {
                 setShowUserMenu(!showUserMenu);
@@ -203,7 +203,7 @@ const StudentLayout = () => {
         <div className="absolute bottom-0 flex justify-center w-full">
           {showUserMenu && (
             <div
-              className=" bg-headerPrimary rounded-t-md w-full shadow-upper-shadow absolute
+              className=" bg-primaryColor rounded-t-md w-full shadow-upper-shadow absolute
  grid grid-cols-mHeader gap-4 bottom-[64px] right-0 l animate-menu-appear-right"
             >
               <div className="grid grid-cols-2">

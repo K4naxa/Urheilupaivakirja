@@ -412,7 +412,7 @@ const NewJournalEntryPage = () => {
 
       <div className="mainArea overflow-x-auto pb-14">
         <div className="flex flex-col border-4 border-borderPrimary rounded-md w-[600px]">
-          <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+          <div className="bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
             <p>Uusi harjoitus</p>
           </div>
           <form

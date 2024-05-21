@@ -228,7 +228,7 @@ const HeatMap_Month = ({ journal }) => {
             onClick={handlePreviousMonthClick}
           >
             <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
+              value={{ className: "hover:text-primaryColor" }}
             >
               <FiChevronLeft />
             </IconContext.Provider>
@@ -239,7 +239,7 @@ const HeatMap_Month = ({ journal }) => {
             onClick={handleNextMonthClick}
           >
             <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
+              value={{ className: "hover:text-primaryColor" }}
             >
               <FiChevronRight />
             </IconContext.Provider>

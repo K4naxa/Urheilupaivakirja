@@ -40,7 +40,7 @@ const ConfirmModal = ({
     };
   }, [onAgree, onDecline]);
 
-  const defaultStyle = "bg-headerPrimary border-headerPrimary text-white";
+  const defaultStyle = "bg-primaryColor border-primaryColor text-white";
   const redStyleClass = "bg-btnRed border-btnRed hover:bg-red-800 text-white";
   const grayStyleClass =
     "bg-btnGray border-btnGray hover:bg-gray-600 text-white";

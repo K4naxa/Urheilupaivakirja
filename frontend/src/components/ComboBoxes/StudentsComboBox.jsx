@@ -37,7 +37,7 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
         <div className="relative mt-1">
           <div
             className="relative w-full cursor-default overflow-hidden border-b
-            focus-visible:border-headerPrimary  border-borderPrimary"
+            focus-visible:border-primaryColor  border-borderPrimary"
           >
             {/* default input field */}
             <Combobox.Input
@@ -52,7 +52,7 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
             {/* button to list all options */}
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
               <FiChevronDown
-                className="h-5 w-5 text-headerPrimary"
+                className="h-5 w-5 text-primaryColor"
                 aria-hidden="true"
               />
             </Combobox.Button>
@@ -84,7 +84,7 @@ function StudentComboBox({ journals, selectedStudent, setSelectedStudent }) {
                     className={({ active }) =>
                       `relative cursor-default select-none p-2 pr-4 ${
                         active
-                          ? "bg-headerPrimary text-white"
+                          ? "bg-primaryColor text-white"
                           : "text-textPrimary"
                       }`
                     }

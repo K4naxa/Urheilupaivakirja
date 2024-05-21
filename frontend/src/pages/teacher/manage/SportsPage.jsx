@@ -86,7 +86,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
        px-4 py-2 items-center "
         >
           <input
-            className="flex text-textPrimary border-headerPrimary bg-bgSecondary focus-visible:outline-none  border-b"
+            className="flex text-textPrimary border-primaryColor bg-bgSecondary focus-visible:outline-none  border-b"
             type="text"
             id="editSport"
             autoFocus
@@ -135,13 +135,13 @@ function CreateSportContainer({ sport, sports, setSports }) {
           <div className="flex gap-4 text-xl">
             <button
               id="editBtn"
-              className="IconButton text-textSecondary"
+              className="IconButton text-iconGray"
               onClick={() => handleEdit()}
             >
               <FiEdit3 />
             </button>
             <button
-              className="IconButton text-btnRed "
+              className="IconButton text-iconRed "
               id="deleteBtn"
               onClick={() => handleDelete()}
             >
@@ -207,7 +207,7 @@ const SportsPage = () => {
     <div className="flex flex-col w-full items-center bg-bgSecondary rounded-md ">
       {/* header for mobile*/}
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Lajit

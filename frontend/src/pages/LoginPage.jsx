@@ -83,7 +83,7 @@ function LoginPage() {
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center  h-screen w-screen">
       <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
-        <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className="bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Kirjautuminen
         </div>
         <div className="relative flex h-full pt-20 flex-col gap-10 p-8 sm:p-12">
@@ -119,7 +119,7 @@ function LoginPage() {
               value={email}
               required
               placeholder="Sähköposti"
-              className={` text-lg  text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${errors.emailError ? " border-red-500" : ""}`}
+              className={` text-lg  text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-primaryColor border-b p-1 ${errors.emailError ? " border-red-500" : ""}`}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -137,7 +137,7 @@ function LoginPage() {
           <div className=" flex w-full flex-col gap-1 relative">
             {/* <label className="font-bold">Salasana</label> */}
             <input
-              className={` text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full border-b p-1 focus-visible:outline-none focus-visible:border-headerPrimary ${errors.passwordError ? "border-red-500" : ""}`}
+              className={` text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full border-b p-1 focus-visible:outline-none focus-visible:border-primaryColor ${errors.passwordError ? "border-red-500" : ""}`}
               type="password"
               placeholder="Salasana"
               value={password}
@@ -179,7 +179,7 @@ function LoginPage() {
               <button
                 type="button"
                 onClick={handleLogin}
-                className="text-textPrimary border-borderPrimary bg-headerPrimary h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
+                className="text-textPrimary border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
               >
                 Kirjaudu
               </button>

@@ -4,7 +4,7 @@ const ManageStudentsLayout = () => {
   return (
     <div className="flex flex-col gap-4 w-full">
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Opiskelija Hallinta

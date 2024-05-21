@@ -82,7 +82,7 @@ function WeekDayActivity({ journal }) {
           <select
             name="timeFilter"
             id="selectTimeFilter"
-            className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md"
+            className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md hover:cursor-pointer"
             value={selectedTime}
             onChange={(e) => setSelectedTime(e.target.value)}
           >
@@ -108,10 +108,10 @@ function WeekDayActivity({ journal }) {
               name="Tunnit"
               stroke="rgb(var(--color-text-secondary))"
             />
-            <Tooltip cursor={{ fill: "rgb(var(--color-bg-gray))" }} />
+            <Tooltip cursor={{ fill: "rgb(var(--color-bg-secondary))" }} />
             <Bar
               dataKey="hours"
-              fill="rgb(var(--color-header-primary))"
+              fill="rgb(var(--color-primary))"
               name="Treenattu"
             />
           </BarChart>

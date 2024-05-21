@@ -142,7 +142,7 @@ const ForgottenPasswordNewPasswordPage = () => {
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center  h-screen w-screen">
       <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
-        <div className="bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className="bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Salasanan palautus
         </div>
         <form
@@ -156,7 +156,7 @@ const ForgottenPasswordNewPasswordPage = () => {
               value={password}
               required
               placeholder="Salasana"
-              className={`text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${
+              className={`text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-primaryColor border-b p-1 ${
                 errors.password?.value === "error"
                   ? "border-red-500"
                   : errors.password?.value === "success"
@@ -176,7 +176,7 @@ const ForgottenPasswordNewPasswordPage = () => {
               value={passwordConfirm}
               required
               placeholder="Salasana uudelleen"
-              className={`text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-headerPrimary border-b p-1 ${
+              className={`text-lg text-textPrimary border-borderPrimary bg-bgSecondary h-10 w-full focus-visible:outline-none focus-visible:border-primaryColor border-b p-1 ${
                 errors.passwordConfirm?.value === "error"
                   ? "border-red-500"
                   : errors.passwordConfirm?.value === "success"
@@ -191,7 +191,7 @@ const ForgottenPasswordNewPasswordPage = () => {
             )}
           </div>
           <button
-            className="bg-headerPrimary text-bgPrimary w-full h-10 rounded-md"
+            className="bg-primaryColor text-bgPrimary w-full h-10 rounded-md"
             type="submit"
             disabled={!isFormValid()}
           >

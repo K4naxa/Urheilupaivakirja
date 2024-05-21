@@ -327,7 +327,7 @@ const RegistrationPage = () => {
   const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
-    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-headerPrimary";
+    "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center border-none h-screen w-screen">
@@ -335,7 +335,7 @@ const RegistrationPage = () => {
         className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
-        <div className=" relative bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className=" relative bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           <p>Rekisteröityminen</p>
 
           <Link
@@ -621,7 +621,7 @@ const RegistrationPage = () => {
           {/* TODO: Button to the center of the 2 cols when in sm:  */}
           <div className="flex sm:col-span-2 w-full justify-center my-8">
             <button
-              className=" text-textPrimary border-borderPrimary bg-headerPrimary h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
+              className=" text-textPrimary border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
               type="submit"
             >
               Rekisteröidy
