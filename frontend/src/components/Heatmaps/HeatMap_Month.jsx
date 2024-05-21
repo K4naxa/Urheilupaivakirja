@@ -1,12 +1,16 @@
 import {
+  addMonths,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   isSameDay,
   isSameMonth,
   isToday,
+  startOfDay,
   startOfMonth,
   startOfWeek,
+  sub,
+  subMonths,
 } from "date-fns";
 import { useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
@@ -30,19 +34,18 @@ function HeatMap_Month({ journal }) {
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-      const previousMonth = new Date(showDate);
-      previousMonth.setMonth(previousMonth.getMonth() + 1);
-      setShowDate(previousMonth);
+      setShowDate(startOfDay(subMonths(showDate, 1)));
     },
     onSwipedRight: () => {
-      const nextMonth = new Date(showDate);
-      nextMonth.setMonth(nextMonth.getMonth() - 1);
-      setShowDate(nextMonth);
+      setShowDate(startOfDay(addMonths(showDate, 1)));
     },
   });
 
   return (
-    <div {...handlers} className="MonthGrid w-full h-full pt-6  gap-1">
+    <div
+      {...handlers}
+      className="MonthGrid max-w-[600px]  w-full h-full pt-6  gap-1"
+    >
       {calendarDays.map((day, index) => (
         <CalendarDay
           key={day.getTime()}

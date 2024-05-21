@@ -4,15 +4,18 @@ export default function CreateGraphCell({ value, max, text }) {
   const percentage = Math.round((value / max) * 1000) / 10;
 
   return (
-    <div className="flex flex-col w-full">
-      <h4 className="text-textPrimary">{text}</h4>
-      <p className="text-textSecondary text-sm">{percentage}%</p>
-      <div className={`flex h-1 w-full bg-graphSecondary rounded-sm`}>
+    <div className="flex flex-col w-8 items-center">
+      <div
+        className={`flex flex-col-reverse h-44 w-full bg-bgSecondary rounded-md`}
+      >
         <div
-          className={`flex h-full bg-graphPrimary rounded-sm`}
-          style={{ width: `${percentage}%` }}
+          className={`flex  w-full bg-graphPrimary rounded-sm`}
+          style={{ height: `${percentage}%` }}
         ></div>
       </div>
+      <p className="text-textSecondary text-sm">{percentage}%</p>
+
+      <h4 className="text-textPrimary">{text}</h4>
     </div>
   );
 }

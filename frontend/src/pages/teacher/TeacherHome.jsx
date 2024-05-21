@@ -333,6 +333,8 @@ function TeacherHome() {
     });
   }, []);
 
+  console.log(journals);
+
   // set loading screen until journals are loaded
   useEffect(() => {
     if (journals.length > 0) {

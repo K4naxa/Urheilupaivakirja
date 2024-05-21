@@ -4,7 +4,6 @@ import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
 import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";
-import WorkoutActivityChart from "../../components/WorkoutActivityChart";
 import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useEffect, useState } from "react";
