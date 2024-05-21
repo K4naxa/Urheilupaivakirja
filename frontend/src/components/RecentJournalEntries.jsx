@@ -58,16 +58,16 @@ const RecentJournalEntry = ({ entry }) => {
         {entry.entry_type}
       </p>
       {/* Edit button only for student*/}
-      <p className="flex justify-center">
+      <div className="flex justify-center">
         {user.role !== 1 && (
           <button
             onClick={() => openBigModal("edit", { entryId: entry.id })}
-            className="col-start-3 mx-4 justify-self-end"
+            className="text-iconGray"
           >
-            <FiEdit3 size={25} />
+            <FiEdit3 size={20} />
           </button>
         )}
-      </p>
+      </div>
     </div>
   );
 };
