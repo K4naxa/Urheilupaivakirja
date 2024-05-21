@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import PractiseBoxes from "../../components/PractiseBoxes";
+import PractiseBoxes from "../../components/charts/PractiseBoxes";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";
+import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
 import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useEffect, useState } from "react";

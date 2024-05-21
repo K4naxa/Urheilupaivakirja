@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMainContext } from "../hooks/mainContext";
+import { useMainContext } from "../../hooks/mainContext";
 import dayjs from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 import { isSameMonth, isSameYear } from "date-fns";

@@ -24,6 +24,8 @@ import {
   eachMonthOfInterval,
   startOfWeek,
   endOfWeek,
+  eachYearOfInterval,
+  endOfDay,
 } from "date-fns";
 import formatDate from "../../utils/formatDate";
 
@@ -95,8 +97,12 @@ function WeekDayActivity({ journal }) {
       // Get Renderable Weeks depending on the selectedTime
       let calendarWeeks = () => {
         if (selectedTime === "Month") {
-          const firstWeekStart = startOfWeek(startOfMonth(showDate));
-          const lastWeekEnd = endOfWeek(endOfMonth(showDate));
+          const firstWeekStart = startOfWeek(startOfMonth(showDate), {
+            weekStartsOn: 1,
+          });
+          const lastWeekEnd = endOfWeek(endOfMonth(endOfDay(showDate)), {
+            weekStartsOn: 1,
+          });
           return eachWeekOfInterval(
             {
               start: firstWeekStart,
@@ -115,10 +121,10 @@ function WeekDayActivity({ journal }) {
             { weekStartsOn: 1 }
           );
         } else if (selectedTime === "AllTime") {
-          const firstWeekStart = startOfWeek(new Date(journal[0].date));
-          const lastWeekEnd = endOfWeek(
+          const firstWeekStart = startOfWeek(
             new Date(journal[journal.length - 1].date)
           );
+          const lastWeekEnd = endOfWeek(new Date(journal[0].date));
           return eachWeekOfInterval(
             {
               start: firstWeekStart,
@@ -156,10 +162,10 @@ function WeekDayActivity({ journal }) {
             end: lastMonthEnd,
           });
         } else if (selectedTime === "AllTime") {
-          const firstMonthStart = startOfMonth(new Date(journal[0].date));
-          const lastMonthEnd = endOfMonth(
+          const firstMonthStart = startOfMonth(
             new Date(journal[journal.length - 1].date)
           );
+          const lastMonthEnd = endOfMonth(new Date(journal[0].date));
           return eachMonthOfInterval({
             start: firstMonthStart,
             end: lastMonthEnd,
@@ -176,6 +182,35 @@ function WeekDayActivity({ journal }) {
         });
         newData.push({
           date: formatDate(month, { month: "narrow" }),
+          hours: totalHours,
+        });
+      });
+      setData(newData);
+    }
+
+    if (selectedView === "Year") {
+      newData = [];
+      // Get Renderable Months depending on the selectedTime
+      const calendarYears = () => {
+        const firstYearStart = startOfYear(
+          new Date(journal[journal.length - 1].date)
+        );
+        const lastYearEnd = endOfYear(new Date(journal[0].date));
+        return eachYearOfInterval({
+          start: firstYearStart,
+          end: lastYearEnd,
+        });
+      };
+
+      calendarYears().forEach((year) => {
+        let totalHours = 0;
+        filteredJournal.forEach((entry) => {
+          if (isSameYear(new Date(entry.date), year)) {
+            totalHours += entry.length_in_minutes / 60;
+          }
+        });
+        newData.push({
+          date: formatDate(year, { year: "numeric" }),
           hours: totalHours,
         });
       });

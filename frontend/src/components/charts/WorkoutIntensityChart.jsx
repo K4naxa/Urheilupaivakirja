@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CreateGraphCell from "./CreateGraphCell";
-import { useMainContext } from "../hooks/mainContext";
+import { useMainContext } from "../../hooks/mainContext";
 import { isSameMonth, isSameYear } from "date-fns";
 
 export default function WorkoutIntensityChart({ journal }) {
