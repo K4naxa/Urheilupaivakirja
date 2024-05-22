@@ -4,77 +4,79 @@
 @tailwind utilities;
 
 @layer base {
-  /* 
-
-  - bg-primary: Background color for the entire page
-  - bg-secondary: Background color for the secondary elements
-
-  - text-primary: Text color for the primary elements
-  - text-secondary: Text color for the secondary elements (like placeholder text)
-
-  - primaryColor: Main accent color for the page
-  - primaryColorHover: Hover color for the primaryColor
-
-  - border-primary: Border color for the primary elements (grayish)
-     */
   :root {
     font-family: roboto, sans-serif;
+    --color-primary: 30 150 240;
+    --color-secondary: 40 52 78;
 
-    --color-bg-primary: 235 238 241;
+    --color-bg-primary: 249 250 251;
     --color-bg-secondary: 255 255 255;
+    --color-bg-gray: 247 247 250;
+
+    --color-bg-exercise: 0 150 0;
+    --color-bg-rest: 190 200 250;
+    --color-bg-sick: 231 154 63;
+
+    --color-hover-default: 230 230 230;
+    --color-hover-primary: 30 130 230;
+    --color-hover-gray: 220 220 220;
+
+    --color-text-exercise: 230 255 230;
+    --color-text-rest: 8 8 12;
+    --color-text-sick: 23 15 6;
 
     --color-text-primary: 0 0 0;
     --color-text-secondary: 103 103 103;
 
-    --color-header-primary: 49 156 255;
-    --color-header-secondary: 40 52 78;
+    --color-border-primary: 240 240 240;
 
-    --color-border-primary: 143 142 142;
+    --color-button-gray: 235 235 235;
+    --color-button-green: 0 230 0;
+    --color-button-red: 230 0 0;
 
-    --color-graph-primary: 49 156 255;
-    --color-graph-secondary: 40 52 78;
+    --color-icon-gray: 130 130 130;
+    --color-icon-red: 240 0 0;
 
-    --color-gray: 140 140 140;
-    --color-green: 0 230 0;
-    --color-red: 230 0 0;
-
+    /* PUBLIC COLORS UNDER THIS !!! ( used in both themes ) */
     --color-modal-bg-primary: 75 75 75;
 
-    /*NEW COLORS HERE*/
-    --color-rest: 93 148 205;
-    --color-sick: 231 154 63;
-
-    --color-list-exercise: 240 250 240;
-    --color-list-sick: 250 240 240;
-    --color-list-rest: 240 240 250;
-
+    /* Heat map exercise colors */
     --color-heatmap-exercise1: 144 238 144;
     --color-heatmap-exercise2: 72 183 72;
     --color-heatmap-exercise3: 0 107 0;
-    --color-heatmap-sick: 231 154 63;
-    --color-heatmap-rest: 128 128 128;
   }
 
   :root[data-theme="dark"] {
-    font-family: roboto, sans-serif;
-    --color-bg-primary: 28 28 31;
-    --color-bg-secondary: 49 49 60;
+    --color-primary: 58 77 249;
+    --color-secondary: 40 52 78;
+
+    --color-bg-primary: 19 19 26;
+    --color-bg-secondary: 28 28 36;
+    --color-bg-gray: 39 39 47;
+
+    --color-bg-exercise: 0 150 0;
+    --color-bg-rest: 150 170 200;
+    --color-bg-sick: 231 154 63;
+
+    --color-hover-default: 230 230 230;
+    --color-hover-primary: 58 77 200;
+    --color-hover-gray: 120 120 120;
+
+    --color-text-exercise: 210 240 210;
+    --color-text-rest: 8 8 12;
+    --color-text-sick: 23 15 6;
+
     --color-text-primary: 255 255 255;
-    --color-text-secondary: 151 149 173;
+    --color-text-secondary: 177 177 178;
 
-    --color-header-primary: 83 131 232;
-    --color-header-secondary: 40 52 78;
+    --color-border-primary: 40 40 50;
 
-    --color-graph-primary: 83 131 232;
-    --color-graph-secondary: 40 52 78;
+    --color-button-gray: 100 100 100;
+    --color-button-green: 0 180 0;
+    --color-button-red: 180 0 0;
 
-    --color-gray: 180 180 180;
-    --color-green: 0 180 0;
-    --color-red: 180 0 0;
-
-    --color-list-exercise: 40 60 40;
-    --color-list-sick: 50 35 35;
-    --color-list-rest: 40 40 60;
+    --color-icon-gray: 130 130 130;
+    --color-icon-red: 200 0 0;
   }
 
   body {
@@ -89,34 +91,43 @@
     padding: 0.25rem 0rem;
     width: 4rem;
     border-radius: 0.375rem;
-    background-color: rgb(var(--color-header-primary));
+    background-color: rgb(var(--color-primary));
     color: rgb(var(--color-text-primary));
     border: 1px solid rgb(var(--color-border-primary));
 
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    transition: all ease-in-out 0.1s;
+    transition: scale ease-in-out 0.1s;
 
     &:active {
       scale: 0.95;
     }
   }
 
+  /* IconBox for componentHeader Icons */
+  .IconBox {
+    padding: 0.2rem;
+    aspect-ratio: 1;
+    background-color: rgb(var(--color-primary));
+    color: white;
+    font-size: 20px;
+    border-radius: 3px;
+  }
+
   .MonthDate {
-    display: block;
+    display: flex;
     aspect-ratio: 1;
     border-radius: 4px;
-    font-size: 10px;
-    text-align: center;
+    font-size: 12px;
     justify-content: center;
-    align-content: center;
+    align-items: center;
     color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-bg-secondary));
-    border-color: rgb(var(--color-bg-secondary));
+    background-color: rgb(var(--color-bg-primary));
+    border-color: rgb(var(--color-border-primary));
 
     &:hover {
-      border: 1px solid rgb(var(--color-header-primary));
+      border: 1px solid rgb(var(--color-primary));
       cursor: pointer;
     }
   }
@@ -127,8 +138,8 @@
     justify-content: center;
     align-items: center;
     color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-bg-secondary));
-    border-color: rgb(var(--color-bg-secondary));
+    background-color: rgb(var(--color-bg-primary));
+    border-color: rgb(var(--color-border-primary));
 
     &:hover {
       cursor: pointer;
@@ -194,45 +205,8 @@
 }
 
 a.active {
-  color: rgb(var(--color-header-primary));
-  border-color: rgb(var(--color-header-primary));
-}
-
-/* Cal-Heatmap Settings */
-.ch-subdomain-bg {
-  fill: rgb(var(--color-bg-secondary));
-  color: rgb(var(--color-text-primary));
-}
-.ch-subdomain-text {
-  fill: rgb(var(--color-text-secondary));
-}
-
-.ch-subdomain-bg.highlight {
-  stroke: rgb(var(--color-graph-primary));
-  stroke-width: 1px;
-}
-
-.ch-subdomain-bg:hover {
-  stroke: rgb(var(--color-header-primary));
-  stroke-width: 1px;
-}
-[data-theme="dark"] .ch-subdomain-bg {
-  fill: rgb(var(--color-bg-secondary));
-}
-
-[data-theme="dark"] .ch-subdomain-bg.highlight {
-  stroke: rgb(var(--color-graph-primary));
-}
-
-[data-theme="dark"] .ch-subdomain-bg:hover {
-  stroke: #636e7b;
-  color: rgb(var(--color-text-primary));
-}
-
-#studentCard {
-  & .ch-subdomain-bg {
-    fill: rgb(var(--color-bg-primary));
-  }
+  color: rgb(var(--color-primary));
+  border-color: rgb(var(--color-primary));
 }
 /* Scrollbar Settings */
 ::-webkit-scrollbar {
@@ -249,7 +223,7 @@ a.active {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--color-header-primary));
+  background: rgb(var(--color-primary));
   border-radius: 5px;
 }
 

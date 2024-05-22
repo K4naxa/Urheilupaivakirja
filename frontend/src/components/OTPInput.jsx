@@ -71,12 +71,10 @@ const OTPInput = ({ length, onComplete }) => {
   const handlePost = () => {
     if (isFilled()) {
       onComplete(inputs.join(""));
+    } else {
+      addToast("Täytä kaikki kentät", { style: "error" });
     }
-    else {
-        addToast("Täytä kaikki kentät", { style: "error" });
-    }
-  }
-
+  };
 
   const focusAndSelect = (index) => {
     const input = inputRefs.current[index].current;
@@ -89,7 +87,7 @@ const OTPInput = ({ length, onComplete }) => {
       <div className="flex w-full justify-between">
         {inputs.map((input, index) => (
           <input
-            className="bg-bgkPrimary text-center w-[40px] h-[40px] rounded border border-borderPrimary"
+            className="bg-bgPrimary text-center w-[40px] h-[40px] rounded border border-borderPrimary"
             key={index}
             ref={inputRefs.current[index]}
             type="text"

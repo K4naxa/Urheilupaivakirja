@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import PractiseBoxes from "../../components/PractiseBoxes";
+import PractiseBoxes from "../../components/charts/PractiseBoxes";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";
-import WorkoutActivityChart from "../../components/WorkoutActivityChart";
+import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
 import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useEffect, useState } from "react";
@@ -59,9 +58,9 @@ function StudentPage() {
             <p>{student.sport}</p>
           </div>
         </div>
-        <div className="h-[1px] w-full bg-headerPrimary rounded-md"></div>
+        <div className="h-[1px] w-full bg-primaryColor rounded-md"></div>
         <div
-          className={`bg-bgkPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8  lg:grid-cols-3`}
+          className={`bg-bgPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8  lg:grid-cols-3`}
         >
           <div className=" flex flex-col justify-between gap-4 align-middle">
             <div className="grid place-items-center  gap-2">
@@ -76,7 +75,7 @@ function StudentPage() {
                     }}
                   >
                     <IconContext.Provider
-                      value={{ className: "hover:text-graphPrimary" }}
+                      value={{ className: "hover:text-primaryColor" }}
                     >
                       <FiChevronLeft />
                     </IconContext.Provider>
@@ -91,7 +90,7 @@ function StudentPage() {
                     }}
                   >
                     <IconContext.Provider
-                      value={{ className: "hover:text-graphPrimary" }}
+                      value={{ className: "hover:text-primaryColor" }}
                     >
                       <FiChevronRight />
                     </IconContext.Provider>
@@ -105,7 +104,6 @@ function StudentPage() {
             <PractiseBoxes journalEntries={studentJournalData} />
           </div>
           <div className=" flex flex-col gap-4">
-            <WorkoutActivityChart journal={studentJournalData} />
             <WorkoutIntensityChart journal={studentJournalData} />
           </div>
           <div className="sm:col-span-2 lg:col-span-1">

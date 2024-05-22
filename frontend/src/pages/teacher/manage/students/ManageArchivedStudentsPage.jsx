@@ -15,7 +15,7 @@ import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx"
 const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
     <div
-      className="flex justify-between border border-headerPrimary p-2 rounded-md"
+      className="flex justify-between border border-primaryColor p-2 rounded-md"
       key={student.user_id}
     >
       <div className="flex flex-col">
@@ -55,7 +55,7 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
           <FiTrash2 />
         </button>
         <button
-          className="text-headerPrimary"
+          className="text-primaryColor"
           onClick={() => {
             handleActivation(student);
           }}
@@ -246,7 +246,7 @@ const ManageArchivedStudentsPage = () => {
             <div
               className={cc(
                 "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.name !== 0 && "text-headerPrimary"
+                sorting.name !== 0 && "text-primaryColor"
               )}
               onClick={() => {
                 handleNameSorting();
@@ -261,7 +261,7 @@ const ManageArchivedStudentsPage = () => {
             <div
               className={cc(
                 "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.sport !== 0 && "text-headerPrimary"
+                sorting.sport !== 0 && "text-primaryColor"
               )}
               onClick={() => {
                 handleSportSorting();
@@ -276,7 +276,7 @@ const ManageArchivedStudentsPage = () => {
             <div
               className={cc(
                 "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.group !== 0 && "text-headerPrimary"
+                sorting.group !== 0 && "text-primaryColor"
               )}
               onClick={() => {
                 handleGroupSorting();
@@ -291,7 +291,7 @@ const ManageArchivedStudentsPage = () => {
             <div
               className={cc(
                 "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.campus !== 0 && "text-headerPrimary"
+                sorting.campus !== 0 && "text-primaryColor"
               )}
               onClick={() => {
                 handleCampusSorting();

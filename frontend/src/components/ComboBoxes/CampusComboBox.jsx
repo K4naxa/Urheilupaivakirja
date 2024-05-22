@@ -19,12 +19,12 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
         <div className="relative mt-1">
           <div
             className="relative w-full cursor-default overflow-hidden border-b
-            focus-visible:border-headerPrimary  border-borderPrimary"
+            focus-visible:border-primaryColor  border-borderPrimary"
           >
             {/* default input field */}
             <Combobox.Input
               className="w-full border-none p-2
-                focus-visible:outline-none bg-bgkSecondary z-0"
+                focus-visible:outline-none bg-bgSecondary z-0"
               displayValue={(campus) => campus?.name}
               placeholder="Hae Toimipiste"
               onChange={(event) => setQuery(event.target.value)}
@@ -32,7 +32,7 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
             {/* button to list all options */}
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
               <FiCheck
-                className="h-5 w-5 text-headerPrimary"
+                className="h-5 w-5 text-primaryColor"
                 aria-hidden="true"
               />
             </Combobox.Button>
@@ -48,7 +48,7 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
           >
             {/* list of choises */}
             <Combobox.Options
-              className="absolute mt-1 max-h-60 w-full overflow-auto bg-bgkSecondary rounded-md py-1 text-base shadow-lg
+              className="absolute mt-1 max-h-60 w-full overflow-auto bg-bgSecondary rounded-md py-1 text-base shadow-lg
                ring-1 ring-black/5 focus:outline-none sm:text-sm"
             >
               {/* if nothing is found */}
@@ -64,7 +64,7 @@ function CampusComboBox({ campuses, selectedCampus, setSelectedCampus }) {
                     className={({ active }) =>
                       `relative cursor-default select-none p-2 pr-4 ${
                         active
-                          ? "bg-headerPrimary text-white"
+                          ? "bg-primaryColor text-white"
                           : "text-textPrimary"
                       }`
                     }

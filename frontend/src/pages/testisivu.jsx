@@ -33,7 +33,7 @@ function Testisivu() {
             }}
           >
             <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
+              value={{ className: "hover:text-primaryColor" }}
             >
               <FiChevronLeft />
             </IconContext.Provider>
@@ -48,7 +48,7 @@ function Testisivu() {
             }}
           >
             <IconContext.Provider
-              value={{ className: "hover:text-graphPrimary" }}
+              value={{ className: "hover:text-primaryColor" }}
             >
               <FiChevronRight />
             </IconContext.Provider>

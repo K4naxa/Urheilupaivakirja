@@ -1,6 +1,13 @@
-import { FiEdit3 } from "react-icons/fi";
+import { FiBarChart2, FiEdit3 } from "react-icons/fi";
 import { useJournalModal } from "../hooks/useJournalModal";
 import { useAuth } from "../hooks/useAuth";
+import dayjs from "dayjs";
+import cc from "../utils/cc";
+
+import { FootballSoccerBall } from "@vectopus/atlas-icons-react";
+import { useMainContext } from "../hooks/mainContext";
+import { useEffect, useState } from "react";
+import { isSameMonth, isSameYear } from "date-fns";
 
 const convertTime = (totalMinutes) => {
   const hours = Math.floor(totalMinutes / 60);
@@ -14,102 +21,51 @@ const convertTime = (totalMinutes) => {
   return `${hours}h ${minutes}min`;
 };
 
-function formatDateString(isoDateString) {
-  const date = new Date(isoDateString);
-
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function formatDateToDisplay(isoDateString) {
-  const formattedDate = formatDateString(isoDateString);
-  const [year, month, day] = formattedDate.split("-");
-  return `${day}.${month}.${year}`;
-}
-
-const dataContainerClass = "grid grid-cols-merkInfo gap-2";
-const labelClass = "text-textSecondary min-w-16";
-
 const RecentJournalEntry = ({ entry }) => {
   const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 
-  let bgColor = "";
-  if (entry.entry_type === "Sairaana") bgColor = "bg-listSick";
-  if (entry.entry_type === "Lepo") bgColor = "bg-listRest";
-  if (entry.entry_type_id === 1) bgColor = "bg-listExercise";
-
   return (
-    <div
-      className={` bg-bgkSecondary flex w-full flex-col rounded-md p-2 shadow-md ${bgColor}`}
-    >
-      {/* Header */}
-      <div className=" border-headerPrimary grid grid-cols-3 rounded-t-md border-b py-2  ">
-        {entry.entry_type &&
-          (entry.entry_type === "Lepo" || entry.entry_type === "Sairaana") && (
-            <p className="text-textPrimary col-start-1 mx-2 justify-self-start">
-              {entry.entry_type}
-            </p>
-          )}
-        {entry.date && (
-          <p className="text-textPrimary col-start-2 text-center">
-            {formatDateToDisplay(entry.date)}
-          </p>
+    <div className="grid  grid-cols-6 gap-4 p-2 items-center hover:bg-bgGray">
+      {/* Sport */}
+      {/* Date */}
+      <p>{dayjs(entry.date).format("DD.MM.YYYY")}</p>
+      <div className="flex gap-2">
+        <div className="bg-bgGray p-1 rounded-md ">
+          {" "}
+          <FootballSoccerBall size={20} className="text-primaryColor" />
+        </div>
+
+        <p>{entry.workout_category}</p>
+      </div>
+
+      {/* WorkoutLenght */}
+      <p>
+        {" "}
+        {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
+      </p>
+      {/* Intensity */}
+      <p>{entry.intensity}</p>
+      {/* Type of entry (sick, rest, ..) */}
+      <p
+        className={cc(
+          "flex w-24 h-8 justify-center items-center rounded-md",
+          entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+          entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+          entry.entry_type_id === 3 && "bg-bgSick text-textSick"
         )}
+      >
+        {entry.entry_type}
+      </p>
+      {/* Edit button only for student*/}
+      <div className="flex justify-center">
         {user.role !== 1 && (
           <button
             onClick={() => openBigModal("edit", { entryId: entry.id })}
-            className="col-start-3 mx-4 justify-self-end"
+            className="text-iconGray"
           >
-            <FiEdit3 />
+            <FiEdit3 size={20} />
           </button>
-        )}
-      </div>
-      {/* content container */}
-      <div className="grid w-full grid-cols-2 gap-2 p-2 pb-0">
-        {/* left Container */}
-        <div>
-          {entry.length_in_minutes && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Kesto:</span>
-              <span className="text-textPrimary">
-                {convertTime(entry.length_in_minutes)}
-              </span>
-            </div>
-          )}
-
-          {entry.intensity && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Rankkuus:</span>
-              <span className="value">{entry.intensity}</span>
-            </div>
-          )}
-        </div>
-        {/* right Container */}
-        <div>
-          {entry.workout_category && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Laji:</span>
-              <span className="value">{entry.workout_category}</span>
-            </div>
-          )}
-          {entry.time_of_day && (
-            <div className={dataContainerClass}>
-              <span className={labelClass}>Aika:</span>
-              <span className="value">{entry.time_of_day}</span>
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="p-2">
-        {entry.details && (
-          <div className=" flex flex-wrap gap-2">
-            <span className={labelClass}>Lisätiedot:</span>
-            <span className="value">{entry.details}</span>
-          </div>
         )}
       </div>
     </div>
@@ -118,15 +74,44 @@ const RecentJournalEntry = ({ entry }) => {
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
 const RecentJournalEntries = ({ journal }) => {
+  const { showDate } = useMainContext();
+  const [filteredJournal, setFilteredJournal] = useState([]);
+  const [selectedTime, setSelectedTime] = useState("Month");
+
   if (journal.journal_entries) journal = journal.journal_entries;
-  if (journal.length === 0) {
+
+  useEffect(() => {
+    if (journal) {
+      const filteredJournal = journal.filter((entry) => {
+        if (selectedTime === "Month") {
+          return isSameMonth(showDate, new Date(entry.date), {
+            weekStartsOn: 1,
+          })
+            ? entry
+            : null;
+        } else if (selectedTime === "Year") {
+          return isSameYear(showDate, new Date(entry.date), {
+            weekStartsOn: 1,
+          })
+            ? entry
+            : null;
+        } else {
+          return entry;
+        }
+      });
+
+      setFilteredJournal(filteredJournal);
+    }
+  }, [journal, selectedTime, showDate]);
+
+  if (filteredJournal.length === 0) {
     return (
       <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
         <h2 className="text-lg">Viimeisimmät merkinnät</h2>
         <div
           className="flex w-full 
         flex-col gap-4 overflow-y-auto
-        overscroll-none rounded-md scroll-smooth text-center bg-bgkSecondary h-full"
+        overscroll-none rounded-md scroll-smooth text-center bg-bgSecondary h-full"
         >
           Ei merkintöjä
         </div>
@@ -134,16 +119,46 @@ const RecentJournalEntries = ({ journal }) => {
     );
   } else
     return (
-      <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
-        <h2 className="text-lg">Viimeisimmät merkinnät</h2>
-        <div
-          className="flex w-full pr-2
-        flex-col gap-4 overflow-y-auto
-        overscroll-none rounded-md scroll-smooth"
-        >
-          {journal.map((entry) => (
-            <RecentJournalEntry key={entry.id} entry={entry} />
-          ))}
+      <div className="p-4 rounded-md border border-borderPrimary">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex gap-2 items-center">
+            <p className="IconBox">
+              <FiBarChart2 />
+            </p>
+            <h2 className="text-lg font-medium">Omat merkinnät</h2>
+          </div>
+          <div>
+            <select
+              name="timeFilter"
+              id="selectTimeFilter"
+              className="bg-bgSecondary border border-borderPrimary
+               text-textSecondary p-2 rounded-md hover:cursor-pointer"
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+            >
+              <option value="Month">Kuukausi</option>
+              <option value="Year">Vuosi</option>
+              <option value="AllTime">Kaikki</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex h-full overflow-y-auto">
+          <div className="flex w-full h-full flex-col overflow-y-auto rounded-md max-h-[300px] relative">
+            <div className="sticky top-0 grid grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
+              <span>Laji</span>
+              <span>Päivämäärä</span>
+              <span>Kesto</span>
+              <span>Rankkuus</span>
+              <span>Tyyppi</span>
+              <span></span>
+            </div>
+            <div className="divide-y divide-borderPrimary flex flex-col h-full">
+              {" "}
+              {filteredJournal.map((entry) => (
+                <RecentJournalEntry key={entry.id} entry={entry} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

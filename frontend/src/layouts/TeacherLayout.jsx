@@ -25,18 +25,18 @@ const TeacherLayout = () => {
   const [showControlPanel, setShowControlPanel] = useState(false);
 
   const linkClass =
-    "flex flex-col items-center text-textPrimary hover:underline py-2 rounded-md hover:text-headerSecondary text-xl";
+    "flex flex-col items-center text-textPrimary py-2 px-4 rounded-md hover:bg-bgGray text-xl";
   const linkTextClass =
-    "text-textPrimary hover:text-bgkSecondary active:text-graphPrimary items-center text-[12px] leading-none mt-2";
+    "text-textPrimary hover:text-bgSecondary active:text-primaryColor items-center text-[12px] leading-none mt-2";
   return (
     <div className="text-textPrimary">
       <header
         id="desktop-header"
-        className={`bg-bgkPrimary border-graphPrimary fixed-header mb-12 hidden z-10
+        className={`bg-bgSecondary border-primaryColor fixed-header mb-12 hidden z-10
           border-b-2 px-4 py-2 text-xl shadow-md max-h-20 lg:flex`}
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
-          <div className="text-textPrimary flex justify-center gap-8 ">
+          <div className="text-textPrimary flex justify-center gap-4 ">
             <div className="items-center flex">Urheilupäiväkirja</div>
             <NavLink to="/opettaja/" id="homeLink" className={linkClass}>
               Etusivu
@@ -91,7 +91,7 @@ const TeacherLayout = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgkSecondary text-lg divide-y divide-headerSecondary rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgSecondary text-lg divide-y divide-secondaryColor rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     {({ active }) => (
@@ -99,7 +99,7 @@ const TeacherLayout = () => {
                         to="/profiili"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgkSecondary"
+                            ? "bg-primaryColor text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -114,7 +114,7 @@ const TeacherLayout = () => {
                         to="/asetukset"
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgkSecondary"
+                            ? "bg-primaryColor text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -133,7 +133,7 @@ const TeacherLayout = () => {
                         }}
                         className={`${
                           active
-                            ? "bg-headerPrimary text-bgkSecondary"
+                            ? "bg-primaryColor text-bgSecondary"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -151,7 +151,7 @@ const TeacherLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgkPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden z-10`}
+        className={`bg-bgPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden z-10`}
         id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
@@ -168,7 +168,7 @@ const TeacherLayout = () => {
             to="/opettaja/hallitse/"
             className={
               linkClass +
-              `${showControlPanel ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-150" : " bg-bgkPrimary"}`
+              `${showControlPanel ? " bg-primaryColor rounded-b-md rounded-t-none transition-colors duration-150" : " bg-bgPrimary"}`
             }
             onClick={(e) => {
               e.preventDefault();
@@ -188,7 +188,7 @@ const TeacherLayout = () => {
           <button
             className={
               linkClass +
-              `${showMenu ? " bg-headerPrimary rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgkPrimary"}`
+              `${showMenu ? " bg-primaryColor rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgPrimary"}`
             }
             onClick={() => {
               setShowMenu(!showMenu);
@@ -203,7 +203,7 @@ const TeacherLayout = () => {
         {/* Div for Control Panel menu*/}
         <div className="absolute bottom-0 flex justify-center w-full">
           {showControlPanel && (
-            <div className=" bg-headerPrimary rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-5 place-items-center bottom-[64px] right-0 l animate-menu-appear-middle">
+            <div className=" bg-primaryColor rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-5 place-items-center bottom-[64px] right-0 l animate-menu-appear-middle">
               <NavLink
                 to="/opettaja/hallitse/lajit"
                 className={linkClass}
@@ -252,7 +252,7 @@ const TeacherLayout = () => {
         <div className="absolute bottom-0 flex justify-center w-full">
           {showMenu && (
             <div
-              className=" bg-headerPrimary rounded-t-md w-full shadow-upper-shadow
+              className=" bg-primaryColor rounded-t-md w-full shadow-upper-shadow
              absolute grid grid-cols-4 place-items-center bottom-[64px] right-0
               animate-menu-appear-right"
             >

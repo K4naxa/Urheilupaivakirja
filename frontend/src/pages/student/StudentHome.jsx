@@ -1,24 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
-import PractiseBoxes from "../../components/PractiseBoxes";
+import { useEffect } from "react";
+import PractiseBoxes from "../../components/charts/PractiseBoxes";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/WorkoutIntensityChart";
-import WorkoutActivityChart from "../../components/WorkoutActivityChart";
+import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
 import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
-import { useEffect } from "react";
-
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
-
-import { FiChevronLeft } from "react-icons/fi";
-import { FiChevronRight } from "react-icons/fi";
-import { IconContext } from "react-icons/lib";
 import { addMonths, subMonths } from "date-fns";
+
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiBarChart,
+  FiZap,
+  FiBarChart2,
+} from "react-icons/fi";
+
+import { useJournalModal } from "../../hooks/useJournalModal";
+import WeekDayActivity from "../../components/charts/WeekDayActivity";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
+  const { openBigModal } = useJournalModal();
 
   const {
     data: studentJournalData,
@@ -28,7 +34,7 @@ function StudentHome() {
   } = useQuery({
     queryKey: ["studentJournal"],
     queryFn: () => trainingService.getAllUserJournalEntries(),
-    staleTime: 15 * 60 * 1000, // = 15 minutes in milliseconds - how long to use the cached data before re-fetching
+    staleTime: 15 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -46,57 +52,97 @@ function StudentHome() {
   if (studentJournalDataError) {
     return (
       <div className="flex justify-center items-center">
-        <h1>Jokin meni vikaan</h1>
+        <h1>Something went wrong</h1>
       </div>
     );
   }
+
   return (
-    <div className="mainArea overflow-x-auto">
-      <div
-        className={`bg-bgkPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-12`}
-      >
-        <div className=" flex flex-col justify-between gap-4 align-middle">
-          <div className="grid place-items-center  gap-4">
-            <div className="flex w-full flex-col justify-center text-center">
-              {/* controls */}
-              <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-              <div className="hover: flex justify-center gap-4">
-                <button
-                  className="hover:underline hover:text-graphPrimary"
-                  onClick={() => {
-                    setShowDate(subMonths(showDate, 1));
-                  }}
-                >
-                  <FiChevronLeft />
-                </button>
-                <p className="text-xl w-24">
-                  {formatDate(showDate, { month: "long" })}
-                </p>
-                <button
-                  className="hover:fill-blue-500 hover:underline hover:text-graphPrimary"
-                  onClick={() => {
-                    setShowDate(addMonths(showDate, 1));
-                  }}
-                >
-                  <FiChevronRight />
-                </button>
-              </div>
-            </div>
-            <HeatMap_Month journal={studentJournalData} />
+    <div className="grid grid-cols-1 w-full m-8  gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
+      {/* first row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 grid-rows-1 w-full h-full">
+        {/* left Side */}
+        <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
+          <div className="text-textSecondary">{showDate.getFullYear()}</div>
+          <div className="w-full flex justify-center items-center mb-4">
+            <p
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              onClick={() => {
+                setShowDate(subMonths(showDate, 1));
+              }}
+            >
+              <FiChevronLeft />
+            </p>
+            <p className="w-24 text-lg">
+              {formatDate(showDate, { month: "long" })}
+            </p>
+            <p
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              onClick={() => {
+                setShowDate(addMonths(showDate, 1));
+              }}
+            >
+              <FiChevronRight />
+            </p>
           </div>
 
-          <PractiseBoxes journalEntries={studentJournalData} />
+          <div className="w-full flex justify-center">
+            <HeatMap_Month journal={studentJournalData} />
+          </div>
         </div>
-        <div className=" flex flex-col gap-4">
-          <WorkoutActivityChart journal={studentJournalData} />
-          <WorkoutIntensityChart journal={studentJournalData} />
+        {/* rightSide */}
+        <div className="lg:col-span-2 flex-col bg-bgSecondary p-4 rounded-md border border-borderPrimary">
+          <div className="flex justify-between">
+            <div>
+              <div className="text-2xl font-medium flex gap-2">
+                <p className="text-textSecondary">Huomenta</p>
+                <p className="text-textPrimary"> Testi Käyttäjä</p>
+              </div>
+              <p className="text-textSecondary">
+                Paras päivä aloittaa urheilu oli eilen
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <button
+                className="px-4 py-2 border border-borderPrimary rounded-md bg-primaryColor text-white
+              hover:bg-hoverPrimary"
+              >
+                <p onClick={() => openBigModal("new")} className="">
+                  + Lisää harjoitus
+                </p>
+              </button>
+            </div>
+          </div>
+          <div className=" mt-4">
+            <RecentJournalEntries journal={studentJournalData} />
+          </div>
         </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <RecentJournalEntries journal={studentJournalData} />
+      </div>
+      {/* second row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+        <div>
+          <WeekDayActivity journal={studentJournalData} />
         </div>
-        <div className="flex  overflow-x-auto self-center sm:col-span-2 lg:col-span-3">
-          <HeatMap_Year journal={studentJournalData} />
+
+        <div className="bg-bgSecondary w-full  p-4 rounded-md border border-borderPrimary"></div>
+      </div>
+
+      {/* thrid Row */}
+      <div
+        className="flex flex-col bg-bgSecondary
+      p-4
+        rounded-md"
+      >
+        <div className="flex justify-between">
+          <div className="flex gap-2  mb-4 items-center">
+            {" "}
+            <p className="IconBox">
+              <FiZap />
+            </p>
+            <p className="text-lg">Vuoden merkinnät</p>
+          </div>
         </div>
+        <HeatMap_Year journal={studentJournalData} />
       </div>
     </div>
   );

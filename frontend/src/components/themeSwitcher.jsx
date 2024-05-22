@@ -8,14 +8,14 @@ const ThemeSwitcher = () => {
   return (
     <div
       className={`flex w-[26px] select-none h-[56px] border border-btnGray rounded-t-full rounded-b-full justify-center relative transition-all duration-300 ease-in-out hover:cursor-pointer
-      bg-bgkPrimary shadow-md ${theme === "light" ? "" : ""}`}
+      bg-bgPrimary shadow-md ${theme === "light" ? "" : ""}`}
       onClick={() => toggleTheme()}
     >
       <div
-        className={`flex bg-headerPrimary rounded-full justify-center items-center w-[26px] h-[28px] absolute transition-transform duration-300 ease-in-out ${
+        className={`flex bg-primaryColor rounded-full justify-center items-center w-[26px] h-[28px] absolute transition-transform duration-300 ease-in-out ${
           theme === "light"
             ? "transform translate-y-0"
-            : "transform translate-y-full bg-headerSecondary"
+            : "transform translate-y-full bg-secondaryColor"
         }`}
       >
         {theme === "dark" ? (

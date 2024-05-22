@@ -92,9 +92,9 @@ function CalendarDay({ day, journal, month, showDate }) {
       return "bg-heatmapExercise3 text-white border-heatmapExercise3";
 
     if (journal[0]?.entry_type_id === 2)
-      return "bg-heatmapRest text-white border-heatmapRest";
+      return "bg-bgRest text-white border-bgRest";
     if (journal[0]?.entry_type_id === 3)
-      return "bg-heatmapSick text-white border-heatmapSick";
+      return "bg-bgSick text-white border-bgSick";
 
     return null;
   }
@@ -102,9 +102,9 @@ function CalendarDay({ day, journal, month, showDate }) {
   return (
     <div
       className={cc(
-        "YearDate border relative rounded-sm hover:border-headerPrimary",
+        "YearDate border relative rounded-sm hover:border-primaryColor",
         !isSameMonth(day, month[10]) && "invisible",
-        isToday(day) && "border-headerPrimary",
+        isToday(day) && "border-primaryColor",
         handleColor(minutes)
       )}
     ></div>

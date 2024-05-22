@@ -78,9 +78,9 @@ export default function HeatMap_Weeks({ journal }) {
         return "bg-heatmapExercise3 border-heatmapExercise3  text-white";
 
       if (journal[0]?.entry_type_id === 2)
-        return "bg-heatmapRest border-heatmapRest text-white";
+        return "bg-bgRest border-bgRest text-white";
       if (journal[0]?.entry_type_id === 3)
-        return "bg-heatmapSick border-heatmapSick text-white";
+        return "bg-bgSick border-bgSick text-white";
 
       return null;
     }
@@ -90,7 +90,7 @@ export default function HeatMap_Weeks({ journal }) {
         className={cc(
           "MonthDate relative border w-5 lg:w-7",
           user.role === 1 && "bg-bgPrimary border-bgPrimary",
-          isToday(day) && "border  border-headerPrimary",
+          isToday(day) && "border  border-primaryColor",
           handleColor(minutes)
         )}
       >

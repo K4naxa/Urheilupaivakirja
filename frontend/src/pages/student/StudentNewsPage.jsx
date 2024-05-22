@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 const renderSingleNews = (news) => {
   return (
     <div
-      className="bg-bgkSecondary p-4 shadow-md rounded-md max-w-96"
+      className="bg-bgSecondary p-4 shadow-md rounded-md max-w-96"
       key={news.id}
     >
       <h3 className="text-lg text-center mb-2 font-semibold">{news.title}</h3>
@@ -27,7 +27,7 @@ const StudentNewsPage = () => {
   return (
     <div className="">
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Tiedotteet

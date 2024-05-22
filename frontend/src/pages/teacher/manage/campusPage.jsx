@@ -81,11 +81,11 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
   if (campus.isEditing) {
     return (
       <div className="flex flex-col">
-        <div className="flex justify-between rounded-md gap-8 px-4 py-2 bg-bgkPrimary">
+        <div className="flex justify-between rounded-md gap-8 px-4 py-2 bg-bgPrimary">
           <input
             autoFocus
             type="text"
-            className="flex w-full text-textPrimary border-headerPrimary bg-bgkPrimary focus-visible:outline-none  border-b"
+            className="flex w-full text-textPrimary border-primaryColor bg-bgPrimary focus-visible:outline-none  border-b"
             data-testid="editCampus"
             defaultValue={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -119,7 +119,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
     return (
       <div className="flex flex-col">
         {/* main Container */}
-        <div className="grid grid-cols-controlpanel3 hover:bg-bgkPrimary rounded-md px-4 py-2 items-center">
+        <div className="grid grid-cols-controlpanel3 hover:bg-bgPrimary rounded-md px-4 py-2 items-center">
           <p className="">{campus.name}</p>
           <p className="text-center">{campus.student_count}</p>
           <div className="flex gap-4 text-xl">
@@ -181,10 +181,10 @@ const CampusPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col w-full items-center bg-bgkSecondary rounded-md">
+    <div className="flex flex-col w-full items-center bg-bgSecondary rounded-md">
       {/* header for mobile*/}
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-headerPrimary w-full
+        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Toimipaikat
@@ -211,7 +211,7 @@ const CampusPage = () => {
         {/* New campus input */}
         <div className="flex text-textPrimary text-xl justify-center">
           <input
-            className="text-lg text-textPrimary border-btnGreen bg-bgkSecondary h-10 focus-visible:outline-none border-b p-1"
+            className="text-lg text-textPrimary border-btnGreen bg-bgSecondary h-10 focus-visible:outline-none border-b p-1"
             type="text"
             data-testid="newCampusInput"
             placeholder="Lisää toimipaikka.."

@@ -6,7 +6,7 @@ import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 
-//const headerContainer = "bg-headerPrimary border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
+//const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
   "flex flex-col items-center gap-0.5 sm:gap-1 w-full max-w-[370px] p-1";
 const inputLabel = "text-textPrimary font-medium";
@@ -360,9 +360,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:border-headerPrimary  peer-checked:text-bgkSecondary peer-checked:bg-headerPrimary bg-bgkSecondary
-          peer-focus-visible:ring-2 peer-focus-visible:ring-headerSecondary p-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
-          active:scale-95 transition-transform duration-75 hover:border-headerPrimary hover:text-headerPrimary"
+          className="peer-checked:border-primaryColor  peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgSecondary
+          peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor p-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
+          active:scale-95 transition-transform duration-75 hover:border-primaryColor hover:text-primaryColor"
         >
           {label}
         </label>
@@ -431,7 +431,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         closeOnOutsideClick={false}
       />
       <div className="flex flex-col h-full sm:border  sm:border-borderPrimary sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
-        <div className="relative bg-headerPrimary p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
+        <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
           <p className="sm:min-w-[400px] cursor-default	">Uusi merkintä</p>
           <button
             onClick={onClose}
@@ -441,7 +441,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           </button>
         </div>
         <form
-          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgkSecondary sm:rounded-b-md flex-grow"
+          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
           onSubmit={newJournalEntryHandler}
         >
           <div className="flex flex-col items-center w-full p-1">
@@ -450,7 +450,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 type="button"
                 onClick={() => entryTypeChangeHandler("2")}
                 className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "2" ? "border-restday bg-restday" : "border-restday bg-bgkSecondary"}
+              border-2 ${newJournalEntryData.entry_type === "2" ? "border-bgRest bg-bgRest" : "border-bgRest bg-bgSecondary"}
               `}
               >
                 Lepopäivä
@@ -460,7 +460,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 type="button"
                 onClick={() => entryTypeChangeHandler("3")}
                 className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "3" ? "border-sickday bg-sickday" : "border-sickday bg-bgkSecondary"}
+              border-2 ${newJournalEntryData.entry_type === "3" ? "border-bgSick bg-bgSick" : "border-bgSick bg-bgSecondary"}
               `}
               >
                 Sairauspäivä
@@ -491,7 +491,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               </label>
               <div className="w-full p-1">
                 <input
-                  className="bg-bgkPrimary w-full"
+                  className="bg-bgPrimary w-full"
                   type="range"
                   min="30"
                   max="180"
@@ -549,7 +549,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   Harjoituskategoria
                 </label>
                 <select
-                  className={`text-md text-textPrimary bg-bgkSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
+                  className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
                   id="workoutCategory"
                   name="workout_category"
                   value={newJournalEntryData.workout_category}
@@ -615,7 +615,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
             <button
-              className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-headerPrimary border-borderPrimary active:scale-95 transition-transform duration-75
+              className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75
     ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
               type="submit"
               disabled={submitButtonIsDisabled}

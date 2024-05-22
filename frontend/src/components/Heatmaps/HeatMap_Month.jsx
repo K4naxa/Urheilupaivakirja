@@ -1,12 +1,16 @@
 import {
+  addMonths,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   isSameDay,
   isSameMonth,
   isToday,
+  startOfDay,
   startOfMonth,
   startOfWeek,
+  sub,
+  subMonths,
 } from "date-fns";
 import { useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
@@ -30,19 +34,18 @@ function HeatMap_Month({ journal }) {
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-      const previousMonth = new Date(showDate);
-      previousMonth.setMonth(previousMonth.getMonth() + 1);
-      setShowDate(previousMonth);
+      setShowDate(startOfDay(subMonths(showDate, 1)));
     },
     onSwipedRight: () => {
-      const nextMonth = new Date(showDate);
-      nextMonth.setMonth(nextMonth.getMonth() - 1);
-      setShowDate(nextMonth);
+      setShowDate(startOfDay(addMonths(showDate, 1)));
     },
   });
 
   return (
-    <div {...handlers} className="MonthGrid w-full h-full pt-6  gap-1">
+    <div
+      {...handlers}
+      className="MonthGrid max-w-[600px]  w-full h-full pt-6  gap-1"
+    >
       {calendarDays.map((day, index) => (
         <CalendarDay
           key={day.getTime()}
@@ -64,16 +67,16 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
     if (!journal) return;
 
     if (minutes > 1 && minutes <= 60)
-      return "bg-heatmapExercise1 border-heatmapExercise1";
+      return "bg-heatmapExercise1 border-heatmapExercise1 text-textExercise";
     if (minutes > 60 && minutes <= 120)
-      return "bg-heatmapExercise2 border-heatmapExercise2 text-white";
+      return "bg-heatmapExercise2 border-heatmapExercise2 text-textExercise";
     if (minutes > 120)
-      return "bg-heatmapExercise3 border-heatmapExercise3  text-white";
+      return "bg-heatmapExercise3 border-heatmapExercise3  text-textExercise";
 
     if (journal[0]?.entry_type_id === 2)
-      return "bg-heatmapRest border-heatmapRest text-white";
+      return "bg-bgRest border-bgRest text-textRest";
     if (journal[0]?.entry_type_id === 3)
-      return "bg-heatmapSick border-heatmapSick text-white";
+      return "bg-bgSick border-bgSick text-textSick";
 
     return null;
   }
@@ -84,7 +87,7 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
         "MonthDate relative border",
         !isSameMonth(day, showDate) && "invisible",
         // user.role === 1 && "bg-bgPrimary border-bgPrimary",
-        isToday(day) && "border  border-headerPrimary",
+        isToday(day) && "border  border-primaryColor",
         handleColor(minutes)
       )}
     >

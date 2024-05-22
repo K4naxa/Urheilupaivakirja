@@ -65,7 +65,7 @@ const DateModal = () => {
     <div
       id="date-modal"
       style={modalStyle}
-      className="absolute z-50 p-2.5 bg-bgkSecondary border border-borderPrimary rounded shadow-lg"
+      className="absolute z-50 p-2.5 bg-bgSecondary border border-borderPrimary rounded shadow-lg"
       onClick={(e) => e.stopPropagation()}
     >
       <div style={arrowBackgroundStyle}></div>
@@ -78,14 +78,14 @@ const DateModal = () => {
       </div>
       <div className="flex justify-between">
         <div
-          className="m-1 px-4 py-2 bg-headerPrimary text-white rounded cursor-pointer flex items-center"
+          className="m-1 px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
           onClick={onClickShow}
         >
           <FiBookOpen className="text-xl" />
           <p className="ml-2 text-sm">Näytä</p>
         </div>
         <div
-          className="m-1 px-4 py-2 bg-headerPrimary text-white rounded cursor-pointer flex items-center"
+          className="m-1 px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
           onClick={onClickAdd}
         >
           <FiPlusCircle className="text-xl" />
