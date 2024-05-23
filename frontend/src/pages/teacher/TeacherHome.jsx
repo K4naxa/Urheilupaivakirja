@@ -333,7 +333,8 @@ function TeacherHome() {
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary w-full">
         <div
-          className="bg-bgSecondary flex flex-col w-full mx-auto items-center justify-around
+          className=" hidden md:flex flex-col w-full mx-auto
+          bg-bgSecondary items-center justify-around
            rounded-md p-4 gap-8 border border-borderPrimary"
         >
           {/* Aika filtteri */}

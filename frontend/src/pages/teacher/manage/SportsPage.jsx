@@ -86,7 +86,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
        px-4 py-2 items-center "
         >
           <input
-            className="flex text-textPrimary border-primaryColor bg-bgSecondary focus-visible:outline-none  border-b"
+            className="flex text-textPrimary border-primaryColor bg-bgSecondary my-2 focus-visible:outline-none  border-b"
             type="text"
             id="editSport"
             autoFocus
@@ -128,7 +128,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
       <div>
         <div
           key={sport.id}
-          className="grid grid-cols-controlpanel3 hover:bg-bgPrimary rounded-md px-4 py-2 items-center"
+          className="grid grid-cols-controlpanel3 hover:bg-bgPrimary rounded-md  p-2 my-2 items-center"
         >
           <p>{sport.name}</p>
           <p className="text-center">{sport.student_count}</p>
@@ -168,10 +168,6 @@ const SportsPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleNewSport = () => {
-    if (newSport == "") {
-      setErrorMessage("Lajin nimi puuttuu.");
-      return;
-    }
     if (
       sports.find(
         (sport) => sport.name.toLowerCase() === newSport.toLowerCase()
@@ -204,10 +200,10 @@ const SportsPage = () => {
   // adds "isEditing" property to the sport object and sets it to "true"
 
   return (
-    <div className="flex flex-col w-full items-center bg-bgSecondary rounded-md ">
+    <div className="w-full items-center bg-bgSecondary rounded-md ">
       {/* header for mobile*/}
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
+        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Lajit
@@ -231,7 +227,10 @@ const SportsPage = () => {
       )}
 
       {/* sports container */}
-      <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8 ">
+      <div
+        className="flex flex-col gap-10 p-4 w-full 
+      border border-borderPrimary rounded-md"
+      >
         {/* New Sport input */}
         <div className=" flex text-textPrimary text-xl justify-center">
           <input
@@ -248,21 +247,27 @@ const SportsPage = () => {
             }}
           />
         </div>
-        <div className="grid grid-cols-controlpanel3 text-textSecondary px-4">
-          <p>Lajit</p>
-          <p className="text-center">Oppilaita</p>
-          <p className="w-16"></p>
-        </div>
-        {/* container for sport list */}
-        <div className="flex flex-col gap-2" id="sportsContainer">
-          {sports.map((sport) => (
-            <CreateSportContainer
-              sport={sport}
-              setSports={setSports}
-              sports={sports}
-              key={sport.id}
-            />
-          ))}
+        <div>
+          {" "}
+          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary">
+            <p>Lajit</p>
+            <p className="text-center">Oppilaita</p>
+            <p className="w-16"></p>
+          </div>
+          {/* container for sport list */}
+          <div
+            className="flex flex-col divide-y divide-borderPrimary"
+            id="sportsContainer"
+          >
+            {sports.map((sport) => (
+              <CreateSportContainer
+                sport={sport}
+                setSports={setSports}
+                sports={sports}
+                key={sport.id}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

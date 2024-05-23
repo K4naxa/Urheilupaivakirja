@@ -28,14 +28,14 @@ const TeacherLayout = () => {
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 px-4 rounded-md hover:bg-bgGray text-[12px] gap-1";
   const linkTextClass =
-    "text-textPrimary hover:text-bgSecondary active:text-primaryColor items-center text-[12px] leading-none mt-2";
+    "hover:text-bgSecondary active:text-primaryColor items-center text-[12px] leading-none mt-2";
   let iconSize = 20;
   return (
     <div className="text-textPrimary">
       <header
         id="desktop-header"
         className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
-        border-b-2 px-4 py-2 lg:flex z-10"
+        border-b-2 px-4 py-2 md:flex z-10"
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-4 ">
@@ -155,7 +155,7 @@ const TeacherLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl lg:hidden z-10`}
+        className={`bg-bgPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl md:hidden z-10`}
         id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
@@ -207,7 +207,7 @@ const TeacherLayout = () => {
         {/* Div for Control Panel menu*/}
         <div className="absolute bottom-0 flex justify-center w-full">
           {showControlPanel && (
-            <div className=" bg-primaryColor rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-5 place-items-center bottom-[64px] right-0 l animate-menu-appear-middle">
+            <div className=" bg-bgPrimary border-b border-borderPrimary rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-5 place-items-center bottom-[64px] right-0 l animate-menu-appear-middle">
               <NavLink
                 to="/opettaja/hallitse/lajit"
                 className={linkClass}
@@ -256,9 +256,9 @@ const TeacherLayout = () => {
         <div className="absolute bottom-0 flex justify-center w-full">
           {showMenu && (
             <div
-              className=" bg-primaryColor rounded-t-md w-full shadow-upper-shadow
+              className=" bg-bgPrimary rounded-t-md w-full shadow-upper-shadow
              absolute grid grid-cols-4 place-items-center bottom-[64px] right-0
-              animate-menu-appear-right"
+              animate-menu-appear-right border-b border-borderPrimary"
             >
               <NavLink to="/profiili" className={linkClass}>
                 <FiUser size={iconSize} />
@@ -285,8 +285,8 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <div className="flex w-full  lg:mt-20">
-        <main className="flex w-full mx-auto max-w-[1480px] justify-center pb-16 ">
+      <div className="flex w-full  md:mt-20">
+        <main className=" w-full mx-auto max-w-[1480px] pb-16 ">
           <Outlet />
         </main>
       </div>
