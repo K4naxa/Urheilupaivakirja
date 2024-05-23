@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import trainingService from "../../../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
+import { FiChevronUp } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
+import cc from "../../../utils/cc";
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
@@ -164,9 +167,13 @@ function CreateSportContainer({ sport, sports, setSports }) {
 const SportsPage = () => {
   const [sports, setSports] = useState([]);
   const [newSport, setNewSport] = useState("");
-
   const [errorMessage, setErrorMessage] = useState("");
+  const [sorting, setSorting] = useState({
+    name: 0,
+    student: 0,
+  });
 
+  // logic behind creating a new sport
   const handleNewSport = () => {
     if (
       sports.find(
@@ -196,6 +203,51 @@ const SportsPage = () => {
       setSports(data);
     });
   }, []);
+
+  useEffect(() => {
+    if (sorting.name) {
+      if (sorting.name === 1) {
+        setSports((prevSports) =>
+          [...prevSports].sort((a, b) => (a.name > b.name ? 1 : -1))
+        );
+      } else if (sorting.name === -1) {
+        setSports((prevSports) =>
+          [...prevSports].sort((a, b) => (a.name < b.name ? 1 : -1))
+        );
+      }
+    }
+
+    if (sorting.student) {
+      if (sorting.student === 1) {
+        setSports((prevSports) =>
+          [...prevSports].sort((a, b) =>
+            a.student_count > b.student_count ? 1 : -1
+          )
+        );
+      } else if (sorting.student === -1) {
+        setSports((prevSports) =>
+          [...prevSports].sort((a, b) =>
+            a.student_count < b.student_count ? 1 : -1
+          )
+        );
+      }
+    }
+  }, [sorting]);
+
+  const handleNameSorting = () => {
+    let newSorting = { ...sorting, student: 0 };
+    sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
+    sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
+    sorting.name === 0 && (newSorting = { ...newSorting, name: 1 });
+    setSorting(newSorting);
+  };
+  const handleStudentSorting = () => {
+    let newSorting = { ...sorting, name: 0 };
+    sorting.student === 0 && (newSorting = { ...newSorting, student: 1 });
+    sorting.student === 1 && (newSorting = { ...newSorting, student: -1 });
+    sorting.student === -1 && (newSorting = { ...newSorting, student: 0 });
+    setSorting(newSorting);
+  };
 
   // adds "isEditing" property to the sport object and sets it to "true"
 
@@ -249,9 +301,21 @@ const SportsPage = () => {
         </div>
         <div>
           {" "}
-          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary">
-            <p>Lajit</p>
-            <p className="text-center">Oppilaita</p>
+          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary ">
+            <p
+              onClick={() => {
+                handleNameSorting();
+              }}
+              className="select-none cursor-pointer"
+            >
+              Lajit
+            </p>
+            <div
+              onClick={() => handleStudentSorting()}
+              className="flex gap-2 items-center select-none cursor-pointer"
+            >
+              Oppilaita
+            </div>
             <p className="w-16"></p>
           </div>
           {/* container for sport list */}
