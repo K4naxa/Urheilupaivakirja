@@ -1,12 +1,14 @@
 import ThemeSwitcher from "../components/themeSwitcher";
 import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
+import { FiInbox } from "react-icons/fi";
+
 import { FiMessageSquare } from "react-icons/fi";
 import { FiGrid } from "react-icons/fi";
 import { FiMenu } from "react-icons/fi";
@@ -25,28 +27,28 @@ const TeacherLayout = () => {
   const [showControlPanel, setShowControlPanel] = useState(false);
 
   const linkClass =
-    "flex flex-col items-center text-textPrimary py-2 px-4 rounded-md hover:bg-bgGray text-xl";
+    "flex flex-col items-center text-textPrimary py-2 px-4 rounded-md hover:bg-bgGray text-[12px] gap-1";
   const linkTextClass =
     "text-textPrimary hover:text-bgSecondary active:text-primaryColor items-center text-[12px] leading-none mt-2";
   return (
     <div className="text-textPrimary">
       <header
         id="desktop-header"
-        className={`bg-bgSecondary border-primaryColor fixed-header mb-12 hidden z-10
-          border-b-2 px-4 py-2 text-xl shadow-md max-h-20 lg:flex`}
+        className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
+        border-b-2 px-4 py-2 lg:flex z-10"
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-4 ">
-            <div className="items-center flex">Urheilupäiväkirja</div>
-            <NavLink to="/opettaja/" id="homeLink" className={linkClass}>
-              Etusivu
-            </NavLink>
+            <Link to={"/opettaja/"} className="text-xl flex items-center mx-4">
+              Urheilupäiväkirja
+            </Link>
 
             <NavLink
               to="/opettaja/tiedotteet/"
               id="tiedotteetLink"
               className={linkClass}
             >
+              <FiInbox size={20} />
               Tiedotteet
             </NavLink>
 
@@ -55,6 +57,7 @@ const TeacherLayout = () => {
               id="verifoiLink"
               className={linkClass}
             >
+              <FiUserCheck size={20} />
               Verifoi
             </NavLink>
 
@@ -63,6 +66,7 @@ const TeacherLayout = () => {
               id="controlLink"
               className={linkClass}
             >
+              <FiGrid size={20} />
               Hallinta
             </NavLink>
           </div>

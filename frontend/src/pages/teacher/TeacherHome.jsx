@@ -82,7 +82,7 @@ function TeacherHome() {
               // Student card
               <div
                 key={journal.user_id}
-                className="flex flex-col rounded-md j bg-bgSecondary p-3 border border-primaryColor shadow-sm hover:shadow-primaryColor w-full"
+                className="flex flex-col rounded-md  p-4 border border-borderPrimary shadow-md hover:bg-bgGray w-full"
                 id="studentCard"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
