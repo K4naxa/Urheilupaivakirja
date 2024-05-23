@@ -53,7 +53,7 @@ export default function HeatMap_Year({ journal }) {
             <div className="text-center text-xs text-textSecondary">
               {formatDate(fifthDayOfMonth, { month: "long" })}
             </div>
-            <div className="relative YearMonthGrid gap-[2px]">
+            <div className=" YearMonthGrid gap-[2px]">
               {month.map((day) => {
                 return (
                   <CalendarDay
@@ -102,7 +102,7 @@ function CalendarDay({ day, journal, month, showDate }) {
   return (
     <div
       className={cc(
-        "YearDate border relative rounded-sm hover:border-primaryColor",
+        "YearDate border rounded-sm hover:border-primaryColor",
         !isSameMonth(day, month[10]) && "invisible",
         isToday(day) && "border-primaryColor",
         handleColor(minutes)

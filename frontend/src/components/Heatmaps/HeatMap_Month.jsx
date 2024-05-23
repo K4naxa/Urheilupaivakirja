@@ -9,7 +9,6 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-  sub,
   subMonths,
 } from "date-fns";
 import { useMemo } from "react";
@@ -84,9 +83,8 @@ function CalendarDay({ day, showWeekName, journal, showDate }) {
   return (
     <div
       className={cc(
-        "MonthDate relative border",
+        "MonthDate border border-borderPrimary",
         !isSameMonth(day, showDate) && "invisible",
-        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-primaryColor",
         handleColor(minutes)
       )}

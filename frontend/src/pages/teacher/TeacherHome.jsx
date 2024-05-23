@@ -204,25 +204,17 @@ function TeacherHome() {
           <div className="flex flex-col text-center mb-8">
             <div className="hover: flex justify-center gap-4">
               <button
-                className="hover:underline"
+                className="hover:text-primaryColor"
                 onClick={handlePreviousYearClick}
               >
-                <IconContext.Provider
-                  value={{ className: "hover:text-primaryColor" }}
-                >
-                  <FiChevronLeft />
-                </IconContext.Provider>
+                <FiChevronLeft />
               </button>
               <p className="text-xl">{showDate.getFullYear()}</p>
               <button
-                className="hover:fill-blue-500 hover:underline"
+                className="hover:text-primaryColor"
                 onClick={handleNextYearClick}
               >
-                <IconContext.Provider
-                  value={{ className: "hover:text-primaryColor" }}
-                >
-                  <FiChevronRight />
-                </IconContext.Provider>
+                <FiChevronRight />
               </button>
             </div>
           </div>
@@ -344,10 +336,10 @@ function TeacherHome() {
     );
   } else
     return (
-      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
+      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary w-full">
         <div
-          className="bg-bgSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
-           rounded-md p-4 justify-between lg:p-8 lg:gap-8 shadow-md"
+          className="bg-bgSecondary flex flex-col w-full mx-auto items-center justify-around
+           rounded-md p-4 gap-8 shadow-md"
         >
           {/* Aika filtteri */}
           <div className="flex text-textSecondary text-sm justify-center">
@@ -382,7 +374,7 @@ function TeacherHome() {
               Vuosi
             </p>
           </div>
-          <div className="flex gap-8">
+          <div className="w-full grid grid-cols-2 md:grid-cols-5 items-center gap-8">
             <StudentComboBox
               journals={journals}
               selectedStudent={selectedStudent}

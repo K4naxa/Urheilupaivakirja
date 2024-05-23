@@ -30,6 +30,7 @@ const TeacherLayout = () => {
     "flex flex-col items-center text-textPrimary py-2 px-4 rounded-md hover:bg-bgGray text-[12px] gap-1";
   const linkTextClass =
     "text-textPrimary hover:text-bgSecondary active:text-primaryColor items-center text-[12px] leading-none mt-2";
+  let iconSize = 20;
   return (
     <div className="text-textPrimary">
       <header
@@ -48,7 +49,7 @@ const TeacherLayout = () => {
               id="tiedotteetLink"
               className={linkClass}
             >
-              <FiInbox size={20} />
+              <FiInbox size={iconSize} />
               Tiedotteet
             </NavLink>
 
@@ -57,7 +58,7 @@ const TeacherLayout = () => {
               id="verifoiLink"
               className={linkClass}
             >
-              <FiUserCheck size={20} />
+              <FiUserCheck size={iconSize} />
               Verifoi
             </NavLink>
 
@@ -66,7 +67,7 @@ const TeacherLayout = () => {
               id="controlLink"
               className={linkClass}
             >
-              <FiGrid size={20} />
+              <FiGrid size={iconSize} />
               Hallinta
             </NavLink>
           </div>
@@ -81,7 +82,7 @@ const TeacherLayout = () => {
                 "flex flex-col items-center text-textPrimary py-2 gap-2 rounded-md  text-xl"
               }
             >
-              <FiUser />
+              <FiUser size={iconSize} />
               <p className="text-[12px] leading-none px-2 select-none">
                 Käyttäjä
               </p>
@@ -107,7 +108,7 @@ const TeacherLayout = () => {
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
-                        <FiUser />
+                        <FiUser size={iconSize} />
                         <p className={"text-[12px]"}>Profiili</p>
                       </NavLink>
                     )}
@@ -122,7 +123,7 @@ const TeacherLayout = () => {
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
-                        <FiSettings />
+                        <FiSettings size={iconSize} />
                         <p className={"text-[12px]"}>Asetukset</p>
                       </NavLink>
                     )}
@@ -141,7 +142,7 @@ const TeacherLayout = () => {
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
-                        <FiLogOut />
+                        <FiLogOut size={iconSize} />
                         <p className={"text-[12px]"}>Kirjaudu ulos</p>
                       </button>
                     )}
@@ -160,11 +161,11 @@ const TeacherLayout = () => {
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
           <NavLink to="/opettaja" className={linkClass}>
-            <FiHome />
+            <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
           </NavLink>
           <NavLink to="/tiedotteet/" className={linkClass}>
-            <FiMessageSquare />
+            <FiInbox size={iconSize} />
             <p className={linkTextClass}>Tiedotteet</p>
           </NavLink>
 
@@ -180,12 +181,12 @@ const TeacherLayout = () => {
               setShowMenu(false);
             }}
           >
-            <FiGrid />
+            <FiGrid size={iconSize} />
             <p className={linkTextClass}>Hallinta</p>
           </NavLink>
 
           <NavLink to="/opettaja/hyvaksy/" className={linkClass}>
-            <FiUserCheck />
+            <FiUserCheck size={iconSize} />
             <p className={linkTextClass}>Verifoi</p>
           </NavLink>
 
@@ -199,7 +200,7 @@ const TeacherLayout = () => {
               setShowControlPanel(false);
             }}
           >
-            <FiMenu />
+            <FiMenu size={iconSize} />
             <p className={linkTextClass}>Menu</p>
           </button>
         </nav>
@@ -213,7 +214,7 @@ const TeacherLayout = () => {
                 className={linkClass}
                 onClick={() => showControlPanel(false)}
               >
-                <MdOutlineSportsFootball />
+                <MdOutlineSportsFootball size={iconSize} />
                 <p className={linkTextClass}>Lajit</p>
               </NavLink>
               <NavLink
@@ -221,7 +222,7 @@ const TeacherLayout = () => {
                 className={linkClass}
                 onClick={() => showControlPanel(false)}
               >
-                <MdOutlineGroups />
+                <MdOutlineGroups size={iconSize} />
                 <p className={linkTextClass}>Ryhmät</p>
               </NavLink>
               <NavLink
@@ -229,7 +230,7 @@ const TeacherLayout = () => {
                 className={linkClass}
                 onClick={() => showControlPanel(false)}
               >
-                <PiBuildings />
+                <PiBuildings size={iconSize} />
                 <p className={linkTextClass}>Toimipaikat</p>
               </NavLink>
               <NavLink
@@ -237,7 +238,7 @@ const TeacherLayout = () => {
                 className={linkClass}
                 onClick={() => showControlPanel(false)}
               >
-                <GrUserNew />
+                <GrUserNew size={iconSize} />
                 <p className={linkTextClass}>Vierailijat</p>
               </NavLink>
               <NavLink
@@ -245,7 +246,7 @@ const TeacherLayout = () => {
                 className={linkClass}
                 onClick={() => showControlPanel(false)}
               >
-                <PiStudent />
+                <PiStudent size={iconSize} />
                 <p className={linkTextClass}>Opiskelijat</p>
               </NavLink>
             </div>
@@ -261,11 +262,11 @@ const TeacherLayout = () => {
               animate-menu-appear-right"
             >
               <NavLink to="/profiili" className={linkClass}>
-                <FiUser />
+                <FiUser size={iconSize} />
                 <p className={linkTextClass}>Profiili</p>
               </NavLink>
               <NavLink to="/asetukset" className={linkClass}>
-                <FiSettings />
+                <FiSettings size={iconSize} />
                 <p className={linkTextClass}>Asetukset</p>
               </NavLink>
               <button
@@ -274,7 +275,7 @@ const TeacherLayout = () => {
                   logout();
                 }}
               >
-                <FiLogOut />
+                <FiLogOut size={iconSize} />
                 <p className={linkTextClass}>Kirjaudu ulos</p>
               </button>
               <div className={linkClass}>
