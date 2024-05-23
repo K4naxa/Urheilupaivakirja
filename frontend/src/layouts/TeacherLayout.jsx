@@ -9,7 +9,6 @@ import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 import { FiInbox } from "react-icons/fi";
 
-import { FiMessageSquare } from "react-icons/fi";
 import { FiGrid } from "react-icons/fi";
 import { FiMenu } from "react-icons/fi";
 import { FiUserCheck } from "react-icons/fi";
