@@ -49,7 +49,7 @@ const ConfirmModal = ({
     isOpen &&
     createPortal(
       <div
-        className="fixed flex items-center justify-center top-0 left-0 w-screen h-screen bg-modalPrimary bg-opacity-50 text-textPrimary z-150"
+        className="fixed flex items-center justify-center top-0 left-0 w-screen h-screen bg-modalPrimary bg-opacity-50 text-textPrimary z-50"
         onClick={closeOnOutsideClick ? onDecline : undefined}
       >
         <div

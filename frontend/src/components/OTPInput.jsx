@@ -103,9 +103,9 @@ const OTPInput = ({ length, onComplete }) => {
       </div>
       <button
         onClick={handlePost}
-        className="ml-4 px-3 py-1 border rounded text-white bg-blue-500"
+        className="px-3 py-1 border rounded text-white bg-blue-500"
       >
-        Verify
+        Vahvista
       </button>
     </>
   );

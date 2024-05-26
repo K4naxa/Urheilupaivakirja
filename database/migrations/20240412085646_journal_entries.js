@@ -7,7 +7,7 @@ exports.up = function (knex) {
     table.integer("workout_category_id").unsigned();
     table.integer("time_of_day_id").unsigned();
     table.integer("length_in_minutes");
-    table.integer("intensity").unsigned(),
+    table.integer("workout_intensity_id").unsigned(),
     table.text("details");
     table.timestamp("date").notNullable();
     table.timestamp("created_at").defaultTo(knex.fn.now());
@@ -35,8 +35,8 @@ exports.up = function (knex) {
       .onDelete("SET NULL")
       .onUpdate("CASCADE");
     table
-      .foreign("intensity")
-      .references("intensity.id")
+      .foreign("workout_intensity_id")
+      .references("workout_intensities.id")
       .onDelete("SET NULL")
       .onUpdate("CASCADE");
   });

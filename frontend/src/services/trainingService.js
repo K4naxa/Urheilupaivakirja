@@ -1,4 +1,5 @@
 import axios from "axios";
+import dayjs from "dayjs";
 
 // get token from localStorage
 const getToken = () => {
@@ -41,6 +42,24 @@ const getJournalEntry = async (id) => {
   return response.data;
 };
 
+const getJournalEntryForForm = async (id) => {
+  console.log("getJournalEntryForForm id", id);
+  const response = await axios.get(`/journal_entry/${id}`, makeHeader());
+  const journalEntry = response.data;
+  return {
+    entry_id: journalEntry.entry_id ? journalEntry.entry_id.toString() : "",
+    entry_type: journalEntry.entry_type_id ? journalEntry.entry_type_id.toString() : "",
+    workout_type: journalEntry.workout_type_id ? journalEntry.workout_type_id.toString() : "",
+    workout_category: journalEntry.workout_category_id ? journalEntry.workout_category_id.toString() : "",
+    length_in_minutes: journalEntry.length_in_minutes ? journalEntry.length_in_minutes.toString() : "",
+    time_of_day: journalEntry.time_of_day_id ? journalEntry.time_of_day_id.toString() : "",
+    workout_intensity: journalEntry.workout_intensity_id ? journalEntry.workout_intensity_id.toString() : "",
+    date: journalEntry.date ? dayjs(journalEntry.date).format("YYYY-MM-DD") : "",
+    details: journalEntry.details || "",
+  };
+};
+
+
 // ................................................................................
 
 // post new journal entry
@@ -54,7 +73,7 @@ const postJournalEntry = async (journalEntry) => {
       workout_category_id: journalEntry.workout_category,
       time_of_day_id: journalEntry.time_of_day,
       length_in_minutes: journalEntry.length_in_minutes,
-      intensity: journalEntry.intensity,
+      workout_intensity_id: journalEntry.intensity,
       details: journalEntry.details,
       date: journalEntry.date,
     };
@@ -82,17 +101,33 @@ const getJournalEntryOptions = async () => {
 // edit existing journal entry
 const editJournalEntry = async (journalEntry) => {
   let id = journalEntry.entry_id;
-  let updatedJournalEntry = {
-    id: journalEntry.entry_id,
-    entry_type_id: journalEntry.entry_type,
-    workout_type_id: journalEntry.workout_type,
-    workout_category_id: journalEntry.workout_category,
-    time_of_day_id: journalEntry.time_of_day,
-    length_in_minutes: journalEntry.length_in_minutes,
-    intensity: journalEntry.intensity,
-    details: journalEntry.details,
-    date: journalEntry.date,
-  };
+  let updatedJournalEntry = {};
+  if (journalEntry.entry_type === "1") {
+    updatedJournalEntry = {
+      id: journalEntry.entry_id,
+      entry_type_id: journalEntry.entry_type,
+      workout_type_id: journalEntry.workout_type,
+      workout_category_id: journalEntry.workout_category,
+      time_of_day_id: journalEntry.time_of_day,
+      length_in_minutes: journalEntry.length_in_minutes,
+      workout_intensity_id: journalEntry.intensity,
+      details: journalEntry.details,
+      date: journalEntry.date,
+    };
+  } else {
+    updatedJournalEntry = {
+      id: journalEntry.entry_id,
+      entry_type_id: journalEntry.entry_type,
+      workout_type_id: null,
+      workout_category_id: null,
+      time_of_day_id: null,
+      length_in_minutes: null,
+      workout_intensity_id: null,
+      details: journalEntry.details,
+      date: journalEntry.date,
+    };
+  }
+
   const response = await axios.put(
     `/journal_entry/${id}`,
     updatedJournalEntry,
@@ -100,6 +135,7 @@ const editJournalEntry = async (journalEntry) => {
   );
   return response.data;
 };
+
 
 // delete journal entry
 const deleteJournalEntry = async (id) => {
@@ -152,6 +188,7 @@ export default {
   editJournalEntry,
   deleteJournalEntry,
   getJournalEntry,
+  getJournalEntryForForm,
   getJournalEntryOptions,
   getSports,
   getSport,

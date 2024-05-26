@@ -5,10 +5,11 @@ import { useEffect } from "react";
 import userService from "../services/userService";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { FiArrowLeft } from "react-icons/fi";
 
 const EmailVerificationPage = () => {
   const { addToast } = useToast();
-  const { user, login } = useAuth();
+  const { user, login, logout } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -76,12 +77,22 @@ const EmailVerificationPage = () => {
 
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center h-screen w-screen">
-      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
-        <div className="bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+        <div className="relative bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Sähköpostin vahvistus
+          <button
+            onClick={() => {
+              logout();
+            }}
+            className="absolute top-0 left-0 text-2xl hover:scale-125 transition-transform duration-150 p-5"
+          >
+            <FiArrowLeft />
+          </button>
         </div>
-        <div className="relative flex h-full pt-20 flex-col gap-10 p-8 sm:p-12 items-center justify-center">
-          <p>Syötä sähköpostiisi lähetetty koodi. Etkö saanut linkkiä?</p>
+        <div className="relative flex h-full pt-20 flex-col gap-10 p-2 sm:p-12 items-center justify-center">
+          <p className="text-center">
+            Syötä sähköpostiisi lähetetty koodi. Etkö saanut linkkiä?
+          </p>
           <button
             className="bg-primaryColor hover:bg-buttonHoverColor cursor-pointer text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             onClick={() => requestOTP()}

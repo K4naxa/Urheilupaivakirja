@@ -10,7 +10,7 @@ import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated";
 import StudentLayout from "./layouts/StudentLayout";
 import StudentHome from "./pages/student/StudentHome";
 import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPage";
-import EditJournalEntryPage from "./pages/student/journal-entry/edit/EditJournalEntryPage";
+import EditJournalEntryPage from "./pages/student/journal-entry/EditJournalEntryPage";
 import StudentNewsPage from "./pages/student/StudentNewsPage";
 
 //teacher

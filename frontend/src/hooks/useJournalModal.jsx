@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import JournalEntryModal from "../components/JournalEntryModal";
 import NewJournalEntryPage from "../pages/student/journal-entry/NewJournalEntryPage";
-import EditJournalEntryPage from "../pages/student/journal-entry/edit/EditJournalEntryPage";
+import EditJournalEntryPage from "../pages/student/journal-entry/EditJournalEntryPage";
 
 const JournalModalContext = createContext();
 

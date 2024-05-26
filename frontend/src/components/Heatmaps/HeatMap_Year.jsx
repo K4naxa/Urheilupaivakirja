@@ -12,17 +12,17 @@ import {
   startOfWeek,
   startOfYear,
 } from "date-fns";
-
-import { useAuth } from "../../hooks/useAuth";
-
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
+import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 export default function HeatMap_Year({ journal }) {
   if (journal.journal_entries) journal = journal.journal_entries;
+  const { setTooltipContent, setTooltipUser, setTooltipDate } = useHeatmapContext();
 
   const { showDate } = useMainContext();
+  
 
   const calendaryYear = useMemo(() => {
     const firstMonthStart = startOfMonth(startOfYear(showDate));
@@ -41,6 +41,14 @@ export default function HeatMap_Year({ journal }) {
     });
     return months;
   }, [calendaryYear]);
+
+  const handleClick = (day) => {
+    const dayEntries = journal.filter(entry => 
+      isSameDay(new Date(entry.date), day)
+    );
+    setTooltipDate(day);
+    setTooltipContent(dayEntries);
+  };
 
   return (
     <div className="YearGrid overflow-x-auto gap-1 pb-2">
@@ -64,6 +72,7 @@ export default function HeatMap_Year({ journal }) {
                     )}
                     month={month}
                     showDate={showDate}
+                    onClick={() => handleClick(day)}
                   />
                 );
               })}
@@ -75,7 +84,7 @@ export default function HeatMap_Year({ journal }) {
   );
 }
 
-function CalendarDay({ day, journal, month, showDate }) {
+function CalendarDay({ day, journal, month, showDate, onClick }) {
   let minutes = 0;
   journal?.map((entry) => (minutes += entry.length_in_minutes));
 
@@ -102,11 +111,12 @@ function CalendarDay({ day, journal, month, showDate }) {
   return (
     <div
       className={cc(
-        "YearDate border relative rounded-sm hover:border-primaryColor",
+        "YearDate clickableCalendarDay border relative rounded-sm hover:border-primaryColor",
         !isSameMonth(day, month[10]) && "invisible",
         isToday(day) && "border-primaryColor",
         handleColor(minutes)
       )}
+      onClick={onClick}
     ></div>
   );
 }

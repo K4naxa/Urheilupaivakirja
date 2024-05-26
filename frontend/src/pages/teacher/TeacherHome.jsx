@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import trainingService from "../../services/trainingService.js";
+import { useState, useMemo } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
@@ -20,12 +20,10 @@ import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
+import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
 
 function TeacherHome() {
-  const [journals, setJournals] = useState([]);
-  const [filteredJournals, setFilteredJournals] = useState([]);
-  const [options, setOptions] = useState([]); // [campuses, sports, students
-  const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState([]); // [campuses, sports, set
 
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
@@ -36,6 +34,55 @@ function TeacherHome() {
   const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
   const [selectedCampus, setSelectedCampus] = useState("");
   const { setShowDate } = useMainContext();
+
+  const {
+    data: studentsAndJournalsData,
+    isLoading: studentsAndJournalsDataLoading,
+    error: studentsAndJournalsDataError,
+  } = useQuery({
+    queryKey: ["studentsAndJournals"],
+    queryFn: () => userService.getStudentsAndEntries(),
+    staleTime: 30 * 60 * 1000, //30 minutes
+  });
+
+  console.log("isLoading: ", studentsAndJournalsDataLoading)
+
+  console.log(studentsAndJournalsData);
+
+  const filteredJournals = useMemo(() => {
+    if (!studentsAndJournalsData) return [];
+
+    let filtJournals = [...studentsAndJournalsData];
+
+    if (selectedCampus) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.campus === (selectedCampus.name || selectedCampus)
+      );
+    }
+    if (selectedSport) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.sport === selectedSport.name
+      );
+    }
+    if (selectedStudentGroup) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.group === selectedStudentGroup.group_identifier
+      );
+    }
+    if (selectedStudent) {
+      filtJournals = filtJournals.filter(
+        (journal) => journal.user_id === selectedStudent.id
+      );
+    }
+    return filtJournals;
+  }, [
+    studentsAndJournalsData,
+    selectedCampus,
+    selectedSport,
+    selectedStudentGroup,
+    selectedStudent,
+  ]);
+
 
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
@@ -94,6 +141,7 @@ function TeacherHome() {
                     <p>{journal.last_name}</p>
                   </Link>
 
+                  {console.log(journal)}
                   <HeatMap_Weeks journal={journal} />
                 </div>
               </div>
@@ -260,53 +308,15 @@ function TeacherHome() {
       );
   };
 
-  useEffect(() => {
-    let filtJournals = [...journals];
-
-    if (selectedCampus) {
-      if (selectedCampus.name) {
-        filtJournals = filtJournals.filter(
-          (journal) => journal.campus === selectedCampus.name
-        );
-      } else {
-        filtJournals = filtJournals.filter(
-          (journal) => journal.campus === selectedCampus
-        );
-      }
-    }
-    if (selectedSport) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.sport === selectedSport.name
-      );
-    }
-    if (selectedStudentGroup) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.group === selectedStudentGroup.group_identifier
-      );
-    }
-    if (selectedStudent) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.user_id === selectedStudent.id
-      );
-    }
-    setFilteredJournals(filtJournals);
-  }, [
-    journals,
-    selectedCampus,
-    selectedSport,
-    selectedStudentGroup,
-    selectedStudent,
-  ]);
-
   const handleFilterReset = () => {
     setSelectedCampus("");
     setSelectedSport("");
     setSelectedStudentGroup("");
     setSelectedStudent("");
-    setFilteredJournals(journals);
+    setFilteredJournals(studentsAndJournalsData);
     setShowDate(new Date());
   };
-
+  /*
   useEffect(() => {
     // Get journal entries for all students
     userService
@@ -326,17 +336,9 @@ function TeacherHome() {
       console.log(response);
     });
   }, []);
+*/
 
-  console.log(journals);
-
-  // set loading screen until journals are loaded
-  useEffect(() => {
-    if (journals.length > 0) {
-      setLoading(false);
-    }
-  }, [journals]);
-
-  if (loading) {
+  if (studentsAndJournalsDataLoading) {
     return (
       <>
         <LoadingScreen />
@@ -345,6 +347,8 @@ function TeacherHome() {
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
+        <TeacherHeatmapTooltip />
+
         <div
           className="bg-bgSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
            rounded-md p-4 justify-between lg:p-8 lg:gap-8 shadow-md"
@@ -384,7 +388,7 @@ function TeacherHome() {
           </div>
           <div className="flex gap-8">
             <StudentComboBox
-              journals={journals}
+              journals={studentsAndJournalsData}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             />
@@ -423,8 +427,9 @@ function TeacherHome() {
           id="studentList"
           className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center"
         >
+
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
-          {showMonths && <RenderMonths journals={filteredJournals} />}
+        {showMonths && <RenderMonths journals={filteredJournals} />}
           {showYears && <RenderYears journals={filteredJournals} />}
         </div>
       </div>
