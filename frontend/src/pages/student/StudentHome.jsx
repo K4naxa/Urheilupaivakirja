@@ -49,6 +49,8 @@ function StudentHome() {
     );
   }
 
+  console.log(studentJournalData)
+
   if (studentJournalDataError) {
     return (
       <div className="flex justify-center items-center">

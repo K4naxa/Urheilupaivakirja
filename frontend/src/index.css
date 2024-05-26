@@ -254,3 +254,12 @@ a.active {
 .top-neg-one {
   top: -0.25rem;
 }
+
+.nice-shadow {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+.react-tooltip-arrow {
+  border-right: 1px solid rgb(var(--color-border-primary));
+  border-bottom: 1px solid rgb(var(--color-border-primary));
+  box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 3px;
+}

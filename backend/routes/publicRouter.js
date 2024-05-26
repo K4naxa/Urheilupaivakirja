@@ -11,15 +11,17 @@ router.get("/options", async (req, res, next) => {
     knex("student_groups").select("*"),
     knex("sports").select("*"),
     knex("campuses").select("*"),
+    knex("intensities").select("*")
   ])
     .then((results) => {
-      const [student_groups, sports, campuses] = results;
+      const [student_groups, sports, campuses, intensities] = results;
 
       res.setHeader("Content-Type", "application/json");
       res.status(200).json({
         student_groups,
         sports,
         campuses,
+        intensities
       });
     })
     .catch((err) => {

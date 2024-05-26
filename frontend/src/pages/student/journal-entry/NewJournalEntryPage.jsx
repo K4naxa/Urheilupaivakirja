@@ -1,10 +1,10 @@
-import { useState, useEffect, useLayoutEffect, useMemo } from "react";
-import dayjs from "dayjs";
+import { useState, useLayoutEffect, useMemo } from "react";
 import trainingService from "../../../services/trainingService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
+import  ConfirmModal  from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import  dayjs  from "dayjs";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -51,7 +51,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
       queryClient.invalidateQueries(["studentJournal"]);
-      // Navigate to the next page after the mutation succeeds
       addToast("Merkintä lisätty", { style: "success" });
       onClose();
     },
@@ -65,7 +64,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   } = useQuery({
     queryKey: ["studentJournal"],
     queryFn: () => trainingService.getAllUserJournalEntries(),
-    staleTime: 15 * 60 * 1000, // Same staleTime to manage freshness similarly
+    staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
@@ -124,7 +123,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   };
 
   const handleUserConfirmation = async () => {
-    setShowConfirmModal(false); // Close the modal
+    setShowConfirmModal(false);
     try {
       await addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
@@ -407,7 +406,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   }
 
   function formatDateString(isoDateString) {
-    // Assuming the input date string is in UTC and in ISO format
     const date = new Date(isoDateString);
     date.setUTCHours(0, 0, 0, 0); // Normalize time to midnight UTC to avoid day roll-over issues
 
@@ -430,12 +428,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         declineButton="Peruuta"
         closeOnOutsideClick={false}
       />
-      <div className="flex flex-col h-full sm:border  sm:border-borderPrimary sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
+      <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
         <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
           <p className="sm:min-w-[400px] cursor-default	">Uusi merkintä</p>
           <button
             onClick={onClose}
-            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl"
+            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
           >
             <FiArrowLeft />
           </button>
@@ -450,7 +448,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 type="button"
                 onClick={() => entryTypeChangeHandler("2")}
                 className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "2" ? "border-bgRest bg-bgRest" : "border-bgRest bg-bgSecondary"}
+              border-2 ${newJournalEntryData.entry_type === "2" ? "border-bgRest bg-bgRest" : "border-bgRest bg-bgSecondary hover:bg-bgRest hover:bg-opacity-40"}
               `}
               >
                 Lepopäivä
@@ -460,7 +458,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 type="button"
                 onClick={() => entryTypeChangeHandler("3")}
                 className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "3" ? "border-bgSick bg-bgSick" : "border-bgSick bg-bgSecondary"}
+              border-2 ${newJournalEntryData.entry_type === "3" ? "border-bgSick bg-bgSick" : "border-bgSick bg-bgSecondary hover:bg-bgSick hover:bg-opacity-40"}
               `}
               >
                 Sairauspäivä
@@ -524,7 +522,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           {newJournalEntryData.entry_type === "1" && (
             <div
-              className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
+            className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
             >
               <label className={inputLabel}>Harjoitustyyppi</label>
               <div className={optionContainer}>
@@ -571,11 +569,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
             >
               <label className={inputLabel}>Rankkuus</label>
               <div className={optionContainer}>
-                {[1, 2, 3].map((intensity) =>
+                {console.log(optionsData.workout_intensities[0].id)}
+                {optionsData.workout_intensities.map((intensity) =>
                   renderRadioButton(
                     "intensity",
-                    intensity.toString(),
-                    intensity.toString(),
+                    intensity.id.toString(),
+                    intensity.name,
                     changeHandler
                   )
                 )}
@@ -585,14 +584,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           <div className={inputContainer}>
             <label
-              className={`${inputLabel} cursor-pointer flex items-center gap-1`}
+              className={`${inputLabel} cursor-pointer flex items-center gap-1 hover:text-primaryColor hover:cursor-pointer`}
               htmlFor="details-textarea"
               onClick={() => setShowDetails((prevState) => !prevState)}
             >
-              Lisätiedot{" "}
-              {(showDetails && <FiChevronUp className="text-lg" />) || (
-                <FiChevronDown className="text-lg" />
-              )}
+              Lisätiedot {(showDetails && <FiChevronUp className="text-lg"/>) || <FiChevronDown className="text-lg"/>}
             </label>
             {showDetails && (
               <textarea
@@ -615,7 +611,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
             <button
-              className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75
+              className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
     ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
               type="submit"
               disabled={submitButtonIsDisabled}
