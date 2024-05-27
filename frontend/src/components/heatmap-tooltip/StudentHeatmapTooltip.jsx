@@ -24,10 +24,7 @@ const StudentHeatmapTooltip = () => {
   const { tooltipUser } = useHeatmapContext();
   const { tooltipDate } = useHeatmapContext();
 
-  console.log("StudentHeatmapTooltip");
-
   const TooltipContent = ({ user, openBigModal }) => {
-    console.log("TooltipContent");
     const [expandedEntry, setExpandedEntry] = useState(null);
     const dayEntries = tooltipContent;
     const day = tooltipDate;

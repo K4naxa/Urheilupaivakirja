@@ -24,14 +24,10 @@ const TeacherHeatmapTooltip = () => {
   const { tooltipUser } = useHeatmapContext();
   const { tooltipDate } = useHeatmapContext();
 
-  console.log("DateTooltip");
-
   const TooltipContent = ({ user, openBigModal }) => {
-    console.log("TooltipContent");
     const [expandedEntry, setExpandedEntry] = useState(null);
     const dayEntries = tooltipContent;
     const day = tooltipDate;
-
 
     const simulateClickOutside = () => {
       const benignElement = document.getElementById("benign-target");
@@ -61,19 +57,6 @@ const TeacherHeatmapTooltip = () => {
       }
     };
 
-    const renderIntensity = (intensity) => {
-      switch (intensity) {
-        case 1:
-          return "Kevyt";
-        case 2:
-          return "Normaali";
-        case 3:
-          return "Rankka";
-        default:
-          return "";
-      }
-    };
-
     const allEntriesAreExercises = dayEntries?.every(
       (entry) => entry.entry_type_id === 1
     );
@@ -86,8 +69,7 @@ const TeacherHeatmapTooltip = () => {
       }
     };
 
-    console.log(dayEntries);
-
+    dayEntries.sort((a, b) => a.time_of_day_id - b.time_of_day_id);
     
     return (
       <>
@@ -107,12 +89,12 @@ const TeacherHeatmapTooltip = () => {
                               onClick={() => toggleDetails(entry.id)}
                             >
                               <td className="flex justify-center px-2">
-                                {renderTimeOfDayIcon(entry.time_of_day)}
+                                {renderTimeOfDayIcon(entry.time_of_day_name)}
                               </td>
-                              <td className="px-2">{entry.workout_category}</td>
-                              <td className="flex justify-center px-2">
-                                {renderIntensity(entry.intensity)}
-                              </td>
+                              <td className="px-2">{entry.workout_category_name}</td>
+                          <td className="px-2 ">
+                            {entry.workout_intensity_name}
+                          </td>
                               <td className="px-2">
                                 {entry.length_in_minutes} min
                               </td>

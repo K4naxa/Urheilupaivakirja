@@ -4,7 +4,8 @@ import StudentRoute from "./components/StudentRoute";
 import TeacherRoute from "./components/TeacherRoute";
 
 import { AuthLayout } from "./layouts/auth-layout/AuthLayout";
-import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated";
+import RedirectIfAuthenticated from "./components/redirect/RedirectIfAuthenticated";
+import RedirectIfNotAuthenticated from "./components/redirect/RedirectIfNotAuthenticated";
 
 //student
 import StudentLayout from "./layouts/StudentLayout";
@@ -73,7 +74,7 @@ export const router = createBrowserRouter([
           { path: "/unohditko-salasanasi", element: <RedirectIfAuthenticated><ForgottenPasswordPage /></RedirectIfAuthenticated> },
           { path: "/unohditko-salasanasi/vahvista", element: <RedirectIfAuthenticated><ForgottenPasswordConfirmPage/></RedirectIfAuthenticated>},
           { path: "/unohditko-salasanasi/uusi-salasana", element: <RedirectIfAuthenticated><ForgottenPasswordNewPasswordPage/></RedirectIfAuthenticated>},
-          { path: "/vahvista-sahkoposti", element: <EmailVerificationPage />},
+          { path: "/vahvista-sahkoposti", element: <RedirectIfNotAuthenticated><EmailVerificationPage /></RedirectIfNotAuthenticated>},
           {
             path: "/opettaja",
             element: (

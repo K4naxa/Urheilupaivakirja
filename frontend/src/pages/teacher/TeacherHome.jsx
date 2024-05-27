@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 import { useQuery } from "@tanstack/react-query";
@@ -23,8 +23,6 @@ import userService from "../../services/userService.js";
 import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
 
 function TeacherHome() {
-  const [options, setOptions] = useState([]); // [campuses, sports, set
-
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
@@ -45,36 +43,31 @@ function TeacherHome() {
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
-  console.log("isLoading: ", studentsAndJournalsDataLoading)
+  const {
+    data: optionsData,
+    isLoading: optionsLoading,
+    error: optionsError,
+  } = useQuery({
+    queryKey: ["options"],
+    queryFn: () => publicService.getOptions(),
+  })
 
-  console.log(studentsAndJournalsData);
+  const options = useMemo(() => {
+    if (optionsData) return optionsData;
+    return { sports: [], student_groups: [], campuses: [] };
+  }, [optionsData]);
 
   const filteredJournals = useMemo(() => {
     if (!studentsAndJournalsData) return [];
-
-    let filtJournals = [...studentsAndJournalsData];
-
-    if (selectedCampus) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.campus === (selectedCampus.name || selectedCampus)
+  
+    return studentsAndJournalsData.filter((journal) => {
+      return (
+        (!selectedCampus || journal.campus_name === (selectedCampus.name || selectedCampus)) &&
+        (!selectedSport || journal.sport_name === selectedSport.name) &&
+        (!selectedStudentGroup || journal.group_identifier === selectedStudentGroup.group_identifier) &&
+        (!selectedStudent || journal.user_id === selectedStudent.id)
       );
-    }
-    if (selectedSport) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.sport === selectedSport.name
-      );
-    }
-    if (selectedStudentGroup) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.group === selectedStudentGroup.group_identifier
-      );
-    }
-    if (selectedStudent) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.user_id === selectedStudent.id
-      );
-    }
-    return filtJournals;
+    });
   }, [
     studentsAndJournalsData,
     selectedCampus,
@@ -82,7 +75,6 @@ function TeacherHome() {
     selectedStudentGroup,
     selectedStudent,
   ]);
-
 
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
@@ -140,8 +132,6 @@ function TeacherHome() {
                     <p> {journal.first_name}</p>
                     <p>{journal.last_name}</p>
                   </Link>
-
-                  {console.log(journal)}
                   <HeatMap_Weeks journal={journal} />
                 </div>
               </div>
@@ -308,42 +298,16 @@ function TeacherHome() {
       );
   };
 
-  const handleFilterReset = () => {
+  const handleFilterReset = useCallback(() => {
     setSelectedCampus("");
     setSelectedSport("");
     setSelectedStudentGroup("");
     setSelectedStudent("");
-    setFilteredJournals(studentsAndJournalsData);
     setShowDate(new Date());
-  };
-  /*
-  useEffect(() => {
-    // Get journal entries for all students
-    userService
-      .getStudents()
-      .then((response) => {
-        setJournals(response);
-        setFilteredJournals(response);
-      })
-
-      .catch((error) => {
-        console.log(error);
-      });
-
-    // Get options for filters ( campuses, sports, students )
-    publicService.getOptions().then((response) => {
-      setOptions(response);
-      console.log(response);
-    });
-  }, []);
-*/
+  }, [setShowDate]);
 
   if (studentsAndJournalsDataLoading) {
-    return (
-      <>
-        <LoadingScreen />
-      </>
-    );
+    return <LoadingScreen />;
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
