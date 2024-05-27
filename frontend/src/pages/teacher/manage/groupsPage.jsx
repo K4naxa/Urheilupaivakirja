@@ -123,14 +123,14 @@ function CreateGroupContainer({ group, setGroups, groups }) {
             </button>
           </div>
         </div>
-        {cellError && <p className="text-btnRed px-4">{cellError}</p>}
+        {cellError && <p className="text-btnRed px-2">{cellError}</p>}
       </div>
     );
   } else {
     return (
       <div className="flex flex-col">
         {/* main Container */}
-        <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md p-2 my-2 items-center">
+        <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md p-2 items-center">
           <p className="">{group.group_identifier}</p>
           <p className="text-center">{group.student_count}</p>
           <div className="flex gap-4 text-xl">

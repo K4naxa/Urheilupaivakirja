@@ -2,9 +2,6 @@ import { useState, useEffect } from "react";
 import trainingService from "../../../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
-import { FiChevronUp } from "react-icons/fi";
-import { FiChevronDown } from "react-icons/fi";
-import cc from "../../../utils/cc";
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
@@ -73,7 +70,12 @@ function CreateSportContainer({ sport, sports, setSports }) {
       prevSports.map((prevSport) => {
         if (prevSport.id === sport.id) {
           {
-            if (sport.isEditing) return { id: sport.id, name: sport.name };
+            if (sport.isEditing)
+              return {
+                id: sport.id,
+                name: sport.name,
+                student_count: sport.student_count,
+              };
             else return { ...prevSport, isEditing: true };
           }
         } else {
@@ -86,7 +88,6 @@ function CreateSportContainer({ sport, sports, setSports }) {
   if (sport.isEditing) {
     return (
       <div className="flex flex-col">
-        {/* normal Container */}
         <div
           key={sport.id}
           className="flex justify-between  rounded-md  p-2 my-2 gap-4 items-center "
@@ -108,9 +109,9 @@ function CreateSportContainer({ sport, sports, setSports }) {
           />
           <div className="flex gap-4 text-sm">
             <button
-              className="w-16 py-1 bg-btnGreen border border-borderPrimary rounded-md "
+              className="Button bg-btnGreen"
               onClick={() => handleSave()}
-              id="Button bg-btnGreen"
+              data-testid="saveBtn"
             >
               Tallenna
             </button>{" "}
@@ -125,7 +126,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
         </div>
         {/* Error Container */}
         {cellError && (
-          <div className="bg-bgSecondary text-red-500 text-center p-2 mt-2">
+          <div className="bg-bgSecondary text-red-500 text-center px-2">
             {cellError}
           </div>
         )}
@@ -136,7 +137,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
       <div>
         <div
           key={sport.id}
-          className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md  p-2 my-2 items-center"
+          className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md  p-2 items-center"
         >
           <p>{sport.name}</p>
           <p className="text-center">{sport.student_count}</p>
