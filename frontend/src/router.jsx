@@ -125,7 +125,7 @@ export const router = createBrowserRouter([
                 path: "hallitse",
                 element: <ManageLayout />,
                 children: [
-                  { path: "lajit", element: <SportsPage /> },
+                  { element: <SportsPage />, index: true },
                   { path: "vierailijat", element: <Visitors /> },
                   { path: "ryhmat", element: <GroupsPage /> },
                   { path: "toimipaikat", element: <CampusPage /> },

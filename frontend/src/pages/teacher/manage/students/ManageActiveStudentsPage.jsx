@@ -38,7 +38,7 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
 
   return (
     <div
-      className="flex justify-between border border-primaryColor p-2 rounded-md"
+      className="flex justify-between border border-borderPrimary p-2 rounded-md"
       key={student.user_id}
     >
       <div className="flex flex-col">
@@ -74,7 +74,7 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
 
       <div className="flex flex-col justify-center items-center gap-2">
         <button
-          className="text-btnRed"
+          className="text-iconRed"
           onClick={() => {
             handleDelete(student);
           }}
@@ -82,7 +82,7 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
           <FiTrash2 />
         </button>
         <button
-          className="text-btnGray"
+          className="text-iconGray"
           onClick={() => {
             handleArchive(student);
           }}
@@ -303,7 +303,7 @@ const ManageActiveStudentsPage = () => {
     );
   else
     return (
-      <div className="bg-bgSecondary rounded-md p-4">
+      <div className="bg-bgSecondary rounded-md p-2">
         <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
           <StudentsComboBox
             journals={students}
@@ -339,12 +339,12 @@ const ManageActiveStudentsPage = () => {
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          {students ? (
+          {students.length > 0 ? (
             filteredStudents.map((student) =>
               createStudentContainer(student, handleArchive, handleDelete)
             )
           ) : (
-            <p>No students found</p>
+            <p className="text-center my-2">No students found</p>
           )}
         </div>
         <ConfirmModal

@@ -11,11 +11,11 @@ import { FiTrash2 } from "react-icons/fi";
 
 import cc from "../../../../utils/cc.js";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
-
+//TODO: Ryhmä not showing correctly in the UI
 const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
     <div
-      className="flex justify-between border border-primaryColor p-2 rounded-md"
+      className="flex justify-between border border-borderPrimary p-2 rounded-md"
       key={student.user_id}
     >
       <div className="flex flex-col">
@@ -47,7 +47,7 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
 
       <div className="flex flex-col justify-center items-center gap-2">
         <button
-          className="text-btnRed"
+          className="text-iconRed"
           onClick={() => {
             handleDelete(student);
           }}
@@ -73,7 +73,7 @@ const ManageArchivedStudentsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState("");
   const [sorting, setSorting] = useState({
-    name: 0,
+    name: 1,
     sport: 0,
     group: 0,
     campus: 0,
@@ -91,7 +91,9 @@ const ManageArchivedStudentsPage = () => {
   useEffect(() => {
     userService.getArchivedStudents().then((data) => {
       setStudents(data);
-      setFilteredStudents(data);
+      setFilteredStudents(
+        data.sort((a, b) => (a.first_name > b.first_name ? 1 : -1))
+      );
       setLoading(false);
     });
   }, []);
@@ -133,33 +135,71 @@ const ManageArchivedStudentsPage = () => {
     setHandleUserConfirmation(() => handleUserConfirmation);
   };
 
-  const handleNameSorting = () => {
+  const handleNameSorting = (type) => {
     let newSorting = { ...sorting, sport: 0, group: 0, campus: 0, activity: 0 };
-    sorting.name === 0 && (newSorting = { ...newSorting, name: 1 });
-    sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
-    sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
+    if (type === 1) newSorting = { ...newSorting, name: 1 };
+    if (type === -1) newSorting = { ...newSorting, name: -1 };
     setSorting(newSorting);
   };
-  const handleSportSorting = () => {
+  const handleSportSorting = (type) => {
     let newSorting = { ...sorting, name: 0, group: 0, campus: 0, activity: 0 };
-    sorting.sport === 0 && (newSorting = { ...newSorting, sport: 1 });
-    sorting.sport === 1 && (newSorting = { ...newSorting, sport: -1 });
-    sorting.sport === -1 && (newSorting = { ...newSorting, sport: 0 });
+
+    if (type === 1) newSorting = { ...newSorting, sport: 1 };
+    if (type === -1) newSorting = { ...newSorting, sport: -1 };
     setSorting(newSorting);
   };
-  const handleGroupSorting = () => {
+  const handleGroupSorting = (type) => {
     let newSorting = { ...sorting, sport: 0, name: 0, campus: 0, activity: 0 };
-    sorting.group === 0 && (newSorting = { ...newSorting, group: 1 });
-    sorting.group === 1 && (newSorting = { ...newSorting, group: -1 });
-    sorting.group === -1 && (newSorting = { ...newSorting, group: 0 });
+    if (type === 1) newSorting = { ...newSorting, group: 1 };
+    if (type === -1) newSorting = { ...newSorting, group: -1 };
+
     setSorting(newSorting);
   };
-  const handleCampusSorting = () => {
+  const handleCampusSorting = (type) => {
     let newSorting = { ...sorting, sport: 0, group: 0, name: 0, activity: 0 };
-    sorting.campus === 0 && (newSorting = { ...newSorting, campus: 1 });
-    sorting.campus === 1 && (newSorting = { ...newSorting, campus: -1 });
-    sorting.campus === -1 && (newSorting = { ...newSorting, campus: 0 });
+    if (type === 1) newSorting = { ...newSorting, campus: 1 };
+    if (type === -1) newSorting = { ...newSorting, campus: -1 };
+
     setSorting(newSorting);
+  };
+
+  const handleActivitySorting = (type) => {
+    let newSorting = { ...sorting, sport: 0, group: 0, name: 0, campus: 0 };
+    if (type === 1) newSorting = { ...newSorting, activity: 1 };
+    if (type === -1) newSorting = { ...newSorting, activity: -1 };
+
+    setSorting(newSorting);
+  };
+
+  const handleSortingChange = (value) => {
+    switch (value) {
+      case "name1":
+        handleNameSorting(1);
+        break;
+      case "name2":
+        handleNameSorting(-1);
+        break;
+      case "sport1":
+        handleSportSorting(1);
+        break;
+      case "sport2":
+        handleSportSorting(-1);
+        break;
+      case "group1":
+        handleGroupSorting(1);
+        break;
+      case "group2":
+        handleGroupSorting(-1);
+        break;
+      case "campus1":
+        handleCampusSorting(1);
+        break;
+      case "campus2":
+        handleCampusSorting(-1);
+        break;
+      default:
+        break;
+    }
   };
 
   //useEffect for sorting and filtering students
@@ -227,104 +267,58 @@ const ManageArchivedStudentsPage = () => {
         <LoadingScreen />
       </div>
     );
-  if (students.length === 0)
-    return (
-      <div className="bg-bgSecondary rounded-md text-center p-4">
-        <p>Ei Opiskelijoita</p>
-      </div>
-    );
-  else
-    return (
-      <div className="bg-bgSecondary rounded-md p-4">
-        <div className="flex flex-wrap gap-4 justify-center sm:justify-between mb-4">
-          <StudentsComboBox
-            journals={students}
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
-          />
-          <div className="flex gap-2 flex-wrap text-sm text-textSecondary">
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.name !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleNameSorting();
-              }}
-            >
-              Nimi{" "}
-              <p className="w-6">
-                {sorting.name === 1 && <FiChevronUp />}
-                {sorting.name === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.sport !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleSportSorting();
-              }}
-            >
-              Laji
-              <p className="w-6">
-                {sorting.sport === 1 && <FiChevronUp />}
-                {sorting.sport === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.group !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleGroupSorting();
-              }}
-            >
-              Ryhmä
-              <p className="w-6">
-                {sorting.group === 1 && <FiChevronUp />}
-                {sorting.group === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.campus !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleCampusSorting();
-              }}
-            >
-              Toimipaikka
-              <p className="w-6">
-                {sorting.campus === 1 && <FiChevronUp />}
-                {sorting.campus === -1 && <FiChevronDown />}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col gap-4">
-          {students ? (
-            filteredStudents.map((student) =>
-              createStudentContainer(student, handleActivation, handleDelete)
-            )
-          ) : (
-            <p>No students found</p>
-          )}
-        </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
+
+  return (
+    <div className="bg-bgSecondary rounded-md p-2">
+      <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
+        <StudentsComboBox
+          journals={students}
+          selectedStudent={selectedStudent}
+          setSelectedStudent={setSelectedStudent}
         />
+
+        <div className="flex flex-col">
+          <label htmlFor="sorting" className="px-2 text-xs text-textSecondary">
+            Järjestys:
+          </label>
+          <select
+            name="sorting"
+            id="sortingSelect"
+            className="bg-bgSecondary border border-borderPrimary text-textSecondary
+               p-1 rounded-md hover:cursor-pointer "
+            onChange={(e) => handleSortingChange(e.target.value)}
+          >
+            <option value="name1">Nimi A-Ö</option>
+            <option value="name2">Nimi Ö-A</option>
+            <option value="sport1">Laji A-Ö</option>
+            <option value="sport2">Laji Ö-A</option>
+            <option value="group1">Ryhmä A-Ö</option>
+            <option value="group2">Ryhmä Ö-A</option>
+            <option value="campus1">Toimipaikka A-Ö</option>
+            <option value="campus2">Toimipaikka Ö-A</option>
+          </select>
+        </div>
       </div>
-    );
+      <div className="flex flex-col gap-4">
+        {students.length > 0 ? (
+          filteredStudents.map((student) =>
+            createStudentContainer(student, handleActivation, handleDelete)
+          )
+        ) : (
+          <p className="text-center my-2">No students found</p>
+        )}
+      </div>
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onDecline={() => setShowConfirmModal(false)}
+        onAgree={handleUserConfirmation}
+        text={modalMessage}
+        agreeButton={continueButton}
+        declineButton={"Peruuta"}
+        agreeStyle={agreeStyle}
+      />
+    </div>
+  );
 };
 
 export default ManageArchivedStudentsPage;

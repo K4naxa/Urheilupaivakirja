@@ -12,7 +12,7 @@ const ManageLayout = () => {
         id="manage-nav"
         className="hidden md:grid grid-cols-5 place-items-center gap-4 self-center"
       >
-        <NavLink to="/opettaja/hallitse/lajit" className={linkClass}>
+        <NavLink to="/opettaja/hallitse/" end className={linkClass}>
           Lajit
         </NavLink>
 
