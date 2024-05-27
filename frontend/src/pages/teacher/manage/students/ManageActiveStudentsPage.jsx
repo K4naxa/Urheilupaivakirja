@@ -100,7 +100,7 @@ const ManageActiveStudentsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState("");
   const [sorting, setSorting] = useState({
-    name: 0,
+    name: 1,
     sport: 0,
     group: 0,
     campus: 0,
@@ -119,46 +119,84 @@ const ManageActiveStudentsPage = () => {
   useEffect(() => {
     userService.getStudents().then((data) => {
       setStudents(data);
-      setFilteredStudents(data);
+      setFilteredStudents(
+        data.sort((a, b) => (a.first_name > b.first_name ? 1 : -1))
+      );
       setLoading(false);
     });
   }, []);
 
-  const handleNameSorting = () => {
+  const handleNameSorting = (type) => {
     let newSorting = { ...sorting, sport: 0, group: 0, campus: 0, activity: 0 };
-    sorting.name === 0 && (newSorting = { ...newSorting, name: 1 });
-    sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
-    sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
+    if (type === 1) newSorting = { ...newSorting, name: 1 };
+    if (type === -1) newSorting = { ...newSorting, name: -1 };
     setSorting(newSorting);
   };
-  const handleSportSorting = () => {
+  const handleSportSorting = (type) => {
     let newSorting = { ...sorting, name: 0, group: 0, campus: 0, activity: 0 };
-    sorting.sport === 0 && (newSorting = { ...newSorting, sport: 1 });
-    sorting.sport === 1 && (newSorting = { ...newSorting, sport: -1 });
-    sorting.sport === -1 && (newSorting = { ...newSorting, sport: 0 });
+
+    if (type === 1) newSorting = { ...newSorting, sport: 1 };
+    if (type === -1) newSorting = { ...newSorting, sport: -1 };
     setSorting(newSorting);
   };
-  const handleGroupSorting = () => {
+  const handleGroupSorting = (type) => {
     let newSorting = { ...sorting, sport: 0, name: 0, campus: 0, activity: 0 };
-    sorting.group === 0 && (newSorting = { ...newSorting, group: 1 });
-    sorting.group === 1 && (newSorting = { ...newSorting, group: -1 });
-    sorting.group === -1 && (newSorting = { ...newSorting, group: 0 });
+    if (type === 1) newSorting = { ...newSorting, group: 1 };
+    if (type === -1) newSorting = { ...newSorting, group: -1 };
+
     setSorting(newSorting);
   };
-  const handleCampusSorting = () => {
+  const handleCampusSorting = (type) => {
     let newSorting = { ...sorting, sport: 0, group: 0, name: 0, activity: 0 };
-    sorting.campus === 0 && (newSorting = { ...newSorting, campus: 1 });
-    sorting.campus === 1 && (newSorting = { ...newSorting, campus: -1 });
-    sorting.campus === -1 && (newSorting = { ...newSorting, campus: 0 });
+    if (type === 1) newSorting = { ...newSorting, campus: 1 };
+    if (type === -1) newSorting = { ...newSorting, campus: -1 };
+
     setSorting(newSorting);
   };
 
-  const handleActivitySorting = () => {
+  const handleActivitySorting = (type) => {
     let newSorting = { ...sorting, sport: 0, group: 0, name: 0, campus: 0 };
-    sorting.activity === 0 && (newSorting = { ...newSorting, activity: 1 });
-    sorting.activity === 1 && (newSorting = { ...newSorting, activity: -1 });
-    sorting.activity === -1 && (newSorting = { ...newSorting, activity: 0 });
+    if (type === 1) newSorting = { ...newSorting, activity: 1 };
+    if (type === -1) newSorting = { ...newSorting, activity: -1 };
+
     setSorting(newSorting);
+  };
+
+  const handleSortingChange = (value) => {
+    switch (value) {
+      case "name1":
+        handleNameSorting(1);
+        break;
+      case "name2":
+        handleNameSorting(-1);
+        break;
+      case "sport1":
+        handleSportSorting(1);
+        break;
+      case "sport2":
+        handleSportSorting(-1);
+        break;
+      case "group1":
+        handleGroupSorting(1);
+        break;
+      case "group2":
+        handleGroupSorting(-1);
+        break;
+      case "campus1":
+        handleCampusSorting(1);
+        break;
+      case "campus2":
+        handleCampusSorting(-1);
+        break;
+      case "activity1":
+        handleActivitySorting(1);
+        break;
+      case "activity2":
+        handleActivitySorting(-1);
+        break;
+      default:
+        break;
+    }
   };
 
   //useEffect for sorting and filtering students
@@ -285,48 +323,18 @@ const ManageActiveStudentsPage = () => {
               id="sortingSelect"
               className="bg-bgSecondary border border-borderPrimary text-textSecondary
                p-1 rounded-md hover:cursor-pointer "
+              onChange={(e) => handleSortingChange(e.target.value)}
             >
-              <option
-                value={"name1"}
-                name="name"
-                className="m-2"
-                onClick={() => handleNameSorting(1)}
-              >
-                Nimi A-Ö{" "}
-              </option>
-              <option value={"name2"} onClick={() => handleNameSorting(-1)}>
-                Nimi Ö-A{" "}
-              </option>
-              <option value={"sport1"} onClick={() => handleSportSorting(1)}>
-                Laji A-Ö{" "}
-              </option>
-              <option value={"sport2"} onClick={() => handleSportSorting(-1)}>
-                Laji Ö-A{" "}
-              </option>
-              <option value={"group1"} onClick={() => handleGroupSorting(1)}>
-                Ryhmä A-Ö{" "}
-              </option>
-              <option value={"group2"} onClick={() => handleGroupSorting(-1)}>
-                Ryhmä Ö-A{" "}
-              </option>
-              <option value={"campus1"} onClick={() => handleCampusSorting(1)}>
-                Toimipaikka A-Ö{" "}
-              </option>
-              <option value={"campus2"} onClick={() => handleCampusSorting(-1)}>
-                Toimipaikka Ö-A{" "}
-              </option>
-              <option
-                value={"activity1"}
-                onClick={() => handleActivitySorting(1)}
-              >
-                Viimeisin merkintä ensin{" "}
-              </option>
-              <option
-                value={"activity2"}
-                onClick={() => handleActivitySorting(-1)}
-              >
-                Viimeisin merkintä viimeisenä{" "}
-              </option>
+              <option value="name1">Nimi A-Ö</option>
+              <option value="name2">Nimi Ö-A</option>
+              <option value="sport1">Laji A-Ö</option>
+              <option value="sport2">Laji Ö-A</option>
+              <option value="group1">Ryhmä A-Ö</option>
+              <option value="group2">Ryhmä Ö-A</option>
+              <option value="campus1">Toimipaikka A-Ö</option>
+              <option value="campus2">Toimipaikka Ö-A</option>
+              <option value="activity1">Viimeisin merkintä ensin</option>
+              <option value="activity2">Viimeisin merkintä viimeisenä</option>
             </select>
           </div>
         </div>
