@@ -168,24 +168,6 @@
     grid-template-rows: repeat(6, 1fr);
     grid-row: auto;
   }
-
-  ö .IconButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: rgb(var(--color-text-primary));
-
-    border-radius: 3px;
-    width: 22px;
-    height: 22px;
-
-    cursor: pointer;
-    transition: all ease-in-out 0.1s;
-
-    &:active {
-      scale: 0.95;
-    }
-  }
 }
 
 .mainArea {

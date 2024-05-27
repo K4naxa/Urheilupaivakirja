@@ -266,88 +266,68 @@ const ManageActiveStudentsPage = () => {
   else
     return (
       <div className="bg-bgSecondary rounded-md p-4">
-        <div className="flex flex-wrap gap-4 justify-center sm:justify-between mb-4">
+        <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
           <StudentsComboBox
             journals={students}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
           />
-          <div className="flex gap-2 flex-wrap text-sm text-textSecondary">
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.name !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleNameSorting();
-              }}
+
+          <div className="flex flex-col">
+            <label
+              htmlFor="sorting"
+              className="px-2 text-xs text-textSecondary"
             >
-              Nimi{" "}
-              <p className="w-6">
-                {sorting.name === 1 && <FiChevronUp />}
-                {sorting.name === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.sport !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleSportSorting();
-              }}
+              Järjestys:
+            </label>
+            <select
+              name="sorting"
+              id="sortingSelect"
+              className="bg-bgSecondary border border-borderPrimary text-textSecondary
+               p-1 rounded-md hover:cursor-pointer "
             >
-              Laji
-              <p className="w-6">
-                {sorting.sport === 1 && <FiChevronUp />}
-                {sorting.sport === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.group !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleGroupSorting();
-              }}
-            >
-              Ryhmä
-              <p className="w-6">
-                {sorting.group === 1 && <FiChevronUp />}
-                {sorting.group === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.campus !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleCampusSorting();
-              }}
-            >
-              Toimipaikka
-              <p className="w-6">
-                {sorting.campus === 1 && <FiChevronUp />}
-                {sorting.campus === -1 && <FiChevronDown />}
-              </p>
-            </div>
-            <div
-              className={cc(
-                "flex items-center hover:underline hover:cursor-pointer select-none",
-                sorting.activity !== 0 && "text-primaryColor"
-              )}
-              onClick={() => {
-                handleActivitySorting();
-              }}
-            >
-              Aktiivisuus
-              <p className="w-6">
-                {sorting.activity === 1 && <FiChevronUp />}
-                {sorting.activity === -1 && <FiChevronDown />}
-              </p>
-            </div>
+              <option
+                value={"name1"}
+                name="name"
+                className="m-2"
+                onClick={() => handleNameSorting(1)}
+              >
+                Nimi A-Ö{" "}
+              </option>
+              <option value={"name2"} onClick={() => handleNameSorting(-1)}>
+                Nimi Ö-A{" "}
+              </option>
+              <option value={"sport1"} onClick={() => handleSportSorting(1)}>
+                Laji A-Ö{" "}
+              </option>
+              <option value={"sport2"} onClick={() => handleSportSorting(-1)}>
+                Laji Ö-A{" "}
+              </option>
+              <option value={"group1"} onClick={() => handleGroupSorting(1)}>
+                Ryhmä A-Ö{" "}
+              </option>
+              <option value={"group2"} onClick={() => handleGroupSorting(-1)}>
+                Ryhmä Ö-A{" "}
+              </option>
+              <option value={"campus1"} onClick={() => handleCampusSorting(1)}>
+                Toimipaikka A-Ö{" "}
+              </option>
+              <option value={"campus2"} onClick={() => handleCampusSorting(-1)}>
+                Toimipaikka Ö-A{" "}
+              </option>
+              <option
+                value={"activity1"}
+                onClick={() => handleActivitySorting(1)}
+              >
+                Viimeisin merkintä ensin{" "}
+              </option>
+              <option
+                value={"activity2"}
+                onClick={() => handleActivitySorting(-1)}
+              >
+                Viimeisin merkintä viimeisenä{" "}
+              </option>
+            </select>
           </div>
         </div>
         <div className="flex flex-col gap-4">

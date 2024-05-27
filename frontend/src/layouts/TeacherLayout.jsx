@@ -19,6 +19,7 @@ import { MdOutlineSportsFootball } from "react-icons/md";
 import { GrUserNew } from "react-icons/gr";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import cc from "../utils/cc";
 
 const TeacherLayout = () => {
   const { logout } = useAuth();
@@ -159,7 +160,7 @@ const TeacherLayout = () => {
         id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
-          <NavLink to="/opettaja" className={linkClass}>
+          <NavLink to="/opettaja" end className={linkClass}>
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
           </NavLink>
@@ -170,10 +171,12 @@ const TeacherLayout = () => {
 
           <NavLink
             to="/opettaja/hallitse/"
-            className={
-              linkClass +
-              `${showControlPanel ? " bg-primaryColor rounded-b-md rounded-t-none transition-colors duration-150" : " bg-bgPrimary"}`
-            }
+            className={cc(
+              linkClass,
+              showControlPanel
+                ? "rounded-b-md rounded-t-none transition-colors duration-150"
+                : " bg-bgPrimary"
+            )}
             onClick={(e) => {
               e.preventDefault();
               setShowControlPanel(!showControlPanel);

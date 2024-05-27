@@ -146,7 +146,7 @@ const StudentLayout = () => {
         <nav id="top-nav" className="grid-cols-mHeader gap-4 grid w-full">
           {/* left of navigation bar */}
           <div className="grid grid-cols-2">
-            <NavLink to="/" className={linkClass}>
+            <NavLink to="/" end className={linkClass}>
               <FiHome />
               <p className={linkTextClass}>Etusivu</p>
             </NavLink>
