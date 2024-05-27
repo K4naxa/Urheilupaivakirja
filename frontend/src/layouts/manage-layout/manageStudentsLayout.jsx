@@ -2,9 +2,9 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const ManageStudentsLayout = () => {
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full border border-borderPrimary rounded-md md:p-4">
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
+        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Opiskelija Hallinta
@@ -12,17 +12,19 @@ const ManageStudentsLayout = () => {
       <div className="pt-3 flex flex-col w-full items-center">
         <nav
           id="manage-students-nav"
-          className="flex gap-4 text-textSecondary active:text-textPrimary"
+          className="flex text-textPrimary active:text-textPrimary"
         >
           <NavLink
             to="/opettaja/hallitse/opiskelijat/"
-            className="pt-2 border border-borderPrimary rounded-md  p-2 px-4"
+            className="pt-2 border border-borderPrimary rounded-l-md  p-2 px-4"
+            end
           >
             Aktiiviset
           </NavLink>{" "}
           <NavLink
-            to="/opettaja/hallitse/opiskelijat/arkistoidut"
-            className="pt-2 border border-borderPrimary rounded-md  p-2 px-4"
+            end
+            to="/opettaja/hallitse/opiskelijat/arkistoidut/"
+            className="pt-2 border border-borderPrimary rounded-r-md  p-2 px-4"
           >
             Arkistoidut
           </NavLink>

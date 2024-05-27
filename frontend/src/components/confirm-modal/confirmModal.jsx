@@ -40,10 +40,11 @@ const ConfirmModal = ({
     };
   }, [onAgree, onDecline]);
 
-  const defaultStyle = "bg-primaryColor border-primaryColor text-white";
+  const defaultStyle =
+    "bg-primaryColor border-primaryColor hover:bg-hoverPrimary text-white";
   const redStyleClass = "bg-btnRed border-btnRed hover:bg-red-800 text-white";
   const grayStyleClass =
-    "bg-btnGray border-btnGray hover:bg-gray-600 text-white";
+    "bg-bgGray border-borderPrimary hover:bg-hoverGray text-textPrimary";
 
   return (
     isOpen &&
@@ -61,7 +62,7 @@ const ConfirmModal = ({
           <p className="text-center">{text}</p>
           <div className="flex justify-center gap-8">
             <button
-              className="w-20 py-1.5 border rounded-md border-borderPrimary hover:bg-borderPrimary"
+              className="w-20 py-1.5 border rounded-md border-borderPrimary hover:bg-hoverDefault"
               onClick={onDecline}
             >
               {declineButton}

@@ -81,11 +81,13 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
   if (campus.isEditing) {
     return (
       <div className="flex flex-col">
-        <div className="flex justify-between rounded-md gap-8 px-4 py-2 bg-bgPrimary">
+        <div className="flex justify-between rounded-md p-2 my-2 gap-4 items-center">
           <input
             autoFocus
             type="text"
-            className="flex w-full text-textPrimary border-primaryColor bg-bgPrimary focus-visible:outline-none  border-b"
+            className="text-textPrimary bg-bgGray p-1 w-full
+            border border-borderPrimary rounded-md
+              focus-visible:outline-none"
             data-testid="editCampus"
             defaultValue={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -112,26 +114,26 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
             </button>
           </div>
         </div>
-        {error && <p className="text-btnRed px-4">{error}</p>}
+        {error && <p className="text-btnRed px-2">{error}</p>}
       </div>
     );
   } else {
     return (
       <div className="flex flex-col">
         {/* main Container */}
-        <div className="grid grid-cols-controlpanel3 hover:bg-bgPrimary rounded-md px-4 py-2 items-center">
+        <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md  p-2 items-center">
           <p className="">{campus.name}</p>
           <p className="text-center">{campus.student_count}</p>
           <div className="flex gap-4 text-xl">
             <button
-              className="IconButton text-btnGray"
+              className="IconButton text-iconGray"
               data-testid="editBtn"
               onClick={() => handleEdit()}
             >
               <FiEdit3 />
             </button>
             <button
-              className="IconButton text-btnRed "
+              className="IconButton text-iconRed "
               data-testid="deleteBtn"
               onClick={() => handleDelete()}
             >
@@ -141,23 +143,17 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
         </div>
 
         {/* error container */}
-        {error && <p className="text-btnRed px-4">{error}</p>}
+        {error && (
+          <p className="bg-bgSecondary text-red-500 text-center p-2">{error}</p>
+        )}
       </div>
     );
   }
 };
 
-const handleNewCampus = (newCampus, setCampuses) => {
-  publicService.addCampus(newCampus).then(() => {
-    publicService.getCampuses().then((data) => setCampuses(data));
-  });
-};
-
 const handleInputError = (input, setError, campuses) => {
-  if (input === "") {
-    setError("Toimipaikan nimi puuttuu");
-    return false;
-  }
+  if (input === "") return false;
+
   if (input.length > 20) {
     setError("Toimipaikan nimi liian pitkä");
     return false;
@@ -180,11 +176,21 @@ const CampusPage = () => {
     publicService.getCampuses().then((data) => setCampuses(data));
   }, []);
 
+  const handleNewCampus = () => {
+    if (!handleInputError(newCampus, setErrorMessage, campuses)) return;
+    publicService.addCampus(newCampus).then(() => {
+      publicService.getCampuses().then((data) => {
+        setCampuses(data);
+        setNewCampus("");
+      });
+    });
+  };
+
   return (
-    <div className="flex flex-col w-full items-center bg-bgSecondary rounded-md">
+    <div className="w-full items-center bg-bgSecondary rounded-md">
       {/* header for mobile*/}
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
+        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
        rounded-b-md shadow-md"
       >
         Toimipaikat
@@ -207,37 +213,43 @@ const CampusPage = () => {
       )}
 
       {/* Campus Container */}
-      <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8">
+      <div
+        className="flex flex-col gap-10 p-4 w-full 
+      border border-borderPrimary rounded-md"
+      >
         {/* New campus input */}
-        <div className="flex text-textPrimary text-xl justify-center">
+        {/* New Sport input */}
+        <div className=" flex justify-center">
           <input
-            className="text-lg text-textPrimary border-btnGreen bg-bgSecondary h-10 focus-visible:outline-none border-b p-1"
+            className="text-textPrimary bg-bgGray p-1 
+            border border-borderPrimary rounded-l-md
+              focus-visible:outline-none"
             type="text"
-            data-testid="newCampusInput"
-            placeholder="Lisää toimipaikka.."
+            data-testid="newSportInput"
+            placeholder="Luo toimipaikka"
+            value={newCampus}
             onChange={(e) => setNewCampus(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                try {
-                  if (!handleInputError(newCampus, setErrorMessage, campuses)) {
-                    return;
-                  }
-                  handleNewCampus(newCampus, setCampuses);
-                  e.target.value = "";
-                } catch (error) {
-                  setErrorMessage(error.response.data);
-                }
+                handleNewCampus();
               }
             }}
           />
+          <p
+            onClick={() => handleNewCampus()}
+            className="py-2 px-4 rounded-r-md bg-primaryColor text-white
+             hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
+          >
+            +
+          </p>
         </div>
         <div className="flex flex-col gap-2" id="campusesContainer">
-          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-4">
+          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-2">
             <p className="">Toimipaikka</p>
             <p className="text-center">Opiskelijat</p>
             <div className="w-16" />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col divide-y divide-borderPrimary">
             {campuses.map((campus) => (
               <CreateCampusContainer
                 campus={campus}

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import trainingService from "../../services/trainingService.js";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 
@@ -50,7 +49,7 @@ function TeacherHome() {
             <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
             <div className="hover: flex justify-center gap-4">
               <button
-                className="hover:underline"
+                className="hover:text-primaryColor"
                 onClick={() => {
                   setShowDate(subWeeks(showDate, 1));
                 }}
@@ -63,7 +62,7 @@ function TeacherHome() {
               </button>
               <p className="text-xl">{getWeek(showDate)}</p>
               <button
-                className="hover:fill-blue-500 hover:underline"
+                className="hover:text-primaryColor"
                 onClick={() => {
                   setShowDate(addWeeks(showDate, 1));
                 }}
@@ -82,7 +81,7 @@ function TeacherHome() {
               // Student card
               <div
                 key={journal.user_id}
-                className="flex flex-col rounded-md j bg-bgSecondary p-3 border border-primaryColor shadow-sm hover:shadow-primaryColor w-full"
+                className="flex flex-col rounded-md  p-4 border border-borderPrimary hover:bg-hoverDefault w-full"
                 id="studentCard"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -147,7 +146,7 @@ function TeacherHome() {
             {journals.map((journal) => (
               <div
                 key={journal.user_id}
-                className="flex flex-col gap-2 w-64 rounded-md border border-primaryColor shadow-sm hover:shadow-primaryColor"
+                className="flex flex-col gap-2 w-64 rounded-md border border-borderPrimary p-4 hover:bg-hoverDefault"
                 id="studentCard"
               >
                 <Link
@@ -159,9 +158,7 @@ function TeacherHome() {
                   </p>
                 </Link>
 
-                <div className="bg-bgPrimary p-2 rounded-md">
-                  <HeatMap_Month journal={journal} />
-                </div>
+                <HeatMap_Month journal={journal} />
               </div>
             ))}
           </div>
@@ -200,29 +197,21 @@ function TeacherHome() {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
       return (
-        <div className="flex flex-col justify-center overflow-x-auto">
+        <div className="flex flex-col justify-center w-full">
           <div className="flex flex-col text-center mb-8">
             <div className="hover: flex justify-center gap-4">
               <button
-                className="hover:underline"
+                className="hover:text-primaryColor"
                 onClick={handlePreviousYearClick}
               >
-                <IconContext.Provider
-                  value={{ className: "hover:text-primaryColor" }}
-                >
-                  <FiChevronLeft />
-                </IconContext.Provider>
+                <FiChevronLeft />
               </button>
               <p className="text-xl">{showDate.getFullYear()}</p>
               <button
-                className="hover:fill-blue-500 hover:underline"
+                className="hover:text-primaryColor"
                 onClick={handleNextYearClick}
               >
-                <IconContext.Provider
-                  value={{ className: "hover:text-primaryColor" }}
-                >
-                  <FiChevronRight />
-                </IconContext.Provider>
+                <FiChevronRight />
               </button>
             </div>
           </div>
@@ -230,8 +219,8 @@ function TeacherHome() {
             {journals.map((journal) => (
               <div
                 key={journal.user_id}
-                className="flex flex-col gap-2 rounded-md bg-bgSecondary border
-               border-primaryColor shadow-sm hover:shadow-primaryColor"
+                className="flex flex-col  gap-2 p-4 rounded-md  border
+               border-borderPrimary hover:bg-hoverDefault"
                 id="studentCard"
               >
                 <div className="flex gap-4  leading-none items-end p-2">
@@ -250,9 +239,7 @@ function TeacherHome() {
                     Laji: {journal.sport}
                   </p>
                 </div>
-                <div className="bg-bgPrimary p-2 rounded-md">
-                  <HeatMap_Year journal={journal} />
-                </div>
+                <HeatMap_Year journal={journal} />
               </div>
             ))}
           </div>
@@ -344,10 +331,11 @@ function TeacherHome() {
     );
   } else
     return (
-      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
+      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary w-full">
         <div
-          className="bg-bgSecondary flex flex-col w-fit mx-auto align-middle lg:justify-center
-           rounded-md p-4 justify-between lg:p-8 lg:gap-8 shadow-md"
+          className=" hidden md:flex flex-col w-full mx-auto
+          bg-bgSecondary items-center justify-around
+           rounded-md p-4 gap-8 border border-borderPrimary"
         >
           {/* Aika filtteri */}
           <div className="flex text-textSecondary text-sm justify-center">
@@ -382,7 +370,7 @@ function TeacherHome() {
               Vuosi
             </p>
           </div>
-          <div className="flex gap-8">
+          <div className="w-full grid grid-cols-2 md:grid-cols-5 items-center gap-8">
             <StudentComboBox
               journals={journals}
               selectedStudent={selectedStudent}
@@ -421,7 +409,7 @@ function TeacherHome() {
         > */}
         <div
           id="studentList"
-          className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center"
+          className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center border border-borderPrimary"
         >
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
           {showMonths && <RenderMonths journals={filteredJournals} />}

@@ -67,13 +67,48 @@ export const router = createBrowserRouter([
             ],
           },
 
-          { path: "/kirjaudu", element: <RedirectIfAuthenticated><LoginPage /></RedirectIfAuthenticated> },
-          { path: "/test" , element: <TestPage/>},
-          { path: "/rekisteroidy", element: <RedirectIfAuthenticated><RegistrationPage /></RedirectIfAuthenticated> },
-          { path: "/unohditko-salasanasi", element: <RedirectIfAuthenticated><ForgottenPasswordPage /></RedirectIfAuthenticated> },
-          { path: "/unohditko-salasanasi/vahvista", element: <RedirectIfAuthenticated><ForgottenPasswordConfirmPage/></RedirectIfAuthenticated>},
-          { path: "/unohditko-salasanasi/uusi-salasana", element: <RedirectIfAuthenticated><ForgottenPasswordNewPasswordPage/></RedirectIfAuthenticated>},
-          { path: "/vahvista-sahkoposti", element: <EmailVerificationPage />},
+          {
+            path: "/kirjaudu",
+            element: (
+              <RedirectIfAuthenticated>
+                <LoginPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          { path: "/test", element: <TestPage /> },
+          {
+            path: "/rekisteroidy",
+            element: (
+              <RedirectIfAuthenticated>
+                <RegistrationPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/unohditko-salasanasi",
+            element: (
+              <RedirectIfAuthenticated>
+                <ForgottenPasswordPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/unohditko-salasanasi/vahvista",
+            element: (
+              <RedirectIfAuthenticated>
+                <ForgottenPasswordConfirmPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/unohditko-salasanasi/uusi-salasana",
+            element: (
+              <RedirectIfAuthenticated>
+                <ForgottenPasswordNewPasswordPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          { path: "/vahvista-sahkoposti", element: <EmailVerificationPage /> },
           {
             path: "/opettaja",
             element: (
@@ -90,12 +125,12 @@ export const router = createBrowserRouter([
                 path: "hallitse",
                 element: <ManageLayout />,
                 children: [
-                  { path: "lajit", element: <SportsPage /> },
+                  { element: <SportsPage />, index: true },
                   { path: "vierailijat", element: <Visitors /> },
                   { path: "ryhmat", element: <GroupsPage /> },
                   { path: "toimipaikat", element: <CampusPage /> },
                   {
-                    path: "opiskelijat",
+                    path: "opiskelijat/",
                     element: <ManageStudentsLayout />,
                     children: [
                       {
