@@ -9,7 +9,6 @@ const Verify = () => {
 
   useEffect(() => {
     userService.getAllUnverified().then((users) => {
-      console.log(users);
       setUnverifiedStudents(users?.students);
     });
   }, []);
@@ -112,7 +111,6 @@ const Verify = () => {
 
 function CreateStudentContainer({ student, setUnverifiedStudents }) {
   const handleVerify = () => {
-    console.log(student.user_id);
     userService.verifyUser(student.user_id).then(() => {
       setUnverifiedStudents((prevStudents) =>
         prevStudents.filter(
