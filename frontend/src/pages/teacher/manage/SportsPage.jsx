@@ -34,7 +34,11 @@ function CreateSportContainer({ sport, sports, setSports }) {
       return;
     }
 
-    const newSport = { id: sport.id, name: editedSport };
+    const newSport = {
+      id: sport.id,
+      student_count: sport.student_count,
+      name: editedSport,
+    };
     trainingService
       .editSport(newSport)
       .then(() => {
@@ -85,11 +89,12 @@ function CreateSportContainer({ sport, sports, setSports }) {
         {/* normal Container */}
         <div
           key={sport.id}
-          className="flex justify-between  rounded-md
-       px-4 py-2 items-center "
+          className="flex justify-between  rounded-md  p-2 my-2 gap-4 items-center "
         >
           <input
-            className="flex text-textPrimary border-primaryColor bg-bgSecondary my-2 focus-visible:outline-none  border-b"
+            className="text-textPrimary bg-bgGray p-1 w-full
+            border border-borderPrimary rounded-md
+              focus-visible:outline-none"
             type="text"
             id="editSport"
             autoFocus
@@ -131,7 +136,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
       <div>
         <div
           key={sport.id}
-          className="grid grid-cols-controlpanel3 hover:bg-bgPrimary rounded-md  p-2 my-2 items-center"
+          className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md  p-2 my-2 items-center"
         >
           <p>{sport.name}</p>
           <p className="text-center">{sport.student_count}</p>
@@ -154,7 +159,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
         </div>
         {/* Error Container */}
         {cellError && (
-          <div className="bg-bgSecondary text-red-500 text-center p-2 mt-2">
+          <div className="bg-bgSecondary text-red-500 text-center p-2">
             {cellError}
           </div>
         )}
@@ -175,6 +180,7 @@ const SportsPage = () => {
 
   // logic behind creating a new sport
   const handleNewSport = () => {
+    if (newSport === "") return;
     if (
       sports.find(
         (sport) => sport.name.toLowerCase() === newSport.toLowerCase()
@@ -189,6 +195,7 @@ const SportsPage = () => {
       .then(() => {
         trainingService.getSports().then((data) => setSports(data));
 
+        setNewSport("");
         setErrorMessage("");
       })
       .catch((error) => {
@@ -236,9 +243,9 @@ const SportsPage = () => {
 
   const handleNameSorting = () => {
     let newSorting = { ...sorting, student: 0 };
-    sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
-    sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
     sorting.name === 0 && (newSorting = { ...newSorting, name: 1 });
+    sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
+    sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
     setSorting(newSorting);
   };
   const handleStudentSorting = () => {
@@ -284,23 +291,32 @@ const SportsPage = () => {
       border border-borderPrimary rounded-md"
       >
         {/* New Sport input */}
-        <div className=" flex text-textPrimary text-xl justify-center">
+        <div className=" flex justify-center">
           <input
-            className="text-lg text-textPrimary border-btnGreen bg-bgSecondary h-10 focus-visible:outline-none border-b p-1"
+            className="text-textPrimary bg-bgGray p-1 
+            border border-borderPrimary rounded-l-md
+              focus-visible:outline-none"
             type="text"
             data-testid="newSportInput"
-            placeholder="Uusi laji..."
+            placeholder="Luo laji"
+            value={newSport}
             onChange={(e) => setNewSport(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleNewSport();
-                e.target.value = "";
               }
             }}
           />
+          <p
+            onClick={() => handleNewSport()}
+            className="py-2 px-4 rounded-r-md bg-primaryColor text-white
+             hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
+          >
+            +
+          </p>
         </div>
-        <div>
-          {" "}
+
+        <div className="flex flex-col gap-2">
           <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary ">
             <p
               onClick={() => {
@@ -308,15 +324,15 @@ const SportsPage = () => {
               }}
               className="select-none cursor-pointer"
             >
-              Lajit
+              Laji
             </p>
-            <div
+            <p
               onClick={() => handleStudentSorting()}
-              className="flex gap-2 items-center select-none cursor-pointer"
+              className="select-none cursor-pointer text-center"
             >
-              Oppilaita
-            </div>
-            <p className="w-16"></p>
+              Opiskelijat
+            </p>
+            <p className="w-16" />
           </div>
           {/* container for sport list */}
           <div
