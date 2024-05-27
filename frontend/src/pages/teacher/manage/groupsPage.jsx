@@ -294,9 +294,9 @@ const GroupsPage = () => {
       )}
 
       {/* Campus Container */}
-      <div className="flex flex-col gap-10 p-4 w-full border border-borderPrimary rounded-md">
+      <div className="flex flex-col gap-8 p-4 w-full border border-borderPrimary rounded-md">
         {/* New campus input */}
-        <div className=" flex justify-center">
+        <div className=" flex justify-center mt-4">
           <input
             className="text-textPrimary bg-bgGray p-1 
             border border-borderPrimary rounded-l-md

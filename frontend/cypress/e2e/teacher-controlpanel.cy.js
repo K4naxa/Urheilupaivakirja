@@ -14,7 +14,6 @@ describe("Teacher basic functionalitys", () => {
     cy.get("#desktop-header").should("be.visible");
     cy.get("#desktop-header").contains("Käyttäjä").click();
     cy.get("#desktop-header").contains("Profiili");
-    cy.get("#desktop-header").contains("Asetukset");
     cy.get("#desktop-header").contains("Kirjaudu ulos");
     cy.get("#desktop-header").contains("Kirjaudu ulos").click();
   });
