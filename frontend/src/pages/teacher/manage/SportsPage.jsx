@@ -214,6 +214,7 @@ const SportsPage = () => {
   useEffect(() => {
     trainingService.getSports().then((data) => {
       setSports(data);
+      setSortedSports(data);
     });
   }, []);
 
