@@ -115,6 +115,7 @@
     border-radius: 3px;
   }
 
+  /* HeatMap ---------------------------------------------------------- */
   .MonthDate {
     display: flex;
     aspect-ratio: 1;
@@ -131,7 +132,6 @@
       cursor: pointer;
     }
   }
-
   .YearDate {
     aspect-ratio: 1;
     height: auto;
@@ -170,6 +170,7 @@
   }
 }
 
+/* Areas ------------------------------------------------------------- */
 .mainArea {
   display: flex;
   flex-direction: column;
@@ -184,6 +185,12 @@
   top: 0;
   left: 0;
   width: 100%;
+}
+
+.unverifiedStudentsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
 a.active {
