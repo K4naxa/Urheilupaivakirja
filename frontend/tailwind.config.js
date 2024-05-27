@@ -41,6 +41,7 @@ export default {
         btnRed: "rgb(var(--color-button-red) / <alpha-value>)",
 
         iconGray: "rgb(var(--color-icon-gray) / <alpha-value>)",
+        iconGreen: "rgb(var(--color-icon-green) / <alpha-value>)",
         iconRed: "rgb(var(--color-icon-red) / <alpha-value>)",
 
         // Heatmap exercise colors

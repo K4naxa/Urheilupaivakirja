@@ -35,6 +35,7 @@
     --color-button-red: 230 0 0;
 
     --color-icon-gray: 130 130 130;
+    --color-icon-green: 0 230 0;
     --color-icon-red: 240 0 0;
 
     /* PUBLIC COLORS UNDER THIS !!! ( used in both themes ) */
@@ -75,6 +76,7 @@
     --color-button-green: 0 180 0;
     --color-button-red: 180 0 0;
 
+    --color-button-green: 0 230 0;
     --color-icon-gray: 130 130 130;
     --color-icon-red: 200 0 0;
   }
