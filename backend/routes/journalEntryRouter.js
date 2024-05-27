@@ -2,11 +2,10 @@ var express = require("express");
 var router = express.Router();
 var { getUserId } = require("../middleware/auth");
 
-const dayjs = require('dayjs')
-var utc = require('dayjs/plugin/utc')
+const dayjs = require("dayjs");
+var utc = require("dayjs/plugin/utc");
 
-dayjs.extend(utc)
-
+dayjs.extend(utc);
 
 const config = require("../utils/config");
 const options = config.DATABASE_OPTIONS;
@@ -79,6 +78,7 @@ router.get("/options", async (req, res, next) => {
       knex("workout_types").select("*"),
       knex("workout_categories").select("*"),
       knex("time_of_day").select("*"),
+      knex("workout_intensities").select("*"),
     ]);
 
     const [
@@ -86,6 +86,7 @@ router.get("/options", async (req, res, next) => {
       workout_types,
       workout_categories,
       time_of_day,
+      workout_intensities,
     ] = data;
 
     res.json({
@@ -93,6 +94,7 @@ router.get("/options", async (req, res, next) => {
       workout_types,
       workout_categories,
       time_of_day,
+      workout_intensities,
     });
   } catch (err) {
     console.log("GET /journal_entry/options failed", err);
@@ -123,12 +125,12 @@ router.get("/:id", async (req, res, next) => {
     const data = await knex("journal_entries")
       .select([
         "id as entry_id",
-        "entry_type_id as entry_type",
-        "workout_type_id as workout_type",
-        "workout_category_id as workout_category",
+        "entry_type_id",
+        "workout_type_id",
+        "workout_category_id",
         "length_in_minutes",
-        "time_of_day_id as time_of_day",
-        "intensity",
+        "time_of_day_id",
+        "workout_intensity_id",
         "date",
         "details",
       ])
@@ -147,6 +149,9 @@ router.get("/:id", async (req, res, next) => {
 router.put("/:id", async (req, res, next) => {
   const id = req.params.id;
   const entry = req.body;
+
+  entry.date = new Date(entry.date);
+  entry.date.setUTCHours(0, 0, 0, 0);
   entry.updated_at = new Date();
 
   try {
@@ -157,10 +162,10 @@ router.put("/:id", async (req, res, next) => {
         .first();
 
       if (!existingEntry) {
-        throw new Error("Entry not found.");
+        return res.status(404).json({ error: "Entry not found." });
       }
 
-      // check for conflicts (entries on the same day) except for the entry being updated
+      // Check for conflicts (entries on the same day) except for the entry being updated
       const conflicts = await trx("journal_entries")
         .where({
           user_id: entry.user_id || existingEntry.user_id,
@@ -175,7 +180,7 @@ router.put("/:id", async (req, res, next) => {
           );
 
           if (!allTypeOne) {
-            // if not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
+            // If not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
             await trx("journal_entries")
               .where({
                 user_id: entry.user_id || existingEntry.user_id,
@@ -185,7 +190,7 @@ router.put("/:id", async (req, res, next) => {
               .del();
           }
         } else {
-          // for rest or sick days, delete all existing conflicting entries
+          // For rest or sick days, delete all existing conflicting entries
           await trx("journal_entries")
             .where({
               user_id: entry.user_id || existingEntry.user_id,
@@ -196,14 +201,19 @@ router.put("/:id", async (req, res, next) => {
         }
       }
 
-      // update entry after handling possible conflicts
+      // Update entry after handling possible conflicts
       const rows = await trx("journal_entries").where("id", id).update(entry);
+
+      if (rows === 0) {
+        throw new Error("Failed to update entry.");
+      }
+
       return rows;
     });
 
     res.json({ message: "Entry updated successfully" });
   } catch (err) {
-    console.log("PUT /journal_entry/:id failed", err);
+    console.error("PUT /:id failed", err);
     res.status(500).json({
       error: "An error occurred while updating a journal entry.",
     });

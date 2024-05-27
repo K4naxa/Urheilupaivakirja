@@ -7,6 +7,7 @@ const knex = require("knex")(options);
 
 const { getRole, getUserId } = require("../../middleware/auth");
 
+// TODO: Default "get" for student route shouldn't include journal entries
 // Get all students and the names of their sport, group and campus
 router.get("/", async (req, res) => {
   try {
@@ -55,6 +56,66 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });
+
+// Get all students and the names of their sport, group, campus and all journal entries
+router.get("/entries", async (req, res) => {
+  try {
+    const role = getRole(req);
+    if (role !== 1) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Fetch all journal entries 
+    const allEntries = await knex("journal_entries")
+      .select(
+        "journal_entries.*",
+        "journal_entry_types.name as entry_type_name",
+        "workout_types.name as workout_type_name",
+        "workout_categories.name as workout_category_name",
+        "time_of_day.name as time_of_day_name",
+        "workout_intensities.name as workout_intensity_name"
+      )
+      .leftJoin("journal_entry_types", "journal_entries.entry_type_id", "journal_entry_types.id")
+      .leftJoin("workout_types", "journal_entries.workout_type_id", "workout_types.id")
+      .leftJoin("workout_categories", "journal_entries.workout_category_id", "workout_categories.id")
+      .leftJoin("time_of_day", "journal_entries.time_of_day_id", "time_of_day.id")
+      .leftJoin("workout_intensities", "journal_entries.workout_intensity_id", "workout_intensities.id")
+      .orderBy("journal_entries.date", "desc");
+
+    // Fetch all students with their associated sports, groups, and campus information
+    const allStudents = await knex("students")
+      .select(
+        "students.user_id",
+        "students.first_name",
+        "students.last_name",
+        "sports.name as sport_name",
+        "student_groups.group_identifier",
+        "campuses.name as campus_name"
+      )
+      .where("students.archived", false)
+      .leftJoin("sports", "students.sport_id", "sports.id")
+      .leftJoin("student_groups", "students.group_id", "student_groups.id")
+      .leftJoin("campuses", "students.campus_id", "campuses.id")
+      .orderBy("students.last_name", "asc");
+
+
+    const studentEntries = allStudents.map(student => ({
+      user_id: student.user_id,
+      first_name: student.first_name,
+      last_name: student.last_name,
+      sport_name: student.sport_name,
+      group_identifier: student.group_identifier,
+      campus_name: student.campus_name,
+      journal_entries: allEntries.filter(entry => entry.user_id === student.user_id)
+    }));
+
+    res.json(studentEntries);
+  } catch (err) {
+    console.error("Failed to fetch data", err);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
+
 
 // Get all archived students
 router.get("/archived", async (req, res) => {

@@ -120,6 +120,11 @@ const getStudents = async () => {
   return response.data;
 };
 
+const getStudentsAndEntries = async () => {
+  const response = await axios.get("/students/entries", makeHeader());
+  return response.data;
+};
+
 const getArchivedStudents = async () => {
   const response = await axios.get("/students/archived", makeHeader());
   return response.data;
@@ -138,6 +143,7 @@ export default {
   verifyUser,
   deleteUser,
   getStudents,
+  getStudentsAndEntries,
   toggleStudentArchive,
   getArchivedStudents,
   createEmailVerificationOTP,

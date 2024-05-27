@@ -14,9 +14,11 @@ import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
 import { useAuth } from "../../hooks/useAuth";
+import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 export default function HeatMap_Weeks({ journal }) {
   const { showDate } = useMainContext();
+  const { setTooltipContent, setTooltipUser, setTooltipDate } = useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
 
   let calendarWeeks = useMemo(() => {
@@ -41,6 +43,15 @@ export default function HeatMap_Weeks({ journal }) {
     return newCalendar;
   }, [calendarWeeks]);
 
+  const handleClick = (day) => {
+    const dayEntries = journal.filter(entry => 
+      isSameDay(new Date(entry.date), day)
+    );
+    console.log (dayEntries);
+    setTooltipDate(day);
+    setTooltipContent(dayEntries);
+  };
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {calendar.map((week, index) => (
@@ -54,6 +65,7 @@ export default function HeatMap_Weeks({ journal }) {
                 journal={journal?.filter((journal) =>
                   isSameDay(journal.date, day)
                 )}
+                onClick={() => handleClick(day)}
               />
             ))}
           </div>
@@ -62,7 +74,7 @@ export default function HeatMap_Weeks({ journal }) {
     </div>
   );
 
-  function CalendarDay({ day, journal }) {
+  function CalendarDay({ day, journal, onClick }) {
     const { user } = useAuth();
     let minutes = 0;
     journal?.forEach((entry) => (minutes += entry.length_in_minutes));
@@ -88,11 +100,12 @@ export default function HeatMap_Weeks({ journal }) {
     return (
       <div
         className={cc(
-          "MonthDate border w-5 lg:w-7",
+          "MonthDate border-borderPrimary border w-5 lg:w-7 clickableCalendarDay",
           user.role === 1 && "bg-bgPrimary border-bgPrimary",
           isToday(day) && "border  border-primaryColor",
           handleColor(minutes)
         )}
+        onClick={onClick}
       >
         {formatDate(day, { day: "numeric" })}
       </div>

@@ -9,6 +9,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
 import { JournalModalProvider } from "./hooks/useJournalModal.jsx";
 import { DateModalProvider } from "./hooks/useDateModal.jsx";
+import { HeatmapTooltipContextProvider } from "./hooks/useHeatmapContext.jsx";
 
 import App from "./App.jsx";
 import "./index.css";
@@ -19,10 +20,12 @@ import "./hooks/toast-messages/toast.css";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <QueryClientProvider client={queryClient}>
-      <MainContextProvider>
-        <ToastProvider>
-          <JournalModalProvider>
+  <React.StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <MainContextProvider>
+      <ToastProvider>
+        <JournalModalProvider>
+          <HeatmapTooltipContextProvider>
             <DateModalProvider>
               <RouterProvider router={router}>
                 <AuthProvider>
@@ -30,8 +33,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 </AuthProvider>
               </RouterProvider>
             </DateModalProvider>
-          </JournalModalProvider>
-        </ToastProvider>
-      </MainContextProvider>
-    </QueryClientProvider>
+          </HeatmapTooltipContextProvider>
+        </JournalModalProvider>
+      </ToastProvider>
+    </MainContextProvider>
+  </QueryClientProvider>
+  </React.StrictMode>
 );

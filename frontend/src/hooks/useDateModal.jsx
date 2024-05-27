@@ -2,7 +2,15 @@ import { createContext, useContext, useState } from 'react';
 
 const DateModalContext = createContext();
 
-export const useDateModal = () => useContext(DateModalContext);
+export const useDateModal = () => {
+  const value = useContext(DateModalContext);
+
+  if ( value == null) {
+   throw new Error("useToast must be used within a <ToastProvider>");   
+  }
+
+  return value;
+}
 
 export const DateModalProvider = ({ children }) => {
   const [dateModalOpen, setDateModalOpen] = useState(false);

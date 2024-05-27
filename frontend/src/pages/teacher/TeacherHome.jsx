@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
@@ -19,13 +20,9 @@ import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
+import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
 
 function TeacherHome() {
-  const [journals, setJournals] = useState([]);
-  const [filteredJournals, setFilteredJournals] = useState([]);
-  const [options, setOptions] = useState([]); // [campuses, sports, students
-  const [loading, setLoading] = useState(true);
-
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
@@ -35,6 +32,49 @@ function TeacherHome() {
   const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
   const [selectedCampus, setSelectedCampus] = useState("");
   const { setShowDate } = useMainContext();
+
+  const {
+    data: studentsAndJournalsData,
+    isLoading: studentsAndJournalsDataLoading,
+    error: studentsAndJournalsDataError,
+  } = useQuery({
+    queryKey: ["studentsAndJournals"],
+    queryFn: () => userService.getStudentsAndEntries(),
+    staleTime: 30 * 60 * 1000, //30 minutes
+  });
+
+  const {
+    data: optionsData,
+    isLoading: optionsLoading,
+    error: optionsError,
+  } = useQuery({
+    queryKey: ["options"],
+    queryFn: () => publicService.getOptions(),
+  })
+
+  const options = useMemo(() => {
+    if (optionsData) return optionsData;
+    return { sports: [], student_groups: [], campuses: [] };
+  }, [optionsData]);
+
+  const filteredJournals = useMemo(() => {
+    if (!studentsAndJournalsData) return [];
+  
+    return studentsAndJournalsData.filter((journal) => {
+      return (
+        (!selectedCampus || journal.campus_name === (selectedCampus.name || selectedCampus)) &&
+        (!selectedSport || journal.sport_name === selectedSport.name) &&
+        (!selectedStudentGroup || journal.group_identifier === selectedStudentGroup.group_identifier) &&
+        (!selectedStudent || journal.user_id === selectedStudent.id)
+      );
+    });
+  }, [
+    studentsAndJournalsData,
+    selectedCampus,
+    selectedSport,
+    selectedStudentGroup,
+    selectedStudent,
+  ]);
 
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
@@ -92,7 +132,6 @@ function TeacherHome() {
                     <p> {journal.first_name}</p>
                     <p>{journal.last_name}</p>
                   </Link>
-
                   <HeatMap_Weeks journal={journal} />
                 </div>
               </div>
@@ -247,91 +286,21 @@ function TeacherHome() {
       );
   };
 
-  useEffect(() => {
-    let filtJournals = [...journals];
-
-    if (selectedCampus) {
-      if (selectedCampus.name) {
-        filtJournals = filtJournals.filter(
-          (journal) => journal.campus === selectedCampus.name
-        );
-      } else {
-        filtJournals = filtJournals.filter(
-          (journal) => journal.campus === selectedCampus
-        );
-      }
-    }
-    if (selectedSport) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.sport === selectedSport.name
-      );
-    }
-    if (selectedStudentGroup) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.group === selectedStudentGroup.group_identifier
-      );
-    }
-    if (selectedStudent) {
-      filtJournals = filtJournals.filter(
-        (journal) => journal.user_id === selectedStudent.id
-      );
-    }
-    setFilteredJournals(filtJournals);
-  }, [
-    journals,
-    selectedCampus,
-    selectedSport,
-    selectedStudentGroup,
-    selectedStudent,
-  ]);
-
-  const handleFilterReset = () => {
+  const handleFilterReset = useCallback(() => {
     setSelectedCampus("");
     setSelectedSport("");
     setSelectedStudentGroup("");
     setSelectedStudent("");
-    setFilteredJournals(journals);
     setShowDate(new Date());
-  };
+  }, [setShowDate]);
 
-  useEffect(() => {
-    // Get journal entries for all students
-    userService
-      .getStudents()
-      .then((response) => {
-        setJournals(response);
-        setFilteredJournals(response);
-      })
-
-      .catch((error) => {
-        console.log(error);
-      });
-
-    // Get options for filters ( campuses, sports, students )
-    publicService.getOptions().then((response) => {
-      setOptions(response);
-      console.log(response);
-    });
-  }, []);
-
-  console.log(journals);
-
-  // set loading screen until journals are loaded
-  useEffect(() => {
-    if (journals.length > 0) {
-      setLoading(false);
-    }
-  }, [journals]);
-
-  if (loading) {
-    return (
-      <>
-        <LoadingScreen />
-      </>
-    );
+  if (studentsAndJournalsDataLoading) {
+    return <LoadingScreen />;
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary w-full">
+        <TeacherHeatmapTooltip />
+
         <div
           className=" hidden md:flex flex-col w-full mx-auto
           bg-bgSecondary items-center justify-around
@@ -372,7 +341,7 @@ function TeacherHome() {
           </div>
           <div className="w-full grid grid-cols-2 md:grid-cols-5 items-center gap-8">
             <StudentComboBox
-              journals={journals}
+              journals={studentsAndJournalsData}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             />
@@ -411,8 +380,9 @@ function TeacherHome() {
           id="studentList"
           className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center border border-borderPrimary"
         >
+
           {showWeeks && <RenderWeeks journals={filteredJournals} />}
-          {showMonths && <RenderMonths journals={filteredJournals} />}
+        {showMonths && <RenderMonths journals={filteredJournals} />}
           {showYears && <RenderYears journals={filteredJournals} />}
         </div>
       </div>

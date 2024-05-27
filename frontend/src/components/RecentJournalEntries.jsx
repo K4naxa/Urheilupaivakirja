@@ -27,16 +27,17 @@ const RecentJournalEntry = ({ entry }) => {
 
   return (
     <div className="grid  grid-cols-6 gap-4 p-2 items-center hover:bg-bgGray">
-      {/* Sport */}
+
       {/* Date */}
       <p>{dayjs(entry.date).format("DD.MM.YYYY")}</p>
       <div className="flex gap-2">
+
+      {/* Sport */}
         <div className="bg-bgGray p-1 rounded-md ">
           {" "}
           <FootballSoccerBall size={20} className="text-primaryColor" />
         </div>
-
-        <p>{entry.workout_category}</p>
+        <p>{entry.workout_category_name}</p>
       </div>
 
       {/* WorkoutLenght */}
@@ -45,7 +46,7 @@ const RecentJournalEntry = ({ entry }) => {
         {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
       </p>
       {/* Intensity */}
-      <p>{entry.intensity}</p>
+      <p>{entry.workout_intensity_name}</p>
       {/* Type of entry (sick, rest, ..) */}
       <p
         className={cc(
@@ -55,14 +56,14 @@ const RecentJournalEntry = ({ entry }) => {
           entry.entry_type_id === 3 && "bg-bgSick text-textSick"
         )}
       >
-        {entry.entry_type}
+        {entry.entry_type_name}
       </p>
       {/* Edit button only for student*/}
       <div className="flex justify-center">
         {user.role !== 1 && (
           <button
             onClick={() => openBigModal("edit", { entryId: entry.id })}
-            className="text-iconGray"
+            className="text-iconGray hover:text-primaryColor"
           >
             <FiEdit3 size={20} />
           </button>
@@ -132,7 +133,7 @@ const RecentJournalEntries = ({ journal }) => {
               name="timeFilter"
               id="selectTimeFilter"
               className="bg-bgSecondary border border-borderPrimary
-               text-textSecondary p-2 rounded-md hover:cursor-pointer"
+               text-textSecondary p-2 rounded-md hover:cursor-pointer focus:bg-bgPrimary hover:bg-bgPrimary"
               value={selectedTime}
               onChange={(e) => setSelectedTime(e.target.value)}
             >
@@ -145,8 +146,8 @@ const RecentJournalEntries = ({ journal }) => {
         <div className="flex h-full overflow-y-auto">
           <div className="flex w-full h-full flex-col overflow-y-auto rounded-md max-h-[300px] relative">
             <div className="sticky top-0 grid grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
-              <span>Laji</span>
               <span>Päivämäärä</span>
+              <span>Laji</span>
               <span>Kesto</span>
               <span>Rankkuus</span>
               <span>Tyyppi</span>

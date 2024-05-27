@@ -46,7 +46,13 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// custom hook to use the auth context
+
 export const useAuth = () => {
-  return useContext(AuthContext);
-};
+  const value = useContext(AuthContext);
+
+  if ( value == null) {
+   throw new Error("useToast must be used within a <ToastProvider>");   
+  }
+
+  return value;
+}
