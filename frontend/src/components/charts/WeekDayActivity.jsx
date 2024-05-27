@@ -250,7 +250,7 @@ function WeekDayActivity({ journal }) {
               name="viewSelect"
               id="selectView"
               className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
-                    hover:cursor-pointer hover:bg-bgPrimary focus:bg-bgPrimary"
+                    hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
               value={selectedView}
               onChange={(e) => setSelectedView(e.target.value)}
             >
@@ -270,7 +270,7 @@ function WeekDayActivity({ journal }) {
             name="timeFilter"
             id="selectTimeFilter"
             className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
-           hover:cursor-pointer hover:bg-bgPrimary focus:bg-bgPrimary"
+           hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
             value={selectedTime}
             onChange={(e) => setSelectedTime(e.target.value)}
           >

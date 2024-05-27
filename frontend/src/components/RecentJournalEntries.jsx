@@ -27,12 +27,10 @@ const RecentJournalEntry = ({ entry }) => {
 
   return (
     <div className="grid  grid-cols-6 gap-4 p-2 items-center hover:bg-bgGray">
-
       {/* Date */}
       <p>{dayjs(entry.date).format("DD.MM.YYYY")}</p>
       <div className="flex gap-2">
-
-      {/* Sport */}
+        {/* Sport */}
         <div className="bg-bgGray p-1 rounded-md ">
           {" "}
           <FootballSoccerBall size={20} className="text-primaryColor" />
@@ -105,64 +103,55 @@ const RecentJournalEntries = ({ journal }) => {
     }
   }, [journal, selectedTime, showDate]);
 
-  if (filteredJournal.length === 0) {
-    return (
-      <div className=" flex max-h-[400px] w-full flex-col gap-2 md:max-h-[570px] ">
-        <h2 className="text-lg">Viimeisimmät merkinnät</h2>
-        <div
-          className="flex w-full 
-        flex-col gap-4 overflow-y-auto
-        overscroll-none rounded-md scroll-smooth text-center bg-bgSecondary h-full"
-        >
-          Ei merkintöjä
+  return (
+    <div className="p-4 rounded-md border border-borderPrimary">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex gap-2 items-center">
+          <p className="IconBox">
+            <FiBarChart2 />
+          </p>
+          <h2 className="text-lg font-medium">Omat merkinnät</h2>
+        </div>
+        <div>
+          <select
+            name="timeFilter"
+            id="selectTimeFilter"
+            className="bg-bgSecondary border border-borderPrimary
+               text-textSecondary p-2 rounded-md hover:cursor-pointer
+                focus-visible:outline-none focus:bg-bgPrimary hover:bg-bgPrimary"
+            value={selectedTime}
+            onChange={(e) => setSelectedTime(e.target.value)}
+          >
+            <option value="Month">Kuukausi</option>
+            <option value="Year">Vuosi</option>
+            <option value="AllTime">Kaikki</option>
+          </select>
         </div>
       </div>
-    );
-  } else
-    return (
-      <div className="p-4 rounded-md border border-borderPrimary">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex gap-2 items-center">
-            <p className="IconBox">
-              <FiBarChart2 />
-            </p>
-            <h2 className="text-lg font-medium">Omat merkinnät</h2>
+      <div className="flex h-full overflow-y-auto">
+        <div className="flex w-full h-full flex-col overflow-y-auto rounded-md max-h-[300px] relative">
+          <div className="sticky top-0 grid grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
+            <span>Päivämäärä</span>
+            <span>Laji</span>
+            <span>Kesto</span>
+            <span>Rankkuus</span>
+            <span>Tyyppi</span>
+            <span></span>
           </div>
-          <div>
-            <select
-              name="timeFilter"
-              id="selectTimeFilter"
-              className="bg-bgSecondary border border-borderPrimary
-               text-textSecondary p-2 rounded-md hover:cursor-pointer focus:bg-bgPrimary hover:bg-bgPrimary"
-              value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
-            >
-              <option value="Month">Kuukausi</option>
-              <option value="Year">Vuosi</option>
-              <option value="AllTime">Kaikki</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex h-full overflow-y-auto">
-          <div className="flex w-full h-full flex-col overflow-y-auto rounded-md max-h-[300px] relative">
-            <div className="sticky top-0 grid grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
-              <span>Päivämäärä</span>
-              <span>Laji</span>
-              <span>Kesto</span>
-              <span>Rankkuus</span>
-              <span>Tyyppi</span>
-              <span></span>
-            </div>
-            <div className="divide-y divide-borderPrimary flex flex-col h-full">
-              {" "}
-              {filteredJournal.map((entry) => (
-                <RecentJournalEntry key={entry.id} entry={entry} />
-              ))}
-            </div>
+          <div className="divide-y divide-borderPrimary flex flex-col h-full">
+            {filteredJournal.length === 0 && (
+              <p className="text-textSecondary text-center m-4">
+                Ei merkintöjä
+              </p>
+            )}
+            {filteredJournal?.map((entry) => (
+              <RecentJournalEntry key={entry.id} entry={entry} />
+            ))}
           </div>
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default RecentJournalEntries;

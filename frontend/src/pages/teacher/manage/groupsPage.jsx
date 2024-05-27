@@ -133,20 +133,20 @@ function CreateGroupContainer({ group, setGroups, groups }) {
         <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md p-2 items-center">
           <p className="">{group.group_identifier}</p>
           <p className="text-center">{group.student_count}</p>
-          <div className="flex gap-4 text-xl">
+          <div className="flex gap-4 ">
             <button
               className="IconButton text-iconGray"
               data-testid="editBtn"
               onClick={() => handleEdit()}
             >
-              <FiEdit3 />
+              <FiEdit3 size={20} />
             </button>
             <button
               className="IconButton text-iconRed "
               data-testid="deleteBtn"
               onClick={() => handleDelete()}
             >
-              <FiTrash2 />
+              <FiTrash2 size={20} />
             </button>
           </div>
         </div>

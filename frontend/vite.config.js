@@ -1,8 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), VitePWA(manifestForPWAPlugIn)],
   server: {
     proxy: {
       "/user/login": {
@@ -73,3 +74,48 @@ export default defineConfig({
     },
   },
 });
+
+const manifestForPWAPlugIn = {
+  registerType: "prompt",
+  includeAssests: ["favicon.ico", "apple-touc-icon.png", "masked-icon.svg"],
+  manifest: {
+    name: "Urheilupäiväkirja",
+    short_name: "U-päiväkirja",
+    description: "Sivu urheilusuoritusten kirjaamiseen, sekä seurantaan",
+    devOptions: {
+      enabled: true,
+    },
+    icons: [
+      {
+        src: "/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "favicon",
+      },
+      {
+        src: "/android-chrome-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "favicon",
+      },
+      {
+        src: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+        purpose: "apple touch icon",
+      },
+      {
+        src: "/maskable_icon.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any maskable",
+      },
+    ],
+    theme_color: "rgb(var(--color-primary))",
+    background_color: "rgb(var(--color-bg-primary))",
+    display: "standalone",
+    scope: "/",
+    start_url: "/",
+    orientation: "portrait",
+  },
+};
