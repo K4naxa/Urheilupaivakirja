@@ -16,7 +16,6 @@ describe("Student basic functionalitys", () => {
 
     // Check that the user menu is visible
     cy.get("#mobile-header").contains("Profiili");
-    cy.get("#mobile-header").contains("Asetukset");
     cy.get("#mobile-header").contains("Kirjaudu ulos");
 
     // Click on the logout button

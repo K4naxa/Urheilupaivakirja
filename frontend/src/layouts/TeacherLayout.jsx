@@ -113,21 +113,6 @@ const TeacherLayout = () => {
                       </NavLink>
                     )}
                   </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <NavLink
-                        to="/asetukset"
-                        className={`${
-                          active
-                            ? "bg-primaryColor text-bgSecondary"
-                            : "text-textPrimary"
-                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
-                      >
-                        <FiSettings size={iconSize} />
-                        <p className={"text-[12px]"}>Asetukset</p>
-                      </NavLink>
-                    )}
-                  </Menu.Item>
                 </div>
                 <div className="px-1 py-1">
                   <Menu.Item>
@@ -260,16 +245,12 @@ const TeacherLayout = () => {
           {showMenu && (
             <div
               className=" bg-bgPrimary rounded-t-md w-full shadow-upper-shadow
-             absolute grid grid-cols-4 place-items-center bottom-[64px] right-0
+             absolute grid grid-cols-3 place-items-center bottom-[64px] right-0
               animate-menu-appear-right border-b border-borderPrimary"
             >
               <NavLink to="/profiili" className={linkClass}>
                 <FiUser size={iconSize} />
                 <p className={linkTextClass}>Profiili</p>
-              </NavLink>
-              <NavLink to="/asetukset" className={linkClass}>
-                <FiSettings size={iconSize} />
-                <p className={linkTextClass}>Asetukset</p>
               </NavLink>
               <button
                 className={linkClass}

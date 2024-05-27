@@ -16,14 +16,15 @@ router.put("/:id", (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   } else {
     const verifiedUser_id = req.params.id;
+    console.log(verifiedUser_id);
 
     const updatedVerification = {
-      email_verified: 1,
+      verified: 1,
     };
 
-    knex("users")
-      .where("id", "=", verifiedUser_id)
-      .update(updatedVerification) // change email_verified to 1
+    knex("students")
+      .where("user_id", "=", verifiedUser_id)
+      .update(updatedVerification) // change verified to 1
       .then(() => {
         res.status(200).json({ message: "User verified" });
       });

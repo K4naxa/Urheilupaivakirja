@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import publicService from "../../../services/publicService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
+import cc from "../../../utils/cc";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
@@ -124,20 +125,20 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
         <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md  p-2 items-center">
           <p className="">{campus.name}</p>
           <p className="text-center">{campus.student_count}</p>
-          <div className="flex gap-4 text-xl">
+          <div className="flex gap-4">
             <button
               className="IconButton text-iconGray"
               data-testid="editBtn"
               onClick={() => handleEdit()}
             >
-              <FiEdit3 />
+              <FiEdit3 size={20} />
             </button>
             <button
               className="IconButton text-iconRed "
               data-testid="deleteBtn"
               onClick={() => handleDelete()}
             >
-              <FiTrash2 />
+              <FiTrash2 size={20} />
             </button>
           </div>
         </div>
@@ -169,11 +170,19 @@ const handleInputError = (input, setError, campuses) => {
 
 const CampusPage = () => {
   const [campuses, setCampuses] = useState([]);
+  const [sortedCampuses, setSortedCampuses] = useState([]);
   const [newCampus, setNewCampus] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [sorting, setSorting] = useState({
+    name: 0,
+    student: 0,
+  });
 
   useEffect(() => {
-    publicService.getCampuses().then((data) => setCampuses(data));
+    publicService.getCampuses().then((data) => {
+      setCampuses(data);
+      setSortedCampuses(data);
+    });
   }, []);
 
   const handleNewCampus = () => {
@@ -184,6 +193,53 @@ const CampusPage = () => {
         setNewCampus("");
       });
     });
+  };
+
+  useEffect(() => {
+    if (sorting.name === 0 && sorting.student === 0)
+      return setSortedCampuses(campuses);
+    if (sorting.name) {
+      if (sorting.name === 1) {
+        setSortedCampuses((prevSports) =>
+          [...prevSports].sort((a, b) => (a.name > b.name ? 1 : -1))
+        );
+      } else if (sorting.name === -1) {
+        setSortedCampuses((prevSports) =>
+          [...prevSports].sort((a, b) => (a.name < b.name ? 1 : -1))
+        );
+      }
+    }
+
+    if (sorting.student) {
+      if (sorting.student === 1) {
+        setSortedCampuses((prevSports) =>
+          [...prevSports].sort((a, b) =>
+            a.student_count > b.student_count ? 1 : -1
+          )
+        );
+      } else if (sorting.student === -1) {
+        setSortedCampuses((prevSports) =>
+          [...prevSports].sort((a, b) =>
+            a.student_count < b.student_count ? 1 : -1
+          )
+        );
+      }
+    }
+  }, [sorting, campuses]);
+
+  const handleNameSorting = () => {
+    let newSorting = { ...sorting, student: 0 };
+    sorting.name === 0 && (newSorting = { ...newSorting, name: 1 });
+    sorting.name === 1 && (newSorting = { ...newSorting, name: -1 });
+    sorting.name === -1 && (newSorting = { ...newSorting, name: 0 });
+    setSorting(newSorting);
+  };
+  const handleStudentSorting = () => {
+    let newSorting = { ...sorting, name: 0 };
+    sorting.student === 0 && (newSorting = { ...newSorting, student: 1 });
+    sorting.student === 1 && (newSorting = { ...newSorting, student: -1 });
+    sorting.student === -1 && (newSorting = { ...newSorting, student: 0 });
+    setSorting(newSorting);
   };
 
   return (
@@ -214,12 +270,12 @@ const CampusPage = () => {
 
       {/* Campus Container */}
       <div
-        className="flex flex-col gap-10 p-4 w-full 
+        className="flex flex-col gap-8 p-4 w-full 
       border border-borderPrimary rounded-md"
       >
         {/* New campus input */}
         {/* New Sport input */}
-        <div className=" flex justify-center">
+        <div className=" flex justify-center mt-4">
           <input
             className="text-textPrimary bg-bgGray p-1 
             border border-borderPrimary rounded-l-md
@@ -244,17 +300,37 @@ const CampusPage = () => {
           </p>
         </div>
         <div className="flex flex-col gap-2" id="campusesContainer">
-          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-2">
-            <p className="">Toimipaikka</p>
-            <p className="text-center">Opiskelijat</p>
-            <div className="w-16" />
+          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">
+            <p
+              onClick={() => {
+                handleNameSorting();
+              }}
+              className={cc(
+                "select-none cursor-pointer",
+                sorting.name === 1 && "text-primaryColor",
+                sorting.name === -1 && "text-primaryColor"
+              )}
+            >
+              Toimipaikka
+            </p>
+            <p
+              onClick={() => handleStudentSorting()}
+              className={cc(
+                "text-center select-none cursor-pointer",
+                sorting.student === 1 && "text-primaryColor",
+                sorting.student === -1 && "text-primaryColor"
+              )}
+            >
+              Opiskelijat
+            </p>
+            <p className="w-16" />
           </div>
           <div className="flex flex-col divide-y divide-borderPrimary">
-            {campuses.map((campus) => (
+            {sortedCampuses.map((campus) => (
               <CreateCampusContainer
                 campus={campus}
-                campuses={campuses}
-                setCampuses={setCampuses}
+                sortedCampuses={campuses}
+                setSortedCampuses={setCampuses}
                 key={campus.id}
               />
             ))}

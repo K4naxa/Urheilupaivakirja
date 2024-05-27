@@ -103,13 +103,13 @@ const deleteUser = async (id) => {
 
 // Unverified users -------------------------------------------------------------------
 
-const getUnverifiedUsers = async () => {
+const getAllUnverified = async () => {
   const response = await axios.get("/user/unverified", makeHeader());
   return response.data;
 };
 
-const verifyUser = async (user) => {
-  const response = await axios.put(`/user/verify/${user.id}`, {}, makeHeader());
+const verifyUser = async (userid) => {
+  const response = await axios.put(`/user/verify/${userid}`, {}, makeHeader());
   return response.data;
 };
 
@@ -139,7 +139,7 @@ export default {
   login,
   register,
   logout,
-  getUnverifiedUsers,
+  getAllUnverified,
   verifyUser,
   deleteUser,
   getStudents,

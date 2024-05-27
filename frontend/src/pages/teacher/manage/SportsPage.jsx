@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import trainingService from "../../../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
+import cc from "../../../utils/cc";
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
@@ -141,20 +142,20 @@ function CreateSportContainer({ sport, sports, setSports }) {
         >
           <p>{sport.name}</p>
           <p className="text-center">{sport.student_count}</p>
-          <div className="flex gap-4 text-xl">
+          <div className="flex gap-4">
             <button
               id="editBtn"
               className="IconButton text-iconGray"
               onClick={() => handleEdit()}
             >
-              <FiEdit3 />
+              <FiEdit3 size={20} />
             </button>
             <button
               className="IconButton text-iconRed "
               id="deleteBtn"
               onClick={() => handleDelete()}
             >
-              <FiTrash2 />
+              <FiTrash2 size={20} />
             </button>
           </div>
         </div>
@@ -172,6 +173,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
 
 const SportsPage = () => {
   const [sports, setSports] = useState([]);
+  const [sortedSports, setSortedSports] = useState([]);
   const [newSport, setNewSport] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [sorting, setSorting] = useState({
@@ -194,7 +196,10 @@ const SportsPage = () => {
     trainingService
       .addSport({ name: newSport })
       .then(() => {
-        trainingService.getSports().then((data) => setSports(data));
+        trainingService.getSports().then((data) => {
+          setSports(data);
+          setSortedSports(data);
+        });
 
         setNewSport("");
         setErrorMessage("");
@@ -209,17 +214,20 @@ const SportsPage = () => {
   useEffect(() => {
     trainingService.getSports().then((data) => {
       setSports(data);
+      setSortedSports(data);
     });
   }, []);
 
   useEffect(() => {
+    if (sorting.name === 0 && sorting.student === 0)
+      return setSortedSports(sports);
     if (sorting.name) {
       if (sorting.name === 1) {
-        setSports((prevSports) =>
+        setSortedSports((prevSports) =>
           [...prevSports].sort((a, b) => (a.name > b.name ? 1 : -1))
         );
       } else if (sorting.name === -1) {
-        setSports((prevSports) =>
+        setSortedSports((prevSports) =>
           [...prevSports].sort((a, b) => (a.name < b.name ? 1 : -1))
         );
       }
@@ -227,20 +235,20 @@ const SportsPage = () => {
 
     if (sorting.student) {
       if (sorting.student === 1) {
-        setSports((prevSports) =>
+        setSortedSports((prevSports) =>
           [...prevSports].sort((a, b) =>
             a.student_count > b.student_count ? 1 : -1
           )
         );
       } else if (sorting.student === -1) {
-        setSports((prevSports) =>
+        setSortedSports((prevSports) =>
           [...prevSports].sort((a, b) =>
             a.student_count < b.student_count ? 1 : -1
           )
         );
       }
     }
-  }, [sorting]);
+  }, [sorting, sports]);
 
   const handleNameSorting = () => {
     let newSorting = { ...sorting, student: 0 };
@@ -288,11 +296,11 @@ const SportsPage = () => {
 
       {/* sports container */}
       <div
-        className="flex flex-col gap-10 p-4 w-full 
+        className="flex flex-col gap-8 p-4 w-full 
       border border-borderPrimary rounded-md"
       >
         {/* New Sport input */}
-        <div className=" flex justify-center">
+        <div className=" flex justify-center mt-4">
           <input
             className="text-textPrimary bg-bgGray p-1 
             border border-borderPrimary rounded-l-md
@@ -318,18 +326,26 @@ const SportsPage = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary ">
+          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">
             <p
               onClick={() => {
                 handleNameSorting();
               }}
-              className="select-none cursor-pointer"
+              className={cc(
+                "select-none cursor-pointer",
+                sorting.name === 1 && "text-primaryColor",
+                sorting.name === -1 && "text-primaryColor"
+              )}
             >
               Laji
             </p>
             <p
               onClick={() => handleStudentSorting()}
-              className="select-none cursor-pointer text-center"
+              className={cc(
+                "text-center select-none cursor-pointer",
+                sorting.student === 1 && "text-primaryColor",
+                sorting.student === -1 && "text-primaryColor"
+              )}
             >
               Opiskelijat
             </p>
@@ -340,7 +356,7 @@ const SportsPage = () => {
             className="flex flex-col divide-y divide-borderPrimary"
             id="sportsContainer"
           >
-            {sports.map((sport) => (
+            {sortedSports.map((sport) => (
               <CreateSportContainer
                 sport={sport}
                 setSports={setSports}

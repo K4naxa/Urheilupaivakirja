@@ -11,7 +11,6 @@ exports.seed = async function (knex) {
       first_name: "Onni",
       last_name: "Opo",
       phone: "0401234567",
-      permanent: true,
       created_at: new Date(),
     },
 
@@ -20,7 +19,6 @@ exports.seed = async function (knex) {
       first_name: "Valtteri",
       last_name: "Varaopo",
       phone: "0401234567",
-      permanent: false,
       created_at: new Date(),
     },
   ]);

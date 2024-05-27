@@ -8,7 +8,7 @@ exports.up = function (knex) {
     table.integer("sport_id").unsigned();
     table.integer("group_id").unsigned();
     table.integer("campus_id").unsigned();
-    table.boolean("activated").notNullable().defaultTo(false);
+    table.boolean("verified").notNullable().defaultTo(false);
     table.boolean("archived").notNullable().defaultTo(false);
     table.timestamp("archived_at");
     table.timestamp("created_at").defaultTo(knex.fn.now());
