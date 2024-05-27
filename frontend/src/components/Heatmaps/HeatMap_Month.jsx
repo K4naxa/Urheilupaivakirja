@@ -10,7 +10,6 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-  sub,
   subMonths,
 } from "date-fns";
 import { useMemo, useState, useEffect } from "react";
@@ -105,9 +104,8 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
     <div
       /*data-tooltip-id={`calendar-tooltip-${identifier}`}*/
       className={cc(
-        "MonthDate relative border clickableCalendarDay",
+        "MonthDate border-borderPrimary border clickableCalendarDay",
         !isSameMonth(day, showDate) && "invisible",
-        // user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-primaryColor",
         handleColor(minutes)
       )}

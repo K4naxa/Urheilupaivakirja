@@ -100,7 +100,7 @@ export default function HeatMap_Weeks({ journal }) {
     return (
       <div
         className={cc(
-          "MonthDate clickableCalendarDay relative border w-5 lg:w-7",
+          "MonthDate border-borderPrimary border w-5 lg:w-7 clickableCalendarDay",
           user.role === 1 && "bg-bgPrimary border-bgPrimary",
           isToday(day) && "border  border-primaryColor",
           handleColor(minutes)

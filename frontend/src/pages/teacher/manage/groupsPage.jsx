@@ -90,11 +90,13 @@ function CreateGroupContainer({ group, setGroups, groups }) {
   if (group.isEditing) {
     return (
       <div className="flex flex-col">
-        <div className="flex justify-between rounded-md gap-8 px-4 py-2 bg-bgPrimary">
+        <div className="flex justify-between  rounded-md  p-2 my-2 gap-4 items-center">
           <input
             autoFocus
             type="text"
-            className="flex w-full text-textPrimary border-primaryColor bg-bgPrimary focus-visible:outline-none  border-b"
+            className="text-textPrimary bg-bgGray p-1 w-full
+            border border-borderPrimary rounded-md
+              focus-visible:outline-none"
             data-testid="editCampus"
             defaultValue={editedGroup}
             onChange={(e) => setEditedGroup(e.target.value)}
@@ -121,26 +123,26 @@ function CreateGroupContainer({ group, setGroups, groups }) {
             </button>
           </div>
         </div>
-        {cellError && <p className="text-btnRed px-4">{cellError}</p>}
+        {cellError && <p className="text-btnRed px-2">{cellError}</p>}
       </div>
     );
   } else {
     return (
       <div className="flex flex-col">
         {/* main Container */}
-        <div className="grid grid-cols-controlpanel3 hover:bg-bgPrimary rounded-md px-4 py-2 items-center">
+        <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md p-2 items-center">
           <p className="">{group.group_identifier}</p>
           <p className="text-center">{group.student_count}</p>
           <div className="flex gap-4 text-xl">
             <button
-              className="IconButton text-textSecondary"
+              className="IconButton text-iconGray"
               data-testid="editBtn"
               onClick={() => handleEdit()}
             >
               <FiEdit3 />
             </button>
             <button
-              className="IconButton text-btnRed "
+              className="IconButton text-iconRed "
               data-testid="deleteBtn"
               onClick={() => handleDelete()}
             >
@@ -150,7 +152,9 @@ function CreateGroupContainer({ group, setGroups, groups }) {
         </div>
 
         {/* error container */}
-        {cellError && <p className="text-btnRed px-4">{cellError}</p>}
+        {cellError && (
+          <p className="text-btnRed px-4 text-center p-2 ">{cellError}</p>
+        )}
       </div>
     );
   }
@@ -169,10 +173,8 @@ const GroupsPage = () => {
 
   // Creates a new group of the input and adds it to the server and state
   const handleNewGroup = () => {
-    if (newGroup === "") {
-      setErrorMessage("Ryhmän nimi ei voi olla tyhjä");
-      return;
-    }
+    if (newGroup === "") return;
+
     if (
       groups.some(
         (group) =>
@@ -187,23 +189,26 @@ const GroupsPage = () => {
       return;
     }
 
-    publicService.addGroup(newGroup).then((group) => {
-      setGroups((prevGroups) => [...prevGroups, group]);
+    publicService.addGroup(newGroup).then(() => {
+      publicService.getGroups().then((data) => {
+        setGroups(data);
+      });
+      setNewGroup("");
       setErrorMessage("");
     });
   };
 
   const handleInputError = (input, setError, campuses) => {
     if (input === "") {
-      setError("Toimipaikan nimi puuttuu");
+      setError("Ryhmän nimi puuttuu");
       return false;
     }
     if (input.length > 20) {
-      setError("Toimipaikan nimi liian pitkä");
+      setError("Ryhmän nimi liian pitkä");
       return false;
     }
     if (campuses.some((campus) => campus.name === input)) {
-      setError("Toimipaikka on jo olemassa");
+      setError("Ryhmä on jo olemassa");
       return false;
     }
 
@@ -212,13 +217,13 @@ const GroupsPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-full items-center bg-bgSecondary rounded-md">
+    <div className="w-full items-center bg-bgSecondary rounded-md">
       {/* header for mobile*/}
       <div
-        className="lg:hidden text-2xl text-center py-4 bg-primaryColor w-full
+        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
      rounded-b-md shadow-md"
       >
-        Toimipaikat
+        Ryhmät
       </div>
       {/* Error Header */}
       {errorMessage && (
@@ -238,37 +243,39 @@ const GroupsPage = () => {
       )}
 
       {/* Campus Container */}
-      <div className="flex flex-col gap-10 w-full max-w-[600px] mt-8 my-4 mb-16 lg:my-8">
+      <div className="flex flex-col gap-10 p-4 w-full border border-borderPrimary rounded-md">
         {/* New campus input */}
-        <div className="flex text-textPrimary text-xl justify-center">
+        <div className=" flex justify-center">
           <input
-            className="text-lg text-textPrimary border-btnGreen bg-bgSecondary h-10 focus-visible:outline-none border-b p-1"
+            className="text-textPrimary bg-bgGray p-1 
+            border border-borderPrimary rounded-l-md
+              focus-visible:outline-none"
             type="text"
-            data-testid="newCampusInput"
-            placeholder="Lisää toimipaikka.."
+            data-testid="newSportInput"
+            placeholder="Luo Ryhmä"
+            value={newGroup}
             onChange={(e) => setNewGroup(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                try {
-                  if (!handleInputError(newGroup, setErrorMessage, groups)) {
-                    return;
-                  }
-                  handleNewGroup(newGroup, setNewGroup);
-                  e.target.value = "";
-                } catch (error) {
-                  setErrorMessage(error.response.data);
-                }
+                handleNewGroup();
               }
             }}
           />
+          <p
+            onClick={() => handleNewGroup()}
+            className="py-2 px-4 rounded-r-md bg-primaryColor text-white
+             hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
+          >
+            +
+          </p>
         </div>
         <div className="flex flex-col gap-2" id="campusesContainer">
-          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-4">
+          <div className="grid grid-cols-controlpanel3 w-full text-textSecondary px-2">
             <p className="">Ryhmä</p>
             <p className="text-center">Opiskelijat</p>
             <div className="w-16" />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col divide-y divide-borderPrimary">
             {groups.map((group) => (
               <CreateGroupContainer
                 groups={groups}
