@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 import { useQuery } from "@tanstack/react-query";
@@ -8,10 +8,8 @@ import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
 import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
-import StudentComboBox from "../../components/ComboBoxes/StudentsComboBox.jsx";
-import SportComboBox from "../../components/ComboBoxes/SportsComboBox.jsx";
-import StudentGroupComboBox from "../../components/ComboBoxes/GroupComboBox.jsx";
-import CampusComboBox from "../../components/ComboBoxes/CampusComboBox.jsx";
+import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
+import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
 import { FiChevronLeft } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
@@ -21,16 +19,21 @@ import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
 import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
+import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSelect.jsx";
+import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
 
 function TeacherHome() {
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
 
-  const [selectedStudent, setSelectedStudent] = useState("");
-  const [selectedSport, setSelectedSport] = useState("");
-  const [selectedStudentGroup, setSelectedStudentGroup] = useState("");
-  const [selectedCampus, setSelectedCampus] = useState("");
+  const [filteredStudents, setfilteredStudents] = useState([]);
+
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [selectedSports, setSelectedSports] = useState([]);
+  const [selectedCampuses, setSelectedCampuses] = useState([]);
+  const [selectedGroups, setSelectedGroups] = useState([]);
+
   const { setShowDate } = useMainContext();
 
   const {
@@ -50,36 +53,58 @@ function TeacherHome() {
   } = useQuery({
     queryKey: ["options"],
     queryFn: () => publicService.getOptions(),
-  })
+  });
+
+  useEffect(() => {
+    if (studentsAndJournalsData) {
+      setfilteredStudents(studentsAndJournalsData);
+    }
+  }, [studentsAndJournalsData]);
+
+  // filter students based on selected filters
+  useEffect(() => {
+    let newFilteredStudents = studentsAndJournalsData;
+
+    if (selectedSports.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        selectedSports.some((sport) => sport.label === student.sport_name)
+      );
+    }
+    if (selectedCampuses.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        selectedCampuses.some((campus) => campus.label === student.campus)
+      );
+    }
+    if (selectedGroups.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        selectedGroups.some((group) => group.label === student.group_identifier)
+      );
+    }
+
+    if (selectedStudents.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((journal) =>
+        selectedStudents.some((student) => student.value === journal.user_id)
+      );
+    }
+
+    setfilteredStudents(newFilteredStudents);
+  }, [
+    selectedStudents,
+    selectedSports,
+    selectedCampuses,
+    selectedGroups,
+    studentsAndJournalsData,
+  ]);
 
   const options = useMemo(() => {
     if (optionsData) return optionsData;
     return { sports: [], student_groups: [], campuses: [] };
   }, [optionsData]);
 
-  const filteredJournals = useMemo(() => {
-    if (!studentsAndJournalsData) return [];
-  
-    return studentsAndJournalsData.filter((journal) => {
-      return (
-        (!selectedCampus || journal.campus_name === (selectedCampus.name || selectedCampus)) &&
-        (!selectedSport || journal.sport_name === selectedSport.name) &&
-        (!selectedStudentGroup || journal.group_identifier === selectedStudentGroup.group_identifier) &&
-        (!selectedStudent || journal.user_id === selectedStudent.id)
-      );
-    });
-  }, [
-    studentsAndJournalsData,
-    selectedCampus,
-    selectedSport,
-    selectedStudentGroup,
-    selectedStudent,
-  ]);
-
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
 
-    if (journals.length === 0) {
+    if (journals?.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
       return (
@@ -117,7 +142,7 @@ function TeacherHome() {
           </div>
           {/* Student list */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {journals.map((journal) => (
+            {journals?.map((journal) => (
               // Student card
               <div
                 key={journal.user_id}
@@ -287,10 +312,7 @@ function TeacherHome() {
   };
 
   const handleFilterReset = useCallback(() => {
-    setSelectedCampus("");
-    setSelectedSport("");
-    setSelectedStudentGroup("");
-    setSelectedStudent("");
+    setSelectedStudents([]);
     setShowDate(new Date());
   }, [setShowDate]);
 
@@ -302,7 +324,7 @@ function TeacherHome() {
         <TeacherHeatmapTooltip />
 
         <div
-          className=" hidden md:flex flex-col w-full mx-auto
+          className="flex flex-col w-full mx-auto
           bg-bgSecondary items-center justify-around
            rounded-md p-4 gap-8 border border-borderPrimary"
         >
@@ -339,27 +361,32 @@ function TeacherHome() {
               Vuosi
             </p>
           </div>
-          <div className="w-full grid grid-cols-2 md:grid-cols-5 items-center gap-8">
-            <StudentComboBox
-              journals={studentsAndJournalsData}
-              selectedStudent={selectedStudent}
-              setSelectedStudent={setSelectedStudent}
+          <div className=" grid grid-cols-1 lg:grid-cols-2 items-center gap-8">
+            <StudentMultiSelect
+              studentArray={studentsAndJournalsData}
+              selectedStudents={selectedStudents}
+              setSelectedStudents={setSelectedStudents}
+              filter={selectedStudents}
             />
-            <SportComboBox
-              sports={options.sports}
-              selectedSport={selectedSport}
-              setSelectedSport={setSelectedSport}
+            <SportsMultiSelect
+              sportsArray={options.sports}
+              selectedSports={selectedSports}
+              setSelectedSports={setSelectedSports}
+              filter={selectedSports}
             />
-            <StudentGroupComboBox
-              groups={options.student_groups}
-              selectedStudentGroup={selectedStudentGroup}
-              setSelectedStudentGroup={setSelectedStudentGroup}
+            <CampusMultiSelect
+              campusArray={options.campuses}
+              selectedCampuses={selectedCampuses}
+              setSelectedCampuses={setSelectedCampuses}
+              filter={selectedCampuses}
             />
-            <CampusComboBox
-              campuses={options.campuses}
-              selectedCampus={selectedCampus}
-              setSelectedCampus={setSelectedCampus}
+            <GroupMultiSelect
+              groupArray={options.student_groups}
+              selectedGroups={selectedGroups}
+              setSelectedGroups={setSelectedGroups}
+              filter={selectedGroups}
             />
+
             <div className="flex lg:gap-8 justify-center text-sm">
               <button
                 className="Button bg-btnGray hover:bg-hoverGray"
@@ -380,10 +407,9 @@ function TeacherHome() {
           id="studentList"
           className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center border border-borderPrimary"
         >
-
-          {showWeeks && <RenderWeeks journals={filteredJournals} />}
-        {showMonths && <RenderMonths journals={filteredJournals} />}
-          {showYears && <RenderYears journals={filteredJournals} />}
+          {showWeeks && <RenderWeeks journals={filteredStudents} />}
+          {showMonths && <RenderMonths journals={filteredStudents} />}
+          {showYears && <RenderYears journals={filteredStudents} />}
         </div>
       </div>
     );

@@ -197,8 +197,9 @@ const TeacherLayout = () => {
           {showControlPanel && (
             <div className=" bg-bgPrimary border-b border-borderPrimary rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-5 place-items-center bottom-[64px] right-0 l animate-menu-appear-middle">
               <NavLink
-                to="/opettaja/hallitse/lajit"
+                to="/opettaja/hallitse/"
                 className={linkClass}
+                end
                 onClick={() => showControlPanel(false)}
               >
                 <MdOutlineSportsFootball size={iconSize} />
