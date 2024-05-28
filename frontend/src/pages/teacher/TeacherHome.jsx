@@ -323,7 +323,7 @@ function TeacherHome() {
     return <LoadingScreen />;
   } else
     return (
-      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary w-full">
+      <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
         <TeacherHeatmapTooltip />
 
         <div
