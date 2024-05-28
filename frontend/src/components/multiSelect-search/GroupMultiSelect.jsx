@@ -33,6 +33,8 @@ const GroupMultiSelect = ({
       isMulti
       components={makeAnimated()}
       value={selectedGroups}
+      openMenuOnFocus={false}
+      openMenuOnClick={false}
       styles={{
         // Styles for the select component
         control: (provided) => ({
@@ -40,6 +42,7 @@ const GroupMultiSelect = ({
           border: "1px solid rgb(var(--color-border-primary))",
           color: "rgb(var(--color-text-primary))",
           borderRadius: "0.375rem",
+          minWidth: "15rem",
           minHeight: "2.5rem",
           backgroundColor: "rgb(var(--color-bg-secondary))",
         }),

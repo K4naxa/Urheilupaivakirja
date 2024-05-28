@@ -11,7 +11,7 @@ import LoadingScreen from "../../components/LoadingScreen.jsx";
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
-import { FiChevronLeft } from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
 import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
@@ -21,11 +21,14 @@ import userService from "../../services/userService.js";
 import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
 import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSelect.jsx";
 import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
+import cc from "../../utils/cc.js";
 
 function TeacherHome() {
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
+
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [filteredStudents, setfilteredStudents] = useState([]);
 
@@ -361,7 +364,8 @@ function TeacherHome() {
               Vuosi
             </p>
           </div>
-          <div className=" grid grid-cols-1 lg:grid-cols-2 items-center gap-8">
+
+          <div className="hidden lg:flex flex-wrap justify-center w-full items-center gap-2 lg:gap-8">
             <StudentMultiSelect
               studentArray={studentsAndJournalsData}
               selectedStudents={selectedStudents}
@@ -395,6 +399,62 @@ function TeacherHome() {
                 Nollaa
               </button>
             </div>
+          </div>
+
+          {/* filtres for mobile  */}
+          <div className="flex flex-col lg:hidden w-full">
+            <div
+              className="flex gap-8 text-textSecondary w-full py-2 border-b border-borderPrimary
+              justify-center items-center cursor-pointer select-none"
+              onClick={() => {
+                setShowMobileFilters(!showMobileFilters);
+              }}
+            >
+              {showMobileFilters ? "Piilota suodattimet" : "Näytä suodattimet"}
+              {showMobileFilters ? <FiChevronUp /> : <FiChevronDown />}
+            </div>
+
+            {showMobileFilters && (
+              <div
+                className={cc(
+                  "grid lg:hidden w-full items-center gap-2 lg:gap-8"
+                )}
+              >
+                <StudentMultiSelect
+                  studentArray={studentsAndJournalsData}
+                  selectedStudents={selectedStudents}
+                  setSelectedStudents={setSelectedStudents}
+                  filter={selectedStudents}
+                />
+                <SportsMultiSelect
+                  sportsArray={options.sports}
+                  selectedSports={selectedSports}
+                  setSelectedSports={setSelectedSports}
+                  filter={selectedSports}
+                />
+                <CampusMultiSelect
+                  campusArray={options.campuses}
+                  selectedCampuses={selectedCampuses}
+                  setSelectedCampuses={setSelectedCampuses}
+                  filter={selectedCampuses}
+                />
+                <GroupMultiSelect
+                  groupArray={options.student_groups}
+                  selectedGroups={selectedGroups}
+                  setSelectedGroups={setSelectedGroups}
+                  filter={selectedGroups}
+                />
+
+                <div className="flex lg:gap-8 justify-center text-sm">
+                  <button
+                    className="Button bg-btnGray hover:bg-hoverGray"
+                    onClick={handleFilterReset}
+                  >
+                    Nollaa
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

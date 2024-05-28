@@ -32,6 +32,8 @@ const CampusMultiSelect = ({
       isMulti
       components={makeAnimated()}
       value={selectedCampuses}
+      openMenuOnFocus={false}
+      openMenuOnClick={false}
       styles={{
         // Styles for the select component
         control: (provided) => ({
@@ -39,6 +41,8 @@ const CampusMultiSelect = ({
           border: "1px solid rgb(var(--color-border-primary))",
           color: "rgb(var(--color-text-primary))",
           borderRadius: "0.375rem",
+          minWidth: "15rem",
+          width: "100%",
           minHeight: "2.5rem",
           backgroundColor: "rgb(var(--color-bg-secondary))",
         }),
