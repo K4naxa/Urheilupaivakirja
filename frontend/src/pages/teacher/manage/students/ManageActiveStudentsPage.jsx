@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import userService from "../../../../services/userService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
-import StudentsComboBox from "../../../../components/ComboBoxes/StudentsComboBox.jsx";
 import { Link } from "react-router-dom";
 
 import { FiChevronUp } from "react-icons/fi";
@@ -12,6 +11,7 @@ import { FiTrash2 } from "react-icons/fi";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 
 import cc from "../../../../utils/cc.js";
+import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
 
 const createStudentContainer = (student, handleArchive, handleDelete) => {
   const daysSinceLastEntry = () => {
@@ -98,7 +98,7 @@ const ManageActiveStudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStudent, setSelectedStudent] = useState("");
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const [sorting, setSorting] = useState({
     name: 1,
     sport: 0,
@@ -251,12 +251,12 @@ const ManageActiveStudentsPage = () => {
     }
 
     // check if student is being searched
-    if (selectedStudent)
-      newFiltered = newFiltered.filter(
-        (student) => student.user_id === selectedStudent.id
+    if (selectedStudents.length > 0)
+      newFiltered = newFiltered.filter((student) =>
+        selectedStudents.some((s) => s.value === student.user_id)
       );
     setFilteredStudents(newFiltered);
-  }, [selectedStudent, sorting, students]);
+  }, [selectedStudents, sorting, students]);
 
   const handleArchive = (student) => {
     setAgreeStyle("gray");
@@ -305,10 +305,10 @@ const ManageActiveStudentsPage = () => {
     return (
       <div className="bg-bgSecondary rounded-md p-2">
         <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
-          <StudentsComboBox
-            journals={students}
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
+          <StudentMultiSelect
+            studentArray={students}
+            selectedStudents={selectedStudents}
+            setSelectedStudents={setSelectedStudents}
           />
 
           <div className="flex flex-col">
@@ -344,7 +344,7 @@ const ManageActiveStudentsPage = () => {
               createStudentContainer(student, handleArchive, handleDelete)
             )
           ) : (
-            <p className="text-center my-2">No students found</p>
+            <p className="text-center my-2">Ei opiskelijoita</p>
           )}
         </div>
         <ConfirmModal
