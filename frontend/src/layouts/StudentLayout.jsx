@@ -1,8 +1,9 @@
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { FiLogOut } from "react-icons/fi";
-import { FiUser } from "react-icons/fi";
-import { FiHome } from "react-icons/fi";
+
+import { FiUser, FiHome, FiLogOut } from "react-icons/fi";
+
+import { HiOutlineTrophy } from "react-icons/hi2";
 
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
@@ -162,11 +163,11 @@ const StudentLayout = () => {
             <button
               className={linkClass}
               onClick={() => {
-                logout();
+                console.log("saavutukset");
               }}
             >
-              <FiLogOut />
-              <p className={linkTextClass}>Logout</p>
+              <HiOutlineTrophy size={20} />
+              <p className={linkTextClass}>Saavutukset</p>
             </button>
             <button
               className={

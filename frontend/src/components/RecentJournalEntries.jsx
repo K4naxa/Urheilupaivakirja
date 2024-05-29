@@ -26,16 +26,18 @@ const RecentJournalEntry = ({ entry }) => {
   const { openBigModal } = useJournalModal();
 
   return (
-    <div className="grid  grid-cols-6 gap-4 p-2 items-center hover:bg-bgGray">
+    <div className=" grid  grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-bgGray">
       {/* Date */}
-      <p>{dayjs(entry.date).format("DD.MM.YYYY")}</p>
+      <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
+      <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
+
       <div className="flex gap-2">
         {/* Sport */}
         <div className="bg-bgGray p-1 rounded-md ">
           {" "}
           <FootballSoccerBall size={20} className="text-primaryColor" />
         </div>
-        <p>{entry.workout_category_name}</p>
+        <p className="md:flex hidden">{entry.workout_category_name}</p>
       </div>
 
       {/* WorkoutLenght */}
@@ -44,7 +46,7 @@ const RecentJournalEntry = ({ entry }) => {
         {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
       </p>
       {/* Intensity */}
-      <p>{entry.workout_intensity_name}</p>
+      <p className="hidden md:flex">{entry.workout_intensity_name}</p>
       {/* Type of entry (sick, rest, ..) */}
       <p
         className={cc(
@@ -57,7 +59,7 @@ const RecentJournalEntry = ({ entry }) => {
         {entry.entry_type_name}
       </p>
       {/* Edit button only for student*/}
-      <div className="flex justify-center">
+      <div className="flex justify-end md:justify-center">
         {user.role !== 1 && (
           <button
             onClick={() => openBigModal("edit", { entryId: entry.id })}
@@ -129,16 +131,17 @@ const RecentJournalEntries = ({ journal }) => {
         </div>
       </div>
       <div className="flex h-full overflow-y-auto">
-        <div className="flex w-full h-full flex-col overflow-y-auto rounded-md max-h-[300px] relative">
-          <div className="sticky top-0 grid grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
-            <span>Päivämäärä</span>
+        <div className="w-full h-full  rounded-md max-h-[300px] relative ">
+          <div className="grid grid-cols-5 md:grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
+            <span className="hidden md:flex">Päivämäärä</span>
+            <span className="flex md:hidden">Pvm</span>
             <span>Laji</span>
             <span>Kesto</span>
-            <span>Rankkuus</span>
+            <span className="hidden md:flex">Rankkuus</span>
             <span>Tyyppi</span>
             <span></span>
           </div>
-          <div className="divide-y divide-borderPrimary flex flex-col h-full">
+          <div className="divide-y divide-borderPrimary flex flex-col h-full overflow-auto">
             {filteredJournal.length === 0 && (
               <p className="text-textSecondary text-center m-4">
                 Ei merkintöjä

@@ -21,15 +21,15 @@ const Verify = () => {
   min-w-96"
       >
         <div
-          className="w-full py-2 rounded-t-md border-b border-borderPrimary 
+          className="w-full py-2  rounded-t-md border-b border-borderPrimary 
      text-xl text-center"
         >
           <h2>Oppilaat</h2>
         </div>
         <div className=" w-full py-2">
-          <div className=" flex flex-wrap gap-4 p-2 bg-bgSecondary max-h-[600px] overflow-auto">
+          <div className=" flex justify-center lg:justify-start flex-wrap gap-4 p-2 max-h-[600px] overflow-auto">
             {unverifiedStudents.length === 0 ? (
-              <div className="text-center text-secondaryColor">
+              <div className="text-center text-textSecondary">
                 Ei hyväksyttäviä oppilaita
               </div>
             ) : (
@@ -52,7 +52,7 @@ const Verify = () => {
   min-w-96"
       >
         <div
-          className="w-full py-2 rounded-t-md border-b border-borderPrimary 
+          className="w-full r py-2 rounded-t-md border-b border-borderPrimary 
      text-xl text-center"
         >
           <h2>Toimipisteet</h2>
@@ -60,7 +60,7 @@ const Verify = () => {
         <div className=" w-full py-2">
           <div className=" flex flex-col gap-4 p-2 bg-bgSecondary">
             {unverifiedCampuses.length === 0 ? (
-              <div className="text-center text-secondaryColor">
+              <div className="text-center text-textSecondary">
                 Ei hyväksyttäviä toimipisteitä
               </div>
             ) : (
@@ -90,7 +90,7 @@ const Verify = () => {
         <div className=" w-full py-2">
           <div className=" flex flex-col gap-4 p-2 bg-bgSecondary">
             {unverifiedSports.length === 0 ? (
-              <div className="text-center text-secondaryColor">
+              <div className="text-center text-textSecondary">
                 Ei hyväksyttäviä lajeja
               </div>
             ) : (

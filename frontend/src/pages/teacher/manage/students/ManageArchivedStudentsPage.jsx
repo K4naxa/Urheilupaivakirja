@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import userService from "../../../../services/userService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
-import StudentsComboBox from "../../../../components/ComboBoxes/StudentsComboBox.jsx";
+
 import { Link } from "react-router-dom";
 
 import { FiChevronUp } from "react-icons/fi";
@@ -11,6 +11,7 @@ import { FiTrash2 } from "react-icons/fi";
 
 import cc from "../../../../utils/cc.js";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
+import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
 //TODO: Ryhmä not showing correctly in the UI
 const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
@@ -71,7 +72,7 @@ const ManageArchivedStudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStudent, setSelectedStudent] = useState("");
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const [sorting, setSorting] = useState({
     name: 1,
     sport: 0,
@@ -163,14 +164,6 @@ const ManageArchivedStudentsPage = () => {
     setSorting(newSorting);
   };
 
-  const handleActivitySorting = (type) => {
-    let newSorting = { ...sorting, sport: 0, group: 0, name: 0, campus: 0 };
-    if (type === 1) newSorting = { ...newSorting, activity: 1 };
-    if (type === -1) newSorting = { ...newSorting, activity: -1 };
-
-    setSorting(newSorting);
-  };
-
   const handleSortingChange = (value) => {
     switch (value) {
       case "name1":
@@ -254,12 +247,12 @@ const ManageArchivedStudentsPage = () => {
     }
 
     // check if student is being searched
-    if (selectedStudent)
-      newFiltered = newFiltered.filter(
-        (student) => student.user_id === selectedStudent.id
-      );
+    if (selectedStudents.length > 0)
+      newFiltered = newFiltered.filter((student) => {
+        return selectedStudents.some((s) => s.value === student.user_id);
+      });
     setFilteredStudents(newFiltered);
-  }, [selectedStudent, sorting, students]);
+  }, [selectedStudents, sorting, students]);
 
   if (loading)
     return (
@@ -271,10 +264,11 @@ const ManageArchivedStudentsPage = () => {
   return (
     <div className="bg-bgSecondary rounded-md p-2">
       <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
-        <StudentsComboBox
-          journals={students}
-          selectedStudent={selectedStudent}
-          setSelectedStudent={setSelectedStudent}
+        <StudentMultiSelect
+          studentArray={students}
+          selectedStudents={selectedStudents}
+          setSelectedStudents={setSelectedStudents}
+          filter={selectedStudents}
         />
 
         <div className="flex flex-col">
@@ -305,7 +299,7 @@ const ManageArchivedStudentsPage = () => {
             createStudentContainer(student, handleActivation, handleDelete)
           )
         ) : (
-          <p className="text-center my-2">No students found</p>
+          <p className="text-center my-2">Ei opiskelijoita</p>
         )}
       </div>
       <ConfirmModal
