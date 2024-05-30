@@ -6,27 +6,25 @@ import {
   isSameDay,
   isSameMonth,
   isToday,
-  set,
   startOfDay,
   startOfMonth,
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
 import { useMainContext } from "../../hooks/mainContext";
-import { useHeatmapContext} from "../../hooks/useHeatmapContext";
+import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 //import { FootballSoccerBall } from "@vectopus/atlas-icons-react";
 
 function HeatMap_Month({ journal }) {
   const { showDate, setShowDate } = useMainContext();
-  const { setTooltipContent, setTooltipUser, setTooltipDate } = useHeatmapContext();
+  const { setTooltipContent, setTooltipUser, setTooltipDate } =
+    useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
-
-
 
   // create an array for the month
   const calendarDays = useMemo(() => {
@@ -47,15 +45,13 @@ function HeatMap_Month({ journal }) {
   });
 
   const handleClick = (day) => {
-    const dayEntries = journal.filter(entry => 
+    const dayEntries = journal.filter((entry) =>
       isSameDay(new Date(entry.date), day)
     );
-    console.log (dayEntries);
+    console.log(dayEntries);
     setTooltipDate(day);
     setTooltipContent(dayEntries);
-
   };
-
 
   return (
     <div
@@ -71,7 +67,8 @@ function HeatMap_Month({ journal }) {
           )}
           showWeekName={index < 7}
           showDate={showDate}
-          onClick={() => handleClick(day)}        />
+          onClick={() => handleClick(day)}
+        />
       ))}
     </div>
   );

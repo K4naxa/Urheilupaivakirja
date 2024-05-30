@@ -120,6 +120,10 @@ const getStudents = async () => {
   return response.data;
 };
 
+const getStudentData = async () => {
+  const response = await axios.get(`/students/data`, makeHeader());
+  return response.data;
+};
 const getStudentsAndEntries = async () => {
   const response = await axios.get("/students/entries", makeHeader());
   return response.data;
@@ -151,5 +155,6 @@ export default {
   requestPasswordReset,
   verifyPasswordResetOTP,
   resetPassword,
+  getStudentData,
 };
 // Path: frontEnd/src/services/userService.js

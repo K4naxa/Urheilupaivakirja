@@ -59,6 +59,10 @@ export default defineConfig({
         target: "http://localhost:3001",
         changeOrigin: true,
       },
+      "/students/data": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
       "/public/campuses": {
         target: "http://localhost:3001",
         changeOrigin: true,

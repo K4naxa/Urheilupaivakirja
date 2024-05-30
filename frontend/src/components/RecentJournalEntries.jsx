@@ -26,7 +26,7 @@ const RecentJournalEntry = ({ entry }) => {
   const { openBigModal } = useJournalModal();
 
   return (
-    <div className=" grid  grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-bgGray">
+    <div className=" grid grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-hoverDefault">
       {/* Date */}
       <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
       <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>

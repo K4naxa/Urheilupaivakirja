@@ -39,6 +39,7 @@ import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
 import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
 import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordNewPasswordPage";
+import StudentProfilePage from "./pages/StudentProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -65,16 +66,62 @@ export const router = createBrowserRouter([
                 path: "tiedotteet",
                 element: <StudentNewsPage />,
               },
+              {
+                path: "profiili",
+                element: <StudentProfilePage />,
+              },
             ],
           },
 
-          { path: "/kirjaudu", element: <RedirectIfAuthenticated><LoginPage /></RedirectIfAuthenticated> },
-          { path: "/test" , element: <TestPage/>},
-          { path: "/rekisteroidy", element: <RedirectIfAuthenticated><RegistrationPage /></RedirectIfAuthenticated> },
-          { path: "/unohditko-salasanasi", element: <RedirectIfAuthenticated><ForgottenPasswordPage /></RedirectIfAuthenticated> },
-          { path: "/unohditko-salasanasi/vahvista", element: <RedirectIfAuthenticated><ForgottenPasswordConfirmPage/></RedirectIfAuthenticated>},
-          { path: "/unohditko-salasanasi/uusi-salasana", element: <RedirectIfAuthenticated><ForgottenPasswordNewPasswordPage/></RedirectIfAuthenticated>},
-          { path: "/vahvista-sahkoposti", element: <RedirectIfNotAuthenticated><EmailVerificationPage /></RedirectIfNotAuthenticated>},
+          {
+            path: "/kirjaudu",
+            element: (
+              <RedirectIfAuthenticated>
+                <LoginPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          { path: "/test", element: <TestPage /> },
+          {
+            path: "/rekisteroidy",
+            element: (
+              <RedirectIfAuthenticated>
+                <RegistrationPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/unohditko-salasanasi",
+            element: (
+              <RedirectIfAuthenticated>
+                <ForgottenPasswordPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/unohditko-salasanasi/vahvista",
+            element: (
+              <RedirectIfAuthenticated>
+                <ForgottenPasswordConfirmPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/unohditko-salasanasi/uusi-salasana",
+            element: (
+              <RedirectIfAuthenticated>
+                <ForgottenPasswordNewPasswordPage />
+              </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/vahvista-sahkoposti",
+            element: (
+              <RedirectIfNotAuthenticated>
+                <EmailVerificationPage />
+              </RedirectIfNotAuthenticated>
+            ),
+          },
           {
             path: "/opettaja",
             element: (

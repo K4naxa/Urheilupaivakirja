@@ -9,12 +9,32 @@ import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
-import { addMonths, subMonths } from "date-fns";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+  toDate,
+} from "date-fns";
 import { StudentHeatmapTooltip } from "../../components/heatmap-tooltip/StudentHeatmapTooltip";
-import { FiChevronLeft, FiChevronRight, FiZap } from "react-icons/fi";
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiZap,
+  FiTrendingUp,
+} from "react-icons/fi";
 
 import { useJournalModal } from "../../hooks/useJournalModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
+import HalfCircleProgressBar from "../../components/charts/JournalActivityBar";
+import JournalActivityBar from "../../components/charts/JournalActivityBar";
+import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
@@ -55,7 +75,31 @@ function StudentHome() {
     }
   };
 
-  console.log(studentJournalData);
+  const calcJournalActivity = () => {
+    const monthStart = startOfWeek(startOfMonth(showDate), { weekStartsOn: 1 });
+    const monthEnd = endOfWeek(endOfMonth(showDate), { weekStartsOn: 1 });
+    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+    let activeDaysInMonth = new Set();
+
+    studentJournalData.forEach((entry) => {
+      const entryDate = new Date(entry.date);
+      if (isSameMonth(entryDate, showDate)) {
+        activeDaysInMonth.add(format(entryDate, "yyyy-MM-dd"));
+      }
+    });
+
+    return (activeDaysInMonth.size / monthDays.length) * 100;
+  };
+
+  const calcAllActiveDays = () => {
+    let activeDays = new Set();
+    studentJournalData.forEach((entry) => {
+      const entryDate = new Date(entry.date);
+      activeDays.add(format(entryDate, "yyyy-MM-dd"));
+    });
+    return activeDays.size;
+  };
 
   if (studentJournalDataError) {
     return (
@@ -134,7 +178,39 @@ function StudentHome() {
           <WeekDayActivity journal={studentJournalData} />
         </div>
 
-        <div className="bg-bgSecondary w-full  p-4 rounded-md border border-borderPrimary"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 bg-bgSecondary bg-transparent gap-4">
+          <div className=" bg-bgSecondary border border-borderPrimary rounded-md p-4">
+            <div className="flex gap-2 items-center">
+              {" "}
+              <p className="IconBox">
+                <FiTrendingUp />
+              </p>
+              <p className="text-lg">Seuranta</p>
+            </div>
+            <div className=" grid grid-cols-2 h-full w-full items-center co">
+              <div className="flex flex-col gap-4">
+                <p className="font-semibold ">Merkintä aktiivisuus: </p>
+                <p className="text-textSecondary text-sm">
+                  Viimeisin merkintä: 27.01.2020
+                </p>
+              </div>
+              <JournalActivityBar percentage={calcJournalActivity()} />
+            </div>
+          </div>
+
+          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-2">
+            <div className="flex gap-2  mb-4 items-center">
+              {" "}
+              <p className="IconBox">
+                <FiTrendingUp />
+              </p>
+              <p className="text-lg">Seuranta</p>
+            </div>
+            <div className="flex flex-col justify-center items-center">
+              <CourseComplitionBar value={calcAllActiveDays()} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* thrid Row */}
