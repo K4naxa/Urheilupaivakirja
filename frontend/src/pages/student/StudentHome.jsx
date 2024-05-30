@@ -185,9 +185,10 @@ function StudentHome() {
             </div>
             <div className=" grid grid-cols-2 h-full w-full items-center co">
               <div className="flex flex-col gap-4">
-                <p className="font-semibold ">Merkintä aktiivisuus: </p>
+                <p className="font-medium ">Merkintä aktiivisuus: </p>
                 <p className="text-textSecondary text-sm">
-                  Viimeisin merkintä: 27.01.2020
+                  Viimeisin merkintä:{" "}
+                  {format(studentJournalData[0].date, "dd.MM.yyyy")}
                 </p>
               </div>
               <JournalActivityBar percentage={calcJournalActivity()} />
