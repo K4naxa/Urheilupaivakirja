@@ -3,21 +3,29 @@ import userService from "../services/userService";
 import { useAuth } from "../hooks/useAuth";
 import LoadingScreen from "../components/LoadingScreen";
 import { format } from "date-fns";
+import ConfirmModal from "../components/confirm-modal/confirmModal";
+
 function StudentProfilePage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // statet Modalia varten
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [continueButton, setContinueButton] = useState("");
+  const [agreeStyle, setAgreeStyle] = useState("");
+  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
+    () => {}
+  );
+
   useEffect(() => {
     const fetchUser = async () => {
-      console.log("Fetching user data");
       try {
-        console.log("Fetching user data");
         const response = await userService.getStudentData();
         setUserData(response);
-        console.log(response);
       } catch (error) {
         setError(error);
       } finally {
@@ -33,6 +41,30 @@ function StudentProfilePage() {
     const diffTime = Math.abs(today - created);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  const handleAccountDelete = () => {
+    setShowConfirmModal(true);
+    setAgreeStyle("red");
+    setModalMessage(
+      `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? 
+  
+      Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
+    );
+    setContinueButton("Poista");
+
+    const handleUserConfirmation = async () => {
+      try {
+        await userService.deleteUser(userData.user_id);
+        console.log("User deleted");
+        await logout(); // Ensure this clears tokens/sessions
+      } catch (error) {
+        console.error("Error deleting user or logging out:", error);
+      } finally {
+        setShowConfirmModal(false);
+      }
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
   };
 
   if (loading) {
@@ -113,11 +145,25 @@ function StudentProfilePage() {
           </div>
 
           <div className="flex px-2 py-4 w-full justify-center gap-2 ">
-            <button className="Button bg-iconRed text-white w-32">
+            <button
+              className="Button bg-iconRed text-white w-32"
+              onClick={() => {
+                handleAccountDelete();
+              }}
+            >
               Poista Käyttäjä
             </button>
           </div>
         </div>
+        <ConfirmModal
+          isOpen={showConfirmModal}
+          onDecline={() => setShowConfirmModal(false)}
+          onAgree={handleUserConfirmation}
+          text={modalMessage}
+          agreeButton={continueButton}
+          declineButton={"Peruuta"}
+          agreeStyle={agreeStyle}
+        />
       </div>
     );
 }

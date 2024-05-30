@@ -88,12 +88,6 @@ const resetPassword = async (email, resetToken, newPassword) => {
   return response.data;
 };
 
-const logout = () => {
-  window.localStorage.removeItem("urheilupaivakirjaToken");
-  window.sessionStorage.removeItem("urheilupaivakirjaToken");
-  window.location.href = "/";
-};
-
 // User Controls -------------------------------------------------------------------
 
 const deleteUser = async (id) => {
@@ -142,7 +136,6 @@ const toggleStudentArchive = async (id) => {
 export default {
   login,
   register,
-  logout,
   getAllUnverified,
   verifyUser,
   deleteUser,

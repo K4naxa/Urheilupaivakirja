@@ -75,8 +75,8 @@ const CourseCompletionBar = ({ value }) => {
         </g>
         <Text value={value} REQUIRED_COMPLETION={REQUIRED_COMPLETION} />
       </svg>
-      <p className="p-2 text-textSecondary">
-        Olet suorittanut kurssistasi{" "}
+      <p className="p-2 text-textSecondary text-center">
+        Olet suorittanut kurssistasi
         {((value / REQUIRED_COMPLETION) * 100).toFixed(0)}%
       </p>
     </div>
