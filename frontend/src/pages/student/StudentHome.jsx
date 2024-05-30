@@ -35,6 +35,7 @@ import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import HalfCircleProgressBar from "../../components/charts/JournalActivityBar";
 import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
+import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
@@ -92,13 +93,8 @@ function StudentHome() {
     return (activeDaysInMonth.size / monthDays.length) * 100;
   };
 
-  const calcAllActiveDays = () => {
-    let activeDays = new Set();
-    studentJournalData.forEach((entry) => {
-      const entryDate = new Date(entry.date);
-      activeDays.add(format(entryDate, "yyyy-MM-dd"));
-    });
-    return activeDays.size;
+  const calcJournalEntriesCount = () => {
+    return studentJournalData.length;
   };
 
   if (studentJournalDataError) {
@@ -153,7 +149,7 @@ function StudentHome() {
                 <p className="text-textPrimary"> Testi Käyttäjä</p>
               </div>
               <p className="text-textSecondary">
-                Paras päivä aloittaa urheilu oli eilen
+                {getMotivationQuoteOfTheDay()}
               </p>
             </div>
             <div className="flex gap-4">
@@ -207,7 +203,7 @@ function StudentHome() {
               <p className="text-lg">Seuranta</p>
             </div>
             <div className="flex flex-col justify-center items-center">
-              <CourseComplitionBar value={calcAllActiveDays()} />
+              <CourseComplitionBar value={calcJournalEntriesCount()} />
             </div>
           </div>
         </div>

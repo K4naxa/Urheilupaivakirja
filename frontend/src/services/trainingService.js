@@ -48,17 +48,30 @@ const getJournalEntryForForm = async (id) => {
   const journalEntry = response.data;
   return {
     entry_id: journalEntry.entry_id ? journalEntry.entry_id.toString() : "",
-    entry_type: journalEntry.entry_type_id ? journalEntry.entry_type_id.toString() : "",
-    workout_type: journalEntry.workout_type_id ? journalEntry.workout_type_id.toString() : "",
-    workout_category: journalEntry.workout_category_id ? journalEntry.workout_category_id.toString() : "",
-    length_in_minutes: journalEntry.length_in_minutes ? journalEntry.length_in_minutes.toString() : "",
-    time_of_day: journalEntry.time_of_day_id ? journalEntry.time_of_day_id.toString() : "",
-    workout_intensity: journalEntry.workout_intensity_id ? journalEntry.workout_intensity_id.toString() : "",
-    date: journalEntry.date ? dayjs(journalEntry.date).format("YYYY-MM-DD") : "",
+    entry_type: journalEntry.entry_type_id
+      ? journalEntry.entry_type_id.toString()
+      : "",
+    workout_type: journalEntry.workout_type_id
+      ? journalEntry.workout_type_id.toString()
+      : "",
+    workout_category: journalEntry.workout_category_id
+      ? journalEntry.workout_category_id.toString()
+      : "",
+    length_in_minutes: journalEntry.length_in_minutes
+      ? journalEntry.length_in_minutes.toString()
+      : "",
+    time_of_day: journalEntry.time_of_day_id
+      ? journalEntry.time_of_day_id.toString()
+      : "",
+    workout_intensity: journalEntry.workout_intensity_id
+      ? journalEntry.workout_intensity_id.toString()
+      : "",
+    date: journalEntry.date
+      ? dayjs(journalEntry.date).format("YYYY-MM-DD")
+      : "",
     details: journalEntry.details || "",
   };
 };
-
 
 // ................................................................................
 
@@ -135,7 +148,6 @@ const editJournalEntry = async (journalEntry) => {
   );
   return response.data;
 };
-
 
 // delete journal entry
 const deleteJournalEntry = async (id) => {
