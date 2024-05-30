@@ -194,8 +194,8 @@ function StudentHome() {
             </div>
           </div>
 
-          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-2">
-            <div className="flex gap-2  mb-4 items-center">
+          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-4">
+            <div className="flex gap-2 items-center">
               {" "}
               <p className="IconBox">
                 <FiTrendingUp />
