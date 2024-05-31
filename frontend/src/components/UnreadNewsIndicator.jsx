@@ -17,7 +17,7 @@ const UnreadNewsIndicator = ({ type }) => {
   } = useQuery({
     queryKey: ["checkUnreadNews"],
     queryFn: publicService.checkUnreadNews,
-    refetchInterval: 300000,
+    refetchInterval: 1000 * 60 * 5,
   });
 
   // onSuccess
