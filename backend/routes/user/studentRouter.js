@@ -225,53 +225,70 @@ router.put("/news", async (req, res) => {
 // Get student data
 router.get("/data", async (req, res) => {
   try {
+    // Retrieve the role of the user making the request
     const role = getRole(req);
+
+    // Check if the user is authorized (role must be 1 or 3)
     if (role !== 3 && role !== 1) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
+    // Retrieve the user ID from the request
     const userId = getUserId(req);
+
+    // Fetch the student information from the database
     const student = await knex("students")
       .select(
-        "students.*",
-        "sports.name as sport_name",
-        "student_groups.group_identifier",
-        "campuses.name as campus_name",
-        "users.email",
-        "users.created_at",
-        "users.id as user_id"
+        "students.*", // All columns from the students table
+        "sports.name as sport_name", // Join and select sport name
+        "student_groups.group_identifier", // Join and select group identifier
+        "campuses.name as campus_name", // Join and select campus name
+        "users.email", // Join and select user email
+        "users.created_at", // Join and select user creation date
+        "users.id as user_id" // Join and select user ID
       )
-      .where("user_id", userId)
-      .first()
+      .where("user_id", userId) // Match the user ID
+      .first() // Get the first match (should be only one)
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id")
       .leftJoin("users", "students.user_id", "users.id");
 
+    // Fetch journal entries and perform aggregations
     const journalData = await knex("journal_entries")
       .select(
-        knex.raw("COUNT(DISTINCT DATE(date)) as unique_days_count"),
+        knex.raw("COUNT(DISTINCT DATE(date)) as unique_days_count"), // Count unique days with entries
         knex.raw(
-          "COUNT(CASE WHEN entry_type_id = 1 THEN 1 END) as entry_type_1_count"
+          "COUNT(CASE WHEN entry_type_id = 1 THEN 1 END) as entry_type_1_count" // Count entries of type 1
         ),
-        knex.raw("COUNT(*) as total_entries_count")
+        knex.raw("COUNT(*) as total_entries_count") // Count total entries
       )
-      .where("user_id", userId)
-      .first();
+      .where("user_id", userId) // Match the user ID
+      .first(); // Get the first match
 
+    // If no student is found, return a 404 response
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
     }
 
+    const journals = await knex("journal_entries")
+      .select("*")
+      .where("user_id", userId)
+      .orderBy("date", "desc");
+
+    // Combine student and journal data into a single response object
     const studentData = {
-      ...student,
-      unique_days_count: journalData.unique_days_count,
-      entry_type_1_count: journalData.entry_type_1_count,
-      total_entries_count: journalData.total_entries_count,
+      ...student, // Spread operator to include all student fields
+      journal_entries: journals, // Add journal entries
+      unique_days_count: journalData.unique_days_count, // Add unique days count
+      entry_type_1_count: journalData.entry_type_1_count, // Add entry type 1 count
+      total_entries_count: journalData.total_entries_count, // Add total entries count
     };
 
+    // Send the combined data as a JSON response
     res.json(studentData);
   } catch (error) {
+    // Log the error and return a 500 response
     console.error("Error fetching student data:", error);
     return res.status(500).json({ error: "Internal server error" });
   }

@@ -4,11 +4,11 @@ import { useAuth } from "../hooks/useAuth";
 import LoadingScreen from "../components/LoadingScreen";
 import { format } from "date-fns";
 import ConfirmModal from "../components/confirm-modal/confirmModal";
+import { useQuery } from "@tanstack/react-query";
 
 function StudentProfilePage() {
   const { user, logout } = useAuth();
 
-  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,11 +21,17 @@ function StudentProfilePage() {
     () => {}
   );
 
+  const { data: userData, isLoading: userDataLoading } = useQuery({
+    queryKey: ["studentData"],
+    queryFn: () => userService.getStudentData(),
+    staleTime: 15 * 60 * 1000,
+  });
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await userService.getStudentData();
-        setUserData(response);
+        console.log(response);
       } catch (error) {
         setError(error);
       } finally {
@@ -67,7 +73,7 @@ function StudentProfilePage() {
     setHandleUserConfirmation(() => handleUserConfirmation);
   };
 
-  if (loading) {
+  if (userDataLoading) {
     return (
       <div className="w-full h-full flex justify-center items-center">
         <LoadingScreen />
