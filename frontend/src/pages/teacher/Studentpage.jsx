@@ -96,7 +96,7 @@ function StudentHome() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
         {/* rightSide */}
         <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
-          <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full">
+          <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full mb-4">
             <div className="flex flex-col">
               {/* Student Name */}
               <p className="flex  mb-2 font-medium  text-2xl text-textPrimary w-full justify-center lg:justify-normal ">
@@ -121,7 +121,7 @@ function StudentHome() {
             </div>
 
             {/* student journal entry counts  */}
-            <div className="flex  gap-2  w-full justify-center lg:justify-end">
+            <div className="flex  gap-2  w-full justify-center lg:justify-end ">
               <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
                 <p>{studentData.total_entries_count} merkintää</p>
               </div>
@@ -134,9 +134,7 @@ function StudentHome() {
             </div>
           </div>
 
-          <div className=" lg:mt-4">
-            <RecentJournalEntries journal={studentData.journal_entries} />
-          </div>
+          <RecentJournalEntries journal={studentData.journal_entries} />
         </div>
         {/* left Side */}
         <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
