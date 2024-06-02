@@ -12,11 +12,13 @@ import formatDate from "../../utils/formatDate";
 import {
   addMonths,
   eachDayOfInterval,
+  endOfDay,
   endOfMonth,
   endOfWeek,
   format,
   isSameDay,
   isSameMonth,
+  startOfDay,
   startOfMonth,
   startOfWeek,
   subMonths,
@@ -78,8 +80,8 @@ function StudentHome() {
   };
 
   const calcJournalActivity = () => {
-    const monthStart = startOfWeek(startOfMonth(showDate), { weekStartsOn: 1 });
-    const monthEnd = endOfWeek(endOfMonth(showDate), { weekStartsOn: 1 });
+    const monthStart = startOfDay(startOfMonth(showDate));
+    const monthEnd = endOfDay(endOfMonth(showDate));
     const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     let activeDaysInMonth = new Set();
@@ -100,8 +102,8 @@ function StudentHome() {
 
   if (studentDataError) {
     return (
-      <div className="flex justify-center items-center">
-        <h1>Something went wrong</h1>
+      <div className="flex justify-center items-center w-full">
+        <h1>Something went wrong, try again later</h1>
       </div>
     );
   }
