@@ -34,7 +34,6 @@ import {
 
 import { useJournalModal } from "../../hooks/useJournalModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import HalfCircleProgressBar from "../../components/charts/JournalActivityBar";
 import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";

@@ -1,11 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import PractiseBoxes from "../../components/charts/PractiseBoxes";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
-import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
@@ -14,15 +11,11 @@ import {
   eachDayOfInterval,
   endOfDay,
   endOfMonth,
-  endOfWeek,
   format,
-  isSameDay,
   isSameMonth,
   startOfDay,
   startOfMonth,
-  startOfWeek,
   subMonths,
-  toDate,
 } from "date-fns";
 import { StudentHeatmapTooltip } from "../../components/heatmap-tooltip/StudentHeatmapTooltip";
 import {
@@ -34,10 +27,8 @@ import {
 
 import { useJournalModal } from "../../hooks/useJournalModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import HalfCircleProgressBar from "../../components/charts/JournalActivityBar";
 import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
-import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
 import userService from "../../services/userService";
 import { useParams } from "react-router-dom";
 
@@ -68,18 +59,6 @@ function StudentHome() {
       </div>
     );
   }
-
-  const formatHelloMessage = () => {
-    const date = new Date();
-    const hours = date.getHours();
-    if (hours < 12) {
-      return "Huomenta";
-    } else if (hours < 18) {
-      return "Iltapäivää";
-    } else {
-      return "Hyvää iltaa";
-    }
-  };
 
   const calcJournalActivity = () => {
     const monthStart = startOfDay(startOfMonth(showDate));
@@ -115,6 +94,48 @@ function StudentHome() {
       <StudentHeatmapTooltip />
       {/* first row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
+        {/* rightSide */}
+        <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
+          <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full">
+            <div className="flex flex-col">
+              {/* Student Name */}
+              <p className="flex w-fit mb-2 font-medium  text-2xl text-textPrimary border-b border-primaryColor">
+                {studentData.first_name} {studentData.last_name}
+              </p>
+              <div className="flex flex-wrap gap-x-4">
+                <div className="flex gap-2">
+                  <p className="text-textSecondary">Toimipaikka:</p>{" "}
+                  <p>{studentData.campus_name}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="text-textSecondary">Ryhmä:</p>{" "}
+                  <p>{studentData.group_identifier}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="text-textSecondary">Laji:</p>{" "}
+                  <p>{studentData.sport_name}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* student journal entry counts  */}
+            <div className="flex  gap-2">
+              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
+                <p>{studentData.total_entries_count} merkintää</p>
+              </div>
+              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white">
+                {studentData.entry_type_1_count} harjoitusta
+              </div>
+              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
+                {studentData.unique_days_count} aktiivista päivää
+              </div>
+            </div>
+          </div>
+
+          <div className=" lg:mt-4">
+            <RecentJournalEntries journal={studentData.journal_entries} />
+          </div>
+        </div>
         {/* left Side */}
         <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
           <div className="text-textSecondary">{showDate.getFullYear()}</div>
@@ -141,35 +162,6 @@ function StudentHome() {
           </div>
           <div className="w-full flex justify-center">
             <HeatMap_Month journal={studentData.journal_entries} />
-          </div>
-        </div>
-
-        {/* rightSide */}
-        <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
-          {/* right hello messaage */}
-          <div className="hidden lg:flex justify-between">
-            <div className="">
-              <div className="text-2xl font-medium flex gap-2">
-                <p className="text-textSecondary">{formatHelloMessage()}</p>
-                <p className="text-textPrimary"> Testi Käyttäjä</p>
-              </div>
-              <p className="text-textSecondary">
-                {getMotivationQuoteOfTheDay()}
-              </p>
-            </div>
-            <div className="flex gap-4">
-              <button
-                onClick={() => openBigModal("new")}
-                className="px-4 py-2 border border-borderPrimary rounded-md bg-primaryColor text-white
-              hover:bg-hoverPrimary"
-              >
-                {`+ Uusi harjoitus`}
-              </button>
-            </div>
-          </div>
-
-          <div className=" lg:mt-4">
-            <RecentJournalEntries journal={studentData.journal_entries} />
           </div>
         </div>
       </div>
