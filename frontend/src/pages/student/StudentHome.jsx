@@ -141,7 +141,9 @@ function StudentHome() {
             <div className="">
               <div className="text-2xl font-medium flex gap-2">
                 <p className="text-textSecondary">{formatHelloMessage()}</p>
-                <p className="text-textPrimary"> Testi Käyttäjä</p>
+                <p className="text-textPrimary">
+                  {studentData.first_name} {studentData.last_name}
+                </p>
               </div>
               <p className="text-textSecondary">
                 {getMotivationQuoteOfTheDay()}
