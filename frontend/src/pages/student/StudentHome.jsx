@@ -1,11 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import PractiseBoxes from "../../components/charts/PractiseBoxes";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
-import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
@@ -14,15 +11,11 @@ import {
   eachDayOfInterval,
   endOfDay,
   endOfMonth,
-  endOfWeek,
   format,
-  isSameDay,
   isSameMonth,
   startOfDay,
   startOfMonth,
-  startOfWeek,
   subMonths,
-  toDate,
 } from "date-fns";
 import { StudentHeatmapTooltip } from "../../components/heatmap-tooltip/StudentHeatmapTooltip";
 import {
