@@ -160,15 +160,10 @@ const StudentLayout = () => {
 
           {/* right of navigation bar */}
           <div className=" grid grid-cols-2 ">
-            <button
-              className={linkClass}
-              onClick={() => {
-                console.log("saavutukset");
-              }}
-            >
+            <NavLink to={"/saavutukset"} className={linkClass}>
               <HiOutlineTrophy size={20} />
               <p className={linkTextClass}>Saavutukset</p>
-            </button>
+            </NavLink>
             <button
               className={
                 linkClass +

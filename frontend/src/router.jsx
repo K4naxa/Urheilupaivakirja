@@ -40,6 +40,7 @@ import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/Forgot
 import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
 import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordNewPasswordPage";
 import StudentProfilePage from "./pages/StudentProfilePage";
+import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
               {
                 path: "merkinnat/muokkaa/:entry_id",
                 element: <EditJournalEntryPage />,
+              },
+              {
+                path: "saavutukset",
+                element: <StudentTrophyPage />,
               },
               {
                 path: "tiedotteet",

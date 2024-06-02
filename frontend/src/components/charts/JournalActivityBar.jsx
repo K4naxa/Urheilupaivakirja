@@ -1,16 +1,17 @@
+import cc from "../../utils/cc";
 const cleanPercentage = (percentage) => {
   const tooLow = !Number.isFinite(+percentage) || percentage < 0;
   const tooHigh = percentage > 100;
   return tooLow ? 0 : tooHigh ? 100 : +percentage;
 };
 
-const Circle = ({ colour, pct }) => {
+const Circle = ({ colour, pct, shadow }) => {
   const r = 70;
   const circ = 2 * Math.PI * r;
   const strokePct = ((100 - pct) * circ) / 100;
   return (
     <circle
-      className="transition-all duration-700 ease-in-out"
+      className={cc(pct ? "transition-all duration-700 ease-in-out" : "")}
       r={r}
       cx={100}
       cy={100}
@@ -20,6 +21,7 @@ const Circle = ({ colour, pct }) => {
       strokeDasharray={circ}
       strokeDashoffset={pct ? strokePct : 0}
       strokeLinecap="round"
+      filter={shadow ? "url(#shadow)" : ""}
     ></circle>
   );
 };

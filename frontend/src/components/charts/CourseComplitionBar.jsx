@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import cc from "../../utils/cc";
 
 const cleanPercentage = (percentage) => {
   const tooLow = !Number.isFinite(+percentage) || percentage < 0;
@@ -12,7 +13,7 @@ const Circle = ({ colour, pct }) => {
   const strokePct = ((100 - pct) * circ) / 2 / 100; // Adjust for half circle
   return (
     <circle
-      className="transition-all duration-700 ease-in-out"
+      className={cc(pct ? "transition-all duration-700 ease-in-out" : "")}
       r={r}
       cx={100}
       cy={100}
