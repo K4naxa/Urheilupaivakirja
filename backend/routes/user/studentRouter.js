@@ -272,9 +272,41 @@ router.get("/data", async (req, res) => {
     }
 
     const journals = await knex("journal_entries")
-      .select("*")
-      .where("user_id", userId)
-      .orderBy("date", "desc");
+      .select(
+        "journal_entries.*",
+        "journal_entry_types.name as entry_type_name",
+        "workout_types.name as workout_type_name",
+        "workout_categories.name as workout_category_name",
+        "time_of_day.name as time_of_day_name",
+        "workout_intensities.name as workout_intensity_name"
+      )
+      .where("journal_entries.user_id", userId)
+      .leftJoin(
+        "journal_entry_types",
+        "journal_entries.entry_type_id",
+        "journal_entry_types.id"
+      )
+      .leftJoin(
+        "workout_types",
+        "journal_entries.workout_type_id",
+        "workout_types.id"
+      )
+      .leftJoin(
+        "workout_categories",
+        "journal_entries.workout_category_id",
+        "workout_categories.id"
+      )
+      .leftJoin(
+        "time_of_day",
+        "journal_entries.time_of_day_id",
+        "time_of_day.id"
+      )
+      .leftJoin(
+        "workout_intensities",
+        "journal_entries.workout_intensity_id",
+        "workout_intensities.id"
+      )
+      .orderBy("journal_entries.date", "desc");
 
     // Combine student and journal data into a single response object
     const studentData = {
