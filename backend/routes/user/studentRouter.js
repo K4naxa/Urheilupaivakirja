@@ -223,7 +223,7 @@ router.put("/news", async (req, res) => {
 });
 
 // Get student data
-router.get("/data", async (req, res) => {
+router.get("/data/:userId?", async (req, res) => {
   try {
     // Retrieve the role of the user making the request
     const role = getRole(req);
@@ -234,7 +234,8 @@ router.get("/data", async (req, res) => {
     }
 
     // Retrieve the user ID from the request
-    const userId = getUserId(req);
+    const userId = role === 3 ? getUserId(req) : req.params.userId;
+    console.log(userId);
 
     // Fetch the student information from the database
     const student = await knex("students")

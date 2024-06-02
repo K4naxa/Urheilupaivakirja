@@ -114,8 +114,8 @@ const getStudents = async () => {
   return response.data;
 };
 
-const getStudentData = async () => {
-  const response = await axios.get(`/students/data`, makeHeader());
+const getStudentData = async (userId) => {
+  const response = await axios.get(`/students/data/${userId}`, makeHeader());
   return response.data;
 };
 const getStudentsAndEntries = async () => {

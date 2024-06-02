@@ -68,6 +68,7 @@ function TeacherHome() {
   useEffect(() => {
     if (studentsAndJournalsData) {
       setfilteredStudents(studentsAndJournalsData);
+      console.log(studentsAndJournalsData);
     }
   }, [studentsAndJournalsData]);
 
