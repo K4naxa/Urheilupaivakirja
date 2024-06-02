@@ -1,10 +1,11 @@
 import { useState, useLayoutEffect, useMemo } from "react";
 import trainingService from "../../../services/trainingService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import  ConfirmModal  from "../../../components/confirm-modal/confirmModal.jsx";
+import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
-import  dayjs  from "dayjs";
+import dayjs from "dayjs";
+import userService from "../../../services/userService.js";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -62,8 +63,8 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     isLoading: journalEntriesDataLoading,
     isError: journalEntriesDataError,
   } = useQuery({
-    queryKey: ["studentJournal"],
-    queryFn: () => trainingService.getAllUserJournalEntries(),
+    queryKey: ["studentData"],
+    queryFn: () => userService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -81,7 +82,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData
+      journalEntriesData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
@@ -522,7 +523,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
           {newJournalEntryData.entry_type === "1" && (
             <div
-            className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
+              className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
             >
               <label className={inputLabel}>Harjoitustyyppi</label>
               <div className={optionContainer}>
@@ -556,7 +557,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 >
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {category.name}
+                      {category.id === 1
+                        ? journalEntriesData.sport_name
+                        : category.name}
                     </option>
                   ))}
                 </select>
@@ -588,7 +591,10 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               htmlFor="details-textarea"
               onClick={() => setShowDetails((prevState) => !prevState)}
             >
-              Lisätiedot {(showDetails && <FiChevronUp className="text-lg"/>) || <FiChevronDown className="text-lg"/>}
+              Lisätiedot{" "}
+              {(showDetails && <FiChevronUp className="text-lg" />) || (
+                <FiChevronDown className="text-lg" />
+              )}
             </label>
             {showDetails && (
               <textarea
