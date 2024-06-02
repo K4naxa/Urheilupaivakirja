@@ -43,6 +43,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     publicService
       .editGroup(newGroup)
       .then(() => {
+        console.log("save success");
         setGroups((prevGroups) =>
           prevGroups.map((prevGroup) =>
             prevGroup.id === group.id ? newGroup : prevGroup
@@ -236,6 +237,7 @@ const GroupsPage = () => {
     publicService.addGroup(newGroup).then(() => {
       publicService.getGroups().then((data) => {
         setGroups(data);
+        setSortedGroups(data);
       });
       setNewGroup("");
       setErrorMessage("");
@@ -342,8 +344,8 @@ const GroupsPage = () => {
           <div className="flex flex-col divide-y divide-borderPrimary">
             {sortedGroups.map((group) => (
               <CreateGroupContainer
-                groups={groups}
-                setGroups={setGroups}
+                groups={sortedGroups}
+                setGroups={setSortedGroups}
                 group={group}
                 key={group.group_identifier}
               />
