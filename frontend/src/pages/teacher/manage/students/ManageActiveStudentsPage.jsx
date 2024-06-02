@@ -344,8 +344,9 @@ const ManageActiveStudentsPage = () => {
               <option value="group2">Ryhmä Ö-A</option>
               <option value="campus1">Toimipaikka A-Ö</option>
               <option value="campus2">Toimipaikka Ö-A</option>
-              <option value="activity1">Viimeisin merkintä ensin</option>
-              <option value="activity2">Viimeisin merkintä viimeisenä</option>
+
+              <option value="activity2">Uusin merkintä ensin</option>
+              <option value="activity1">Vanhin merkintä ensin</option>
             </select>
           </div>
         </div>
