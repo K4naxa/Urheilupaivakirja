@@ -113,6 +113,7 @@ router.get("/entries", async (req, res) => {
         "campuses.name as campus_name"
       )
       .where("students.archived", false)
+      .where("students.verified", true)
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id")

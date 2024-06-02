@@ -14,14 +14,7 @@ import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSel
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-import {
-  addMonths,
-  addWeeks,
-  getWeek,
-  set,
-  subMonths,
-  subWeeks,
-} from "date-fns";
+import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
