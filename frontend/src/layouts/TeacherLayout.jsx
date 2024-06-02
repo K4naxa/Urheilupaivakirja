@@ -292,7 +292,7 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <div className="flex w-full  md:mt-20">
+      <div className="flex w-full  md:mt-24">
         <main className=" w-full mx-auto max-w-[1480px] pb-16 ">
           <Outlet />
         </main>

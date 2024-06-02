@@ -72,7 +72,9 @@ const CourseCompletionBar = ({ value }) => {
       >
         <g>
           <Circle colour="rgb(var(--color-bg-gray))" pct={0} />
-          <Circle colour="rgb(var(--color-primary))" pct={animatedPct} />
+          {value !== 0 && (
+            <Circle colour="rgb(var(--color-primary))" pct={animatedPct} />
+          )}
         </g>
         <Text value={value} REQUIRED_COMPLETION={REQUIRED_COMPLETION} />
       </svg>

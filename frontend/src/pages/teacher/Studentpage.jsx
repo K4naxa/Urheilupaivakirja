@@ -90,7 +90,7 @@ function StudentHome() {
   }
 
   return (
-    <div className="grid grid-cols-1 w-full m-2 lg:m-8 gap-4 lg:gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
+    <div className="grid grid-cols-1 w-full m-2 gap-4 lg:gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
       <StudentHeatmapTooltip />
       {/* first row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
@@ -99,10 +99,12 @@ function StudentHome() {
           <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full">
             <div className="flex flex-col">
               {/* Student Name */}
-              <p className="flex w-fit mb-2 font-medium  text-2xl text-textPrimary border-b border-primaryColor">
-                {studentData.first_name} {studentData.last_name}
+              <p className="flex  mb-2 font-medium  text-2xl text-textPrimary w-full justify-center lg:justify-normal ">
+                <p className="w-fit border-b border-primaryColor">
+                  {studentData.first_name} {studentData.last_name}
+                </p>
               </p>
-              <div className="flex flex-wrap gap-x-4">
+              <div className="flex flex-wrap gap-x-4  w-full justify-center lg:justify-normal">
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Toimipaikka:</p>{" "}
                   <p>{studentData.campus_name}</p>
@@ -119,7 +121,7 @@ function StudentHome() {
             </div>
 
             {/* student journal entry counts  */}
-            <div className="flex  gap-2">
+            <div className="flex  gap-2  w-full justify-center lg:justify-end">
               <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
                 <p>{studentData.total_entries_count} merkintää</p>
               </div>
@@ -185,7 +187,9 @@ function StudentHome() {
                 <p className="font-medium ">Merkintä aktiivisuus: </p>
                 <p className="text-textSecondary text-sm">
                   Viimeisin merkintä:{" "}
-                  {format(studentData.journal_entries[0].date, "dd.MM.yyyy")}
+                  {studentData.journal_entries.length > 0
+                    ? format(studentData?.journal_entries[0].date, "dd.MM.yyyy")
+                    : "Ei merkintöjä"}
                 </p>
               </div>
               <JournalActivityBar percentage={calcJournalActivity()} />
