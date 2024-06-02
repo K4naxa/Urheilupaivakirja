@@ -87,7 +87,8 @@ function WeekDayActivity({ journal }) {
         let day = getDay(date);
         if (day === 0) day = 7;
         day -= 1;
-        newData[day].hours += entry.length_in_minutes / 60;
+        const hours = entry.length_in_minutes / 60;
+        newData[day].hours += Math.round(hours * 100) / 100;
       });
       setData(newData);
     }
@@ -144,7 +145,7 @@ function WeekDayActivity({ journal }) {
         });
         newData.push({
           date: getWeek(week),
-          hours: totalHours,
+          hours: Math.round(totalHours * 100) / 100,
         });
       });
       setData(newData);
@@ -182,7 +183,7 @@ function WeekDayActivity({ journal }) {
         });
         newData.push({
           date: formatDate(month, { month: "narrow" }),
-          hours: totalHours,
+          hours: Math.round(totalHours * 100) / 100,
         });
       });
       setData(newData);
@@ -211,7 +212,7 @@ function WeekDayActivity({ journal }) {
         });
         newData.push({
           date: formatDate(year, { year: "numeric" }),
-          hours: totalHours,
+          hours: Math.round(totalHours * 100) / 100,
         });
       });
       setData(newData);
@@ -241,43 +242,60 @@ function WeekDayActivity({ journal }) {
         </div>
 
         {/* Select boxes */}
-        <div className="flex gap-4">
-          {/* Select View */}
-          {selectedTime === "Year" ||
-          selectedTime === "AllTime" ||
-          selectedTime === "Month" ? (
-            <select
-              name="viewSelect"
-              id="selectView"
-              className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
-                    hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
-              value={selectedView}
-              onChange={(e) => setSelectedView(e.target.value)}
+        <div className="flex gap-4 items-center">
+          <div className="flex flex-col">
+            {" "}
+            {/* Select View */}
+            <label
+              htmlFor="viewSelect"
+              className="text-textSecondary text-xs px-2"
             >
-              <option value="Day">Päivä</option>
-              <option value="Week">Viikko</option>
-              {selectedTime === "Year" || selectedTime === "AllTime" ? (
-                <option value="Month">Kuukausi</option>
-              ) : null}
-              {selectedTime === "AllTime" ? (
-                <option value="Year">Vuosi</option>
-              ) : null}
-            </select>
-          ) : null}
+              Näkyvyys:
+            </label>
+            {selectedTime === "Year" ||
+            selectedTime === "AllTime" ||
+            selectedTime === "Month" ? (
+              <select
+                name="viewSelect"
+                id="selectView"
+                className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+                    hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
+                value={selectedView}
+                onChange={(e) => setSelectedView(e.target.value)}
+              >
+                <option value="Day">Päivä</option>
+                <option value="Week">Viikko</option>
+                {selectedTime === "Year" || selectedTime === "AllTime" ? (
+                  <option value="Month">Kuukausi</option>
+                ) : null}
+                {selectedTime === "AllTime" ? (
+                  <option value="Year">Vuosi</option>
+                ) : null}
+              </select>
+            ) : null}
+          </div>
 
-          {/* select Time */}
-          <select
-            name="timeFilter"
-            id="selectTimeFilter"
-            className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+          <div className="flex flex-col">
+            {/* select Time */}
+            <label
+              htmlFor="timeFilter"
+              className="text-textSecondary text-xs px-2"
+            >
+              Aika:
+            </label>
+            <select
+              name="timeFilter"
+              id="selectTimeFilter"
+              className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
            hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
-            value={selectedTime}
-            onChange={(e) => setSelectedTime(e.target.value)}
-          >
-            <option value="Month">Kuukausi</option>
-            <option value="Year">Vuosi</option>
-            <option value="AllTime">Kaikki</option>
-          </select>
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+            >
+              <option value="Month">Kuukausi</option>
+              <option value="Year">Vuosi</option>
+              <option value="AllTime">Kaikki</option>
+            </select>
+          </div>
         </div>
       </div>
       <div>
@@ -291,6 +309,15 @@ function WeekDayActivity({ journal }) {
               stroke="rgb(var(--color-border-primary))"
             />
             <XAxis dataKey="date" stroke="rgb(var(--color-text-secondary))" />
+            <Tooltip
+              cursor={{ fill: "rgba(0,0,0,0.2)" }}
+              contentStyle={{
+                backgroundColor: "rgba(0,0,0,0.5)",
+                border: "none",
+              }}
+              labelStyle={{ color: "rgba(255,255,255,0.8)" }}
+              itemStyle={{ color: "rgba(255,255,255,0.8)" }}
+            />
             <YAxis
               dataKey="hours"
               name="Tunnit"
