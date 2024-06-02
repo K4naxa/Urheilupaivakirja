@@ -31,7 +31,7 @@ const Verify = () => {
         <div className=" w-full py-2">
           <div className=" flex justify-center lg:justify-start flex-wrap gap-4 p-2 max-h-[600px] overflow-auto">
             {unverifiedStudents.length === 0 ? (
-              <div className="text-center text-textSecondary">
+              <div className="text-center w-full text-textSecondary">
                 Ei hyväksyttäviä oppilaita
               </div>
             ) : (

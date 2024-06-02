@@ -7,6 +7,7 @@ import cc from "../../../utils/cc";
 
 // renders a container for a group while checking if it is being edited
 function CreateGroupContainer({ group, setGroups, groups }) {
+  const [isEditing, setIsEditing] = useState(false);
   const [editedGroup, setEditedGroup] = useState(group.group_identifier);
   const [cellError, setCellError] = useState(false);
 
@@ -47,6 +48,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
             prevGroup.id === group.id ? newGroup : prevGroup
           )
         );
+        setIsEditing(false);
       })
       .catch((error) => {
         setCellError(error.response.data.error);
@@ -69,26 +71,17 @@ function CreateGroupContainer({ group, setGroups, groups }) {
 
   // sets the sport's "isEditing" property to "true"
   const handleEdit = () => {
-    setGroups((prevGroups) =>
-      prevGroups.map((prevGroups) => {
-        if (prevGroups.id === group.id) {
-          {
-            if (group.isEditing)
-              return {
-                id: group.id,
-                student_count: group.student_count,
-                group_identifier: group.group_identifier,
-              };
-            else return { ...prevGroups, isEditing: true };
-          }
-        } else {
-          return prevGroups;
-        }
-      })
-    );
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      setEditedGroup(group.group_identifier);
+      setIsEditing(false);
+    }
+    if (!isEditing) {
+      setIsEditing(true);
+    }
   };
 
-  if (group.isEditing) {
+  if (isEditing) {
     return (
       <div className="flex flex-col">
         <div className="flex justify-between  rounded-md  p-2 my-2 gap-4 items-center">
@@ -349,8 +342,8 @@ const GroupsPage = () => {
           <div className="flex flex-col divide-y divide-borderPrimary">
             {sortedGroups.map((group) => (
               <CreateGroupContainer
-                sortedGroups={groups}
-                setSortedGroups={setGroups}
+                groups={groups}
+                setGroups={setGroups}
                 group={group}
                 key={group.group_identifier}
               />

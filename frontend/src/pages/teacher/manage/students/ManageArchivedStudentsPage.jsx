@@ -12,6 +12,7 @@ import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../../utils/cc.js";
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
+import { useQueryClient } from "@tanstack/react-query";
 //TODO: Ryhmä not showing correctly in the UI
 const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
@@ -69,6 +70,7 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
 };
 
 const ManageArchivedStudentsPage = () => {
+  const queryClient = useQueryClient();
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +109,11 @@ const ManageArchivedStudentsPage = () => {
     setContinueButton("Aktivoi");
 
     const handleUserConfirmation = async () => {
-      await userService.toggleStudentArchive(student.user_id);
+      await userService.toggleStudentArchive(student.user_id).then(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["studentsAndJournals"],
+        });
+      });
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
       setShowConfirmModal(false);
