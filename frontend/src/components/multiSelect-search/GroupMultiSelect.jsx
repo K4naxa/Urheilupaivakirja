@@ -10,8 +10,6 @@ const GroupMultiSelect = ({
 }) => {
   // Ensure filter is a string
   const filterString = typeof filter === "string" ? filter.toLowerCase() : "";
-
-  console.log(groupArray);
   // Filter groups based on the input filter
   const filteredGroups = groupArray?.filter((group) =>
     group.group_identifier.toLowerCase().includes(filterString)

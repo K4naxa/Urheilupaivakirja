@@ -61,7 +61,6 @@ function TeacherHome() {
   useEffect(() => {
     if (studentsAndJournalsData) {
       setfilteredStudents(studentsAndJournalsData);
-      console.log(studentsAndJournalsData);
     }
   }, [studentsAndJournalsData]);
 
@@ -76,7 +75,7 @@ function TeacherHome() {
     }
     if (selectedCampuses.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedCampuses.some((campus) => campus.label === student.campus)
+        selectedCampuses.some((campus) => campus.label === student.campus_name)
       );
     }
     if (selectedGroups.length > 0) {

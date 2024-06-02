@@ -187,7 +187,11 @@ const StudentLayout = () => {
  grid grid-cols-mHeader gap-4 bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary"
             >
               <div className="grid grid-cols-2">
-                <NavLink to="/profiili" className={linkClass}>
+                <NavLink
+                  to="/profiili"
+                  className={linkClass}
+                  onClick={() => setShowUserMenu(false)}
+                >
                   <FiUser />
                   <p className={linkTextClass}>Profiili</p>
                 </NavLink>
