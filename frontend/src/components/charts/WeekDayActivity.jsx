@@ -296,7 +296,6 @@ function WeekDayActivity({ journal }) {
               name="Tunnit"
               stroke="rgb(var(--color-text-secondary))"
             />
-            <Tooltip cursor={{ fill: "rgb(var(--color-bg-secondary))" }} />
             <Bar
               dataKey="hours"
               fill="rgb(var(--color-primary))"

@@ -75,7 +75,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     isError: optionsError,
     error,
   } = useQuery({
-    queryKey: ["options"],
+    queryKey: ["sportCategoryOptions"],
     queryFn: () => trainingService.getJournalEntryOptions(),
   });
 

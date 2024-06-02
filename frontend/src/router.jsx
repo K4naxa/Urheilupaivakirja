@@ -41,6 +41,8 @@ import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPass
 import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordNewPasswordPage";
 import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
+import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
+import TeacherNewsPage from "./pages/teacher/TeacherNewsPage";
 
 export const router = createBrowserRouter([
   {
@@ -138,6 +140,8 @@ export const router = createBrowserRouter([
               { index: true, element: <TeacherHome /> },
               { path: "hyvaksy", element: <Verify /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
+              { path: "profiili", element: <TeacherProfilePage /> },
+              { path: "tiedotteet", element: <TeacherNewsPage /> },
 
               {
                 path: "hallitse",

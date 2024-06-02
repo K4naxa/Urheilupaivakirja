@@ -101,7 +101,7 @@ const TeacherLayout = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <NavLink
-                        to="/profiili"
+                        to="/opettaja/profiili"
                         className={`${
                           active
                             ? "bg-primaryColor text-bgSecondary"
@@ -149,7 +149,7 @@ const TeacherLayout = () => {
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
           </NavLink>
-          <NavLink to="/tiedotteet/" className={linkClass}>
+          <NavLink to="/opettaja/tiedotteet/" className={linkClass}>
             <FiInbox size={iconSize} />
             <p className={linkTextClass}>Tiedotteet</p>
           </NavLink>
@@ -249,7 +249,7 @@ const TeacherLayout = () => {
              absolute grid grid-cols-3 place-items-center bottom-[64px] right-0
               animate-menu-appear-right border-b border-borderPrimary"
             >
-              <NavLink to="/profiili" className={linkClass}>
+              <NavLink to="/opettaja/profiili" className={linkClass}>
                 <FiUser size={iconSize} />
                 <p className={linkTextClass}>Profiili</p>
               </NavLink>
