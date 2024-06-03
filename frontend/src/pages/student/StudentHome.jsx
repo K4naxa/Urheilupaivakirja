@@ -36,8 +36,6 @@ function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
   const { openBigModal } = useJournalModal();
 
-  console.log("testi päivitys urheilurelease_3");
-
   const {
     data: studentData,
     isLoading: studentDataLoading,
