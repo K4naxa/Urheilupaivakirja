@@ -1,0 +1,16 @@
+version: '3.1'
+ 
+services:
+  urheilurelease_1:
+    image: urheilurelease_3
+    environment:
+      DB_HOST: jamhyv22.treok.io
+      DB_USER: jamhyv22_urheilurelease1
+      DB_PASS: salasana123
+      DB_DATABASE: jamhyv22_urheilurelease1
+      DB_TYPE: mysql2
+      DB_PORT: 3306
+      PORT: 3001
+      SECRET: tosisalainensalasanainen
+    ports:
+       - 3001:3001
