@@ -23,9 +23,8 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "build")));
 
-app.use("/", indexRouter);
 app.use("/user", userRouter);
 app.use("/user/verify", isAuthenticated, verifyRouter);
 app.use("/user/login", loginRouter);
@@ -38,5 +37,13 @@ app.use("/sports", isAuthenticated, sportsRouter);
 app.use("/public", publicRouter);
 app.use("/public/groups", isAuthenticated, publicRouter);
 app.use("/journal_entry", isAuthenticated, journalEntryRouter);
+
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "build/index.html"), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
 
 module.exports = app;

@@ -1,0 +1,12 @@
+*/node_modules
+*/.env
+*/.env_local
+*/.env_remote
+.dockerignore
+*/.gitignore
+.git
+.aws
+*/database
+*/docker-compose.yml
+Docker
+*/readme.md

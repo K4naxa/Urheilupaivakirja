@@ -36,6 +36,8 @@ function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
   const { openBigModal } = useJournalModal();
 
+  console.log("testi päivitys urheilurelease_3");
+
   const {
     data: studentData,
     isLoading: studentDataLoading,
@@ -185,7 +187,9 @@ function StudentHome() {
                 <p className="font-medium ">Merkintä aktiivisuus: </p>
                 <p className="text-textSecondary text-sm">
                   Viimeisin merkintä:{" "}
-                  {format(studentData.journal_entries[0].date, "dd.MM.yyyy")}
+                  {studentData.journal_entries.length > 0
+                    ? format(studentData.journal_entries[0].date, "dd.MM.yyyy")
+                    : "Ei merkintöjä"}
                 </p>
               </div>
               <JournalActivityBar percentage={calcJournalActivity()} />
