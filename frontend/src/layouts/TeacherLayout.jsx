@@ -101,7 +101,7 @@ const TeacherLayout = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <NavLink
-                        to="/profiili"
+                        to="/opettaja/profiili"
                         className={`${
                           active
                             ? "bg-primaryColor text-bgSecondary"
@@ -149,7 +149,7 @@ const TeacherLayout = () => {
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
           </NavLink>
-          <NavLink to="/tiedotteet/" className={linkClass}>
+          <NavLink to="/opettaja/tiedotteet/" className={linkClass}>
             <FiInbox size={iconSize} />
             <p className={linkTextClass}>Tiedotteet</p>
           </NavLink>
@@ -200,7 +200,10 @@ const TeacherLayout = () => {
                 to="/opettaja/hallitse/"
                 className={linkClass}
                 end
-                onClick={() => showControlPanel(false)}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
               >
                 <MdOutlineSportsFootball size={iconSize} />
                 <p className={linkTextClass}>Lajit</p>
@@ -208,7 +211,10 @@ const TeacherLayout = () => {
               <NavLink
                 to="/opettaja/hallitse/ryhmat"
                 className={linkClass}
-                onClick={() => showControlPanel(false)}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
               >
                 <MdOutlineGroups size={iconSize} />
                 <p className={linkTextClass}>Ryhmät</p>
@@ -216,7 +222,10 @@ const TeacherLayout = () => {
               <NavLink
                 to="/opettaja/hallitse/toimipaikat"
                 className={linkClass}
-                onClick={() => showControlPanel(false)}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
               >
                 <PiBuildings size={iconSize} />
                 <p className={linkTextClass}>Toimipaikat</p>
@@ -224,7 +233,10 @@ const TeacherLayout = () => {
               <NavLink
                 to="/opettaja/hallitse/vierailijat"
                 className={linkClass}
-                onClick={() => showControlPanel(false)}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
               >
                 <GrUserNew size={iconSize} />
                 <p className={linkTextClass}>Vierailijat</p>
@@ -232,7 +244,10 @@ const TeacherLayout = () => {
               <NavLink
                 to="/opettaja/hallitse/opiskelijat"
                 className={linkClass}
-                onClick={() => showControlPanel(false)}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
               >
                 <PiStudent size={iconSize} />
                 <p className={linkTextClass}>Opiskelijat</p>
@@ -249,7 +264,14 @@ const TeacherLayout = () => {
              absolute grid grid-cols-3 place-items-center bottom-[64px] right-0
               animate-menu-appear-right border-b border-borderPrimary"
             >
-              <NavLink to="/profiili" className={linkClass}>
+              <NavLink
+                to="/opettaja/profiili"
+                className={linkClass}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
+              >
                 <FiUser size={iconSize} />
                 <p className={linkTextClass}>Profiili</p>
               </NavLink>
@@ -270,7 +292,7 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <div className="flex w-full  md:mt-20">
+      <div className="flex w-full  md:mt-24">
         <main className=" w-full mx-auto max-w-[1480px] pb-16 ">
           <Outlet />
         </main>

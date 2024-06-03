@@ -1,120 +1,233 @@
 import { useQuery } from "@tanstack/react-query";
-import PractiseBoxes from "../../components/charts/PractiseBoxes";
+import { useEffect } from "react";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
-import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
-import { useEffect, useState } from "react";
-
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfDay,
+  endOfMonth,
+  format,
+  isSameMonth,
+  startOfDay,
+  startOfMonth,
+  subMonths,
+} from "date-fns";
+import { StudentHeatmapTooltip } from "../../components/heatmap-tooltip/StudentHeatmapTooltip";
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiZap,
+  FiTrendingUp,
+} from "react-icons/fi";
 
-import { FiChevronLeft } from "react-icons/fi";
-import { FiChevronRight } from "react-icons/fi";
-import { IconContext } from "react-icons/lib";
-import { addMonths, subMonths } from "date-fns";
+import { useJournalModal } from "../../hooks/useJournalModal";
+import WeekDayActivity from "../../components/charts/WeekDayActivity";
+import JournalActivityBar from "../../components/charts/JournalActivityBar";
+import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
+import userService from "../../services/userService";
 import { useParams } from "react-router-dom";
 
-function StudentPage() {
+function StudentHome() {
   const { id } = useParams();
-  const [studentJournalData, setStudentJournalData] = useState([]);
-  const [student, setStudent] = useState([]);
-
   const { showDate, setShowDate } = useMainContext();
+  const { openBigModal } = useJournalModal();
+
+  const {
+    data: studentData,
+    isLoading: studentDataLoading,
+    error: studentDataError,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["studentData", id],
+    queryFn: () => userService.getStudentData(id),
+    staleTime: 15 * 60 * 1000,
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const newData = await trainingService.getUserJournalEntriesByUserId(id);
-        setStudentJournalData(newData.journal_entries);
-        setStudent(newData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    console.log("studentData fetched successfully");
+  }, [isSuccess]);
 
-    fetchData();
-  }, [id]);
-
-  if (studentJournalData)
+  if (studentDataLoading) {
     return (
-      <div className="mainArea overflow-x-auto">
-        <div className="flex justify-center flex-wrap items-center gap-8 lg:my-1  p-2 w-full ">
-          <div className="text-xl self-end">
-            {student.first_name} {student.last_name}
-          </div>
-          <div className="text-sm">
-            <p className="text-textSecondary">Toimipiste:</p>
-            <p>{student.campus}</p>
-          </div>
-          <div className="text-sm">
-            <p className="text-textSecondary">Ryhmä:</p>
-            <p>{student.group}</p>
-          </div>
-          <div className="text-sm">
-            <p className="text-textSecondary">Laji:</p>
-            <p>{student.sport}</p>
-          </div>
-        </div>
-        <div className="h-[1px] w-full bg-primaryColor rounded-md"></div>
-        <div
-          className={`bg-bgPrimary text-textPrimary lg::grid-rows-2 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:gap-8  lg:grid-cols-3`}
-        >
-          <div className=" flex flex-col justify-between gap-4 align-middle">
-            <div className="grid place-items-center  gap-2">
-              <div className="flex w-full flex-col justify-center text-center">
-                {/* controls */}
-                <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-                <div className="hover: flex justify-center gap-4">
-                  <button
-                    className="hover:underline"
-                    onClick={() => {
-                      setShowDate(subMonths(showDate, 1));
-                    }}
-                  >
-                    <IconContext.Provider
-                      value={{ className: "hover:text-primaryColor" }}
-                    >
-                      <FiChevronLeft />
-                    </IconContext.Provider>
-                  </button>
-                  <p className="text-xl w-24">
-                    {formatDate(showDate, { month: "long" })}
-                  </p>
-                  <button
-                    className="hover:fill-blue-500 hover:underline"
-                    onClick={() => {
-                      setShowDate(addMonths(showDate, 1));
-                    }}
-                  >
-                    <IconContext.Provider
-                      value={{ className: "hover:text-primaryColor" }}
-                    >
-                      <FiChevronRight />
-                    </IconContext.Provider>
-                  </button>
+      <div className="flex justify-center items-center">
+        <LoadingScreen />
+      </div>
+    );
+  }
+
+  const calcJournalActivity = () => {
+    const monthStart = startOfDay(startOfMonth(showDate));
+    const monthEnd = endOfDay(endOfMonth(showDate));
+    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+    let activeDaysInMonth = new Set();
+
+    studentData.journal_entries.forEach((entry) => {
+      const entryDate = new Date(entry.date);
+      if (isSameMonth(entryDate, showDate)) {
+        activeDaysInMonth.add(format(entryDate, "yyyy-MM-dd"));
+      }
+    });
+
+    return (activeDaysInMonth.size / monthDays.length) * 100;
+  };
+
+  const calcJournalEntriesCount = () => {
+    return studentData.journal_entries.length;
+  };
+
+  if (studentDataError) {
+    return (
+      <div className="flex justify-center items-center w-full">
+        <h1>Something went wrong, try again later</h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 w-full m-2 gap-4 lg:gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
+      <StudentHeatmapTooltip />
+      {/* first row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
+        {/* rightSide */}
+        <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
+          <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full mb-4">
+            <div className="flex flex-col">
+              {/* Student Name */}
+              <p className="flex  mb-2 font-medium  text-2xl text-textPrimary w-full justify-center lg:justify-normal ">
+                <p className="w-fit border-b border-primaryColor">
+                  {studentData.first_name} {studentData.last_name}
+                </p>
+              </p>
+              <div className="flex flex-wrap gap-x-4  w-full justify-center lg:justify-normal">
+                <div className="flex gap-2">
+                  <p className="text-textSecondary">Toimipaikka:</p>{" "}
+                  <p>{studentData.campus_name}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="text-textSecondary">Ryhmä:</p>{" "}
+                  <p>{studentData.group_identifier}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="text-textSecondary">Laji:</p>{" "}
+                  <p>{studentData.sport_name}</p>
                 </div>
               </div>
-
-              <HeatMap_Month journal={studentJournalData} />
             </div>
 
-            <PractiseBoxes journalEntries={studentJournalData} />
+            {/* student journal entry counts  */}
+            <div className="flex  gap-2  w-full justify-center lg:justify-end ">
+              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
+                <p>{studentData.total_entries_count} merkintää</p>
+              </div>
+              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white">
+                {studentData.entry_type_1_count} harjoitusta
+              </div>
+              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
+                {studentData.unique_days_count} aktiivista päivää
+              </div>
+            </div>
           </div>
-          <div className=" flex flex-col gap-4">
-            <WorkoutIntensityChart journal={studentJournalData} />
+
+          <RecentJournalEntries journal={studentData.journal_entries} />
+        </div>
+        {/* left Side */}
+        <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
+          <div className="text-textSecondary">{showDate.getFullYear()}</div>
+          <div className="w-full flex justify-center items-center mb-4">
+            <p
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              onClick={() => {
+                setShowDate(subMonths(showDate, 1));
+              }}
+            >
+              <FiChevronLeft />
+            </p>
+            <p className="w-24 text-lg">
+              {formatDate(showDate, { month: "long" })}
+            </p>
+            <p
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              onClick={() => {
+                setShowDate(addMonths(showDate, 1));
+              }}
+            >
+              <FiChevronRight />
+            </p>
           </div>
-          <div className="sm:col-span-2 lg:col-span-1">
-            <RecentJournalEntries journal={studentJournalData} />
-          </div>
-          <div className="flex  overflow-x-auto self-center sm:col-span-2 lg:col-span-4 rounded-md">
-            <HeatMap_Year journal={studentJournalData} />
+          <div className="w-full flex justify-center">
+            <HeatMap_Month journal={studentData.journal_entries} />
           </div>
         </div>
       </div>
-    );
+      {/* second row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+        <div>
+          <WeekDayActivity journal={studentData.journal_entries} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 bg-bgSecondary bg-transparent gap-4">
+          <div className=" bg-bgSecondary border border-borderPrimary rounded-md p-4">
+            <div className="flex gap-2 items-center">
+              {" "}
+              <p className="IconBox">
+                <FiTrendingUp />
+              </p>
+              <p className="text-lg">Seuranta</p>
+            </div>
+            <div className=" grid grid-cols-2 h-full w-full items-center co">
+              <div className="flex flex-col gap-4">
+                <p className="font-medium ">Merkintä aktiivisuus: </p>
+                <p className="text-textSecondary text-sm">
+                  Viimeisin merkintä:{" "}
+                  {studentData.journal_entries.length > 0
+                    ? format(studentData?.journal_entries[0].date, "dd.MM.yyyy")
+                    : "Ei merkintöjä"}
+                </p>
+              </div>
+              <JournalActivityBar percentage={calcJournalActivity()} />
+            </div>
+          </div>
+
+          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-4">
+            <div className="flex gap-2 items-center">
+              {" "}
+              <p className="IconBox">
+                <FiTrendingUp />
+              </p>
+              <p className="text-lg">Seuranta</p>
+            </div>
+            <div className="flex flex-col justify-center items-center">
+              <CourseComplitionBar value={calcJournalEntriesCount()} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* thrid Row */}
+      <div
+        className="flex flex-col bg-bgSecondary
+      p-4
+        rounded-md"
+      >
+        <div className="flex justify-between">
+          <div className="flex gap-2  mb-4 items-center">
+            {" "}
+            <p className="IconBox">
+              <FiZap />
+            </p>
+            <p className="text-lg">Vuoden merkinnät</p>
+          </div>
+        </div>
+        <HeatMap_Year journal={studentData.journal_entries} />
+      </div>
+    </div>
+  );
 }
 
-export default StudentPage;
+export default StudentHome;

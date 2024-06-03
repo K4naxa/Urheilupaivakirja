@@ -4,7 +4,6 @@ import { useAuth } from "../hooks/useAuth";
 import dayjs from "dayjs";
 import cc from "../utils/cc";
 
-import { FootballSoccerBall } from "@vectopus/atlas-icons-react";
 import { useMainContext } from "../hooks/mainContext";
 import { useEffect, useState } from "react";
 import { isSameMonth, isSameYear } from "date-fns";
@@ -22,23 +21,81 @@ const convertTime = (totalMinutes) => {
 };
 
 const RecentJournalEntry = ({ entry }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 
+  if (isOpen)
+    return (
+      <div
+        className=" grid grid-cols-5 md:grid-cols-6 md:grid-rows-2 gap-1 md:gap-4 p-2 items-center hover:bg-hoverDefault"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {/* Date */}
+        <p className="hidden md:flex">
+          {dayjs(entry.date).format("DD.MM.YYYY")}
+        </p>
+        <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
+
+        <p className="">{entry.workout_category_name}</p>
+
+        {/* WorkoutLenght */}
+        <p>
+          {" "}
+          {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
+        </p>
+        {/* Intensity */}
+        <p className="hidden md:flex">{entry.workout_intensity_name}</p>
+        {/* Type of entry (sick, rest, ..) */}
+        <p
+          className={cc(
+            "flex w-24 h-8 justify-center items-center rounded-md",
+            entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+            entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+            entry.entry_type_id === 3 && "bg-bgSick text-textSick"
+          )}
+        >
+          {entry.entry_type_name}
+        </p>
+
+        {/* Edit button only for student*/}
+        <div className="flex justify-end md:justify-center">
+          {user.role !== 1 && (
+            <button
+              onClick={() => openBigModal("edit", { entryId: entry.id })}
+              className="text-iconGray hover:text-primaryColor"
+            >
+              <FiEdit3 size={20} />
+            </button>
+          )}
+        </div>
+        <div className="col-span-6 flex justify-around w-full gap-4">
+          <p className="flex flex-col">
+            <span className="text-textSecondary">Ajankohta:</span>
+            {entry.time_of_day_name ? entry.time_of_day_name : "Ei ajankohtaa"}
+          </p>
+          <p className="flex flex-col">
+            <span className="text-textSecondary">Harjoitus tyyppi:</span>
+            {entry.workout_type_name ? entry.workout_type_name : "Ei tyyppiä"}
+          </p>
+          <p className="flex flex-col">
+            <span className="text-textSecondary">Lisätiedot:</span>
+            {entry.details ? entry.details : "Ei lisätietoja"}
+          </p>
+        </div>
+      </div>
+    );
+
   return (
-    <div className=" grid  grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-bgGray">
+    <div
+      className=" grid grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-hoverDefault"
+      onClick={() => setIsOpen(!isOpen)}
+    >
       {/* Date */}
       <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
       <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
 
-      <div className="flex gap-2">
-        {/* Sport */}
-        <div className="bg-bgGray p-1 rounded-md ">
-          {" "}
-          <FootballSoccerBall size={20} className="text-primaryColor" />
-        </div>
-        <p className="md:flex hidden">{entry.workout_category_name}</p>
-      </div>
+      <p className="">{entry.workout_category_name}</p>
 
       {/* WorkoutLenght */}
       <p>

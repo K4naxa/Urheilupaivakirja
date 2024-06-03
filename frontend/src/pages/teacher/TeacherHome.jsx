@@ -75,7 +75,7 @@ function TeacherHome() {
     }
     if (selectedCampuses.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedCampuses.some((campus) => campus.label === student.campus)
+        selectedCampuses.some((campus) => campus.label === student.campus_name)
       );
     }
     if (selectedGroups.length > 0) {
@@ -316,6 +316,9 @@ function TeacherHome() {
 
   const handleFilterReset = useCallback(() => {
     setSelectedStudents([]);
+    setSelectedSports([]);
+    setSelectedCampuses([]);
+    setSelectedGroups([]);
     setShowDate(new Date());
   }, [setShowDate]);
 

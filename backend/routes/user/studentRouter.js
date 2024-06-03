@@ -65,7 +65,7 @@ router.get("/entries", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    // Fetch all journal entries 
+    // Fetch all journal entries
     const allEntries = await knex("journal_entries")
       .select(
         "journal_entries.*",
@@ -75,11 +75,31 @@ router.get("/entries", async (req, res) => {
         "time_of_day.name as time_of_day_name",
         "workout_intensities.name as workout_intensity_name"
       )
-      .leftJoin("journal_entry_types", "journal_entries.entry_type_id", "journal_entry_types.id")
-      .leftJoin("workout_types", "journal_entries.workout_type_id", "workout_types.id")
-      .leftJoin("workout_categories", "journal_entries.workout_category_id", "workout_categories.id")
-      .leftJoin("time_of_day", "journal_entries.time_of_day_id", "time_of_day.id")
-      .leftJoin("workout_intensities", "journal_entries.workout_intensity_id", "workout_intensities.id")
+      .leftJoin(
+        "journal_entry_types",
+        "journal_entries.entry_type_id",
+        "journal_entry_types.id"
+      )
+      .leftJoin(
+        "workout_types",
+        "journal_entries.workout_type_id",
+        "workout_types.id"
+      )
+      .leftJoin(
+        "workout_categories",
+        "journal_entries.workout_category_id",
+        "workout_categories.id"
+      )
+      .leftJoin(
+        "time_of_day",
+        "journal_entries.time_of_day_id",
+        "time_of_day.id"
+      )
+      .leftJoin(
+        "workout_intensities",
+        "journal_entries.workout_intensity_id",
+        "workout_intensities.id"
+      )
       .orderBy("journal_entries.date", "desc");
 
     // Fetch all students with their associated sports, groups, and campus information
@@ -93,20 +113,22 @@ router.get("/entries", async (req, res) => {
         "campuses.name as campus_name"
       )
       .where("students.archived", false)
+      .where("students.verified", true)
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id")
       .orderBy("students.last_name", "asc");
 
-
-    const studentEntries = allStudents.map(student => ({
+    const studentEntries = allStudents.map((student) => ({
       user_id: student.user_id,
       first_name: student.first_name,
       last_name: student.last_name,
       sport_name: student.sport_name,
       group_identifier: student.group_identifier,
       campus_name: student.campus_name,
-      journal_entries: allEntries.filter(entry => entry.user_id === student.user_id)
+      journal_entries: allEntries.filter(
+        (entry) => entry.user_id === student.user_id
+      ),
     }));
 
     res.json(studentEntries);
@@ -115,7 +137,6 @@ router.get("/entries", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });
-
 
 // Get all archived students
 router.get("/archived", async (req, res) => {
@@ -202,4 +223,108 @@ router.put("/news", async (req, res) => {
   }
 });
 
+// Get student data
+router.get("/data/:userId?", async (req, res) => {
+  try {
+    // Retrieve the role of the user making the request
+    const role = getRole(req);
+
+    // Check if the user is authorized (role must be 1 or 3)
+    if (role !== 3 && role !== 1) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Retrieve the user ID from the request
+    const userId = role === 3 ? getUserId(req) : req.params.userId;
+    console.log(userId);
+
+    // Fetch the student information from the database
+    const student = await knex("students")
+      .select(
+        "students.*", // All columns from the students table
+        "sports.name as sport_name", // Join and select sport name
+        "student_groups.group_identifier", // Join and select group identifier
+        "campuses.name as campus_name", // Join and select campus name
+        "users.email", // Join and select user email
+        "users.created_at", // Join and select user creation date
+        "users.id as user_id" // Join and select user ID
+      )
+      .where("user_id", userId) // Match the user ID
+      .first() // Get the first match (should be only one)
+      .leftJoin("sports", "students.sport_id", "sports.id")
+      .leftJoin("student_groups", "students.group_id", "student_groups.id")
+      .leftJoin("campuses", "students.campus_id", "campuses.id")
+      .leftJoin("users", "students.user_id", "users.id");
+
+    // Fetch journal entries and perform aggregations
+    const journalData = await knex("journal_entries")
+      .select(
+        knex.raw("COUNT(DISTINCT DATE(date)) as unique_days_count"), // Count unique days with entries
+        knex.raw(
+          "COUNT(CASE WHEN entry_type_id = 1 THEN 1 END) as entry_type_1_count" // Count entries of type 1
+        ),
+        knex.raw("COUNT(*) as total_entries_count") // Count total entries
+      )
+      .where("user_id", userId) // Match the user ID
+      .first(); // Get the first match
+
+    // If no student is found, return a 404 response
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    const journals = await knex("journal_entries")
+      .select(
+        "journal_entries.*",
+        "journal_entry_types.name as entry_type_name",
+        "workout_types.name as workout_type_name",
+        "workout_categories.name as workout_category_name",
+        "time_of_day.name as time_of_day_name",
+        "workout_intensities.name as workout_intensity_name"
+      )
+      .where("journal_entries.user_id", userId)
+      .leftJoin(
+        "journal_entry_types",
+        "journal_entries.entry_type_id",
+        "journal_entry_types.id"
+      )
+      .leftJoin(
+        "workout_types",
+        "journal_entries.workout_type_id",
+        "workout_types.id"
+      )
+      .leftJoin(
+        "workout_categories",
+        "journal_entries.workout_category_id",
+        "workout_categories.id"
+      )
+      .leftJoin(
+        "time_of_day",
+        "journal_entries.time_of_day_id",
+        "time_of_day.id"
+      )
+      .leftJoin(
+        "workout_intensities",
+        "journal_entries.workout_intensity_id",
+        "workout_intensities.id"
+      )
+      .orderBy("journal_entries.date", "desc");
+
+    // Combine student and journal data into a single response object
+    const studentData = {
+      ...student, // Spread operator to include all student fields
+      journal_entries: journals, // Add journal entries
+      unique_days_count: journalData.unique_days_count, // Add unique days count
+      entry_type_1_count: journalData.entry_type_1_count, // Add entry type 1 count
+      total_entries_count: journalData.total_entries_count, // Add total entries count
+    };
+
+    // Send the combined data as a JSON response
+    res.json(studentData);
+  } catch (error) {
+    // Log the error and return a 500 response
+    console.error("Error fetching student data:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 module.exports = router;

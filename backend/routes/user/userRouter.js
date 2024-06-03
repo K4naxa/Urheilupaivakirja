@@ -12,25 +12,22 @@ const sendEmail = require("../../utils/email/sendEmail");
 const otpGenerator = require("otp-generator");
 const { getRole, getUserId, createToken } = require("../../middleware/auth");
 
-// delete user by id (only admin)
-router.delete("/:id", (req, res) => {
+// delete user by id (only admin or user themselves can delete their account)
+router.delete("/:id", async (req, res) => {
   const role = getRole(req);
-  if (role !== 1) {
+  const user_id = getUserId(req);
+  const userIdToDelete = Number(req.params.id); // Convert req.params.id to a number
+
+  if (role !== 1 && user_id !== userIdToDelete) {
     return res.status(401).json({ error: "Unauthorized" });
   } else {
-    const user_id = req.params.id;
-
-    knex("users")
-      .where("id", "=", user_id)
-      .delete()
-
-      .then(() => {
-        res.status(200).json({ message: "User deleted" });
-      })
-      .catch((error) => {
-        console.error("Error deleting user:", error);
-        res.status(500).json({ error: "Internal server error" });
-      });
+    try {
+      await knex("users").where("id", "=", userIdToDelete).delete();
+      res.status(200).json({ message: "User deleted" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 });
 

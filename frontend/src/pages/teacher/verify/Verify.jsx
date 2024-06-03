@@ -1,6 +1,8 @@
 import userService from "../../../services/userService";
 import { FiTrash2, FiCheck } from "react-icons/fi";
 import { useEffect, useState } from "react";
+import { QueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Verify = () => {
   const [unverifiedStudents, setUnverifiedStudents] = useState([]);
@@ -14,7 +16,7 @@ const Verify = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {/* Student container */}
       <div
         className="md:col-span-2 flex flex-col bg-bgSecondary rounded-md border border-borderPrimary
@@ -29,7 +31,7 @@ const Verify = () => {
         <div className=" w-full py-2">
           <div className=" flex justify-center lg:justify-start flex-wrap gap-4 p-2 max-h-[600px] overflow-auto">
             {unverifiedStudents.length === 0 ? (
-              <div className="text-center text-textSecondary">
+              <div className="text-center w-full text-textSecondary">
                 Ei hyväksyttäviä oppilaita
               </div>
             ) : (
@@ -110,6 +112,8 @@ const Verify = () => {
 };
 
 function CreateStudentContainer({ student, setUnverifiedStudents }) {
+  const queryClient = useQueryClient();
+
   const handleVerify = () => {
     userService.verifyUser(student.user_id).then(() => {
       setUnverifiedStudents((prevStudents) =>
@@ -117,6 +121,9 @@ function CreateStudentContainer({ student, setUnverifiedStudents }) {
           (prevStudents) => prevStudents.user_id !== student.user_id
         )
       );
+      queryClient.invalidateQueries({
+        queryKey: ["studentsAndJournals"],
+      });
     });
   };
   const handleDelete = () => {

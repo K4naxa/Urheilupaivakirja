@@ -6,7 +6,7 @@
 @layer base {
   :root {
     font-family: roboto, sans-serif;
-    --color-primary: 30 150 240;
+    --color-primary: 44 114 245;
     --color-secondary: 40 52 78;
 
     --color-bg-primary: 249 250 251;
@@ -48,9 +48,6 @@
   }
 
   :root[data-theme="dark"] {
-    --color-primary: 58 77 249;
-    --color-secondary: 40 52 78;
-
     --color-bg-primary: 19 19 26;
     --color-bg-secondary: 28 28 36;
     --color-bg-gray: 39 39 47;

@@ -160,15 +160,10 @@ const StudentLayout = () => {
 
           {/* right of navigation bar */}
           <div className=" grid grid-cols-2 ">
-            <button
-              className={linkClass}
-              onClick={() => {
-                console.log("saavutukset");
-              }}
-            >
+            <NavLink to={"/saavutukset"} className={linkClass}>
               <HiOutlineTrophy size={20} />
               <p className={linkTextClass}>Saavutukset</p>
-            </button>
+            </NavLink>
             <button
               className={
                 linkClass +
@@ -192,7 +187,11 @@ const StudentLayout = () => {
  grid grid-cols-mHeader gap-4 bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary"
             >
               <div className="grid grid-cols-2">
-                <NavLink to="/profiili" className={linkClass}>
+                <NavLink
+                  to="/profiili"
+                  className={linkClass}
+                  onClick={() => setShowUserMenu(false)}
+                >
                   <FiUser />
                   <p className={linkTextClass}>Profiili</p>
                 </NavLink>

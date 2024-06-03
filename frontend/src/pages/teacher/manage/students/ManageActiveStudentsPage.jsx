@@ -12,6 +12,7 @@ import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx"
 
 import cc from "../../../../utils/cc.js";
 import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
+import { useQueryClient } from "@tanstack/react-query";
 
 const createStudentContainer = (student, handleArchive, handleDelete) => {
   const daysSinceLastEntry = () => {
@@ -95,6 +96,8 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
 };
 
 const ManageActiveStudentsPage = () => {
+  const queryClient = useQueryClient();
+
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -266,7 +269,11 @@ const ManageActiveStudentsPage = () => {
     setContinueButton("Arkistoi");
 
     const handleUserConfirmation = async () => {
-      await userService.toggleStudentArchive(student.user_id);
+      await userService.toggleStudentArchive(student.user_id).then(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["studentsAndJournals"],
+        });
+      });
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
       setShowConfirmModal(false);
@@ -287,7 +294,11 @@ const ManageActiveStudentsPage = () => {
     setContinueButton("Poista");
 
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(student.user_id);
+      await userService.deleteUser(student.user_id).then(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["studentsAndJournals"],
+        });
+      });
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
       setShowConfirmModal(false);
@@ -333,8 +344,9 @@ const ManageActiveStudentsPage = () => {
               <option value="group2">Ryhmä Ö-A</option>
               <option value="campus1">Toimipaikka A-Ö</option>
               <option value="campus2">Toimipaikka Ö-A</option>
-              <option value="activity1">Viimeisin merkintä ensin</option>
-              <option value="activity2">Viimeisin merkintä viimeisenä</option>
+
+              <option value="activity2">Uusin merkintä ensin</option>
+              <option value="activity1">Vanhin merkintä ensin</option>
             </select>
           </div>
         </div>

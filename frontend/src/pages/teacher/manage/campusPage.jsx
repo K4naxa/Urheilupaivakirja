@@ -3,9 +3,11 @@ import publicService from "../../../services/publicService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
+import { set } from "date-fns";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(campus.name);
   const [error, setError] = useState("");
 
@@ -18,28 +20,15 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
     }
   }, [error]);
 
-  // checks if campus has edit value and removes it if it does, otherwise creates a edit value
   const handleEdit = () => {
-    setCampuses((prevCampuses) =>
-      prevCampuses.map((prevCampus) => {
-        if (prevCampus.id === campus.id) {
-          {
-            if (campus.isEditing) {
-              setNewName(campus.name);
-              return {
-                id: campus.id,
-                student_count: campus.student_count,
-                name: campus.name,
-              };
-            } else {
-              return { ...prevCampus, isEditing: true };
-            }
-          }
-        } else {
-          return prevCampus;
-        }
-      })
-    );
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      setNewName(campus.name);
+      setIsEditing(false);
+    }
+    if (!isEditing) {
+      setIsEditing(true);
+    }
   };
 
   const handleSave = () => {
@@ -47,7 +36,10 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
       setError("Toimipaikan nimi puuttuu");
       return;
     }
-    if (campuses.some((campus) => campus.name === newName)) {
+    console.log(campuses);
+    console.log(newName);
+    console.log(campus.name);
+    if (campuses.find((campus) => campus.name === newName)) {
       setError("Toimipaikka on jo olemassa");
       return;
     }
@@ -63,6 +55,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
           prevCampus.id === campus.id ? newCampus : prevCampus
         )
       );
+      setIsEditing(false);
     });
   };
 
@@ -79,7 +72,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
       });
   };
 
-  if (campus.isEditing) {
+  if (isEditing) {
     return (
       <div className="flex flex-col">
         <div className="flex justify-between rounded-md p-2 my-2 gap-4 items-center">
@@ -329,8 +322,8 @@ const CampusPage = () => {
             {sortedCampuses.map((campus) => (
               <CreateCampusContainer
                 campus={campus}
-                sortedCampuses={campuses}
-                setSortedCampuses={setCampuses}
+                campuses={sortedCampuses}
+                setCampuses={setSortedCampuses}
                 key={campus.id}
               />
             ))}

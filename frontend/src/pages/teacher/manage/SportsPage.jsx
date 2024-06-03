@@ -6,6 +6,7 @@ import cc from "../../../utils/cc";
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
+  const [isEditing, setIsEditing] = useState(false);
   const [editedSport, setEditedSport] = useState(sport.name);
   const [cellError, setCellError] = useState(false);
   // saves the edited sport to the server and updates the state
@@ -45,6 +46,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
             prevSport.id === sport.id ? newSport : prevSport
           )
         );
+        setIsEditing(false);
       })
       .catch((error) => {
         setCellError(error.response.data.error);
@@ -67,26 +69,15 @@ function CreateSportContainer({ sport, sports, setSports }) {
 
   // sets the sport's "isEditing" property to "true"
   const handleEdit = () => {
-    setSports((prevSports) =>
-      prevSports.map((prevSport) => {
-        if (prevSport.id === sport.id) {
-          {
-            if (sport.isEditing)
-              return {
-                id: sport.id,
-                name: sport.name,
-                student_count: sport.student_count,
-              };
-            else return { ...prevSport, isEditing: true };
-          }
-        } else {
-          return prevSport;
-        }
-      })
-    );
+    if (isEditing) {
+      setEditedSport(sport.name);
+      setIsEditing(false);
+    } else if (!isEditing) {
+      setIsEditing(true);
+    }
   };
 
-  if (sport.isEditing) {
+  if (isEditing) {
     return (
       <div className="flex flex-col">
         <div
@@ -359,8 +350,8 @@ const SportsPage = () => {
             {sortedSports.map((sport) => (
               <CreateSportContainer
                 sport={sport}
-                setSports={setSports}
-                sports={sports}
+                setSports={setSortedSports}
+                sports={sortedSports}
                 key={sport.id}
               />
             ))}

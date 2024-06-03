@@ -88,12 +88,6 @@ const resetPassword = async (email, resetToken, newPassword) => {
   return response.data;
 };
 
-const logout = () => {
-  window.localStorage.removeItem("urheilupaivakirjaToken");
-  window.sessionStorage.removeItem("urheilupaivakirjaToken");
-  window.location.href = "/";
-};
-
 // User Controls -------------------------------------------------------------------
 
 const deleteUser = async (id) => {
@@ -120,6 +114,10 @@ const getStudents = async () => {
   return response.data;
 };
 
+const getStudentData = async (userId) => {
+  const response = await axios.get(`/students/data/${userId}`, makeHeader());
+  return response.data;
+};
 const getStudentsAndEntries = async () => {
   const response = await axios.get("/students/entries", makeHeader());
   return response.data;
@@ -138,7 +136,6 @@ const toggleStudentArchive = async (id) => {
 export default {
   login,
   register,
-  logout,
   getAllUnverified,
   verifyUser,
   deleteUser,
@@ -151,5 +148,6 @@ export default {
   requestPasswordReset,
   verifyPasswordResetOTP,
   resetPassword,
+  getStudentData,
 };
 // Path: frontEnd/src/services/userService.js

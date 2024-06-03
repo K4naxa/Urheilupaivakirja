@@ -1,41 +1,57 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import PractiseBoxes from "../../components/charts/PractiseBoxes";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
-import WorkoutIntensityChart from "../../components/charts/WorkoutIntensityChart";
-import trainingService from "../../services/trainingService";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
 import formatDate from "../../utils/formatDate";
-import { addMonths, subMonths } from "date-fns";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfDay,
+  endOfMonth,
+  format,
+  isSameMonth,
+  startOfDay,
+  startOfMonth,
+  subMonths,
+} from "date-fns";
 import { StudentHeatmapTooltip } from "../../components/heatmap-tooltip/StudentHeatmapTooltip";
-import { FiChevronLeft, FiChevronRight, FiZap } from "react-icons/fi";
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiZap,
+  FiTrendingUp,
+} from "react-icons/fi";
 
 import { useJournalModal } from "../../hooks/useJournalModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
+import JournalActivityBar from "../../components/charts/JournalActivityBar";
+import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
+import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
+import userService from "../../services/userService";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
   const { openBigModal } = useJournalModal();
 
   const {
-    data: studentJournalData,
-    isLoading: studentJournalDataLoading,
-    error: studentJournalDataError,
+    data: studentData,
+    isLoading: studentDataLoading,
+    error: studentDataError,
     isSuccess,
   } = useQuery({
-    queryKey: ["studentJournal"],
-    queryFn: () => trainingService.getAllUserJournalEntries(),
+    queryKey: ["studentData"],
+    queryFn: () => userService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 
   useEffect(() => {
-    console.log("StudentJournalData fetched successfully");
+    console.log("studentData fetched successfully");
   }, [isSuccess]);
 
-  if (studentJournalDataLoading) {
+  if (studentDataLoading) {
     return (
       <div className="flex justify-center items-center">
         <LoadingScreen />
@@ -55,12 +71,31 @@ function StudentHome() {
     }
   };
 
-  console.log(studentJournalData);
+  const calcJournalActivity = () => {
+    const monthStart = startOfDay(startOfMonth(showDate));
+    const monthEnd = endOfDay(endOfMonth(showDate));
+    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  if (studentJournalDataError) {
+    let activeDaysInMonth = new Set();
+
+    studentData.journal_entries.forEach((entry) => {
+      const entryDate = new Date(entry.date);
+      if (isSameMonth(entryDate, showDate)) {
+        activeDaysInMonth.add(format(entryDate, "yyyy-MM-dd"));
+      }
+    });
+
+    return (activeDaysInMonth.size / monthDays.length) * 100;
+  };
+
+  const calcJournalEntriesCount = () => {
+    return studentData.journal_entries.length;
+  };
+
+  if (studentDataError) {
     return (
-      <div className="flex justify-center items-center">
-        <h1>Something went wrong</h1>
+      <div className="flex justify-center items-center w-full">
+        <h1>Something went wrong, try again later</h1>
       </div>
     );
   }
@@ -95,7 +130,7 @@ function StudentHome() {
             </p>
           </div>
           <div className="w-full flex justify-center">
-            <HeatMap_Month journal={studentJournalData} />
+            <HeatMap_Month journal={studentData.journal_entries} />
           </div>
         </div>
 
@@ -106,10 +141,12 @@ function StudentHome() {
             <div className="">
               <div className="text-2xl font-medium flex gap-2">
                 <p className="text-textSecondary">{formatHelloMessage()}</p>
-                <p className="text-textPrimary"> Testi Käyttäjä</p>
+                <p className="text-textPrimary">
+                  {studentData.first_name} {studentData.last_name}
+                </p>
               </div>
               <p className="text-textSecondary">
-                Paras päivä aloittaa urheilu oli eilen
+                {getMotivationQuoteOfTheDay()}
               </p>
             </div>
             <div className="flex gap-4">
@@ -124,17 +161,50 @@ function StudentHome() {
           </div>
 
           <div className=" lg:mt-4">
-            <RecentJournalEntries journal={studentJournalData} />
+            <RecentJournalEntries journal={studentData.journal_entries} />
           </div>
         </div>
       </div>
       {/* second row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
         <div>
-          <WeekDayActivity journal={studentJournalData} />
+          <WeekDayActivity journal={studentData.journal_entries} />
         </div>
 
-        <div className="bg-bgSecondary w-full  p-4 rounded-md border border-borderPrimary"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 bg-bgSecondary bg-transparent gap-4">
+          <div className=" bg-bgSecondary border border-borderPrimary rounded-md p-4">
+            <div className="flex gap-2 items-center">
+              {" "}
+              <p className="IconBox">
+                <FiTrendingUp />
+              </p>
+              <p className="text-lg">Seuranta</p>
+            </div>
+            <div className=" grid grid-cols-2 h-full w-full items-center co">
+              <div className="flex flex-col gap-4">
+                <p className="font-medium ">Merkintä aktiivisuus: </p>
+                <p className="text-textSecondary text-sm">
+                  Viimeisin merkintä:{" "}
+                  {format(studentData.journal_entries[0].date, "dd.MM.yyyy")}
+                </p>
+              </div>
+              <JournalActivityBar percentage={calcJournalActivity()} />
+            </div>
+          </div>
+
+          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-4">
+            <div className="flex gap-2 items-center">
+              {" "}
+              <p className="IconBox">
+                <FiTrendingUp />
+              </p>
+              <p className="text-lg">Seuranta</p>
+            </div>
+            <div className="flex flex-col justify-center items-center">
+              <CourseComplitionBar value={calcJournalEntriesCount()} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* thrid Row */}
@@ -152,7 +222,7 @@ function StudentHome() {
             <p className="text-lg">Vuoden merkinnät</p>
           </div>
         </div>
-        <HeatMap_Year journal={studentJournalData} />
+        <HeatMap_Year journal={studentData.journal_entries} />
       </div>
     </div>
   );
