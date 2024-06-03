@@ -15,7 +15,6 @@
     "@tanstack/react-query-devtools": "^5.32.0",
     "@vectopus/atlas-icons-react": "^0.0.10",
     "axios": "^1.6.8",
-    "cal-heatmap": "^4.2.4",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
     "localforage": "^1.10.0",
