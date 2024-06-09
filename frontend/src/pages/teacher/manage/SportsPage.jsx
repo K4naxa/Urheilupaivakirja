@@ -3,9 +3,13 @@ import trainingService from "../../../services/trainingService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
+import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
+  const queryclient = useQueryClient();
+
   const [isEditing, setIsEditing] = useState(false);
   const [editedSport, setEditedSport] = useState(sport.name);
   const [cellError, setCellError] = useState(false);
@@ -46,9 +50,11 @@ function CreateSportContainer({ sport, sports, setSports }) {
             prevSport.id === sport.id ? newSport : prevSport
           )
         );
+        queryclient.invalidateQueries("sports");
         setIsEditing(false);
       })
       .catch((error) => {
+        console.log(error);
         setCellError(error.response.data.error);
       });
   };
@@ -58,9 +64,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
     trainingService
       .deleteSport(sport.id)
       .then(() => {
-        setSports((prevSports) =>
-          prevSports.filter((prevSport) => prevSport.id !== sport.id)
-        );
+        queryclient.invalidateQueries("sports");
       })
       .catch((error) => {
         setCellError(error.response.data.error);
@@ -163,13 +167,30 @@ function CreateSportContainer({ sport, sports, setSports }) {
 }
 
 const SportsPage = () => {
-  const [sports, setSports] = useState([]);
+  const queryclient = useQueryClient();
+
   const [sortedSports, setSortedSports] = useState([]);
   const [newSport, setNewSport] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [sorting, setSorting] = useState({
     name: 0,
     student: 0,
+  });
+
+  const {
+    data: sports,
+    error: sportsError,
+    isLoading: sportsLoading,
+  } = useQuery({
+    queryKey: ["sports"],
+    queryFn: trainingService.getSports,
+  });
+
+  useEffect(() => {
+    if (sports) {
+      setSortedSports(sports);
+    }
+    [sports];
   });
 
   // logic behind creating a new sport
@@ -187,10 +208,7 @@ const SportsPage = () => {
     trainingService
       .addSport({ name: newSport })
       .then(() => {
-        trainingService.getSports().then((data) => {
-          setSports(data);
-          setSortedSports(data);
-        });
+        queryclient.invalidateQueries("sports");
 
         setNewSport("");
         setErrorMessage("");
@@ -200,14 +218,6 @@ const SportsPage = () => {
         return;
       });
   };
-
-  // get sports from the server on the first render
-  useEffect(() => {
-    trainingService.getSports().then((data) => {
-      setSports(data);
-      setSortedSports(data);
-    });
-  }, []);
 
   useEffect(() => {
     if (sorting.name === 0 && sorting.student === 0)
@@ -286,78 +296,82 @@ const SportsPage = () => {
       )}
 
       {/* sports container */}
-      <div
-        className="flex flex-col gap-8 p-4 w-full 
-      border border-borderPrimary rounded-md"
-      >
-        {/* New Sport input */}
-        <div className=" flex justify-center mt-4">
-          <input
-            className="text-textPrimary bg-bgGray p-1 
-            border border-borderPrimary rounded-l-md
-              focus-visible:outline-none"
-            type="text"
-            data-testid="newSportInput"
-            placeholder="Luo laji"
-            value={newSport}
-            onChange={(e) => setNewSport(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleNewSport();
-              }
-            }}
-          />
-          <p
-            onClick={() => handleNewSport()}
-            className="py-2 px-4 rounded-r-md bg-primaryColor text-white
-             hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
-          >
-            +
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">
-            <p
-              onClick={() => {
-                handleNameSorting();
+      {sportsLoading && <div className="text-center">Loading...</div>}
+      {sportsError && <div className="text-center">Error...</div>}
+      {sortedSports && (
+        <div
+          className="flex flex-col gap-8 p-4 w-full 
+            border border-borderPrimary rounded-md"
+        >
+          {/* New Sport input */}
+          <div className=" flex justify-center mt-4">
+            <input
+              className="text-textPrimary bg-bgGray p-1 
+                  border border-borderPrimary rounded-l-md
+                    focus-visible:outline-none"
+              type="text"
+              data-testid="newSportInput"
+              placeholder="Luo laji"
+              value={newSport}
+              onChange={(e) => setNewSport(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleNewSport();
+                }
               }}
-              className={cc(
-                "select-none cursor-pointer",
-                sorting.name === 1 && "text-primaryColor",
-                sorting.name === -1 && "text-primaryColor"
-              )}
-            >
-              Laji
-            </p>
+            />
             <p
-              onClick={() => handleStudentSorting()}
-              className={cc(
-                "text-center select-none cursor-pointer",
-                sorting.student === 1 && "text-primaryColor",
-                sorting.student === -1 && "text-primaryColor"
-              )}
+              onClick={() => handleNewSport()}
+              className="py-2 px-4 rounded-r-md bg-primaryColor text-white
+                   hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
             >
-              Opiskelijat
+              +
             </p>
-            <p className="w-16" />
           </div>
-          {/* container for sport list */}
-          <div
-            className="flex flex-col divide-y divide-borderPrimary"
-            id="sportsContainer"
-          >
-            {sortedSports.map((sport) => (
-              <CreateSportContainer
-                sport={sport}
-                setSports={setSortedSports}
-                sports={sortedSports}
-                key={sport.id}
-              />
-            ))}
+
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">
+              <p
+                onClick={() => {
+                  handleNameSorting();
+                }}
+                className={cc(
+                  "select-none cursor-pointer",
+                  sorting.name === 1 && "text-primaryColor",
+                  sorting.name === -1 && "text-primaryColor"
+                )}
+              >
+                Laji
+              </p>
+              <p
+                onClick={() => handleStudentSorting()}
+                className={cc(
+                  "text-center select-none cursor-pointer",
+                  sorting.student === 1 && "text-primaryColor",
+                  sorting.student === -1 && "text-primaryColor"
+                )}
+              >
+                Opiskelijat
+              </p>
+              <p className="w-16" />
+            </div>
+            {/* container for sport list */}
+            <div
+              className="flex flex-col divide-y divide-borderPrimary"
+              id="sportsContainer"
+            >
+              {sortedSports.map((sport) => (
+                <CreateSportContainer
+                  sport={sport}
+                  setSports={setSortedSports}
+                  sports={sortedSports}
+                  key={sport.id}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
