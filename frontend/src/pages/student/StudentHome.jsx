@@ -137,7 +137,7 @@ function StudentHome() {
               <div className="text-2xl font-medium flex gap-2">
                 <p className="text-textSecondary">{formatHelloMessage()}</p>
                 <p className="text-textPrimary">
-                  {studentData.first_name} {studentData.last_name}
+                  {studentData.first_name} {studentData.last_name[0]}.
                 </p>
               </div>
               <p className="text-textSecondary">
