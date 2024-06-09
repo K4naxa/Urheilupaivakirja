@@ -78,7 +78,7 @@ const EmailVerificationPage = () => {
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center h-screen w-screen">
       <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
-        <div className="relative bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className="relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md ">
           Sähköpostin vahvistus
           <button
             onClick={() => {
@@ -89,12 +89,12 @@ const EmailVerificationPage = () => {
             <FiArrowLeft />
           </button>
         </div>
-        <div className="relative flex h-full pt-20 flex-col gap-10 p-2 sm:p-12 items-center justify-center">
+        <div className="relative flex h-full pt-20 flex-col gap-10 p-2 sm:p-12 items-center md:justify-center">
           <p className="text-center">
             Syötä sähköpostiisi lähetetty koodi. Etkö saanut linkkiä?
           </p>
           <button
-            className="bg-primaryColor hover:bg-buttonHoverColor cursor-pointer text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-primaryColor hover:bg-buttonHoverColor cursor-pointer text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline duration-75 hover:bg-hoverPrimary active:scale-95"
             onClick={() => requestOTP()}
           >
             Lähetä uudelleen

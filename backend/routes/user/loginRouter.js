@@ -9,7 +9,6 @@ const { createToken } = require("../../middleware/auth");
 
 router.post("/", async (req, res, next) => {
   const user = req.body;
-  console.log(user);
 
   // check if email and password are provided
   if (!user.email || !user.password) {
@@ -43,8 +42,6 @@ router.post("/", async (req, res, next) => {
     if (!passwordCorrect) {
       return res.status(401).json({ error: "invalid email or password" });
     }
-
-    console.log(tempUser);
 
     token = createToken(tempUser);
 

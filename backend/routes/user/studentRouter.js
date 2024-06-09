@@ -140,7 +140,6 @@ router.get("/entries", async (req, res) => {
 
 // Get all archived students
 router.get("/archived", async (req, res) => {
-  console.log("Getting archived students");
   try {
     const role = getRole(req);
     if (role !== 1) {
@@ -236,7 +235,6 @@ router.get("/data/:userId?", async (req, res) => {
 
     // Retrieve the user ID from the request
     const userId = role === 3 ? getUserId(req) : req.params.userId;
-    console.log(userId);
 
     // Fetch the student information from the database
     const student = await knex("students")

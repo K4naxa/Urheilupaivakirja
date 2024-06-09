@@ -8,7 +8,6 @@ import { format } from "date-fns";
 const RenderSingleNews = ({ news }) => {
   const [opened, setOpened] = useState(false);
   const toggleOpen = () => setOpened(!opened);
-  console.log(news);
   return (
     <div
       className="bg-bgSecondary p-4 rounded-md max-w-96 border border-borderPrimary cursor-pointer  hover:bg-bgPrimary"

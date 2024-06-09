@@ -4,7 +4,6 @@ exports.up = function (knex) {
     table.integer("user_id").unsigned().notNullable();
     table.string("first_name").notNullable();
     table.string("last_name").notNullable();
-    table.string("phone").notNullable();
     table.integer("sport_id").unsigned();
     table.integer("group_id").unsigned();
     table.integer("campus_id").unsigned();

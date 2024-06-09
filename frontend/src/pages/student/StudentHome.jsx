@@ -40,16 +40,11 @@ function StudentHome() {
     data: studentData,
     isLoading: studentDataLoading,
     error: studentDataError,
-    isSuccess,
   } = useQuery({
     queryKey: ["studentData"],
     queryFn: () => userService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
-
-  useEffect(() => {
-    console.log("studentData fetched successfully");
-  }, [isSuccess]);
 
   if (studentDataLoading) {
     return (
@@ -117,7 +112,7 @@ function StudentHome() {
             >
               <FiChevronLeft />
             </p>
-            <p className="w-24 text-lg">
+            <p className="w-32 text-2xl">
               {formatDate(showDate, { month: "long" })}
             </p>
             <p
@@ -142,7 +137,7 @@ function StudentHome() {
               <div className="text-2xl font-medium flex gap-2">
                 <p className="text-textSecondary">{formatHelloMessage()}</p>
                 <p className="text-textPrimary">
-                  {studentData.first_name} {studentData.last_name}
+                  {studentData.first_name} {studentData.last_name[0]}.
                 </p>
               </div>
               <p className="text-textSecondary">

@@ -18,7 +18,8 @@ import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 export default function HeatMap_Weeks({ journal }) {
   const { showDate } = useMainContext();
-  const { setTooltipContent, setTooltipUser, setTooltipDate } = useHeatmapContext();
+  const { setTooltipContent, setTooltipUser, setTooltipDate } =
+    useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
 
   let calendarWeeks = useMemo(() => {
@@ -44,10 +45,9 @@ export default function HeatMap_Weeks({ journal }) {
   }, [calendarWeeks]);
 
   const handleClick = (day) => {
-    const dayEntries = journal.filter(entry => 
+    const dayEntries = journal.filter((entry) =>
       isSameDay(new Date(entry.date), day)
     );
-    console.log (dayEntries);
     setTooltipDate(day);
     setTooltipContent(dayEntries);
   };

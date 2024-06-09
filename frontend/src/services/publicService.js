@@ -87,26 +87,23 @@ const deleteCampus = async (id) => {
 const getNews = async () => {
   const response = await axios.get("/public/news");
   return response.data;
-}
+};
 
 // get unread news count
 
 const checkUnreadNews = async () => {
   const response = await axios.get("/public/news/unread", makeHeader());
-  console.log (response.data);
   return response.data;
-}
+};
 
 //TODO: SIIRRÄ OIKEAAN SERVICEEN JA ROUTERIIN
 
 // update student.news_last_viewed_at
 
 const updateNewsLastViewedAt = async () => {
-  console.log("updateNewsLastViewedAt");
   const response = await axios.put("/students/news", {}, makeHeader());
   return response.data;
-}
-
+};
 
 // ................................................................................
 
@@ -122,5 +119,5 @@ export default {
   deleteCampus,
   getNews,
   checkUnreadNews,
-  updateNewsLastViewedAt
+  updateNewsLastViewedAt,
 };

@@ -24,15 +24,12 @@ const UnreadNewsIndicator = ({ type }) => {
   useEffect(() => {
     if (isSuccess) {
       setHasUnreadNews(unreadNews.hasUnreadNews);
-      console.log("Unread news checked successfully");
     }
   }, [isSuccess]);
 
   const updateNewsLastViewedAtMutation = useMutation({
     mutationFn: publicService.updateNewsLastViewedAt,
-    onSuccess: () => {
-      console.log("news_last_viewed_at updated successfully");
-    },
+    onSuccess: () => {},
   });
 
   // update news_last_viewed_at and mark news as read when students visits the news page

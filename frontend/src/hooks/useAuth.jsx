@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   // call this function to sign in user
   const login = async (data) => {
     setUser(data);
-    console.log(data);
     if (data.email_verified === false) {
       navigate("/vahvista-sahkoposti");
     } else {
@@ -46,13 +45,12 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-
 export const useAuth = () => {
   const value = useContext(AuthContext);
 
-  if ( value == null) {
-   throw new Error("useToast must be used within a <ToastProvider>");   
+  if (value == null) {
+    throw new Error("useToast must be used within a <ToastProvider>");
   }
 
   return value;
-}
+};

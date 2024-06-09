@@ -1,6 +1,5 @@
 import ThemeSwitcher from "../components/themeSwitcher";
 import { useState } from "react";
-import { FiSettings } from "react-icons/fi";
 import { Link, Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -21,6 +20,8 @@ import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import cc from "../utils/cc";
 
+import siteLogo from "/pwa-192x192.png";
+
 const TeacherLayout = () => {
   const { logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
@@ -40,7 +41,8 @@ const TeacherLayout = () => {
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-4 ">
-            <Link to={"/opettaja/"} className="text-xl flex items-center mx-4">
+            <Link to={"/opettaja/"} className="text-xl flex items-center gap-2">
+              <img src={siteLogo} alt="site logo" className="w-8 h-8" />
               Urheilupäiväkirja
             </Link>
 

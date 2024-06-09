@@ -13,13 +13,11 @@ export const StudentRoute = ({ children }) => {
     return <Navigate to="/vahvista-sahkoposti" />;
   }
 
-  console.log ("user role is " + user.role);
   if (user.role !== 3) {
     //user is not a student but admin/visitor
     if (user.role === 1) {
       return <Navigate to="/opettaja" />;
-    }
-    else if (user.role === 2) {
+    } else if (user.role === 2) {
       return <Navigate to="/vierailija" />;
     }
     //TODO: else logout and navigate to login with a message

@@ -2,7 +2,7 @@ version: '3.1'
  
 services:
   urheilurelease_1:
-    image: urheilurelease_3
+    image: urheilutest2
     environment:
       DB_HOST: jamhyv22.treok.io
       DB_USER: jamhyv22_urheilurelease1

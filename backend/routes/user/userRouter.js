@@ -78,15 +78,10 @@ router.post("/new-email-verification", async (req, res) => {
       .first();
 
     if (existingToken) {
-      console.log("Existing token:", existingToken);
       const now = Date.now();
       const tokenCreationTime = new Date(existingToken.created_at).getTime();
       const timeSinceLastToken = now - tokenCreationTime;
       const cooldownPeriod = 5 * 60 * 1000; // 5min
-
-      console.log("Now: ", now);
-      console.log("Token creation time: ", tokenCreationTime);
-      console.log("Time since last token:", timeSinceLastToken);
 
       if (timeSinceLastToken < cooldownPeriod) {
         const waitTime = Math.ceil(
@@ -234,15 +229,10 @@ router.post("/request-password-reset", async (req, res) => {
       .first();
 
     if (existingToken) {
-      console.log("Existing token:", existingToken);
       const now = Date.now();
       const tokenCreationTime = new Date(existingToken.created_at).getTime();
       const timeSinceLastToken = now - tokenCreationTime;
       const cooldownPeriod = 5 * 60 * 1000; // 5min
-
-      console.log("Now: ", now);
-      console.log("Token creation time: ", tokenCreationTime);
-      console.log("Time since last token:", timeSinceLastToken);
 
       if (timeSinceLastToken < cooldownPeriod) {
         const waitTime = Math.ceil(
