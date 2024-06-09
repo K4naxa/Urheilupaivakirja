@@ -92,26 +92,6 @@ function LoginPage() {
               {errors.errorMessage}
             </div>
           )}
-          <div className="flex w-full justify-center gap-8">
-            <button
-              onClick={() => {
-                setEmail("student@example.com");
-                setPassword("salasana");
-              }}
-              className="Button text-white w-24"
-            >
-              Student
-            </button>
-            <button
-              onClick={() => {
-                setEmail("teacher@example.com");
-                setPassword("salasana");
-              }}
-              className="Button text-white w-24"
-            >
-              Teacher
-            </button>
-          </div>
           <div className=" flex w-full flex-col gap-1 relative">
             <input
               type="email"
@@ -178,7 +158,7 @@ function LoginPage() {
               <button
                 type="button"
                 onClick={handleLogin}
-                className="text-white border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
+                className="text-white border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:bg-hoverPrimary active:scale-95"
               >
                 Kirjaudu
               </button>

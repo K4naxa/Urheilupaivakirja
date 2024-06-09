@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import userService from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import publicService from "../services/publicService";
-import ThemeSwitcher from "../components/themeSwitcher";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
@@ -300,7 +299,7 @@ const RegistrationPage = () => {
         className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
-        <div className=" relative bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className=" relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           <p>Rekisteröityminen</p>
 
           <Link
@@ -567,9 +566,6 @@ const RegistrationPage = () => {
             </button>
           </div>
         </form>
-      </div>
-      <div className="absolute right-5 top-5">
-        <ThemeSwitcher />
       </div>
     </div>
   );

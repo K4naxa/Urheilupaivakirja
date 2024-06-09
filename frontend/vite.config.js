@@ -7,14 +7,14 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      theme_color: "rgb(44, 114, 245)",
-      background_color: "rgb(var(--color-bg-primary))",
-      display: "standalone",
-      scope: "/",
-      start_url: "/",
       orientation: "portrait",
 
       manifest: {
+        theme_color: "rgb(44, 114, 245)",
+        background_color: "rgb(var(--color-bg-primary))",
+        display: "standalone",
+        scope: "/",
+        start_url: "/",
         name: "Urheilupäiväkirja",
         short_name: "U-päiväkirja",
         description: "Sivu urheilusuoritusten kirjaamiseen, sekä seurantaan",
