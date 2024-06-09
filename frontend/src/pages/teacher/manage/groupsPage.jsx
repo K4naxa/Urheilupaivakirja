@@ -43,7 +43,6 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     publicService
       .editGroup(newGroup)
       .then(() => {
-        console.log("save success");
         setGroups((prevGroups) =>
           prevGroups.map((prevGroup) =>
             prevGroup.id === group.id ? newGroup : prevGroup

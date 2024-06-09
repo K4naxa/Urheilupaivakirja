@@ -36,9 +36,6 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
       setError("Toimipaikan nimi puuttuu");
       return;
     }
-    console.log(campuses);
-    console.log(newName);
-    console.log(campus.name);
     if (campuses.find((campus) => campus.name === newName)) {
       setError("Toimipaikka on jo olemassa");
       return;

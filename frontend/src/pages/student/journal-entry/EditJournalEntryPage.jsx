@@ -33,8 +33,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
 
   const EntryIdForQuery = entryId || entry_id;
 
-  console.log("Rendering");
-
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
@@ -44,8 +42,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     messageShort: "",
   });
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
-
-  console.log("EntryIdForQuery", EntryIdForQuery);
 
   const {
     data: journalEntry,
@@ -64,8 +60,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
       setJournalEntryData(journalEntry);
     }
   }, [journalEntryIsLoading, journalEntry]);
-
-  console.log("journalEntryData", journalEntryData);
 
   const editJournalEntry = useMutation({
     mutationFn: () => trainingService.editJournalEntry(journalEntryData),
@@ -123,7 +117,7 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
       journalEntriesData
         ?.map((entry) => ({
           ...entry,
-          date: formatDateString(entry.date)
+          date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === journalEntryData.date) || [];
     return filteredEntries;
@@ -272,7 +266,10 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
         journalEntryData.time_of_day,
         "time_of_day"
       );
-      hasMissingInputs |= checkIfEmpty(journalEntryData.workout_intensity, "workout_intensity");
+      hasMissingInputs |= checkIfEmpty(
+        journalEntryData.workout_intensity,
+        "workout_intensity"
+      );
     }
 
     if (hasMissingInputs) {
@@ -285,13 +282,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
 
   // check for conflicts between new and existing entries
   const checkForConflicts = (entry_type, inputDate, existingEntries) => {
-    console.log(
-      "Checking for conflicts with:",
-      entry_type,
-      inputDate,
-      existingEntries
-    );
-
     setSubmitButtonIsDisabled(false);
     setConflict({ value: false, message: "", messageShort: "" });
     // Check if there are any existing entries on the same date
@@ -300,16 +290,11 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     );
 
     if (!conflictEntry) {
-      console.log("No conflict detected, using:", existingEntries);
       return false; // No conflict if no entries exist on this date
     }
 
     if (conflictEntry.entry_type_id == 1 && entry_type == 1) {
       setSubmitButtonIsDisabled(false);
-      console.log(
-        "No conflicts as both entry types are 1, using:",
-        existingEntries
-      );
     }
     //if entry type is the same as the existing entry but not an exercise, disable submit button
 
@@ -431,8 +416,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
         return "Lähetä";
     }
   }
-
-
 
   if (optionsError || journalEntriesDataError) {
     console.log("is erroring");
@@ -625,7 +608,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
                   className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
                   onChange={changeHandler}
                   onKeyDown={(event) => {
-                    console.log(event.key);
                     if (event.key === "Enter") {
                       event.stopPropagation();
                     }

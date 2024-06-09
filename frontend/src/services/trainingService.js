@@ -43,7 +43,6 @@ const getJournalEntry = async (id) => {
 };
 
 const getJournalEntryForForm = async (id) => {
-  console.log("getJournalEntryForForm id", id);
   const response = await axios.get(`/journal_entry/${id}`, makeHeader());
   const journalEntry = response.data;
   return {

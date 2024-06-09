@@ -30,7 +30,6 @@ const register = async (
   password,
   firstName,
   lastName,
-  phone,
   sportId,
   groupId,
   campusId
@@ -40,7 +39,6 @@ const register = async (
     password: password,
     first_name: firstName,
     last_name: lastName,
-    phone: phone,
     sport_id: sportId,
     group_id: groupId,
     campus_id: campusId,

@@ -17,7 +17,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
-  console.log("Initial date:", initialDate);
 
   const [newJournalEntryData, setNewJournalEntryData] = useState({
     entry_type: "1",
@@ -29,8 +28,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     date: initialDate,
     details: "",
   });
-
-  console.log("Rendering");
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
@@ -248,13 +245,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   // check for conflicts between new and existing entries
   const checkForConflicts = (entry_type, inputDate, existingEntries) => {
-    console.log(
-      "Checking for conflicts with:",
-      entry_type,
-      inputDate,
-      existingEntries
-    );
-
     setSubmitButtonIsDisabled(false);
     setConflict({ value: false, message: "", messageShort: "" });
     // Check if there are any existing entries on the same date
@@ -263,16 +253,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     );
 
     if (!conflictEntry) {
-      console.log("No conflict detected, using:", existingEntries);
       return false; // No conflict if no entries exist on this date
     }
 
     if (conflictEntry.entry_type_id == 1 && entry_type == 1) {
       setSubmitButtonIsDisabled(false);
-      console.log(
-        "No conflicts as both entry types are 1, using:",
-        existingEntries
-      );
     }
     //if entry type is the same as the existing entry but not an exercise, disable submit button
 
@@ -572,7 +557,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
             >
               <label className={inputLabel}>Rankkuus</label>
               <div className={optionContainer}>
-                {console.log(optionsData.workout_intensities[0].id)}
                 {optionsData.workout_intensities.map((intensity) =>
                   renderRadioButton(
                     "intensity",
@@ -601,7 +585,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                 className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
                 onChange={changeHandler}
                 onKeyDown={(event) => {
-                  console.log(event.key);
                   if (event.key === "Enter") {
                     event.stopPropagation();
                   }

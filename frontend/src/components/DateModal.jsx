@@ -22,7 +22,6 @@ const DateModal = () => {
   }, [hideDateModal]);
 
   const onClickShow = () => {
-    console.log("Show");
     hideDateModal();
   };
 
@@ -58,8 +57,6 @@ const DateModal = () => {
     left: `${dateModalPos.arrowLeft}px`,
     top: "-10px",
   };
-
-  console.log("arrowLeft", dateModalPos.arrowLeft);
 
   return (
     <div

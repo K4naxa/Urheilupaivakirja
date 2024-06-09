@@ -40,16 +40,11 @@ function StudentHome() {
     data: studentData,
     isLoading: studentDataLoading,
     error: studentDataError,
-    isSuccess,
   } = useQuery({
     queryKey: ["studentData"],
     queryFn: () => userService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
-
-  useEffect(() => {
-    console.log("studentData fetched successfully");
-  }, [isSuccess]);
 
   if (studentDataLoading) {
     return (

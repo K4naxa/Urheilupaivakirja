@@ -15,7 +15,6 @@ const RegistrationPage = () => {
     passwordAgain: "",
     firstName: "",
     lastName: "",
-    phone: "",
     sportId: null,
     groupId: null,
     campusId: null,
@@ -31,8 +30,6 @@ const RegistrationPage = () => {
   const { login } = useAuth();
   //inputRef = useRef(null);
 
-  console.log("Rerendering the whole component");
-
   // fetch options for registration form
   useEffect(() => {
     const fetchData = async () => {
@@ -46,10 +43,6 @@ const RegistrationPage = () => {
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    console.log("Registrations changed: ", registrationData);
-  }, [registrationData]);
 
   useEffect(() => {
     console.log("Errors changed: ", errors);
@@ -90,7 +83,6 @@ const RegistrationPage = () => {
       email: generateErrorMessage("email", "Täytä tämä kenttä"),
       password: generateErrorMessage("password", "Täytä tämä kenttä"),
       passwordAgain: generateErrorMessage("passwordAgain", "Täytä tämä kenttä"),
-      phone: generateErrorMessage("phone", "Täytä tämä kenttä"),
       sportId: generateErrorMessage("sportId", "Valitse laji"),
       groupId: generateErrorMessage("groupId", "Valitse ryhmä"),
       campusId: generateErrorMessage("campusId", "Valitse toimipaikka"),
@@ -106,7 +98,6 @@ const RegistrationPage = () => {
     errorCheckEmail();
     errorCheckPassword();
     errorCheckPasswordAgain();
-    errorCheckPhone();
     errorCheckDropdown(registrationData.sportId, "sportId");
     errorCheckDropdown(registrationData.groupId, "groupId");
     errorCheckDropdown(registrationData.campusId, "campusId");
@@ -119,7 +110,6 @@ const RegistrationPage = () => {
         break;
       }
     }
-    console.log(isValid);
     return isValid;
   };
 
@@ -134,7 +124,6 @@ const RegistrationPage = () => {
         registrationData.password,
         registrationData.firstName,
         registrationData.lastName,
-        registrationData.phone,
         registrationData.sportId,
         registrationData.groupId,
         registrationData.campusId
@@ -186,30 +175,6 @@ const RegistrationPage = () => {
       } else {
         // Successfully validate the email
         newErrors.email = {
-          value: "success",
-        };
-      }
-
-      return newErrors;
-    });
-  };
-
-  const errorCheckPhone = () => {
-    setErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-      const phoneRegEx = /^\d{10,12}$/g;
-
-      if (registrationData.phone.length < 1) {
-        newErrors.phone = {
-          value: "error",
-        };
-      } else if (!phoneRegEx.test(registrationData.phone)) {
-        newErrors.phone = {
-          value: "error",
-          message: "Puhelinnumero ei ole oikeassa muodossa",
-        };
-      } else {
-        newErrors.phone = {
           value: "success",
         };
       }
@@ -482,32 +447,6 @@ const RegistrationPage = () => {
             />
             {errors.passwordAgain && errors.passwordAgain.message && (
               <p className={errorClass}>{errors.passwordAgain.message}</p>
-            )}
-          </div>
-
-          {/* phone number */}
-          <div className={containerClass}>
-            <input
-              onChange={changeHandler}
-              type="phone"
-              name="phone"
-              id="phone-input"
-              placeholder="Puhelinnumero"
-              className={
-                inputClass +
-                (errors.phone && errors.phone.value
-                  ? errors.phone.value === "error"
-                    ? " border-red-500"
-                    : errors.phone.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              value={registrationData.phone}
-              onBlur={() => errorCheckPhone()}
-            />
-            {errors.phone && errors.phone.message && (
-              <p className={errorClass}>{errors.phone.message}</p>
             )}
           </div>
 

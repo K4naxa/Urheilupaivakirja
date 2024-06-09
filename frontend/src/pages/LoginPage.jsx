@@ -70,7 +70,7 @@ function LoginPage() {
       const user = await userService.login(email, password);
       setEmail("");
       setPassword("");
-      console.log(user);
+
       login(user);
     } catch (error) {
       console.log(error);

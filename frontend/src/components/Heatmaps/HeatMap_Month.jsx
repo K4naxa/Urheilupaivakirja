@@ -48,7 +48,6 @@ function HeatMap_Month({ journal }) {
     const dayEntries = journal.filter((entry) =>
       isSameDay(new Date(entry.date), day)
     );
-    console.log(dayEntries);
     setTooltipDate(day);
     setTooltipContent(dayEntries);
   };
