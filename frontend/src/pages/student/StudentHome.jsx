@@ -112,7 +112,7 @@ function StudentHome() {
             >
               <FiChevronLeft />
             </p>
-            <p className="w-24 text-lg">
+            <p className="w-32 text-2xl">
               {formatDate(showDate, { month: "long" })}
             </p>
             <p
