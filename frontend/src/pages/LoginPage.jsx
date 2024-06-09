@@ -1,4 +1,3 @@
-import ThemeSwitcher from "../components/themeSwitcher";
 import userService from "../services/userService";
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
@@ -197,9 +196,6 @@ function LoginPage() {
             </div>
           </div>
         </div>
-      </div>
-      <div className="absolute right-5 top-5">
-        <ThemeSwitcher />
       </div>
     </div>
   );
