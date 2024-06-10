@@ -117,7 +117,7 @@ const StudentHeatmapTooltip = () => {
                           <tr>
                             <td colSpan={5}>
                               <div>
-                                <p>Tähän sit kai jotain joo-o...</p>
+                                <p>...</p>
                               </div>
                             </td>
                           </tr>
