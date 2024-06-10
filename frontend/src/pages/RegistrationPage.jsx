@@ -301,16 +301,6 @@ const RegistrationPage = () => {
     errorCheckDropdown(event.target.value, event.target.name);
   };
 
-  const errorColorChange = (field) => {
-    if (errors[field] && errors[field].value) {
-      return errors[field].value === "error"
-        ? "border-red-500"
-        : errors[field].value === "success"
-          ? "border-green-500"
-          : "";
-    }
-  }
-
   const containerClass = "flex flex-col gap-1 relative";
   const errorClass = "text-red-500 absolute top-full mt-1";
 

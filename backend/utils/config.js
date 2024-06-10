@@ -7,6 +7,7 @@ let EMAIL_USERNAME = process.env.EMAIL_USERNAME;
 let EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 let EMAIL_HOST = process.env.EMAIL_HOST;
 let FROM_EMAIL = process.env.FROM_EMAIL;
+let EMAIL_PORT = process.env.EMAIL_PORT;
 
 let DATABASE_OPTIONS = {
   client: process.env.DB_TYPE,
@@ -26,5 +27,6 @@ module.exports = {
   EMAIL_USERNAME,
   EMAIL_PASSWORD,
   EMAIL_HOST,
-  FROM_EMAIL
+  FROM_EMAIL,
+  EMAIL_PORT,
 };
