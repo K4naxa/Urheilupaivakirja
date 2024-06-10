@@ -17,7 +17,7 @@ const RegistrationPage = () => {
     sportId: null,
     groupId: null,
     campusId: null,
-    newSport: "",
+    //newSport: "",
   });
   const [options, setOptions] = useState({
     student_groups: [],
@@ -46,8 +46,6 @@ const RegistrationPage = () => {
   useEffect(() => {
     console.log("Errors changed: ", errors);
   }, [errors]);
-
-  const navigate = useNavigate();
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
@@ -91,6 +89,17 @@ const RegistrationPage = () => {
   const errorCheckRegistration = () => {
     let isValid = true;
 
+    const checkForEmptyFieldsOnRegister = () => {
+      let isValid = true;
+      for (const field in registrationData) {
+        if (registrationData[field] === "" || registrationData[field] === null) {
+          isValid = false;
+          break;
+        }
+      }
+      return isValid;
+    }
+
     //TODO: Create separate error checking functions for each field
     errorCheckSimpleInput(registrationData.firstName, "firstName");
     errorCheckSimpleInput(registrationData.lastName, "lastName");
@@ -103,14 +112,19 @@ const RegistrationPage = () => {
 
     checkForEmptyFields();
 
+    isValid = checkForEmptyFieldsOnRegister();
+
+
     for (const field in errors) {
       if (errors[field].value !== "success") {
         isValid = false;
-        break;
+        break; 
       }
     }
     return isValid;
   };
+
+  
 
   const registerHandler = async (e) => {
     e.preventDefault();
@@ -475,9 +489,9 @@ const RegistrationPage = () => {
                   {sport.name}
                 </option>
               ))}
-              <option value="new">+ Lisää uusi</option>
+              {/*<option value="new">+ Lisää uusi</option>*/}
             </select>
-            {registrationData.sportId === "new" && (
+            {/* registrationData.sportId === "new" && (
               <input
                 type="text"
                 name="newSport"
@@ -486,7 +500,7 @@ const RegistrationPage = () => {
                 className={inputClass}
                 onChange={handleDropdownChange}
               />
-            )}
+            )*/}
             {errors.sportId && errors.sportId.message && (
               <p className={errorClass}>{errors.sportId.message}</p>
             )}

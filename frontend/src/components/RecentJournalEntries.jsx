@@ -28,7 +28,7 @@ const RecentJournalEntry = ({ entry }) => {
   if (isOpen)
     return (
       <div
-        className=" grid grid-cols-5 md:grid-cols-6 md:grid-rows-2 gap-1 md:gap-4 p-2 items-center hover:bg-hoverDefault"
+        className=" grid grid-cols-5 md:grid-cols-6 md:grid-rows-2 gap-x-1 md:gap-x-4 px-2 items-center hover:bg-hoverDefault"
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* Date */}
