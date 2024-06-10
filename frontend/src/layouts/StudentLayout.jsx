@@ -17,6 +17,8 @@ import { Fragment } from "react";
 
 import ThemeSwitcher from "../components/themeSwitcher";
 
+import siteLogo from "/pwa-192x192.png";
+
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -32,7 +34,8 @@ const StudentLayout = () => {
         className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
     border-b-2 px-4 py-2 md:flex z-10"
       >
-        <Link to={"/"} className="text-xl">
+        <Link to={"/"} className="text-xl flex items-center gap-2">
+          <img src={siteLogo} alt="site logo" className="w-8 h-8" />
           Urheilupäiväkirja
         </Link>
 

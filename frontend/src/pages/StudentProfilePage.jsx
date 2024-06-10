@@ -31,7 +31,6 @@ function StudentProfilePage() {
     const fetchUser = async () => {
       try {
         const response = await userService.getStudentData();
-        console.log(response);
       } catch (error) {
         setError(error);
       } finally {
@@ -62,7 +61,6 @@ function StudentProfilePage() {
     const handleUserConfirmation = async () => {
       try {
         await userService.deleteUser(userData.user_id);
-        console.log("User deleted");
         await logout(); // Ensure this clears tokens/sessions
       } catch (error) {
         console.error("Error deleting user or logging out:", error);
@@ -113,12 +111,6 @@ function StudentProfilePage() {
             <div className="flex gap-2">
               <p className="text-textSecondary">Sähköposti:</p>{" "}
               <p>{userData.email}</p>
-            </div>
-          </div>
-          <div className="px-2 py-4">
-            <div className="flex gap-2">
-              <p className="text-textSecondary">Puhelinnumero:</p>{" "}
-              <p>{userData.phone}</p>
             </div>
           </div>
           <div className="px-2 py-4">

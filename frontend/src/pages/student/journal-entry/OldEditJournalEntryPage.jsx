@@ -86,7 +86,6 @@ const EditJournalEntryPage = ({ entryId }) => {
       try {
         const optionsData = await trainingService.getJournalEntryOptions();
         setOptions(optionsData);
-        console.log("Fetched options data:", optionsData);
       } catch (error) {
         console.error("Failed to fetch options:", error);
       }
@@ -115,14 +114,6 @@ const EditJournalEntryPage = ({ entryId }) => {
     };
     fetchExistingEntries();
   }, [journalData.date]);
-
-  useEffect(() => {
-    console.log("Existing Entries Updated:", existingEntries);
-  }, [existingEntries]);
-
-  useEffect(() => {
-    console.log(journalData);
-  }, [journalData]);
 
   useEffect(() => {
     console.log("Errors:", errors);
@@ -240,12 +231,6 @@ const EditJournalEntryPage = ({ entryId }) => {
     inputDate,
     existingEntries
   ) => {
-    console.log(
-      "Checking for conflicts with:",
-      entry_type,
-      inputDate,
-      existingEntries
-    );
     // Check if there are any existing entries on the same date,
     // ignoring the entry being edited so no message is shown if its the only entry for the date
     const conflictEntry = existingEntries.find(
@@ -253,16 +238,11 @@ const EditJournalEntryPage = ({ entryId }) => {
     );
 
     if (!conflictEntry) {
-      console.log("No conflict detected, using:", existingEntries);
       return false; // No conflict if no entries exist on this date
     }
 
     if (conflictEntry.entry_type_id == 1 && entry_type == 1) {
       setSubmitButtonIsDisabled(false);
-      console.log(
-        "No conflicts as both entry types are 1, using:",
-        existingEntries
-      );
     }
     //if entry type is the same as the existing entry but not an exercise, disable submit button
 

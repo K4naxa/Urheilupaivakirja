@@ -103,7 +103,7 @@ const OTPInput = ({ length, onComplete }) => {
       </div>
       <button
         onClick={handlePost}
-        className="px-3 py-1 border rounded text-white bg-blue-500"
+        className="px-3 py-1 rounded text-white bg-primaryColor hover:bg-hoverPrimary active:scale-95 duration-75 "
       >
         Vahvista
       </button>

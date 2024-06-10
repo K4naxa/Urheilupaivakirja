@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import userService from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import publicService from "../services/publicService";
-import ThemeSwitcher from "../components/themeSwitcher";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
@@ -15,11 +14,10 @@ const RegistrationPage = () => {
     passwordAgain: "",
     firstName: "",
     lastName: "",
-    phone: "",
     sportId: null,
     groupId: null,
     campusId: null,
-    newSport: "",
+    //newSport: "",
   });
   const [options, setOptions] = useState({
     student_groups: [],
@@ -30,8 +28,6 @@ const RegistrationPage = () => {
   const { addToast } = useToast();
   const { login } = useAuth();
   //inputRef = useRef(null);
-
-  console.log("Rerendering the whole component");
 
   // fetch options for registration form
   useEffect(() => {
@@ -48,14 +44,8 @@ const RegistrationPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Registrations changed: ", registrationData);
-  }, [registrationData]);
-
-  useEffect(() => {
     console.log("Errors changed: ", errors);
   }, [errors]);
-
-  const navigate = useNavigate();
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
@@ -90,7 +80,6 @@ const RegistrationPage = () => {
       email: generateErrorMessage("email", "Täytä tämä kenttä"),
       password: generateErrorMessage("password", "Täytä tämä kenttä"),
       passwordAgain: generateErrorMessage("passwordAgain", "Täytä tämä kenttä"),
-      phone: generateErrorMessage("phone", "Täytä tämä kenttä"),
       sportId: generateErrorMessage("sportId", "Valitse laji"),
       groupId: generateErrorMessage("groupId", "Valitse ryhmä"),
       campusId: generateErrorMessage("campusId", "Valitse toimipaikka"),
@@ -100,28 +89,42 @@ const RegistrationPage = () => {
   const errorCheckRegistration = () => {
     let isValid = true;
 
+    const checkForEmptyFieldsOnRegister = () => {
+      let isValid = true;
+      for (const field in registrationData) {
+        if (registrationData[field] === "" || registrationData[field] === null) {
+          isValid = false;
+          break;
+        }
+      }
+      return isValid;
+    }
+
     //TODO: Create separate error checking functions for each field
     errorCheckSimpleInput(registrationData.firstName, "firstName");
     errorCheckSimpleInput(registrationData.lastName, "lastName");
     errorCheckEmail();
     errorCheckPassword();
     errorCheckPasswordAgain();
-    errorCheckPhone();
     errorCheckDropdown(registrationData.sportId, "sportId");
     errorCheckDropdown(registrationData.groupId, "groupId");
     errorCheckDropdown(registrationData.campusId, "campusId");
 
     checkForEmptyFields();
 
+    isValid = checkForEmptyFieldsOnRegister();
+
+
     for (const field in errors) {
       if (errors[field].value !== "success") {
         isValid = false;
-        break;
+        break; 
       }
     }
-    console.log(isValid);
     return isValid;
   };
+
+  
 
   const registerHandler = async (e) => {
     e.preventDefault();
@@ -134,7 +137,6 @@ const RegistrationPage = () => {
         registrationData.password,
         registrationData.firstName,
         registrationData.lastName,
-        registrationData.phone,
         registrationData.sportId,
         registrationData.groupId,
         registrationData.campusId
@@ -186,30 +188,6 @@ const RegistrationPage = () => {
       } else {
         // Successfully validate the email
         newErrors.email = {
-          value: "success",
-        };
-      }
-
-      return newErrors;
-    });
-  };
-
-  const errorCheckPhone = () => {
-    setErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-      const phoneRegEx = /^\d{10,12}$/g;
-
-      if (registrationData.phone.length < 1) {
-        newErrors.phone = {
-          value: "error",
-        };
-      } else if (!phoneRegEx.test(registrationData.phone)) {
-        newErrors.phone = {
-          value: "error",
-          message: "Puhelinnumero ei ole oikeassa muodossa",
-        };
-      } else {
-        newErrors.phone = {
           value: "success",
         };
       }
@@ -335,7 +313,7 @@ const RegistrationPage = () => {
         className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
-        <div className=" relative bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+        <div className=" relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           <p>Rekisteröityminen</p>
 
           <Link
@@ -485,32 +463,6 @@ const RegistrationPage = () => {
             )}
           </div>
 
-          {/* phone number */}
-          <div className={containerClass}>
-            <input
-              onChange={changeHandler}
-              type="phone"
-              name="phone"
-              id="phone-input"
-              placeholder="Puhelinnumero"
-              className={
-                inputClass +
-                (errors.phone && errors.phone.value
-                  ? errors.phone.value === "error"
-                    ? " border-red-500"
-                    : errors.phone.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              value={registrationData.phone}
-              onBlur={() => errorCheckPhone()}
-            />
-            {errors.phone && errors.phone.message && (
-              <p className={errorClass}>{errors.phone.message}</p>
-            )}
-          </div>
-
           {/* Sport */}
           <div className={containerClass}>
             <select
@@ -537,9 +489,9 @@ const RegistrationPage = () => {
                   {sport.name}
                 </option>
               ))}
-              <option value="new">+ Lisää uusi</option>
+              {/*<option value="new">+ Lisää uusi</option>*/}
             </select>
-            {registrationData.sportId === "new" && (
+            {/* registrationData.sportId === "new" && (
               <input
                 type="text"
                 name="newSport"
@@ -548,7 +500,7 @@ const RegistrationPage = () => {
                 className={inputClass}
                 onChange={handleDropdownChange}
               />
-            )}
+            )*/}
             {errors.sportId && errors.sportId.message && (
               <p className={errorClass}>{errors.sportId.message}</p>
             )}
@@ -621,16 +573,13 @@ const RegistrationPage = () => {
           {/* TODO: Button to the center of the 2 cols when in sm:  */}
           <div className="flex sm:col-span-2 w-full justify-center my-8">
             <button
-              className=" text-textPrimary border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:scale-105 active:scale-95"
+              className=" text-textPrimary border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:bg-hoverPrimary active:scale-95"
               type="submit"
             >
               Rekisteröidy
             </button>
           </div>
         </form>
-      </div>
-      <div className="absolute right-5 top-5">
-        <ThemeSwitcher />
       </div>
     </div>
   );

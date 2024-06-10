@@ -35,7 +35,6 @@ router.post("/", async (req, res, next) => {
         user_id: userId,
         first_name: user.first_name,
         last_name: user.last_name,
-        phone: user.phone,
         sport_id: user.sport_id,
         group_id: user.group_id,
         campus_id: user.campus_id,
@@ -46,23 +45,19 @@ router.post("/", async (req, res, next) => {
       await trx("students").insert(newStudent);
 
       const token = await createToken({ ...newUser, id: userId });
-      res
-        .status(201)
-        .json({
-          token,
-          email_verified: newUser.email_verified,
-          email: newUser.email,
-          role: newUser.role_id,
-        });
+      res.status(201).json({
+        token,
+        email_verified: newUser.email_verified,
+        email: newUser.email,
+        role: newUser.role_id,
+      });
     });
   } catch (err) {
     console.error("POST /user/register transaction error:", err);
-    res
-      .status(500)
-      .json({
-        error:
-          "An error occurred while creating a new student user: " + err.message,
-      });
+    res.status(500).json({
+      error:
+        "An error occurred while creating a new student user: " + err.message,
+    });
   }
 });
 
