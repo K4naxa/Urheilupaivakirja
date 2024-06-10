@@ -20,7 +20,7 @@ import "./hooks/toast-messages/toast.css";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+
   <QueryClientProvider client={queryClient}>
     <MainContextProvider>
       <ToastProvider>
@@ -38,5 +38,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       </ToastProvider>
     </MainContextProvider>
   </QueryClientProvider>
-  </React.StrictMode>
+
 );
