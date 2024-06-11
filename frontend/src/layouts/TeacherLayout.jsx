@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { FiLogOut } from "react-icons/fi";
+import { FiBarChart2, FiLogOut } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 import { FiInbox } from "react-icons/fi";
@@ -71,6 +71,15 @@ const TeacherLayout = () => {
             >
               <FiGrid size={iconSize} />
               Hallinta
+            </NavLink>
+
+            <NavLink
+              to="/opettaja/tilastot/"
+              id="statisticsLink"
+              className={linkClass}
+            >
+              <FiBarChart2 size={iconSize} />
+              Tilastot
             </NavLink>
           </div>
         </nav>

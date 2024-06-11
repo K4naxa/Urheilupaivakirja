@@ -43,6 +43,7 @@ import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import TeacherNewsPage from "./pages/teacher/TeacherNewsPage";
+import StatisticsPage from "./pages/teacher/StatisticsPage";
 
 export const router = createBrowserRouter([
   {
@@ -142,6 +143,7 @@ export const router = createBrowserRouter([
               { path: "opiskelijat/:id", element: <StudentPage /> },
               { path: "profiili", element: <TeacherProfilePage /> },
               { path: "tiedotteet", element: <TeacherNewsPage /> },
+              { path: "tilastot", element: <StatisticsPage /> },
 
               {
                 path: "hallitse",
