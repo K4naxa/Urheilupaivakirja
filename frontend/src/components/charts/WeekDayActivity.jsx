@@ -293,7 +293,9 @@ function WeekDayActivity({ journal }) {
             >
               <option value="Month">Kuukausi</option>
               <option value="Year">Vuosi</option>
-              <option value="AllTime">Kaikki</option>
+              {journal.length > 0 ? (
+                <option value="AllTime">Kaikki</option>
+              ) : null}
             </select>
           </div>
         </div>
