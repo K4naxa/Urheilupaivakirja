@@ -3,7 +3,6 @@ import publicService from "../../../services/publicService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
-import { set } from "date-fns";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {

@@ -35,10 +35,10 @@ const isAuthenticated = (req, res, next) => {
 
 const verifyToken = (token) => {
   try {
-      return jwt.verify(token, config.SECRET);
+    return jwt.verify(token, config.SECRET);
   } catch (error) {
-      console.error("Verification error in auth:", error.message);
-      throw new Error("Token verification failed");
+    console.error("Verification error in auth:", error.message);
+    throw new Error("Token verification failed");
   }
 };
 
@@ -65,7 +65,6 @@ const getEmailVerified = (req) => {
 };
 
 const createToken = (user) => {
-
   const userForToken = {
     email: user.email,
     user_id: user.id,
@@ -75,5 +74,10 @@ const createToken = (user) => {
   return jwt.sign(userForToken, config.SECRET);
 };
 
-
-module.exports = { isAuthenticated, getRole, getUserId, createToken, getEmailVerified };
+module.exports = {
+  isAuthenticated,
+  getRole,
+  getUserId,
+  createToken,
+  getEmailVerified,
+};
