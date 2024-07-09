@@ -19,12 +19,12 @@ function StatisticsPage() {
         <h1 className="text-2xl text-center">Tilastot</h1>
 
         <div className="flex gap-8 justify-center">
+          {/* ShowDate Change*/}
           <div className="flex flex-col text-center">
-            {" "}
             <div className="text-textSecondary">
               {chartShowDate.getFullYear()}
             </div>
-            <div className="w-full flex justify-center items-center mb-4">
+            <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary">
               <p
                 className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
                 onClick={() => {
@@ -34,7 +34,7 @@ function StatisticsPage() {
                 <FiChevronLeft />
               </p>
 
-              <p className="w-32 text-xl">
+              <p className="w-32 text-lg">
                 {formatDate(chartShowDate, { month: "long" })}
               </p>
 
@@ -119,10 +119,19 @@ function StatisticsPage() {
             <AvgSickdaysChart />
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-4 lg:gap-8 lg:grid-cols-3 items-center text-center ">
-          <div>Opiskelijat: 0</div>
-          <div>Urheiluajat: 0</div>
-          <div>Merkinnät: 0</div>
+        <div className="flex gap-8 justify-center ">
+          <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
+            <p className=""> Opiskelijoiden määrä:</p>{" "}
+            <p className="text-xl text-primaryColor">89</p>
+          </div>
+          <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
+            <p> Merkintöjen määrä:</p>{" "}
+            <p className="text-xl text-primaryColor">698</p>
+          </div>
+          <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
+            <p> Urheiltu aika:</p>{" "}
+            <p className="text-xl text-primaryColor">0h 45min</p>
+          </div>
         </div>
       </div>
     </div>
