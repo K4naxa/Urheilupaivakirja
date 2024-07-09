@@ -6,6 +6,7 @@ import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { format } from "date-fns";
 import { useParams } from "react-router-dom";
+import { FiTrash2 } from "react-icons/fi";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -13,7 +14,7 @@ const inputContainer =
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const NewJournalEntryPage = ({ onClose, entryId }) => {
+const EditJournalEntryPage = ({ onClose, entryId }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -72,6 +73,19 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     onSuccess: () => {
       queryClient.invalidateQueries(["studentJournal"]);
       addToast("Merkintä päivitetty", { style: "success" });
+      onClose();
+    },
+  });
+
+  const deleteEntry = useMutation({
+    mutationFn: () => trainingService.deleteJournalEntry(journalEntryData.entry_id),
+    onError: (error) => {
+      console.error("Error deleting journal entry:", error);
+      addToast("Virhe poistettaessa merkintää", { style: "error" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["studentJournal"]);
+      addToast("Merkintä poistettu", { style: "success" });
       onClose();
     },
   });
@@ -138,7 +152,7 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     journalEntryData.date,
   ]);
 
-  const newJournalEntryHandler = async (e) => {
+  const editJournalEntryHandler = async (e) => {
     e.preventDefault();
     setErrors("");
     if (!errorCheckJournalEntry()) {
@@ -152,6 +166,16 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
 
     try {
       await editJournalEntry.mutate({ journalEntryData });
+    } catch (error) {
+      console.error("Error adding journal entry:", error);
+    }
+  };
+
+  const deleteJournalEntryHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      await deleteEntry.mutate({ journalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -450,7 +474,7 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
           </div>
           <form
             className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
-            onSubmit={newJournalEntryHandler}
+            onSubmit={editJournalEntryHandler}
           >
             <div className="flex flex-col items-center w-full p-1">
               <div className="flex flex-row gap-12 justify-between">
@@ -622,14 +646,25 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
 
             <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
               {conflict.messageShort && <p>{conflict.messageShort}</p>}
-              <button
-                className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
-    ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
-                type="submit"
-                disabled={submitButtonIsDisabled}
-              >
-                {getSubmitButtonText(journalEntryData.entry_type)}
-              </button>
+              <div className="flex w-full">
+                <div className="flex-1"></div>
+                <div>
+                  <button
+                    className={`min-w-[160px] text-white mx-6 px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
+      ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
+                    type="submit"
+                    disabled={submitButtonIsDisabled}
+                  >
+                    {getSubmitButtonText(journalEntryData.entry_type)}
+                  </button>
+                </div>
+                <div className="flex-1 flex justify-center">
+
+                  <button className="hover:cursor-pointer hover:bg-bgGray rounded m-1.5 p-2" onClick={deleteJournalEntryHandler}>
+                    <FiTrash2 className="text-2xl"/>
+                  </button>
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -638,4 +673,4 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
   }
 };
 
-export default NewJournalEntryPage;
+export default EditJournalEntryPage;
