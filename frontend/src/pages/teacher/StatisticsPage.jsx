@@ -7,18 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import {
   addMonths,
-  eachDayOfInterval,
-  eachWeekOfInterval,
   endOfMonth,
-  endOfWeek,
   endOfYear,
-  format,
-  getDate,
-  getWeek,
-  isSameDay,
-  isSameWeek,
   startOfMonth,
-  startOfWeek,
   startOfYear,
   subMonths,
 } from "date-fns";
@@ -32,7 +23,7 @@ function StatisticsPage() {
   const [selectedTime, setSelectedTime] = useState("Month");
   const [selectedView, setSelectedView] = useState("Day");
 
-  const { data: EntriesData, isLoading: avgEntriesLoading } = useQuery({
+  const { data: EntriesData, isLoading: EntriesLoading } = useQuery({
     queryKey: ["EntriesData", selectedTime, selectedView],
     queryFn: () => {
       if (selectedTime === "Month") {
@@ -49,87 +40,42 @@ function StatisticsPage() {
     },
   });
 
+  const getStudentCount = () => {
+    if (!EntriesData) return 0;
+    const count = EntriesData.reduce((acc, entry) => {
+      if (!acc.includes(entry.student_id)) {
+        acc.push(entry.student_id);
+      }
+      return acc;
+    }, []);
+    return count.length;
+  };
+  const getEntryCount = () => {
+    if (!EntriesData) return 0;
+    return EntriesData.length;
+  };
+  const getExcerciseTime = () => {
+    if (!EntriesData) return "0h 0min";
+    const time = EntriesData.reduce((acc, entry) => {
+      if (entry.entry_type_id === 1) {
+        acc += entry.length_in_minutes;
+      }
+      return acc;
+    }, 0);
+    let hours = Math.floor(time / 60);
+    let minutes = time % 60;
+    return `${hours}h ${minutes}min`;
+  };
+
+  useEffect(() => {
+    if (!EntriesLoading) {
+      console.log(EntriesData);
+    }
+  }, [selectedTime, selectedView, chartShowDate, EntriesData]);
+
   useEffect(() => {
     queryclient.invalidateQueries("EntriesData");
-  }, [selectedTime, chartShowDate]);
-
-  useEffect(() => {
-    if (!avgEntriesLoading) {
-      console.log(EntriesData);
-      console.log(formatEntryCountData());
-    }
-  }, [EntriesData, avgEntriesLoading]);
-
-  // format entry count data for the chart
-  // returns an array of objects with count and date
-  // makes an object for each day / week in the set time period and loops through the entries to count the entries for each day
-  function formatEntryCountData() {
-    if (!EntriesData) return [];
-    let formattedData = [];
-
-    let startDay;
-    let endDay;
-
-    if (selectedTime === "Month") {
-      startDay = startOfMonth(chartShowDate);
-      endDay = endOfMonth(chartShowDate);
-    } else if (selectedTime === "Year") {
-      startDay = startOfYear(chartShowDate);
-      endDay = endOfYear(chartShowDate);
-    }
-
-    if (selectedView === "Day") {
-      const daysInMonth = eachDayOfInterval({
-        start: startDay,
-        end: endDay,
-      });
-      daysInMonth.forEach((day) => {
-        const dayData = EntriesData.filter((entry) => {
-          return isSameDay(new Date(entry.date), day);
-        });
-        formattedData.push({
-          value: dayData.length,
-          date:
-            selectedTime === "Month"
-              ? formatDate(day, { day: "numeric" })
-              : formatDate(day, { month: "long", day: "numeric" }),
-        });
-      });
-    }
-
-    if (selectedView === "Week") {
-      const startMonth = startOfMonth(startDay);
-      const endMonth = endOfMonth(endDay);
-
-      const weeksInterval = eachWeekOfInterval({
-        start: startOfWeek(startMonth, { weekStartsOn: 1 }),
-        end: endOfWeek(endMonth, { weekStartsOn: 1 }),
-      });
-
-      weeksInterval.forEach((week) => {
-        const weekStart = startOfWeek(week, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(week, { weekStartsOn: 1 });
-
-        if (weekEnd >= startMonth && weekStart <= endMonth) {
-          const weekData = EntriesData.filter((entry) => {
-            return isSameWeek(new Date(entry.date), week, {
-              weekStartsOn: 1,
-            });
-          });
-          formattedData.push({
-            value: weekData.length,
-            date:
-              selectedTime === "Month"
-                ? `${formatDate(startOfWeek(week, { weekStartsOn: 1 }), { day: "numeric" })} - ${formatDate(endOfWeek(week, { weekStartsOn: 1 }), { day: "numeric" })}`
-                : getWeek(startOfWeek(week, { weekStartsOn: 1 }), {
-                    weekStartsOn: 1,
-                  }),
-          });
-        }
-      });
-    }
-    return formattedData;
-  }
+  }, [selectedTime, chartShowDate, selectedView]);
 
   const graphContainerClass =
     "flex flex-col gap-4 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2";
@@ -209,7 +155,12 @@ function StatisticsPage() {
                 className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
            hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
                 value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value !== "Year" && selectedView === "Month") {
+                    setSelectedView("Day");
+                  }
+                  setSelectedTime(e.target.value);
+                }}
               >
                 <option value="Month">Kuukausi</option>
                 <option value="Year">Vuosi</option>
@@ -220,30 +171,45 @@ function StatisticsPage() {
 
         <div className="grid grid-cols-1 gap-4 lg:gap-8 lg:grid-cols-2 items-center text-center ">
           <div className={graphContainerClass}>
-            <NewEntriesCountChart chartData={formatEntryCountData()} />
+            <NewEntriesCountChart
+              EntriesData={EntriesData}
+              chartShowDate={chartShowDate}
+              selectedTime={selectedTime}
+              selectedView={selectedView}
+            />
           </div>
           <div className={graphContainerClass}>
-            <AvgExcerciseTimeChart />
+            <AvgExcerciseTimeChart
+              EntriesData={EntriesData}
+              chartShowDate={chartShowDate}
+              selectedTime={selectedTime}
+              selectedView={selectedView}
+            />
           </div>
           <div className={graphContainerClass}>
             <NewStudentsChart />
           </div>
           <div className={graphContainerClass}>
-            <AvgSickdaysChart />
+            <AvgSickdaysChart
+              EntriesData={EntriesData}
+              chartShowDate={chartShowDate}
+              selectedTime={selectedTime}
+              selectedView={selectedView}
+            />
           </div>
         </div>
         <div className="flex gap-8 justify-center ">
           <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
             <p className=""> Opiskelijoiden määrä:</p>{" "}
-            <p className="text-xl text-primaryColor">89</p>
+            <p className="text-xl text-primaryColor">{getStudentCount()}</p>
           </div>
           <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
             <p> Merkintöjen määrä:</p>{" "}
-            <p className="text-xl text-primaryColor">698</p>
+            <p className="text-xl text-primaryColor">{getEntryCount()}</p>
           </div>
           <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
             <p> Urheiltu aika:</p>{" "}
-            <p className="text-xl text-primaryColor">0h 45min</p>
+            <p className="text-xl text-primaryColor">{getExcerciseTime()}</p>
           </div>
         </div>
       </div>
