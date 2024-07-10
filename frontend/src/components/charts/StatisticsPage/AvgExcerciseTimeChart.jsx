@@ -45,7 +45,7 @@ export default function AvgExcerciseTimeChart() {
           margin={{ top: 0, right: 0, left: -35, bottom: 0 }}
         >
           <CartesianGrid
-            strokeDasharray="3 3"
+            strokeDasharray="5 5"
             stroke="rgb(var(--color-border-primary))"
           />
           <XAxis

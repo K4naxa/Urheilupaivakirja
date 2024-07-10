@@ -8,42 +8,42 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useState } from "react";
 
-function NewEntriesCountChart() {
-  const avgEntriesData = [
-    {
-      date: new Date("2021-01-01").toLocaleDateString("fi-FI"),
-      journalEntriesCount: 4,
-    },
-    {
-      date: new Date("2021-02-01").toLocaleDateString("fi-FI"),
-      journalEntriesCount: 2,
-    },
-    {
-      date: new Date("2021-03-01").toLocaleDateString("fi-FI"),
-      journalEntriesCount: 3,
-    },
-    {
-      date: new Date("2021-04-01").toLocaleDateString("fi-FI"),
-      journalEntriesCount: 5,
-    },
-    {
-      date: new Date("2021-05-01").toLocaleDateString("fi-FI"),
-      journalEntriesCount: 1,
-    },
-    {
-      date: new Date("2021-06-01").toLocaleDateString("fi-FI"),
-      journalEntriesCount: 2,
-    },
-  ];
+function NewEntriesCountChart({ chartData }) {
+  console.log("chartData", chartData);
+  // const avgEntriesData = [
+  //   {
+  //     date: new Date("2021-01-01").toLocaleDateString("fi-FI"),
+  //     journalEntriesCount: 4,
+  //   },
+  //   {
+  //     date: new Date("2021-02-01").toLocaleDateString("fi-FI"),
+  //     journalEntriesCount: 2,
+  //   },
+  //   {
+  //     date: new Date("2021-03-01").toLocaleDateString("fi-FI"),
+  //     journalEntriesCount: 3,
+  //   },
+  //   {
+  //     date: new Date("2021-04-01").toLocaleDateString("fi-FI"),
+  //     journalEntriesCount: 5,
+  //   },
+  //   {
+  //     date: new Date("2021-05-01").toLocaleDateString("fi-FI"),
+  //     journalEntriesCount: 1,
+  //   },
+  //   {
+  //     date: new Date("2021-06-01").toLocaleDateString("fi-FI"),
+  //     journalEntriesCount: 2,
+  //   },
+  // ];
 
   return (
     <div style={{ width: "100%", height: 200 }} className="">
       <ResponsiveContainer>
         <LineChart
-          data={avgEntriesData}
-          margin={{ top: 0, right: 0, left: -35, bottom: 0 }}
+          data={chartData}
+          margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"
@@ -55,8 +55,8 @@ function NewEntriesCountChart() {
             name="Päivämäärä"
           />
           <YAxis
-            dataKey="journalEntriesCount"
-            name="Uudet Opiskelijat"
+            dataKey="value"
+            name="Merkintöjen määrä"
             stroke="rgb(var(--color-text-secondary))"
           />
 
@@ -73,7 +73,7 @@ function NewEntriesCountChart() {
           <Legend />
           <Line
             type="monotone"
-            dataKey="journalEntriesCount"
+            dataKey="value"
             stroke="rgb(var(--color-primary))"
             activeDot={{ r: 8 }}
             name="Merkintöjen määrä"
