@@ -7,11 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import {
   addMonths,
+  addYears,
   endOfMonth,
   endOfYear,
   startOfMonth,
   startOfYear,
   subMonths,
+  subYears,
 } from "date-fns";
 import formatDate from "../../utils/formatDate";
 import userService from "../../services/userService";
@@ -105,40 +107,67 @@ function StatisticsPage() {
   const graphContainerClass =
     "flex flex-col gap-4 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2";
 
+  const timeSelectWithMonth = (
+    <div className="flex flex-col text-center justify-end ">
+      <div className="text-textSecondary text-sm">
+        {chartShowDate.getFullYear()}
+      </div>
+      <div className="w-full flex justify-center items-center bg-bgSecondary p-2 rounded-md border border-borderPrimary text-textSecondary ">
+        <p
+          className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+          onClick={() => {
+            setChartShowDate(subMonths(chartShowDate, 1));
+          }}
+        >
+          <FiChevronLeft />
+        </p>
+
+        <p className="w-32 ">{formatDate(chartShowDate, { month: "long" })}</p>
+
+        <p
+          className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+          onClick={() => {
+            setChartShowDate(addMonths(chartShowDate, 1));
+          }}
+        >
+          <FiChevronRight />
+        </p>
+      </div>
+    </div>
+  );
+  const timeSelectWithYear = (
+    <div className="flex flex-col text-center justify-end">
+      <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary align-bottom">
+        <p
+          className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+          onClick={() => {
+            setChartShowDate(subYears(chartShowDate, 1));
+          }}
+        >
+          <FiChevronLeft />
+        </p>
+
+        <p className="w-32 text-lg">{chartShowDate.getFullYear()}</p>
+
+        <p
+          className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+          onClick={() => {
+            setChartShowDate(addYears(chartShowDate, 1));
+          }}
+        >
+          <FiChevronRight />
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col w-full gap-8 p-4">
       <div className="flex p-4 pb-0 flex-wrap gap-8 justify-center">
         {/* ShowDate Change*/}
-        <div className="flex flex-col text-center">
-          <div className="text-textSecondary">
-            {chartShowDate.getFullYear()}
-          </div>
-          <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary">
-            <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
-              onClick={() => {
-                setChartShowDate(subMonths(chartShowDate, 1));
-              }}
-            >
-              <FiChevronLeft />
-            </p>
-
-            <p className="w-32 text-lg">
-              {formatDate(chartShowDate, { month: "long" })}
-            </p>
-
-            <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
-              onClick={() => {
-                setChartShowDate(addMonths(chartShowDate, 1));
-              }}
-            >
-              <FiChevronRight />
-            </p>
-          </div>
-        </div>
+        {selectedTime === "Month" ? timeSelectWithMonth : timeSelectWithYear}
         {/* Select boxes */}
-        <div className="flex gap-8 items-center justify-center">
+        <div className="flex gap-8 items-center justify-end">
           <div className="flex flex-col">
             {" "}
             {/* Select View */}
