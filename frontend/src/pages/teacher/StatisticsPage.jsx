@@ -104,143 +104,142 @@ function StatisticsPage() {
 
   const graphContainerClass =
     "flex flex-col gap-4 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2";
+
   return (
-    <div>
-      <div className="flex flex-col gap-8 m-4">
-        <div className="flex gap-8 justify-center">
-          {/* ShowDate Change*/}
-          <div className="flex flex-col text-center">
-            <div className="text-textSecondary">
-              {chartShowDate.getFullYear()}
-            </div>
-            <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary">
-              <p
-                className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
-                onClick={() => {
-                  setChartShowDate(subMonths(chartShowDate, 1));
-                }}
-              >
-                <FiChevronLeft />
-              </p>
-
-              <p className="w-32 text-lg">
-                {formatDate(chartShowDate, { month: "long" })}
-              </p>
-
-              <p
-                className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
-                onClick={() => {
-                  setChartShowDate(addMonths(chartShowDate, 1));
-                }}
-              >
-                <FiChevronRight />
-              </p>
-            </div>
+    <div className="flex flex-col w-full gap-8 p-4">
+      <div className="flex p-4 pb-0 flex-wrap gap-8 justify-center">
+        {/* ShowDate Change*/}
+        <div className="flex flex-col text-center">
+          <div className="text-textSecondary">
+            {chartShowDate.getFullYear()}
           </div>
-          {/* Select boxes */}
-          <div className="flex gap-8 items-center justify-center">
-            <div className="flex flex-col">
-              {" "}
-              {/* Select View */}
-              <label
-                htmlFor="viewSelect"
-                className="text-textSecondary text-xs px-2"
-              >
-                Näkyvyys:
-              </label>
-              {selectedTime === "Year" || selectedTime === "Month" ? (
-                <select
-                  name="viewSelect"
-                  id="selectView"
-                  className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
-                    hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
-                  value={selectedView}
-                  onChange={(e) => setSelectedView(e.target.value)}
-                >
-                  <option value="Day">Päivä</option>
-                  <option value="Week">Viikko</option>
-                  {selectedTime === "Year" ? (
-                    <option value="Month">Kuukausi</option>
-                  ) : null}
-                </select>
-              ) : null}
-            </div>
+          <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary">
+            <p
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              onClick={() => {
+                setChartShowDate(subMonths(chartShowDate, 1));
+              }}
+            >
+              <FiChevronLeft />
+            </p>
 
-            <div className="flex flex-col">
-              {/* select Time */}
-              <label
-                htmlFor="timeFilter"
-                className="text-textSecondary text-xs px-2"
-              >
-                Aika:
-              </label>
+            <p className="w-32 text-lg">
+              {formatDate(chartShowDate, { month: "long" })}
+            </p>
+
+            <p
+              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              onClick={() => {
+                setChartShowDate(addMonths(chartShowDate, 1));
+              }}
+            >
+              <FiChevronRight />
+            </p>
+          </div>
+        </div>
+        {/* Select boxes */}
+        <div className="flex gap-8 items-center justify-center">
+          <div className="flex flex-col">
+            {" "}
+            {/* Select View */}
+            <label
+              htmlFor="viewSelect"
+              className="text-textSecondary text-xs px-2"
+            >
+              Näkyvyys:
+            </label>
+            {selectedTime === "Year" || selectedTime === "Month" ? (
               <select
-                name="timeFilter"
-                id="selectTimeFilter"
+                name="viewSelect"
+                id="selectView"
                 className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
-           hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
-                value={selectedTime}
-                onChange={(e) => {
-                  if (e.target.value !== "Year" && selectedView === "Month") {
-                    setSelectedView("Day");
-                  }
-                  setSelectedTime(e.target.value);
-                }}
+                    hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
+                value={selectedView}
+                onChange={(e) => setSelectedView(e.target.value)}
               >
-                <option value="Month">Kuukausi</option>
-                <option value="Year">Vuosi</option>
+                <option value="Day">Päivä</option>
+                <option value="Week">Viikko</option>
+                {selectedTime === "Year" ? (
+                  <option value="Month">Kuukausi</option>
+                ) : null}
               </select>
-            </div>
-          </div>{" "}
-        </div>
+            ) : null}
+          </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:gap-8 lg:grid-cols-2 items-center text-center ">
-          <div className={graphContainerClass}>
-            <NewEntriesCountChart
-              EntriesData={EntriesData}
-              chartShowDate={chartShowDate}
-              selectedTime={selectedTime}
-              selectedView={selectedView}
-            />
+          <div className="flex flex-col">
+            {/* select Time */}
+            <label
+              htmlFor="timeFilter"
+              className="text-textSecondary text-xs px-2"
+            >
+              Aika:
+            </label>
+            <select
+              name="timeFilter"
+              id="selectTimeFilter"
+              className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+           hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
+              value={selectedTime}
+              onChange={(e) => {
+                if (e.target.value !== "Year" && selectedView === "Month") {
+                  setSelectedView("Day");
+                }
+                setSelectedTime(e.target.value);
+              }}
+            >
+              <option value="Month">Kuukausi</option>
+              <option value="Year">Vuosi</option>
+            </select>
           </div>
-          <div className={graphContainerClass}>
-            <AvgExcerciseTimeChart
-              EntriesData={EntriesData}
-              chartShowDate={chartShowDate}
-              selectedTime={selectedTime}
-              selectedView={selectedView}
-            />
-          </div>
-          <div className={graphContainerClass}>
-            <NewStudentsChart
-              newStudentsData={newStudentsData}
-              chartShowDate={chartShowDate}
-              selectedTime={selectedTime}
-              selectedView={selectedView}
-            />
-          </div>
-          <div className={graphContainerClass}>
-            <AvgSickdaysChart
-              EntriesData={EntriesData}
-              chartShowDate={chartShowDate}
-              selectedTime={selectedTime}
-              selectedView={selectedView}
-            />
-          </div>
+        </div>{" "}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:gap-8 lg:grid-cols-2 items-center text-center ">
+        <div className={graphContainerClass}>
+          <NewEntriesCountChart
+            EntriesData={EntriesData}
+            chartShowDate={chartShowDate}
+            selectedTime={selectedTime}
+            selectedView={selectedView}
+          />
         </div>
-        <div className="flex gap-8 justify-center ">
-          <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
-            <p className=""> Opiskelijoiden määrä:</p>{" "}
-            <p className="text-xl text-primaryColor">{getStudentCount()}</p>
-          </div>
-          <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
-            <p> Merkintöjen määrä:</p>{" "}
-            <p className="text-xl text-primaryColor">{getEntryCount()}</p>
-          </div>
-          <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
-            <p> Urheiltu aika:</p>{" "}
-            <p className="text-xl text-primaryColor">{getExcerciseTime()}</p>
-          </div>
+        <div className={graphContainerClass}>
+          <AvgExcerciseTimeChart
+            EntriesData={EntriesData}
+            chartShowDate={chartShowDate}
+            selectedTime={selectedTime}
+            selectedView={selectedView}
+          />
+        </div>
+        <div className={graphContainerClass}>
+          <NewStudentsChart
+            newStudentsData={newStudentsData}
+            chartShowDate={chartShowDate}
+            selectedTime={selectedTime}
+            selectedView={selectedView}
+          />
+        </div>
+        <div className={graphContainerClass}>
+          <AvgSickdaysChart
+            EntriesData={EntriesData}
+            chartShowDate={chartShowDate}
+            selectedTime={selectedTime}
+            selectedView={selectedView}
+          />
+        </div>
+      </div>
+      <div className="flex gap-8 justify-center flex-wrap">
+        <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
+          <p className=""> Opiskelijoiden määrä:</p>{" "}
+          <p className="text-xl text-primaryColor">{getStudentCount()}</p>
+        </div>
+        <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
+          <p> Merkintöjen määrä:</p>{" "}
+          <p className="text-xl text-primaryColor">{getEntryCount()}</p>
+        </div>
+        <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
+          <p> Urheiltu aika:</p>{" "}
+          <p className="text-xl text-primaryColor">{getExcerciseTime()}</p>
         </div>
       </div>
     </div>

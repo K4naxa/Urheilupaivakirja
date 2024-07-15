@@ -77,6 +77,7 @@ function NewEntriesCountChart({
             stroke="rgb(var(--color-primary))"
             activeDot={{ r: 8 }}
             name="Merkintöjen määrä"
+            dot={false}
             strokeWidth={2}
           />
         </LineChart>
