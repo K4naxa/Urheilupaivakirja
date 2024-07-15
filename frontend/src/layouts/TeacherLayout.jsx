@@ -272,7 +272,7 @@ const TeacherLayout = () => {
           {showMenu && (
             <div
               className=" bg-bgPrimary rounded-t-md w-full shadow-upper-shadow
-             absolute grid grid-cols-3 place-items-center bottom-[64px] right-0
+             absolute grid grid-cols-4 place-items-center bottom-[64px] right-0
               animate-menu-appear-right border-b border-borderPrimary"
             >
               <NavLink
@@ -285,6 +285,17 @@ const TeacherLayout = () => {
               >
                 <FiUser size={iconSize} />
                 <p className={linkTextClass}>Profiili</p>
+              </NavLink>
+              <NavLink
+                to="/opettaja/tilastot"
+                className={linkClass}
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowControlPanel(false);
+                }}
+              >
+                <FiBarChart2 size={iconSize} />
+                <p className={linkTextClass}>Tilastot</p>
               </NavLink>
               <button
                 className={linkClass}
