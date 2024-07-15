@@ -54,11 +54,12 @@ export default function AvgSickdaysChart({
           <Line
             type="monotone"
             dataKey="value"
-            stroke="rgb(var(--color-primary))"
+            stroke="rgb(var(--color-bg-sick))"
             activeDot={{ r: 8 }}
             name="Sairaspäivät"
             label="Sairaspäivät"
             strokeWidth={2}
+            dot={false}
           />
         </LineChart>
       </ResponsiveContainer>

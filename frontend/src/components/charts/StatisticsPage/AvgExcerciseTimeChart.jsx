@@ -71,7 +71,7 @@ export default function AvgExcerciseTimeChart({
           <Line
             type="monotone"
             dataKey="value"
-            stroke="rgb(var(--color-primary))"
+            stroke="rgb(var(--color-bg-exercise))"
             dot={false}
             activeDot={{ r: 8 }}
             name="liikunta-aika (min)"

@@ -379,4 +379,27 @@ router.get("/entries/statistics", async (req, res) => {
   }
 });
 
+router.get("/entries/statistics/new-students", async (req, res) => {
+  try {
+    const role = getRole(req);
+
+    if (role !== 1) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const { date1, date2 } = req.query;
+
+    const newStudents = await knex("students")
+      .select("students.created_at")
+      .whereBetween("students.created_at", [date1, date2])
+      .where("students.verified", true)
+      .leftJoin("users", "students.user_id", "users.id");
+
+    res.json(newStudents);
+  } catch (error) {
+    console.error("Error fetching new student count:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

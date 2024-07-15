@@ -23,6 +23,7 @@ function StatisticsPage() {
   const [selectedTime, setSelectedTime] = useState("Month");
   const [selectedView, setSelectedView] = useState("Day");
 
+  // Get data for the  journal info graphs (new entries, avg excercise time, avg sickdays)
   const { data: EntriesData, isLoading: EntriesLoading } = useQuery({
     queryKey: ["EntriesData", selectedTime, selectedView],
     queryFn: () => {
@@ -40,6 +41,32 @@ function StatisticsPage() {
     },
   });
 
+  // Get data for the new students graph
+  const { data: newStudentsData, isLoading: NewStudentsLoading } = useQuery({
+    queryKey: ["newStudentsData", selectedTime],
+    queryFn: () => {
+      if (selectedTime === "Month") {
+        return userService.getNewStudentsBetweenDates(
+          startOfMonth(chartShowDate),
+          endOfMonth(chartShowDate)
+        );
+      } else if (selectedTime === "Year") {
+        return userService.getNewStudentsBetweenDates(
+          startOfYear(chartShowDate),
+          endOfYear(chartShowDate)
+        );
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!NewStudentsLoading) {
+      console.log(EntriesData);
+      console.log(newStudentsData);
+    }
+  }, [newStudentsData, NewStudentsLoading, selectedTime, chartShowDate]);
+
+  // Get values for the statistics boxes
   const getStudentCount = () => {
     if (!EntriesData) return 0;
     const count = EntriesData.reduce((acc, entry) => {
@@ -67,14 +94,12 @@ function StatisticsPage() {
     return `${hours}h ${minutes}min`;
   };
 
-  useEffect(() => {
-    if (!EntriesLoading) {
-      console.log(EntriesData);
-    }
-  }, [selectedTime, selectedView, chartShowDate, EntriesData]);
+  // -----------------------------------------------------------------------------------------
 
+  // invalidate queries when changing the selected time or view
   useEffect(() => {
     queryclient.invalidateQueries("EntriesData");
+    queryclient.invalidateQueries("newStudentsData");
   }, [selectedTime, chartShowDate, selectedView]);
 
   const graphContainerClass =
@@ -187,7 +212,12 @@ function StatisticsPage() {
             />
           </div>
           <div className={graphContainerClass}>
-            <NewStudentsChart />
+            <NewStudentsChart
+              newStudentsData={newStudentsData}
+              chartShowDate={chartShowDate}
+              selectedTime={selectedTime}
+              selectedView={selectedView}
+            />
           </div>
           <div className={graphContainerClass}>
             <AvgSickdaysChart

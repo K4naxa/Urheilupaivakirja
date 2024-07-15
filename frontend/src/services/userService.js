@@ -149,6 +149,25 @@ const getAllJournalEntryDataBetweenDates = async (date1, date2) => {
   }
 };
 
+const getNewStudentsBetweenDates = async (date1, date2) => {
+  try {
+    const response = await axios.get(
+      "/students/entries/statistics/new-students",
+      {
+        params: { date1, date2 },
+        ...makeHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching new student count:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
 export default {
   login,
   register,
@@ -166,5 +185,6 @@ export default {
   resetPassword,
   getStudentData,
   getAllJournalEntryDataBetweenDates,
+  getNewStudentsBetweenDates,
 };
 // Path: frontEnd/src/services/userService.js
