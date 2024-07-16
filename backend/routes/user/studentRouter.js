@@ -402,4 +402,64 @@ router.get("/entries/statistics/new-students", async (req, res) => {
   }
 });
 
+// Pinning Students Logic ---------------------------------------------------------
+
+router.get("/pinned", async (req, res) => {
+  try {
+    const role = getRole(req);
+    if (role !== 1 && role !== 2) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const caller_id = getUserId(req);
+    const pinnedStudents = await knex("pinned_students")
+      .select("pinned_user_id")
+      .where("pinner_user_id", caller_id);
+    res.json(pinnedStudents);
+  } catch (error) {
+    console.error("Error fetching pinned students:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/pin/:id", async (req, res) => {
+  try {
+    const role = getRole(req);
+    if (role !== 1 && role !== 2) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const caller_id = getUserId(req);
+    const pinned_user_id = req.params.id;
+
+    await knex("pinned_students").insert({
+      pinned_user_id,
+      pinner_user_id: caller_id,
+    });
+    res.status(200).json({ message: "Student pinned successfully" });
+  } catch (error) {
+    console.error("Error pinning student:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/unpin/:id", async (req, res) => {
+  try {
+    const role = getRole(req);
+    if (role !== 1 && role !== 2) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const caller_id = getUserId(req);
+    const pinned_user_id = req.params.id;
+
+    await knex("pinned_students")
+      .delete()
+      .where("pinned_user_id", pinned_user_id)
+      .andWhere("pinner_user_id", caller_id);
+
+    res.status(200).json({ message: "Student unpinned successfully" });
+  } catch (error) {
+    console.error("Error unpinning student:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

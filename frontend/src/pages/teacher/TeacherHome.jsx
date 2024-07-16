@@ -1,7 +1,12 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
-import { useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
@@ -11,7 +16,12 @@ import LoadingScreen from "../../components/LoadingScreen.jsx";
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
-import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronLeft,
+  FiChevronUp,
+  FiStar,
+} from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
 import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
@@ -24,6 +34,7 @@ import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSele
 import cc from "../../utils/cc.js";
 
 function TeacherHome() {
+  const queryClient = useQueryClient();
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
@@ -45,20 +56,21 @@ function TeacherHome() {
   const {
     data: studentsAndJournalsData,
     isLoading: studentsAndJournalsDataLoading,
-    error: studentsAndJournalsDataError,
   } = useQuery({
     queryKey: ["studentsAndJournals"],
     queryFn: () => userService.getStudentsAndEntries(),
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
-  const {
-    data: optionsData,
-    isLoading: optionsLoading,
-    error: optionsError,
-  } = useQuery({
+  const { data: optionsData } = useQuery({
     queryKey: ["options"],
     queryFn: () => publicService.getOptions(),
+  });
+
+  const { data: pinnedStudentsData } = useQuery({
+    queryKey: ["pinnedStudents"],
+    queryFn: () => userService.getPinnedStudents(),
+    staleTime: 30 * 60 * 1000, // Optional: Adjust as needed
   });
 
   useEffect(() => {
@@ -128,6 +140,38 @@ function TeacherHome() {
       ></div>
     );
   };
+  const renderFavouriteStar = (journal) => {
+    let isPinned = false;
+    if (pinnedStudentsData) {
+      isPinned = pinnedStudentsData.find(
+        (pinnedStudent) => pinnedStudent.pinned_user_id === journal.user_id
+      );
+    }
+
+    const handlePinClick = async () => {
+      if (isPinned) {
+        await userService.unpinStudent(journal.user_id).then(() => {
+          queryClient.invalidateQueries("pinnedStudents");
+        });
+      } else {
+        await userService.pinStudent(journal.user_id).then(() => {
+          queryClient.invalidateQueries("pinnedStudents");
+        });
+      }
+    };
+
+    return (
+      <div
+        className={cc(
+          "flex absolute top-0 left-0 cursor-pointer",
+          isPinned ? "text-yellow-300" : "text-textSecondary"
+        )}
+        onClick={() => handlePinClick()}
+      >
+        <FiStar size={14} />
+      </div>
+    );
+  };
 
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
@@ -178,6 +222,7 @@ function TeacherHome() {
                   className="flex flex-col rounded-md p-4 border border-borderPrimary hover:bg-hoverDefault w-full relative"
                   id="studentCard"
                 >
+                  {renderFavouriteStar(journal)}
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
