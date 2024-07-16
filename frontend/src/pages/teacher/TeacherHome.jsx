@@ -39,6 +39,9 @@ function TeacherHome() {
 
   const { setShowDate } = useMainContext();
 
+  // Course completion requirement for passing the course
+  const COURSE_COMPLETION_REQUIREMENT = 300;
+
   const {
     data: studentsAndJournalsData,
     isLoading: studentsAndJournalsDataLoading,
@@ -104,6 +107,28 @@ function TeacherHome() {
     return { sports: [], student_groups: [], campuses: [] };
   }, [optionsData]);
 
+  const countCourseProgression = (student) => {
+    const total = student.journal_entries.length;
+    let progression = total / COURSE_COMPLETION_REQUIREMENT;
+    progression *= 100;
+
+    if (progression > 100) return 100;
+    return Math.round(progression);
+  };
+
+  // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
+  const renderProgressionBar = (progression) => {
+    return (
+      <div
+        className={cc(
+          "absolute bottom-0 left-0 h-1 bg-primaryColor",
+          progression === 100 && "bg-bgExercise"
+        )}
+        style={{ width: `${progression}%` }}
+      ></div>
+    );
+  };
+
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
 
@@ -145,25 +170,29 @@ function TeacherHome() {
           </div>
           {/* Student list */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {journals?.map((journal) => (
-              // Student card
-              <div
-                key={journal.user_id}
-                className="flex flex-col rounded-md  p-4 border border-borderPrimary hover:bg-hoverDefault w-full"
-                id="studentCard"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Link
-                    to={`/opettaja/opiskelijat/${journal.user_id}`}
-                    className="flex gap-1 hover:cursor-pointer hover:underline"
-                  >
-                    <p> {journal.first_name}</p>
-                    <p>{journal.last_name}</p>
-                  </Link>
-                  <HeatMap_Weeks journal={journal} />
+            {journals?.map((journal) => {
+              const progression = countCourseProgression(journal);
+              return (
+                <div
+                  key={journal.user_id}
+                  className="flex flex-col rounded-md p-4 border border-borderPrimary hover:bg-hoverDefault w-full relative"
+                  id="studentCard"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Link
+                      to={`/opettaja/opiskelijat/${journal.user_id}`}
+                      className="flex gap-1 hover:cursor-pointer hover:underline"
+                    >
+                      <p>{journal.first_name}</p>
+                      <p>{journal.last_name}</p>
+                    </Link>
+                    <HeatMap_Weeks journal={journal} />
+                  </div>
+                  {/* Progress bar */}
+                  {renderProgressionBar(progression)}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       );
@@ -210,24 +239,27 @@ function TeacherHome() {
             </div>
           </div>
           <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
-            {journals.map((journal) => (
-              <div
-                key={journal.user_id}
-                className="flex flex-col gap-2 w-64 rounded-md border border-borderPrimary p-4 hover:bg-hoverDefault"
-                id="studentCard"
-              >
-                <Link
-                  to={`/opettaja/opiskelijat/${journal.user_id}`}
-                  className="flex flex-col pt-2 "
+            {journals.map((journal) => {
+              const progression = countCourseProgression(journal);
+              return (
+                <div
+                  key={journal.user_id}
+                  className="flex flex-col gap-2 w-64 rounded-md border border-borderPrimary p-4 hover:bg-hoverDefault relative"
+                  id="studentCard"
                 >
-                  <p className="text-lg text-center hover:cursor-pointer hover:underline">
-                    {journal.first_name} {journal.last_name}
-                  </p>
-                </Link>
-
-                <HeatMap_Month journal={journal} />
-              </div>
-            ))}
+                  <Link
+                    to={`/opettaja/opiskelijat/${journal.user_id}`}
+                    className="flex flex-col pt-2 "
+                  >
+                    <p className="text-lg text-center hover:cursor-pointer hover:underline">
+                      {journal.first_name} {journal.last_name}
+                    </p>
+                  </Link>
+                  <HeatMap_Month journal={journal} />
+                  {renderProgressionBar(progression)}
+                </div>
+              );
+            })}
           </div>
         </div>
       );
@@ -283,32 +315,36 @@ function TeacherHome() {
             </div>
           </div>
           <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
-            {journals.map((journal) => (
-              <div
-                key={journal.user_id}
-                className="flex flex-col  gap-2 p-4 rounded-md  border
-               border-borderPrimary hover:bg-hoverDefault"
-                id="studentCard"
-              >
-                <div className="flex gap-4  leading-none items-end p-2">
-                  <Link
-                    to={`/opettaja/opiskelijat/${journal.user_id}`}
-                    className="text-lg text-center leading-none hover:cursor-pointer hover:underline"
-                  >
-                    {journal.first_name} {journal.last_name}
-                  </Link>
+            {journals.map((journal) => {
+              const progression = countCourseProgression(journal);
+              return (
+                <div
+                  key={journal.user_id}
+                  className="flex flex-col relative gap-2 p-4 rounded-md  border
+                   border-borderPrimary hover:bg-hoverDefault"
+                  id="studentCard"
+                >
+                  <div className="flex gap-4  leading-none items-end p-2">
+                    <Link
+                      to={`/opettaja/opiskelijat/${journal.user_id}`}
+                      className="text-lg text-center leading-none hover:cursor-pointer hover:underline"
+                    >
+                      {journal.first_name} {journal.last_name}
+                    </Link>
 
-                  <p className="text-textSecondary">
-                    Toimipiste: {journal.campus}
-                  </p>
-                  <p className="text-textSecondary">ryhmä: {journal.group}</p>
-                  <p className="flex text-textSecondary">
-                    Laji: {journal.sport}
-                  </p>
+                    <p className="text-textSecondary">
+                      Toimipiste: {journal.campus}
+                    </p>
+                    <p className="text-textSecondary">ryhmä: {journal.group}</p>
+                    <p className="flex text-textSecondary">
+                      Laji: {journal.sport}
+                    </p>
+                  </div>
+                  <HeatMap_Year journal={journal} />
+                  {renderProgressionBar(progression)}
                 </div>
-                <HeatMap_Year journal={journal} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       );
