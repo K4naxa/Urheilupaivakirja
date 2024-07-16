@@ -324,7 +324,7 @@ function TeacherHome() {
                    border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
-                  <div className="flex gap-4  leading-none items-end p-2">
+                  <div className="flex flex-wrap gap-4  leading-none items-end p-2">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
                       className="text-lg text-center leading-none hover:cursor-pointer hover:underline"
