@@ -333,11 +333,13 @@ function TeacherHome() {
                     </Link>
 
                     <p className="text-textSecondary">
-                      Toimipiste: {journal.campus}
+                      Toimipiste: {journal.campus_name}
                     </p>
-                    <p className="text-textSecondary">ryhmä: {journal.group}</p>
+                    <p className="text-textSecondary">
+                      ryhmä: {journal.group_identifier}
+                    </p>
                     <p className="flex text-textSecondary">
-                      Laji: {journal.sport}
+                      Laji: {journal.sport_name}
                     </p>
                   </div>
                   <HeatMap_Year journal={journal} />
