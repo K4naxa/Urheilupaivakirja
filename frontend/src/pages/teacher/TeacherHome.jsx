@@ -48,6 +48,14 @@ function TeacherHome() {
   const [selectedCampuses, setSelectedCampuses] = useState([]);
   const [selectedGroups, setSelectedGroups] = useState([]);
 
+  const [sorting, setSorting] = useState({
+    name: 1,
+    sport: 0,
+    group: 0,
+    campus: 0,
+    activity: 0,
+  });
+
   const { setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
@@ -125,7 +133,7 @@ function TeacherHome() {
     progression *= 100;
 
     if (progression > 100) return 100;
-    return Math.round(progression);
+    return Math.round(progression * 100) / 100;
   };
 
   // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
@@ -133,7 +141,8 @@ function TeacherHome() {
     return (
       <div
         className={cc(
-          "absolute bottom-0 left-0 h-1 bg-primaryColor before:absolute before:rounded-md before:w-10 before:inline-block before:h-1 before:bg-bgPrimary before:transition-all before:duration-300",
+          "absolute bottom-0 left-0 h-1",
+          progression < 100 && "bg-primaryColor",
           progression === 100 && "bg-bgExercise"
         )}
         style={{ width: `${progression}%` }}
