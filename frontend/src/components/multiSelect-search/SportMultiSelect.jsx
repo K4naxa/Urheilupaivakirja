@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
@@ -6,6 +7,7 @@ const SportsMultiSelect = ({
   selectedSports,
   setSelectedSports,
   filter,
+  filteredStudents,
 }) => {
   // Ensure filter is a string
   const filterString = typeof filter === "string" ? filter.toLowerCase() : "";
@@ -15,10 +17,19 @@ const SportsMultiSelect = ({
     sport.name.toLowerCase().includes(filterString)
   );
 
+  const availableSports = filteredStudents?.map(
+    (student) => student.sport_name
+  );
+  useEffect(() => {
+    console.log("filtered students: ", filteredStudents);
+    console.log("filtered out sports: ", availableSports);
+  }, [availableSports]);
+
   // Map filtered sports to the format required by react-select
   const sportOptions = filteredSports?.map((sport) => ({
     value: sport.id,
     label: sport.name,
+    isDisabled: !availableSports?.includes(sport.name),
   }));
 
   // Handle change in selected sports
@@ -78,12 +89,17 @@ const SportsMultiSelect = ({
         // styles for the dropdown options
         option: (provided, state) => ({
           ...provided,
-          backgroundColor: state.isSelected
-            ? "rgb(var(--color-primary))"
-            : state.isFocused
+
+          backgroundColor: state.isDisabled
+            ? "rgb(var(--color-bg-gray))"
+            : state.isSelected
               ? "rgb(var(--color-primary))"
-              : "rgb(var(--color-bg-secondary))",
-          color: "rgb(var(--color-text-primary))",
+              : state.isFocused
+                ? "rgb(var(--color-primary))"
+                : "rgb(var(--color-bg-secondary))",
+          color: state.isDisabled
+            ? "rgb(var(--color-text-secondary))"
+            : "rgb(var(--color-text-primary))",
           ":active": {
             backgroundColor: "rgb(var(--color-bg-primary))",
             color: "rgb(var(--color-text-primary))",
@@ -95,6 +111,11 @@ const SportsMultiSelect = ({
           ...provided,
           backgroundColor: "rgb(var(--color-bg-secondary))",
           color: "rgb(var(--color-text-primary))",
+        }),
+
+        isDisabled: (provided) => ({
+          ...provided,
+          color: "rgb(var(--color-text-secondary))",
         }),
       }}
       onChange={handleSelectChange}

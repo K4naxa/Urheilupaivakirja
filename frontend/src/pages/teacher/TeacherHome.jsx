@@ -687,7 +687,7 @@ function TeacherHome() {
             </div>
           </div>
 
-          <div className="hidden lg:flex flex-wrap justify-center w-full items-center gap-2 lg:gap-8">
+          <div className="hidden text-sm lg:flex  flex-wrap justify-center w-full items-center gap-2 lg:gap-8">
             <StudentMultiSelect
               studentArray={studentsAndJournalsData}
               selectedStudents={selectedStudents}
@@ -698,6 +698,7 @@ function TeacherHome() {
               sportsArray={options.sports}
               selectedSports={selectedSports}
               setSelectedSports={setSelectedSports}
+              filteredStudents={filteredStudents}
               filter={selectedSports}
             />
             <CampusMultiSelect
