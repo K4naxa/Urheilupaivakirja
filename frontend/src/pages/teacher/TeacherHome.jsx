@@ -133,7 +133,7 @@ function TeacherHome() {
     return (
       <div
         className={cc(
-          "absolute bottom-0 left-0 h-1 bg-primaryColor",
+          "absolute bottom-0 left-0 h-1 bg-primaryColor before:absolute before:rounded-md before:w-10 before:inline-block before:h-1 before:bg-bgPrimary before:transition-all before:duration-300",
           progression === 100 && "bg-bgExercise"
         )}
         style={{ width: `${progression}%` }}
@@ -163,13 +163,11 @@ function TeacherHome() {
     return (
       <div
         className={cc(
-          "flex absolute top-0 left-0 cursor-pointer",
-          isPinned ? "text-yellow-300" : "text-textSecondary"
+          "absolute -top-2 -left-2 h-4 w-4 rounded-sm cursor-pointer group-hover/studentCard:border group-hover/studentCard:border-yellow-500",
+          isPinned ? "bg-yellow-500" : null
         )}
         onClick={() => handlePinClick()}
-      >
-        <FiStar size={14} />
-      </div>
+      ></div>
     );
   };
 
@@ -219,7 +217,7 @@ function TeacherHome() {
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col rounded-md p-4 border border-borderPrimary hover:bg-hoverDefault w-full relative"
+                  className="flex flex-col rounded-md p-4 border border-borderPrimary hover:bg-hoverDefault w-full relative overflow-hidden group/studentCard"
                   id="studentCard"
                 >
                   {renderFavouriteStar(journal)}
