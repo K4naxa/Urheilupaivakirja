@@ -1,12 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
@@ -16,12 +11,7 @@ import LoadingScreen from "../../components/LoadingScreen.jsx";
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
-import {
-  FiChevronDown,
-  FiChevronLeft,
-  FiChevronUp,
-  FiStar,
-} from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
 import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
@@ -41,19 +31,21 @@ function TeacherHome() {
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const [filteredStudents, setfilteredStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
 
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedSports, setSelectedSports] = useState([]);
   const [selectedCampuses, setSelectedCampuses] = useState([]);
   const [selectedGroups, setSelectedGroups] = useState([]);
 
+  const [selectedSorting, setSelectedSorting] = useState("default");
   const [sorting, setSorting] = useState({
-    name: 1,
+    default: 1,
+    name: 0,
     sport: 0,
     group: 0,
     campus: 0,
-    activity: 0,
+    progression: 0,
   });
 
   const { setShowDate } = useMainContext();
@@ -83,7 +75,7 @@ function TeacherHome() {
 
   useEffect(() => {
     if (studentsAndJournalsData) {
-      setfilteredStudents(studentsAndJournalsData);
+      setFilteredStudents(studentsAndJournalsData);
     }
   }, [studentsAndJournalsData]);
 
@@ -113,12 +105,213 @@ function TeacherHome() {
       );
     }
 
-    setfilteredStudents(newFilteredStudents);
+    setFilteredStudents(newFilteredStudents);
   }, [
     selectedStudents,
     selectedSports,
     selectedCampuses,
     selectedGroups,
+    studentsAndJournalsData,
+  ]);
+
+  const handleDefaultSorting = () => {
+    let newSorting = {
+      ...sorting,
+      default: 1,
+      name: 0,
+      sport: 0,
+      group: 0,
+      campus: 0,
+      progression: 0,
+    };
+    setSorting(newSorting);
+  };
+
+  const handleNameSorting = (type) => {
+    let newSorting = {
+      ...sorting,
+      default: 0,
+      sport: 0,
+      group: 0,
+      campus: 0,
+      progression: 0,
+    };
+    if (type === 1) newSorting = { ...newSorting, name: 1 };
+    if (type === -1) newSorting = { ...newSorting, name: -1 };
+    setSorting(newSorting);
+  };
+  const handleSportSorting = (type) => {
+    let newSorting = {
+      ...sorting,
+      default: 0,
+      name: 0,
+      group: 0,
+      campus: 0,
+      progression: 0,
+    };
+
+    if (type === 1) newSorting = { ...newSorting, sport: 1 };
+    if (type === -1) newSorting = { ...newSorting, sport: -1 };
+    setSorting(newSorting);
+  };
+  const handleGroupSorting = (type) => {
+    let newSorting = {
+      ...sorting,
+      default: 0,
+      sport: 0,
+      name: 0,
+      campus: 0,
+      progression: 0,
+    };
+    if (type === 1) newSorting = { ...newSorting, group: 1 };
+    if (type === -1) newSorting = { ...newSorting, group: -1 };
+
+    setSorting(newSorting);
+  };
+  const handleCampusSorting = (type) => {
+    let newSorting = {
+      ...sorting,
+      default: 0,
+      sport: 0,
+      group: 0,
+      name: 0,
+      progression: 0,
+    };
+    if (type === 1) newSorting = { ...newSorting, campus: 1 };
+    if (type === -1) newSorting = { ...newSorting, campus: -1 };
+
+    setSorting(newSorting);
+  };
+
+  const handleProgressionSorting = (type) => {
+    let newSorting = {
+      ...sorting,
+      default: 0,
+      sport: 0,
+      group: 0,
+      name: 0,
+      campus: 0,
+    };
+    if (type === 1) newSorting = { ...newSorting, progression: 1 };
+    if (type === -1) newSorting = { ...newSorting, progression: -1 };
+
+    setSorting(newSorting);
+  };
+
+  const handleSortingChange = (value) => {
+    setSelectedSorting(value);
+    switch (value) {
+      case "default":
+        handleDefaultSorting();
+        break;
+      case "name1":
+        handleNameSorting(1);
+        break;
+      case "name2":
+        handleNameSorting(-1);
+        break;
+      case "sport1":
+        handleSportSorting(1);
+        break;
+      case "sport2":
+        handleSportSorting(-1);
+        break;
+      case "group1":
+        handleGroupSorting(1);
+        break;
+      case "group2":
+        handleGroupSorting(-1);
+        break;
+      case "campus1":
+        handleCampusSorting(1);
+        break;
+      case "campus2":
+        handleCampusSorting(-1);
+        break;
+      case "progression1":
+        handleProgressionSorting(1);
+        break;
+      case "progression2":
+        handleProgressionSorting(-1);
+        break;
+      default:
+        break;
+    }
+  };
+
+  //useEffect for sorting and filtering students
+  useEffect(() => {
+    if (!studentsAndJournalsData) return;
+    let newFiltered = [...studentsAndJournalsData];
+
+    if (sorting.default === 1) {
+      newFiltered.sort((a, b) => {
+        const isAPinned = pinnedStudentsData.some(
+          (pinnedStudent) => pinnedStudent.pinned_user_id === a.user_id
+        );
+        const isBPinned = pinnedStudentsData.some(
+          (pinnedStudent) => pinnedStudent.pinned_user_id === b.user_id
+        );
+
+        if (isAPinned && !isBPinned) {
+          return -1;
+        } else if (!isAPinned && isBPinned) {
+          return 1;
+        } else {
+          return a.first_name.localeCompare(b.first_name);
+        }
+      });
+    }
+
+    // Check for sorting settings
+    if (sorting.name === 1) {
+      newFiltered.sort((a, b) => (a.first_name > b.first_name ? 1 : -1));
+    } else if (sorting.name === -1) {
+      newFiltered.sort((a, b) => (a.first_name < b.first_name ? 1 : -1));
+    }
+
+    if (sorting.sport === 1) {
+      newFiltered.sort((a, b) => (a.sport_name > b.sport_name ? 1 : -1));
+    } else if (sorting.sport === -1) {
+      newFiltered.sort((a, b) => (a.sport_name < b.sport_name ? 1 : -1));
+    }
+
+    if (sorting.group === 1) {
+      newFiltered.sort((a, b) =>
+        a.group_identifier > b.group_identifier ? 1 : -1
+      );
+    } else if (sorting.group === -1) {
+      newFiltered.sort((a, b) =>
+        a.group_identifier < b.group_identifier ? 1 : -1
+      );
+    }
+
+    if (sorting.campus === 1) {
+      newFiltered.sort((a, b) => (a.campus_name > b.campus_name ? 1 : -1));
+    } else if (sorting.campus === -1) {
+      newFiltered.sort((a, b) => (a.campus_name < b.campus_name ? 1 : -1));
+    }
+
+    if (sorting.progression === -1) {
+      newFiltered.sort(
+        (a, b) => countCourseProgression(a) - countCourseProgression(b)
+      );
+    } else if (sorting.progression === 1) {
+      newFiltered.sort(
+        (a, b) => countCourseProgression(b) - countCourseProgression(a)
+      );
+    }
+
+    // check if student is being searched
+    if (selectedStudents.length > 0)
+      newFiltered = newFiltered.filter((student) =>
+        selectedStudents.some((s) => s.value === student.user_id)
+      );
+    setFilteredStudents(newFiltered);
+  }, [
+    selectedStudents,
+    pinnedStudentsData,
+    selectedSorting,
     studentsAndJournalsData,
   ]);
 
@@ -180,6 +373,37 @@ function TeacherHome() {
     );
   };
 
+  const renderSortingSelect = () => {
+    return (
+      <div className="flex flex-col md:absolute right-0 mt-4 md:mt-0">
+        <label htmlFor="sorting" className="px-2 text-xs text-textSecondary">
+          Järjestys:
+        </label>
+        <select
+          name="sorting"
+          id="sortingSelect"
+          value={selectedSorting}
+          className="bg-bgSecondary border border-borderPrimary text-textSecondary
+               p-1 rounded-md hover:cursor-pointer "
+          onChange={(e) => handleSortingChange(e.target.value)}
+        >
+          <option value="default">Oletus</option>
+          <option value="name1">Nimi A-Ö</option>
+          <option value="name2">Nimi Ö-A</option>
+          <option value="sport1">Laji A-Ö</option>
+          <option value="sport2">Laji Ö-A</option>
+          <option value="group1">Ryhmä A-Ö</option>
+          <option value="group2">Ryhmä Ö-A</option>
+          <option value="campus1">Toimipaikka A-Ö</option>
+          <option value="campus2">Toimipaikka Ö-A</option>
+
+          <option value="progression1">Edistyminen ^</option>
+          <option value="progression2">Edistyminen vähiten</option>
+        </select>
+      </div>
+    );
+  };
+
   const RenderWeeks = ({ journals }) => {
     const { showDate, setShowDate } = useMainContext();
 
@@ -189,7 +413,7 @@ function TeacherHome() {
       return (
         <div className="flex flex-col justify-center">
           {/* Date controls */}
-          <div className="flex w-full flex-col text-center mb-4">
+          <div className="flex w-full flex-col text-center mb-4 relative">
             <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
             <div className="hover: flex justify-center gap-4">
               <button
@@ -218,6 +442,7 @@ function TeacherHome() {
                 </IconContext.Provider>
               </button>
             </div>
+            {renderSortingSelect()}
           </div>
           {/* Student list */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -258,7 +483,7 @@ function TeacherHome() {
     } else
       return (
         <div className="flex flex-col justify-center">
-          <div className="flex flex-col text-center mb-8">
+          <div className="flex flex-col text-center mb-8 relative">
             <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
             <div className="hover: flex justify-center gap-4">
               <button
@@ -289,6 +514,7 @@ function TeacherHome() {
                 </IconContext.Provider>
               </button>
             </div>
+            {renderSortingSelect()}
           </div>
           <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
             {journals.map((journal) => {
@@ -349,7 +575,7 @@ function TeacherHome() {
     } else
       return (
         <div className="flex flex-col justify-center w-full">
-          <div className="flex flex-col text-center mb-8">
+          <div className="flex flex-col text-center mb-8 relative">
             <div className="hover: flex justify-center gap-4">
               <button
                 className="hover:text-primaryColor"
@@ -365,6 +591,7 @@ function TeacherHome() {
                 <FiChevronRight />
               </button>
             </div>
+            {renderSortingSelect()}
           </div>
           <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
             {journals.map((journal) => {
@@ -425,37 +652,39 @@ function TeacherHome() {
            rounded-md p-4 gap-8 border border-borderPrimary"
         >
           {/* Aika filtteri */}
-          <div className="flex text-textSecondary text-sm justify-center">
-            <p
-              onClick={() => {
-                setShowWeeks(true);
-                setShowMonths(false);
-                setShowYears(false);
-              }}
-              className={`cursor-pointer mx-2 ${showWeeks && "text-primaryColor border-b border-primaryColor"}`}
-            >
-              Viikko
-            </p>
-            <p
-              onClick={() => {
-                setShowWeeks(false);
-                setShowMonths(true);
-                setShowYears(false);
-              }}
-              className={`cursor-pointer mx-2 ${showMonths && "text-primaryColor border-b border-primaryColor"}`}
-            >
-              Kuukausi
-            </p>
-            <p
-              onClick={() => {
-                setShowWeeks(false);
-                setShowMonths(false);
-                setShowYears(true);
-              }}
-              className={`cursor-pointer mx-2 ${showYears && "text-primaryColor border-b border-primaryColor"}`}
-            >
-              Vuosi
-            </p>
+          <div className="flex w-full text-sm justify-center relative">
+            <div className="text-textSecondary text-sm justify-center relative flex">
+              <p
+                onClick={() => {
+                  setShowWeeks(true);
+                  setShowMonths(false);
+                  setShowYears(false);
+                }}
+                className={`cursor-pointer mx-2 ${showWeeks && "text-primaryColor border-b border-primaryColor"}`}
+              >
+                Viikko
+              </p>
+              <p
+                onClick={() => {
+                  setShowWeeks(false);
+                  setShowMonths(true);
+                  setShowYears(false);
+                }}
+                className={`cursor-pointer mx-2 ${showMonths && "text-primaryColor border-b border-primaryColor"}`}
+              >
+                Kuukausi
+              </p>
+              <p
+                onClick={() => {
+                  setShowWeeks(false);
+                  setShowMonths(false);
+                  setShowYears(true);
+                }}
+                className={`cursor-pointer mx-2 ${showYears && "text-primaryColor border-b border-primaryColor"}`}
+              >
+                Vuosi
+              </p>
+            </div>
           </div>
 
           <div className="hidden lg:flex flex-wrap justify-center w-full items-center gap-2 lg:gap-8">
@@ -552,10 +781,6 @@ function TeacherHome() {
         </div>
 
         {/* student list */}
-        {/* <div
-          id="studentList"
-          className="flex lg:ml-72 gap-8 rounded-md bg-bgSecondary p-4 "
-        > */}
         <div
           id="studentList"
           className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center border border-borderPrimary"
