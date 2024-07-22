@@ -14,7 +14,14 @@ import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSel
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-import { addMonths, addWeeks, getWeek, subMonths, subWeeks } from "date-fns";
+import {
+  addMonths,
+  addWeeks,
+  getWeek,
+  set,
+  subMonths,
+  subWeeks,
+} from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
@@ -39,20 +46,13 @@ function TeacherHome() {
   const [selectedGroups, setSelectedGroups] = useState([]);
 
   const [selectedSorting, setSelectedSorting] = useState("default");
-  const [sorting, setSorting] = useState({
-    default: 1,
-    name: 0,
-    sport: 0,
-    group: 0,
-    campus: 0,
-    progression: 0,
-  });
 
   const { setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
   const COURSE_COMPLETION_REQUIREMENT = 300;
 
+  // all Students and their journals
   const {
     data: studentsAndJournalsData,
     isLoading: studentsAndJournalsDataLoading,
@@ -62,26 +62,64 @@ function TeacherHome() {
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
+  // Only pinned students where the user id == pinner_user_id
+  const { data: pinnedStudentsData } = useQuery({
+    queryKey: ["pinnedStudents"],
+    queryFn: () => userService.getPinnedStudents(),
+    staleTime: 30 * 60 * 1000, //30 minutes
+  });
+
+  // all  sports / campuses / student groups for filtering
   const { data: optionsData } = useQuery({
     queryKey: ["options"],
     queryFn: () => publicService.getOptions(),
   });
 
-  const { data: pinnedStudentsData } = useQuery({
-    queryKey: ["pinnedStudents"],
-    queryFn: () => userService.getPinnedStudents(),
-    staleTime: 30 * 60 * 1000, // Optional: Adjust as needed
-  });
+  const options = useMemo(() => {
+    if (optionsData) return optionsData;
+    return { sports: [], student_groups: [], campuses: [] };
+  }, [optionsData]);
 
-  useEffect(() => {
-    if (studentsAndJournalsData) {
-      setFilteredStudents(studentsAndJournalsData);
-    }
-  }, [studentsAndJournalsData]);
+  // Sorting function for students.
+  // Default sorting is based on first name, if the student is pinned, they are placed first.
+  // Other sorting options are based on the selected value.
+  // If the selected value is 1, the sorting is done in ascending order, if the selected value is -1, the sorting is done in descending order.
+  const sortingFunctions = {
+    default: (a, b) => {
+      const isAPinned = pinnedStudentsData?.some(
+        (pinnedStudent) => pinnedStudent.pinned_user_id === a.user_id
+      );
+      const isBPinned = pinnedStudentsData?.some(
+        (pinnedStudent) => pinnedStudent.pinned_user_id === b.user_id
+      );
 
-  // filter students based on selected filters
+      if (isAPinned && !isBPinned) {
+        return -1;
+      } else if (!isAPinned && isBPinned) {
+        return 1;
+      } else {
+        return a.first_name.localeCompare(b.first_name);
+      }
+    },
+    name1: (a, b) => a.first_name.localeCompare(b.first_name),
+    name2: (a, b) => b.first_name.localeCompare(a.first_name),
+    sport1: (a, b) => a.sport_name.localeCompare(b.sport_name),
+    sport2: (a, b) => b.sport_name.localeCompare(a.sport_name),
+    group1: (a, b) => a.group_identifier.localeCompare(b.group_identifier),
+    group2: (a, b) => b.group_identifier.localeCompare(a.group_identifier),
+    campus1: (a, b) => a.campus_name.localeCompare(b.campus_name),
+    campus2: (a, b) => b.campus_name.localeCompare(a.campus_name),
+    progression1: (a, b) =>
+      countCourseProgression(b) - countCourseProgression(a),
+    progression2: (a, b) =>
+      countCourseProgression(a) - countCourseProgression(b),
+  };
+
+  // filter and sort students based on selected filters
   useEffect(() => {
-    let newFilteredStudents = studentsAndJournalsData;
+    if (!studentsAndJournalsData || !pinnedStudentsData) return;
+
+    let newFilteredStudents = [...studentsAndJournalsData];
 
     if (selectedSports.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
@@ -98,11 +136,14 @@ function TeacherHome() {
         selectedGroups.some((group) => group.label === student.group_identifier)
       );
     }
-
     if (selectedStudents.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((journal) =>
-        selectedStudents.some((student) => student.value === journal.user_id)
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        selectedStudents.some((selected) => selected.value === student.user_id)
       );
+    }
+
+    if (sortingFunctions[selectedSorting]) {
+      newFilteredStudents.sort(sortingFunctions[selectedSorting]);
     }
 
     setFilteredStudents(newFilteredStudents);
@@ -112,213 +153,9 @@ function TeacherHome() {
     selectedCampuses,
     selectedGroups,
     studentsAndJournalsData,
-  ]);
-
-  const handleDefaultSorting = () => {
-    let newSorting = {
-      ...sorting,
-      default: 1,
-      name: 0,
-      sport: 0,
-      group: 0,
-      campus: 0,
-      progression: 0,
-    };
-    setSorting(newSorting);
-  };
-
-  const handleNameSorting = (type) => {
-    let newSorting = {
-      ...sorting,
-      default: 0,
-      sport: 0,
-      group: 0,
-      campus: 0,
-      progression: 0,
-    };
-    if (type === 1) newSorting = { ...newSorting, name: 1 };
-    if (type === -1) newSorting = { ...newSorting, name: -1 };
-    setSorting(newSorting);
-  };
-  const handleSportSorting = (type) => {
-    let newSorting = {
-      ...sorting,
-      default: 0,
-      name: 0,
-      group: 0,
-      campus: 0,
-      progression: 0,
-    };
-
-    if (type === 1) newSorting = { ...newSorting, sport: 1 };
-    if (type === -1) newSorting = { ...newSorting, sport: -1 };
-    setSorting(newSorting);
-  };
-  const handleGroupSorting = (type) => {
-    let newSorting = {
-      ...sorting,
-      default: 0,
-      sport: 0,
-      name: 0,
-      campus: 0,
-      progression: 0,
-    };
-    if (type === 1) newSorting = { ...newSorting, group: 1 };
-    if (type === -1) newSorting = { ...newSorting, group: -1 };
-
-    setSorting(newSorting);
-  };
-  const handleCampusSorting = (type) => {
-    let newSorting = {
-      ...sorting,
-      default: 0,
-      sport: 0,
-      group: 0,
-      name: 0,
-      progression: 0,
-    };
-    if (type === 1) newSorting = { ...newSorting, campus: 1 };
-    if (type === -1) newSorting = { ...newSorting, campus: -1 };
-
-    setSorting(newSorting);
-  };
-
-  const handleProgressionSorting = (type) => {
-    let newSorting = {
-      ...sorting,
-      default: 0,
-      sport: 0,
-      group: 0,
-      name: 0,
-      campus: 0,
-    };
-    if (type === 1) newSorting = { ...newSorting, progression: 1 };
-    if (type === -1) newSorting = { ...newSorting, progression: -1 };
-
-    setSorting(newSorting);
-  };
-
-  const handleSortingChange = (value) => {
-    setSelectedSorting(value);
-    switch (value) {
-      case "default":
-        handleDefaultSorting();
-        break;
-      case "name1":
-        handleNameSorting(1);
-        break;
-      case "name2":
-        handleNameSorting(-1);
-        break;
-      case "sport1":
-        handleSportSorting(1);
-        break;
-      case "sport2":
-        handleSportSorting(-1);
-        break;
-      case "group1":
-        handleGroupSorting(1);
-        break;
-      case "group2":
-        handleGroupSorting(-1);
-        break;
-      case "campus1":
-        handleCampusSorting(1);
-        break;
-      case "campus2":
-        handleCampusSorting(-1);
-        break;
-      case "progression1":
-        handleProgressionSorting(1);
-        break;
-      case "progression2":
-        handleProgressionSorting(-1);
-        break;
-      default:
-        break;
-    }
-  };
-
-  //useEffect for sorting and filtering students
-  useEffect(() => {
-    if (!studentsAndJournalsData) return;
-    let newFiltered = [...studentsAndJournalsData];
-
-    if (sorting.default === 1) {
-      newFiltered.sort((a, b) => {
-        const isAPinned = pinnedStudentsData.some(
-          (pinnedStudent) => pinnedStudent.pinned_user_id === a.user_id
-        );
-        const isBPinned = pinnedStudentsData.some(
-          (pinnedStudent) => pinnedStudent.pinned_user_id === b.user_id
-        );
-
-        if (isAPinned && !isBPinned) {
-          return -1;
-        } else if (!isAPinned && isBPinned) {
-          return 1;
-        } else {
-          return a.first_name.localeCompare(b.first_name);
-        }
-      });
-    }
-
-    // Check for sorting settings
-    if (sorting.name === 1) {
-      newFiltered.sort((a, b) => (a.first_name > b.first_name ? 1 : -1));
-    } else if (sorting.name === -1) {
-      newFiltered.sort((a, b) => (a.first_name < b.first_name ? 1 : -1));
-    }
-
-    if (sorting.sport === 1) {
-      newFiltered.sort((a, b) => (a.sport_name > b.sport_name ? 1 : -1));
-    } else if (sorting.sport === -1) {
-      newFiltered.sort((a, b) => (a.sport_name < b.sport_name ? 1 : -1));
-    }
-
-    if (sorting.group === 1) {
-      newFiltered.sort((a, b) =>
-        a.group_identifier > b.group_identifier ? 1 : -1
-      );
-    } else if (sorting.group === -1) {
-      newFiltered.sort((a, b) =>
-        a.group_identifier < b.group_identifier ? 1 : -1
-      );
-    }
-
-    if (sorting.campus === 1) {
-      newFiltered.sort((a, b) => (a.campus_name > b.campus_name ? 1 : -1));
-    } else if (sorting.campus === -1) {
-      newFiltered.sort((a, b) => (a.campus_name < b.campus_name ? 1 : -1));
-    }
-
-    if (sorting.progression === -1) {
-      newFiltered.sort(
-        (a, b) => countCourseProgression(a) - countCourseProgression(b)
-      );
-    } else if (sorting.progression === 1) {
-      newFiltered.sort(
-        (a, b) => countCourseProgression(b) - countCourseProgression(a)
-      );
-    }
-
-    // check if student is being searched
-    if (selectedStudents.length > 0)
-      newFiltered = newFiltered.filter((student) =>
-        selectedStudents.some((s) => s.value === student.user_id)
-      );
-    setFilteredStudents(newFiltered);
-  }, [
-    selectedStudents,
     pinnedStudentsData,
     selectedSorting,
-    studentsAndJournalsData,
   ]);
-
-  const options = useMemo(() => {
-    if (optionsData) return optionsData;
-    return { sports: [], student_groups: [], campuses: [] };
-  }, [optionsData]);
 
   const countCourseProgression = (student) => {
     const total = student.journal_entries.length;
@@ -385,7 +222,7 @@ function TeacherHome() {
           value={selectedSorting}
           className="bg-bgSecondary border border-borderPrimary text-textSecondary
                p-1 rounded-md hover:cursor-pointer "
-          onChange={(e) => handleSortingChange(e.target.value)}
+          onChange={(e) => setSelectedSorting(e.target.value)}
         >
           <option value="default">Oletus</option>
           <option value="name1">Nimi A-Ö</option>
