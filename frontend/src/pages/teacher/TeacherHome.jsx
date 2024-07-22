@@ -17,8 +17,11 @@ import { IconContext } from "react-icons/lib";
 import {
   addMonths,
   addWeeks,
+  endOfWeek,
   getWeek,
   set,
+  startOfDay,
+  startOfWeek,
   subMonths,
   subWeeks,
 } from "date-fns";
@@ -332,6 +335,22 @@ function TeacherHome() {
           {/* Date controls */}
           <div className="flex w-full flex-col text-center mb-4 relative">
             <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+            <h2 className="text-textSecondary">
+              {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
+                day: "numeric",
+              })}{" "}
+              {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
+                month: "long",
+              })}{" "}
+              <span> - </span>
+              {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
+                day: "numeric",
+              })}{" "}
+              {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
+                month: "long",
+              })}{" "}
+            </h2>
+
             <div className="hover: flex justify-center gap-4">
               <button
                 className="hover:text-primaryColor"
@@ -368,11 +387,11 @@ function TeacherHome() {
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col rounded-md p-4 border border-borderPrimary hover:bg-hoverDefault w-full relative overflow-hidden group/studentCard"
+                  className="flex flex-col rounded-md p-2 border border-borderPrimary hover:bg-hoverDefault w-full relative overflow-hidden group/studentCard"
                   id="studentCard"
                 >
                   {renderFavouriteMark(journal)}
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex-col items-center justify-between gap-2">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
                       className="flex gap-1 hover:cursor-pointer hover:underline"
