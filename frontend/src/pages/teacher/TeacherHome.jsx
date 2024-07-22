@@ -179,7 +179,7 @@ function TeacherHome() {
       ></div>
     );
   };
-  const renderFavouriteStar = (journal) => {
+  const renderFavouriteMark = (journal) => {
     let isPinned = false;
     if (pinnedStudentsData) {
       isPinned = pinnedStudentsData.find(
@@ -291,7 +291,7 @@ function TeacherHome() {
                   className="flex flex-col rounded-md p-4 border border-borderPrimary hover:bg-hoverDefault w-full relative overflow-hidden group/studentCard"
                   id="studentCard"
                 >
-                  {renderFavouriteStar(journal)}
+                  {renderFavouriteMark(journal)}
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
@@ -359,9 +359,10 @@ function TeacherHome() {
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col gap-2 w-64 rounded-md border border-borderPrimary p-4 hover:bg-hoverDefault relative"
+                  className="flex flex-col gap-2 w-64 rounded-md border border-borderPrimary p-4 hover:bg-hoverDefault relative overflow-hidden group/studentCard"
                   id="studentCard"
                 >
+                  {renderFavouriteMark(journal)}
                   <Link
                     to={`/opettaja/opiskelijat/${journal.user_id}`}
                     className="flex flex-col pt-2 "
@@ -436,10 +437,11 @@ function TeacherHome() {
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col relative gap-2 p-4 rounded-md  border
+                  className="flex flex-col relative gap-2 p-4 rounded-md  border overflow-hidden group/studentCard
                    border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
+                  {renderFavouriteMark(journal)}
                   <div className="flex flex-wrap gap-4  leading-none items-end p-2">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
