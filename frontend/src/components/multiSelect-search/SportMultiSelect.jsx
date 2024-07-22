@@ -23,8 +23,6 @@ const SportsMultiSelect = ({
     };
   });
 
-  console.log(sportOptions);
-
   // Handle change in selected sports
   const handleSelectChange = (selectedOptions) => {
     setSelectedSports(selectedOptions);

@@ -1,4 +1,3 @@
-import React from "react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
@@ -6,31 +5,46 @@ const CampusMultiSelect = ({
   campusArray,
   selectedCampuses,
   setSelectedCampuses,
-  filter,
+  availableCampuses,
 }) => {
-  // Ensure filter is a string
-  const filterString = typeof filter === "string" ? filter.toLowerCase() : "";
-
-  // Filter campuses based on the input filter
-  const filteredCampuses = campusArray?.filter((campus) =>
-    campus.name.toLowerCase().includes(filterString)
-  );
+  if (!campusArray) {
+    return null;
+  }
 
   // Map filtered campuses to the format required by react-select
-  const campusOptions = filteredCampuses.map((campus) => ({
-    value: campus.id,
-    label: campus.name,
-  }));
+  const campusOptions = campusArray?.map((campus) => {
+    const availableCampus = availableCampuses?.find(
+      (available) => available.name === campus.name
+    );
+    return {
+      value: campus.id,
+      label: `${campus.name}`,
+      studentCount: availableCampus ? availableCampus.studentCount : 0,
+      isDisabled: !availableCampus,
+    };
+  });
 
   // Handle change in selected campuses
   const handleSelectChange = (selectedOptions) => {
     setSelectedCampuses(selectedOptions);
   };
 
+  const CustomOption = ({ label, studentCount }) => (
+    <div className="flex justify-between">
+      <div>{label}</div>
+      {studentCount ? (
+        <div className="flex text-xs bg-bgGray aspect-square w-4 justify-center items-center  rounded-full">
+          {studentCount}
+        </div>
+      ) : null}
+    </div>
+  );
+
   return (
     <Select
       isMulti
       components={makeAnimated()}
+      formatOptionLabel={CustomOption}
       value={selectedCampuses}
       openMenuOnFocus={false}
       openMenuOnClick={false}
@@ -83,9 +97,11 @@ const CampusMultiSelect = ({
           backgroundColor: state.isSelected
             ? "rgb(var(--color-primary))"
             : state.isFocused
-              ? "rgb(var(--color-primary))"
+              ? "rgb(var(--color-hover-select))"
               : "rgb(var(--color-bg-secondary))",
-          color: "rgb(var(--color-text-primary))",
+          color: state.isDisabled
+            ? "rgb(var(--color-text-secondary))"
+            : "rgb(var(--color-text-primary))",
           ":active": {
             backgroundColor: "rgb(var(--color-bg-primary))",
             color: "rgb(var(--color-text-primary))",

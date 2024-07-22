@@ -84,9 +84,11 @@ const StudentMultiSelect = ({
           backgroundColor: state.isSelected
             ? "rgb(var(--color-primary))"
             : state.isFocused
-              ? "rgb(var(--color-primary))"
+              ? "rgb(var(--color-hover-select))"
               : "rgb(var(--color-bg-secondary))",
-          color: "rgb(var(--color-text-primary))",
+          color: state.isDisabled
+            ? "rgb(var(--color-text-secondary))"
+            : "rgb(var(--color-text-primary))",
           ":active": {
             backgroundColor: "rgb(var(--color-bg-primary))",
             color: "rgb(var(--color-text-primary))",
