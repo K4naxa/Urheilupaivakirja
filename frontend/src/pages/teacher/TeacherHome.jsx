@@ -80,6 +80,86 @@ function TeacherHome() {
     return { sports: [], student_groups: [], campuses: [] };
   }, [optionsData]);
 
+  // Calculating available options for each filter type
+  const availableOptions = useMemo(() => {
+    if (!studentsAndJournalsData) return;
+
+    const getAvailableOptions = (filterType) => {
+      let newFilteredStudents = studentsAndJournalsData;
+
+      if (filterType !== "students" && selectedStudents.length > 0) {
+        newFilteredStudents = newFilteredStudents.filter((journal) =>
+          selectedStudents.some((student) => student.value === journal.user_id)
+        );
+      }
+      if (filterType !== "sports" && selectedSports.length > 0) {
+        newFilteredStudents = newFilteredStudents.filter((student) =>
+          selectedSports.some((sport) => sport.label === student.sport_name)
+        );
+      }
+      if (filterType !== "campuses" && selectedCampuses.length > 0) {
+        newFilteredStudents = newFilteredStudents.filter((student) =>
+          selectedCampuses.some(
+            (campus) => campus.label === student.campus_name
+          )
+        );
+      }
+      if (filterType !== "groups" && selectedGroups.length > 0) {
+        newFilteredStudents = newFilteredStudents.filter((student) =>
+          selectedGroups.some(
+            (group) => group.label === student.group_identifier
+          )
+        );
+      }
+
+      return newFilteredStudents;
+    };
+
+    const countStudents = (filteredStudents, key) => {
+      return filteredStudents.reduce((acc, student) => {
+        const keyValue = student[key];
+        if (acc[keyValue]) {
+          acc[keyValue]++;
+        } else {
+          acc[keyValue] = 1;
+        }
+        return acc;
+      }, {});
+    };
+
+    const formatOptions = (countObject) => {
+      return Object.keys(countObject).map((name) => ({
+        name,
+        studentCount: countObject[name],
+      }));
+    };
+
+    const availableSportsCount = countStudents(
+      getAvailableOptions("sports"),
+      "sport_name"
+    );
+    const availableCampusesCount = countStudents(
+      getAvailableOptions("campuses"),
+      "campus_name"
+    );
+    const availableGroupsCount = countStudents(
+      getAvailableOptions("groups"),
+      "group_identifier"
+    );
+
+    return {
+      sports: formatOptions(availableSportsCount),
+      campuses: formatOptions(availableCampusesCount),
+      groups: formatOptions(availableGroupsCount),
+    };
+  }, [
+    selectedStudents,
+    selectedSports,
+    selectedCampuses,
+    selectedGroups,
+    studentsAndJournalsData,
+  ]);
+
   // Sorting function for students.
   // Default sorting is based on first name, if the student is pinned, they are placed first.
   // Other sorting options are based on the selected value.
@@ -537,8 +617,7 @@ function TeacherHome() {
               sportsArray={options.sports}
               selectedSports={selectedSports}
               setSelectedSports={setSelectedSports}
-              filteredStudents={filteredStudents}
-              filter={selectedSports}
+              availableSports={availableOptions.sports}
             />
             <CampusMultiSelect
               campusArray={options.campuses}
@@ -592,7 +671,7 @@ function TeacherHome() {
                   sportsArray={options.sports}
                   selectedSports={selectedSports}
                   setSelectedSports={setSelectedSports}
-                  filter={selectedSports}
+                  availableSports={availableOptions.sports}
                 />
                 <CampusMultiSelect
                   campusArray={options.campuses}

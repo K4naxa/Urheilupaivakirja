@@ -23,6 +23,7 @@ export default {
         hoverDefault: "rgb(var(--color-hover-default) / <alpha-value>)",
         hoverPrimary: "rgb(var(--color-hover-primary) / <alpha-value>)",
         hoverGray: "rgb(var(--color-hover-gray) / <alpha-value>)",
+        hoverSelect: "rgb(var(--color-hover-select) / <alpha-value>)",
 
         // Text colors
         textPrimary: "rgb(var(--color-text-primary) / <alpha-value>)",
