@@ -338,17 +338,19 @@ function TeacherHome() {
             <h2 className="text-textSecondary">
               {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
-              })}{" "}
+              })}
+              {". "}
               {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
                 month: "long",
               })}{" "}
               <span> - </span>
               {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
-              })}{" "}
+              })}
+              {". "}
               {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
                 month: "long",
-              })}{" "}
+              })}
             </h2>
 
             <div className="hover: flex justify-center gap-4">
