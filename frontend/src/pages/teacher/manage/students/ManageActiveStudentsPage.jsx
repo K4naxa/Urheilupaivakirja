@@ -8,7 +8,6 @@ import { FiTrash2 } from "react-icons/fi";
 
 import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 
-import cc from "../../../../utils/cc.js";
 import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 
