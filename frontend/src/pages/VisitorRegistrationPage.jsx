@@ -6,7 +6,9 @@ import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useAuth } from "../hooks/useAuth";
+import cc from "../utils/cc";
 
+//TODO: Email pitää vaihtaa tokenissa tulleen sähköpostin mukaan, eikä tätä pitäisi pystyä muuttamaan
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
     email: "",
@@ -14,34 +16,10 @@ const RegistrationPage = () => {
     passwordAgain: "",
     firstName: "",
     lastName: "",
-    sportId: null,
-    groupId: null,
-    campusId: null,
-    //newSport: "",
-  });
-  const [options, setOptions] = useState({
-    student_groups: [],
-    sports: [],
-    campuses: [],
   });
   const [errors, setErrors] = useState({});
   const { addToast } = useToast();
   const { login } = useAuth();
-  //inputRef = useRef(null);
-
-  // fetch options for registration form
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const optionsData = await publicService.getOptions();
-        setOptions(optionsData);
-      } catch (error) {
-        console.error("Failed to fetch options:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     console.log("Errors changed: ", errors);
@@ -77,12 +55,8 @@ const RegistrationPage = () => {
     setErrors({
       firstName: generateErrorMessage("firstName", "Täytä tämä kenttä"),
       lastName: generateErrorMessage("lastName", "Täytä tämä kenttä"),
-      email: generateErrorMessage("email", "Täytä tämä kenttä"),
       password: generateErrorMessage("password", "Täytä tämä kenttä"),
       passwordAgain: generateErrorMessage("passwordAgain", "Täytä tämä kenttä"),
-      sportId: generateErrorMessage("sportId", "Valitse laji"),
-      groupId: generateErrorMessage("groupId", "Valitse ryhmä"),
-      campusId: generateErrorMessage("campusId", "Valitse toimipaikka"),
     });
   };
 
@@ -106,13 +80,8 @@ const RegistrationPage = () => {
     //TODO: Create separate error checking functions for each field
     errorCheckSimpleInput(registrationData.firstName, "firstName");
     errorCheckSimpleInput(registrationData.lastName, "lastName");
-    errorCheckEmail();
     errorCheckPassword();
     errorCheckPasswordAgain();
-    errorCheckDropdown(registrationData.sportId, "sportId");
-    errorCheckDropdown(registrationData.groupId, "groupId");
-    errorCheckDropdown(registrationData.campusId, "campusId");
-
     checkForEmptyFields();
 
     isValid = checkForEmptyFieldsOnRegister();
@@ -136,10 +105,7 @@ const RegistrationPage = () => {
         registrationData.email,
         registrationData.password,
         registrationData.firstName,
-        registrationData.lastName,
-        registrationData.sportId,
-        registrationData.groupId,
-        registrationData.campusId
+        registrationData.lastName
       );
       addToast("Rekisteröityminen onnistui", { style: "success" });
       login(user);
@@ -166,32 +132,6 @@ const RegistrationPage = () => {
           value: "success",
         };
       }
-      return newErrors;
-    });
-  };
-
-  // reset email errors and check if email is valid
-  const errorCheckEmail = () => {
-    setErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-      const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-
-      if (registrationData.email.length < 1) {
-        newErrors.email = {
-          value: "error",
-        };
-      } else if (!emailRegEx.test(registrationData.email)) {
-        newErrors.email = {
-          value: "error",
-          message: "Sähköposti ei ole oikeassa muodossa",
-        };
-      } else {
-        // Successfully validate the email
-        newErrors.email = {
-          value: "success",
-        };
-      }
-
       return newErrors;
     });
   };
@@ -274,33 +214,6 @@ const RegistrationPage = () => {
     });
   };
 
-  const errorCheckDropdown = (fieldValue, fieldName) => {
-    setErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-
-      // Assume that an empty string or a specific default value indicates no valid selection
-      if (fieldValue === "" || fieldValue === "default") {
-        newErrors[fieldName] = {
-          value: "error",
-          message: "Valitse vaihtoehto", // "Select an option" in Finnish
-        };
-      } else {
-        // If a valid option is selected, mark it as successful
-        newErrors[fieldName] = {
-          value: "success",
-        };
-      }
-
-      return newErrors;
-    });
-  };
-
-  const handleDropdownChange = (event) => {
-    changeHandler(event);
-
-    errorCheckDropdown(event.target.value, event.target.name);
-  };
-
   const containerClass = "flex flex-col gap-1 relative";
   const errorClass = "text-red-500 absolute top-full mt-1";
 
@@ -314,14 +227,7 @@ const RegistrationPage = () => {
        flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
         <div className=" relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
-          <p>Rekisteröityminen</p>
-
-          <Link
-            to="/LoginPage"
-            className="absolute bottom-1/2 translate-y-1/2 left-5 text-3xl"
-          >
-            <FiArrowLeft />
-          </Link>
+          <p>Vierailijaksi rekisteröityminen</p>
         </div>
         <form
           className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid w-full"
@@ -386,29 +292,23 @@ const RegistrationPage = () => {
           {/* Email */}
           <div className="flex flex-col gap-1 sm:col-span-2 relative">
             <input
-              onChange={changeHandler}
+              disabled={true}
               type="text"
               name="email"
               id="email-input"
-              placeholder="Sähköposti"
-              className={
-                inputClass +
-                (errors.email && errors.email.value
+              value={registrationData.email}
+              placeholder="Vierailijan@sähköposti.fi"
+              className={cc(
+                inputClass,
+                errors.email && errors.email.value
                   ? errors.email.value === "error"
                     ? " border-red-500"
                     : errors.email.value === "success"
                       ? " border-green-500"
                       : ""
-                  : "")
-              }
-              value={registrationData.email}
-              onBlur={() => {
-                errorCheckEmail();
-              }}
+                  : ""
+              )}
             />
-            {errors.email && errors.email.message && (
-              <p className={errorClass}>{errors.email.message}</p>
-            )}
           </div>
 
           {/* Password */}
@@ -460,113 +360,6 @@ const RegistrationPage = () => {
             />
             {errors.passwordAgain && errors.passwordAgain.message && (
               <p className={errorClass}>{errors.passwordAgain.message}</p>
-            )}
-          </div>
-
-          {/* Sport */}
-          <div className={containerClass}>
-            <select
-              value={registrationData.sportId || ""}
-              name="sportId"
-              id="sport-select"
-              className={
-                inputClass +
-                (errors.sportId && errors.sportId.value
-                  ? errors.sportId.value === "error"
-                    ? " border-red-500"
-                    : errors.sportId.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              onChange={handleDropdownChange}
-            >
-              {registrationData.sportId === null && (
-                <option value="">Valitse laji</option>
-              )}
-              {options.sports.map((sport) => (
-                <option key={sport.id} value={sport.id}>
-                  {sport.name}
-                </option>
-              ))}
-              {/*<option value="new">+ Lisää uusi</option>*/}
-            </select>
-            {/* registrationData.sportId === "new" && (
-              <input
-                type="text"
-                name="newSport"
-                placeholder="Kirjoita uusi laji MUTTA ÄLÄ LÄHETÄ..."
-                value={registrationData.newSport}
-                className={inputClass}
-                onChange={handleDropdownChange}
-              />
-            )*/}
-            {errors.sportId && errors.sportId.message && (
-              <p className={errorClass}>{errors.sportId.message}</p>
-            )}
-          </div>
-
-          {/* Group */}
-          <div className={containerClass}>
-            <select
-              className={
-                inputClass +
-                (errors.groupId && errors.groupId.value
-                  ? errors.groupId.value === "error"
-                    ? " border-red-500"
-                    : errors.groupId.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              value={registrationData.groupId || ""}
-              name="groupId"
-              id="group-select"
-              onChange={handleDropdownChange}
-            >
-              {registrationData.groupId === null && (
-                <option value="">Valitse ryhmä</option>
-              )}
-              {options.student_groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.group_identifier}
-                </option>
-              ))}
-            </select>
-            {errors.groupId && errors.groupId.message && (
-              <p className={errorClass}>{errors.groupId.message}</p>
-            )}
-          </div>
-
-          {/* Campus */}
-          <div className={containerClass}>
-            <select
-              className={
-                inputClass +
-                (errors.campusId && errors.campusId.value
-                  ? errors.campusId.value === "error"
-                    ? " border-red-500"
-                    : errors.campusId.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              value={registrationData.campusId || ""}
-              name="campusId"
-              id="campus-select"
-              onChange={handleDropdownChange}
-            >
-              {registrationData.campusId === null && (
-                <option value="">Valitse toimipaikka</option>
-              )}
-              {options.campuses.map((campus) => (
-                <option key={campus.id} value={campus.id}>
-                  {campus.name}
-                </option>
-              ))}
-            </select>
-            {errors.campusId && errors.campusId.message && (
-              <p className={errorClass}>{errors.campusId.message}</p>
             )}
           </div>
 
