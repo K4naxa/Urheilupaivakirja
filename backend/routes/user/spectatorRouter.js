@@ -1,10 +1,13 @@
 var express = require("express");
 var express = require("express");
 var router = express.Router();
-
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
+
+const bcrypt = require("bcryptjs");
+const saltRounds = config.BCRYPTSALT;
+
 const sendEmail = require("../../utils/email/sendEmail");
 const otpGenerator = require("otp-generator");
 const { getRole, getUserId, createToken } = require("../../middleware/auth");
@@ -38,6 +41,59 @@ router.get("/", async (req, res) => {
     res.json(combined);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// Register a new spectator
+router.post("/register", async (req, res) => {
+  const visitor = req.body;
+  console.log("POST /spectator/register", visitor);
+
+  try {
+    await knex.transaction(async (trx) => {
+      const passwordHash = await bcrypt.hash(
+        visitor.password,
+        Number(saltRounds)
+      );
+
+      // Prepare new user data
+      const newUser = {
+        email: visitor.email,
+        password: passwordHash,
+        role_id: 2, // Default role for spectator
+        email_verified: 1,
+        created_at: new Date(),
+      };
+
+      // Insert the new user and get the id of the inserted user
+      const insertResult = await trx("users").insert(newUser);
+      const userId = insertResult[0];
+
+      // Prepare new spectator data
+      const newSpectator = {
+        user_id: userId,
+        first_name: visitor.first_name,
+        last_name: visitor.last_name,
+        created_at: new Date(),
+      };
+
+      // Insert the new spectator
+      await trx("spectators").insert(newSpectator);
+
+      const token = await createToken({ ...newUser, id: userId });
+      res.status(201).json({
+        token,
+        email_verified: newUser.email_verified,
+        email: newUser.email,
+        role: newUser.role_id,
+      });
+    });
+  } catch (err) {
+    console.error("POST /spectator/register transaction error:", err);
+    res.status(500).json({
+      error:
+        "An error occurred while creating a new student user: " + err.message,
+    });
   }
 });
 

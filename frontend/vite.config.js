@@ -116,7 +116,7 @@ export default defineConfig({
         target: "http://localhost:3001",
         changeOrigin: true,
       },
-      "/spectators": {
+      "/spectator": {
         target: "http://localhost:3001",
         changeOrigin: true,
       },

@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import userService from "../services/userService";
-import { useNavigate } from "react-router-dom";
-import publicService from "../services/publicService";
-import { Link } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useAuth } from "../hooks/useAuth";
 import cc from "../utils/cc";
 
+// TODO: Sivulle pääsee vain linkinkautta, jossa aktiivinen token mukana
 //TODO: Email pitää vaihtaa tokenissa tulleen sähköpostin mukaan, eikä tätä pitäisi pystyä muuttamaan
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -101,7 +98,7 @@ const RegistrationPage = () => {
       return;
     }
     try {
-      let user = await userService.register(
+      let user = await userService.visitorRegistration(
         registrationData.email,
         registrationData.password,
         registrationData.firstName,
@@ -292,12 +289,18 @@ const RegistrationPage = () => {
           {/* Email */}
           <div className="flex flex-col gap-1 sm:col-span-2 relative">
             <input
-              disabled={true}
+              disabled={false} // todo: enable when email is available in token
               type="text"
               name="email"
               id="email-input"
               value={registrationData.email}
               placeholder="Vierailijan@sähköposti.fi"
+              onChange={(e) => {
+                setRegistrationData({
+                  ...registrationData,
+                  email: e.target.value,
+                });
+              }}
               className={cc(
                 inputClass,
                 errors.email && errors.email.value

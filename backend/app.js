@@ -26,7 +26,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "build")));
 
-app.use("/spectators", isAuthenticated, spectatorRouter);
+app.use("/spectator/register", spectatorRouter);
+app.use("/spectator", spectatorRouter);
+
 app.use("/user", userRouter);
 app.use("/user/verify", isAuthenticated, verifyRouter);
 app.use("/user/login", loginRouter);
