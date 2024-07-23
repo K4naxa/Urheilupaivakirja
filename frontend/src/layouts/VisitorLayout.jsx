@@ -41,7 +41,7 @@ const VisitorLayout = () => {
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
           <div className="text-textPrimary flex justify-center gap-4 ">
-            <Link to={"/opettaja/"} className="text-xl flex items-center gap-2">
+            <Link to={"/"} className="text-xl flex items-center gap-2">
               <img src={siteLogo} alt="site logo" className="w-8 h-8" />
               Urheilupäiväkirja
             </Link>
@@ -85,7 +85,7 @@ const VisitorLayout = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <NavLink
-                        to="/opettaja/profiili"
+                        to="/profiili"
                         className={`${
                           active
                             ? "bg-primaryColor text-bgSecondary"
@@ -129,7 +129,7 @@ const VisitorLayout = () => {
         id="mobile-header"
       >
         <nav id="top-nav" className="grid-cols-3 grid gap-4 w-full ">
-          <NavLink to="/opettaja" end className={linkClass}>
+          <NavLink to="/" end className={linkClass}>
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
           </NavLink>
@@ -169,7 +169,7 @@ const VisitorLayout = () => {
               animate-menu-appear-right border-b border-borderPrimary"
             >
               <NavLink
-                to="/vierailija/profiili"
+                to="/profiili"
                 className={linkClass}
                 onClick={() => {
                   setShowMenu(false);
