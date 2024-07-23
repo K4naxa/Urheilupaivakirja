@@ -1,4 +1,3 @@
-import React from "react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
@@ -11,8 +10,6 @@ const GroupMultiSelect = ({
   if (!groupArray) {
     return null;
   }
-  console.log(availableGroups);
-  console.log(groupArray);
   // Map filtered sports to the format required by react-select
   const groupOptions = groupArray?.map((group) => {
     const availableGroup = availableGroups?.find(

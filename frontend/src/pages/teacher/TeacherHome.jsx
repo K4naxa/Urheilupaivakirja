@@ -238,6 +238,7 @@ function TeacherHome() {
     studentsAndJournalsData,
     pinnedStudentsData,
     selectedSorting,
+    showMobileFilters,
   ]);
 
   const countCourseProgression = (student) => {
@@ -644,14 +645,12 @@ function TeacherHome() {
               campusArray={options.campuses}
               selectedCampuses={selectedCampuses}
               setSelectedCampuses={setSelectedCampuses}
-              filter={selectedCampuses}
               availableCampuses={availableOptions.campuses}
             />
             <GroupMultiSelect
               groupArray={options.student_groups}
               selectedGroups={selectedGroups}
               setSelectedGroups={setSelectedGroups}
-              filter={selectedGroups}
               availableGroups={availableOptions.groups}
             />
 
@@ -700,14 +699,13 @@ function TeacherHome() {
                   campusArray={options.campuses}
                   selectedCampuses={selectedCampuses}
                   setSelectedCampuses={setSelectedCampuses}
-                  filter={selectedCampuses}
                   availableCampuses={availableOptions.campuses}
                 />
                 <GroupMultiSelect
                   groupArray={options.student_groups}
                   selectedGroups={selectedGroups}
                   setSelectedGroups={setSelectedGroups}
-                  filter={selectedGroups}
+                  availableGroups={availableOptions.groups}
                 />
 
                 <div className="flex lg:gap-8 justify-center text-sm">
