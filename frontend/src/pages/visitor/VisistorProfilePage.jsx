@@ -32,12 +32,6 @@ function VisitorProfilePage() {
     return diffDays;
   };
 
-  useEffect(() => {
-    if (visitorDataLoading) {
-      return;
-    }
-    console.log("visitorData", visitorData);
-  }, [visitorDataLoading, visitorData]);
   const handleAccountDelete = () => {
     setShowConfirmModal(true);
     setAgreeStyle("red");
@@ -51,7 +45,7 @@ function VisitorProfilePage() {
     const handleUserConfirmation = async () => {
       try {
         await userService.deleteUser(visitorData.id);
-        await logout(); // Ensure this clears tokens/sessions
+        await logout();
       } catch (error) {
         console.error("Error deleting user or logging out:", error);
       } finally {
@@ -70,7 +64,7 @@ function VisitorProfilePage() {
   } else
     return (
       <div className="w-full h-full flex justify-center items-center">
-        <div className=" flex flex-col bg-bgSecondary p-4 rounded-md border border-borderPrimary divide-y divide-borderPrimary">
+        <div className=" flex w-full md:w-fit flex-col bg-bgSecondary p-4 rounded-md border border-borderPrimary divide-y divide-borderPrimary">
           <div className="px-2 py-4">
             <header className="text-xl text-center mb-4">
               Profiili tiedot
