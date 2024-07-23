@@ -50,7 +50,7 @@ function VisitorProfilePage() {
 
     const handleUserConfirmation = async () => {
       try {
-        await userService.deleteUser(visitorData.user_id);
+        await userService.deleteUser(visitorData.id);
         await logout(); // Ensure this clears tokens/sessions
       } catch (error) {
         console.error("Error deleting user or logging out:", error);
