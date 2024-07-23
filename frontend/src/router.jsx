@@ -14,6 +14,9 @@ import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPa
 import EditJournalEntryPage from "./pages/student/journal-entry/EditJournalEntryPage";
 import StudentNewsPage from "./pages/student/StudentNewsPage";
 
+// Visitor
+import VisitorRegistrationPage from "./pages/VisitorRegistrationPage";
+
 //teacher
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
@@ -97,6 +100,10 @@ export const router = createBrowserRouter([
                 <RegistrationPage />
               </RedirectIfAuthenticated>
             ),
+          },
+          {
+            path: "/vierailijan-rekisterointi",
+            element: <VisitorRegistrationPage />,
           },
           {
             path: "/unohditko-salasanasi",
