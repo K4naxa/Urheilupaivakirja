@@ -42,12 +42,13 @@ import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
 import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
 import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordNewPasswordPage";
-import StudentProfilePage from "./pages/StudentProfilePage";
+import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import TeacherNewsPage from "./pages/teacher/TeacherNewsPage";
 import StatisticsPage from "./pages/teacher/StatisticsPage";
 import VisitorLayout from "./layouts/VisitorLayout";
+import VisitorProfilePage from "./pages/visitor/VisistorProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -186,6 +187,7 @@ export const router = createBrowserRouter([
               { index: true, element: <TeacherHome /> },
               { path: "tilastot", element: <StatisticsPage /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
+              { path: "profiili", element: <VisitorProfilePage /> },
             ],
           },
         ],

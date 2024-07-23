@@ -85,7 +85,7 @@ const VisitorLayout = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <NavLink
-                        to="/profiili"
+                        to="profiili"
                         className={`${
                           active
                             ? "bg-primaryColor text-bgSecondary"
@@ -169,7 +169,7 @@ const VisitorLayout = () => {
               animate-menu-appear-right border-b border-borderPrimary"
             >
               <NavLink
-                to="/profiili"
+                to="profiili"
                 className={linkClass}
                 onClick={() => {
                   setShowMenu(false);

@@ -200,6 +200,11 @@ const visitorRegistration = async (email, password, firstName, lastName) => {
   return response.data;
 };
 
+const getVisitorData = async () => {
+  const response = await axios.get(`/spectator/data`, makeHeader());
+  return response.data;
+};
+
 export default {
   login,
   register,
@@ -223,5 +228,6 @@ export default {
   unpinStudent,
   getSpectators,
   visitorRegistration,
+  getVisitorData,
 };
 // Path: frontEnd/src/services/userService.js

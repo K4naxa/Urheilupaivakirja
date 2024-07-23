@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import userService from "../services/userService";
-import { useAuth } from "../hooks/useAuth";
-import LoadingScreen from "../components/LoadingScreen";
+import userService from "../../services/userService";
+import { useAuth } from "../../hooks/useAuth";
+import LoadingScreen from "../../components/LoadingScreen";
 import { format } from "date-fns";
-import ConfirmModal from "../components/confirm-modal/confirmModal";
+import ConfirmModal from "../../components/confirm-modal/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 
 function StudentProfilePage() {

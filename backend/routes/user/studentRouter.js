@@ -234,13 +234,13 @@ router.get("/data/:userId?", async (req, res) => {
     // Fetch the student information from the database
     const student = await knex("students")
       .select(
-        "students.*", // All columns from the students table
-        "sports.name as sport_name", // Join and select sport name
-        "student_groups.group_identifier", // Join and select group identifier
-        "campuses.name as campus_name", // Join and select campus name
-        "users.email", // Join and select user email
-        "users.created_at", // Join and select user creation date
-        "users.id as user_id" // Join and select user ID
+        "students.*",
+        "sports.name as sport_name",
+        "student_groups.group_identifier",
+        "campuses.name as campus_name",
+        "users.email",
+        "users.created_at",
+        "users.id as user_id"
       )
       .where("user_id", userId) // Match the user ID
       .first() // Get the first match (should be only one)
