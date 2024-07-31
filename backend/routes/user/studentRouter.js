@@ -12,7 +12,7 @@ const { getRole, getUserId } = require("../../middleware/auth");
 router.get("/", async (req, res) => {
   try {
     const role = getRole(req);
-    if (role !== 1) {
+    if (role !== 1 && role !== 2) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -61,7 +61,7 @@ router.get("/", async (req, res) => {
 router.get("/entries", async (req, res) => {
   try {
     const role = getRole(req);
-    if (role !== 1) {
+    if (role !== 1 && role !== 2) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -228,24 +228,19 @@ router.get("/data/:userId?", async (req, res) => {
     // Retrieve the role of the user making the request
     const role = getRole(req);
 
-    // Check if the user is authorized (role must be 1 or 3)
-    if (role !== 3 && role !== 1) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
     // Retrieve the user ID from the request
     const userId = role === 3 ? getUserId(req) : req.params.userId;
 
     // Fetch the student information from the database
     const student = await knex("students")
       .select(
-        "students.*", // All columns from the students table
-        "sports.name as sport_name", // Join and select sport name
-        "student_groups.group_identifier", // Join and select group identifier
-        "campuses.name as campus_name", // Join and select campus name
-        "users.email", // Join and select user email
-        "users.created_at", // Join and select user creation date
-        "users.id as user_id" // Join and select user ID
+        "students.*",
+        "sports.name as sport_name",
+        "student_groups.group_identifier",
+        "campuses.name as campus_name",
+        "users.email",
+        "users.created_at",
+        "users.id as user_id"
       )
       .where("user_id", userId) // Match the user ID
       .first() // Get the first match (should be only one)
@@ -330,7 +325,7 @@ router.get("/entries/statistics", async (req, res) => {
   try {
     const role = getRole(req);
 
-    if (role !== 1) {
+    if (role !== 1 && role !== 2) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -383,7 +378,7 @@ router.get("/entries/statistics/new-students", async (req, res) => {
   try {
     const role = getRole(req);
 
-    if (role !== 1) {
+    if (role !== 1 && role !== 2) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 

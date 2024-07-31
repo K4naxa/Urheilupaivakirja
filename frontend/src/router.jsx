@@ -14,6 +14,9 @@ import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPa
 import EditJournalEntryPage from "./pages/student/journal-entry/EditJournalEntryPage";
 import StudentNewsPage from "./pages/student/StudentNewsPage";
 
+// Visitor
+import VisitorRegistrationPage from "./pages/VisitorRegistrationPage";
+
 //teacher
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
@@ -39,11 +42,13 @@ import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
 import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
 import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordNewPasswordPage";
-import StudentProfilePage from "./pages/StudentProfilePage";
+import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import TeacherNewsPage from "./pages/teacher/TeacherNewsPage";
 import StatisticsPage from "./pages/teacher/StatisticsPage";
+import VisitorLayout from "./layouts/VisitorLayout";
+import VisitorProfilePage from "./pages/visitor/VisistorProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -97,6 +102,10 @@ export const router = createBrowserRouter([
                 <RegistrationPage />
               </RedirectIfAuthenticated>
             ),
+          },
+          {
+            path: "/vierailijan-rekisterointi",
+            element: <VisitorRegistrationPage />,
           },
           {
             path: "/unohditko-salasanasi",
@@ -169,6 +178,16 @@ export const router = createBrowserRouter([
                   },
                 ],
               },
+            ],
+          },
+          {
+            path: "/vierailija",
+            element: <VisitorLayout />,
+            children: [
+              { index: true, element: <TeacherHome /> },
+              { path: "tilastot", element: <StatisticsPage /> },
+              { path: "opiskelijat/:id", element: <StudentPage /> },
+              { path: "profiili", element: <VisitorProfilePage /> },
             ],
           },
         ],

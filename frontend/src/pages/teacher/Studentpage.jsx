@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
@@ -25,7 +24,6 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 
-import { useJournalModal } from "../../hooks/useJournalModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
@@ -35,7 +33,6 @@ import { useParams } from "react-router-dom";
 function StudentHome() {
   const { id } = useParams();
   const { showDate, setShowDate } = useMainContext();
-  const { openBigModal } = useJournalModal();
 
   const {
     data: studentData,
@@ -94,11 +91,11 @@ function StudentHome() {
           <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full mb-4">
             <div className="flex flex-col">
               {/* Student Name */}
-              <p className="flex  mb-2 font-medium  text-2xl text-textPrimary w-full justify-center lg:justify-normal ">
+              <div className="flex  mb-2 font-medium  text-2xl text-textPrimary w-full justify-center lg:justify-normal ">
                 <p className="w-fit border-b border-primaryColor">
                   {studentData.first_name} {studentData.last_name}
                 </p>
-              </p>
+              </div>
               <div className="flex flex-wrap gap-x-4  w-full justify-center lg:justify-normal">
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Toimipaikka:</p>{" "}

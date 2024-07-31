@@ -19,8 +19,6 @@ import {
   addWeeks,
   endOfWeek,
   getWeek,
-  set,
-  startOfDay,
   startOfWeek,
   subMonths,
   subWeeks,
@@ -396,7 +394,7 @@ function TeacherHome() {
                   {renderFavouriteMark(journal)}
                   <div className="flex-col items-center justify-between gap-2">
                     <Link
-                      to={`/opettaja/opiskelijat/${journal.user_id}`}
+                      to={`opiskelijat/${journal.user_id}`}
                       className="flex gap-1 hover:cursor-pointer hover:underline"
                     >
                       <p>{journal.first_name}</p>

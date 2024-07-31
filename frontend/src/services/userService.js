@@ -184,6 +184,27 @@ const getNewStudentsBetweenDates = async (date1, date2) => {
   }
 };
 
+// Visitor Management -------------------------------------------------------------------
+const getSpectators = async () => {
+  const response = await axios.get("/spectator", makeHeader());
+  return response.data;
+};
+
+const visitorRegistration = async (email, password, firstName, lastName) => {
+  const response = await axios.post("/spectator/register", {
+    email: email,
+    password: password,
+    first_name: firstName,
+    last_name: lastName,
+  });
+  return response.data;
+};
+
+const getVisitorData = async () => {
+  const response = await axios.get(`/spectator/data`, makeHeader());
+  return response.data;
+};
+
 export default {
   login,
   register,
@@ -205,5 +226,8 @@ export default {
   getPinnedStudents,
   pinStudent,
   unpinStudent,
+  getSpectators,
+  visitorRegistration,
+  getVisitorData,
 };
 // Path: frontEnd/src/services/userService.js

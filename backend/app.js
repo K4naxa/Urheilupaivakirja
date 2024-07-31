@@ -8,6 +8,7 @@ var { isAuthenticated } = require("./middleware/auth");
 
 var indexRouter = require("./routes/index");
 var loginRouter = require("./routes/user/loginRouter.js");
+var spectatorRouter = require("./routes/user/spectatorRouter.js");
 var registerRouter = require("./routes/user/registerRouter.js");
 var journalRouter = require("./routes/journalRouter.js");
 var sportsRouter = require("./routes/sportsRouter.js");
@@ -24,6 +25,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "build")));
+
+app.use("/spectator/register", spectatorRouter);
+app.use("/spectator", spectatorRouter);
 
 app.use("/user", userRouter);
 app.use("/user/verify", isAuthenticated, verifyRouter);
