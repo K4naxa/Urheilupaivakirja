@@ -3,8 +3,6 @@ import userService from "../../../../services/userService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 import { Link } from "react-router-dom";
 
-import { FiChevronUp } from "react-icons/fi";
-import { FiChevronDown } from "react-icons/fi";
 import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 

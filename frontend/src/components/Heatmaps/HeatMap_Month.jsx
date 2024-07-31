@@ -100,7 +100,7 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
     <div
       /*data-tooltip-id={`calendar-tooltip-${identifier}`}*/
       className={cc(
-        "MonthDate border-borderPrimary border clickableCalendarDay",
+        "MonthDate border-borderPrimary border clickableCalendarDay relative",
         !isSameMonth(day, showDate) && "invisible",
         isToday(day) && "border  border-primaryColor",
         handleColor(minutes)

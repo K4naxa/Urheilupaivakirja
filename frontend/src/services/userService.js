@@ -131,6 +131,22 @@ const toggleStudentArchive = async (id) => {
   return response.data;
 };
 
+// Pinning Students Logic ---------------------------------------------------------
+
+const getPinnedStudents = async () => {
+  const response = await axios.get("/students/pinned", makeHeader());
+  return response.data;
+};
+
+const pinStudent = async (id) => {
+  const response = await axios.put(`/students/pin/${id}`, {}, makeHeader());
+  return response.data;
+};
+
+const unpinStudent = async (id) => {
+  const response = await axios.put(`/students/unpin/${id}`, {}, makeHeader());
+  return response.data;
+};
 // Statistics -------------------------------------------------------------------
 
 const getAllJournalEntryDataBetweenDates = async (date1, date2) => {
@@ -186,5 +202,8 @@ export default {
   getStudentData,
   getAllJournalEntryDataBetweenDates,
   getNewStudentsBetweenDates,
+  getPinnedStudents,
+  pinStudent,
+  unpinStudent,
 };
 // Path: frontEnd/src/services/userService.js
