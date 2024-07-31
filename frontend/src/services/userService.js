@@ -131,6 +131,43 @@ const toggleStudentArchive = async (id) => {
   return response.data;
 };
 
+// Statistics -------------------------------------------------------------------
+
+const getAllJournalEntryDataBetweenDates = async (date1, date2) => {
+  try {
+    const response = await axios.get("/students/entries/statistics", {
+      params: { date1, date2 },
+      ...makeHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching journal entries:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
+const getNewStudentsBetweenDates = async (date1, date2) => {
+  try {
+    const response = await axios.get(
+      "/students/entries/statistics/new-students",
+      {
+        params: { date1, date2 },
+        ...makeHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching new student count:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
 export default {
   login,
   register,
@@ -147,5 +184,7 @@ export default {
   verifyPasswordResetOTP,
   resetPassword,
   getStudentData,
+  getAllJournalEntryDataBetweenDates,
+  getNewStudentsBetweenDates,
 };
 // Path: frontEnd/src/services/userService.js
