@@ -3,8 +3,6 @@ import { useAuth } from "../hooks/useAuth";
 
 import { FiUser, FiHome, FiLogOut } from "react-icons/fi";
 
-import { HiOutlineTrophy } from "react-icons/hi2";
-
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { FiInbox } from "react-icons/fi";
@@ -18,6 +16,7 @@ import { Fragment } from "react";
 import ThemeSwitcher from "../components/themeSwitcher";
 
 import siteLogo from "/pwa-192x192.png";
+import cc from "../utils/cc";
 
 const StudentLayout = () => {
   const { logout } = useAuth();
@@ -25,16 +24,12 @@ const StudentLayout = () => {
   const { openBigModal } = useBigModal();
 
   const linkClass =
-    "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-primaryColor ";
-  const linkTextClass =
-    "text-textPrimary items-center text-[12px] leading-none mt-2";
+    "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl";
+  const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
-      <header
-        className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
-    border-b-2 px-4 py-2 md:flex z-10"
-      >
-        <Link to={"/"} className="text-xl flex items-center gap-2">
+      <header className="z-10 hidden px-4 py-2 border border-b-2 fixed-header bg-bgSecondary border-borderPrimary md:flex">
+        <Link to={"/"} className="flex items-center gap-2 text-xl">
           <img src={siteLogo} alt="site logo" className="w-8 h-8" />
           Urheilupäiväkirja
         </Link>
@@ -62,10 +57,7 @@ const StudentLayout = () => {
           {/* Profile button */}
           <Menu as="div" className="relative text-textPrimary">
             <Menu.Button
-              className="flex flex-col items-center
-                          gap-1 p-2 rounded-md
-                          select-none 
-                          hover:cursor-pointer hover:bg-bgGray"
+              className="flex flex-col items-center gap-1 p-2 rounded-md select-none hover:cursor-pointer hover:bg-bgGray"
               id="userMenuBtn"
             >
               <FiUser size={24} />
@@ -80,7 +72,7 @@ const StudentLayout = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgSecondary text-lg divide-y divide-secondaryColor rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 mt-1 text-lg origin-top-right divide-y rounded-md shadow-lg w-36 bg-bgSecondary divide-secondaryColor ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     {({ active }) => (
@@ -127,19 +119,28 @@ const StudentLayout = () => {
       {/* header for mobile */}
 
       <header
-        className={`bg-bgPrimary shadow-upper-shadow fixed left-0  bottom-0 flex 
+        className={`bg-bgPrimary shadow-upper-shadow fixed left-0 px-2 bottom-0 flex 
         h-16 py-8 w-full items-center text-xl md:hidden z-10`}
         id="mobile-header"
       >
-        <nav id="top-nav" className="grid-cols-mHeader gap-4 grid w-full">
+        <nav id="top-nav" className="grid w-full gap-4 grid-cols-mHeader">
           {/* left of navigation bar */}
           <div className="grid grid-cols-2">
-            <NavLink to="/" end className={linkClass}>
+            <NavLink
+              to="/"
+              end
+              className={linkClass}
+              onClick={() => setShowUserMenu(false)}
+            >
               <FiHome size={20} />
               <p className={linkTextClass}>Etusivu</p>
             </NavLink>
 
-            <NavLink to="/tiedotteet/" className={linkClass}>
+            <NavLink
+              to="/tiedotteet/"
+              className={linkClass}
+              onClick={() => setShowUserMenu(false)}
+            >
               <div className="relative">
                 <FiInbox size={20} />
                 <UnreadNewsIndicator type="phone" />
@@ -150,29 +151,27 @@ const StudentLayout = () => {
 
           {/* new journal entry button */}
           <div className="flex justify-center">
-            <NavLink className="absolute bottom-6 flex justify z-20">
+            <div className="absolute z-20 flex bottom-6 justify">
               <button
                 className="bg-bgSecondary border-primaryColor text-primaryColor
        shadow-upper-shadow size-16 rounded-full border-t-2
         text-3xl drop-shadow-xl duration-100 active:scale-110"
-                onClick={() => openBigModal("newJournalEntry")}
+                onClick={() => openBigModal("new")}
               >
                 +
               </button>
-            </NavLink>
+            </div>
           </div>
 
           {/* right of navigation bar */}
-          <div className=" grid grid-cols-2 ">
-            <NavLink to={"/saavutukset"} className={linkClass}>
-              <HiOutlineTrophy size={20} />
-              <p className={linkTextClass}>Saavutukset</p>
-            </NavLink>
+          <div className="grid grid-cols-2 ">
             <button
-              className={
-                linkClass +
-                `${showUserMenu ? " bg-primaryColor rounded-b-md rounded-t-none transition-colors duration-200" : " bg-bgPrimary"}`
-              }
+              className={cc(
+                linkClass,
+                showUserMenu
+                  ? "border-primaryColor rounded-b-md rounded-t-none transition-colors duration-200"
+                  : " bg-bgPrimary"
+              )}
               onClick={() => {
                 setShowUserMenu(!showUserMenu);
               }}
@@ -190,7 +189,7 @@ const StudentLayout = () => {
               className=" bg-bgPrimary rounded-t-md w-full shadow-upper-shadow absolute
  grid grid-cols-mHeader gap-4 bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary"
             >
-              <div className="grid grid-cols-2">
+              <div className="grid grid-cols-2 place-items-center">
                 <NavLink
                   to="/profiili"
                   className={linkClass}
@@ -220,7 +219,7 @@ const StudentLayout = () => {
           )}
         </div>
       </header>
-      <div className="flex w-full  md:mt-24 box-content">
+      <div className="box-content flex w-full md:mt-24">
         <main className="flex w-full mx-auto max-w-[1480px] pb-16 md:pb-0">
           <Outlet />
         </main>
