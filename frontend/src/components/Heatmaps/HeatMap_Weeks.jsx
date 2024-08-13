@@ -16,7 +16,7 @@ import { useMainContext } from "../../hooks/mainContext";
 import { useAuth } from "../../hooks/useAuth";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
-export default function HeatMap_Weeks({ journal }) {
+function HeatMap_Weeks({ journal }) {
   const { showDate } = useMainContext();
   const { setTooltipContent, setTooltipUser, setTooltipDate } =
     useHeatmapContext();
@@ -73,42 +73,43 @@ export default function HeatMap_Weeks({ journal }) {
       ))}
     </div>
   );
-
-  function CalendarDay({ day, journal, onClick }) {
-    const { user } = useAuth();
-    let minutes = 0;
-    journal?.forEach((entry) => (minutes += entry.length_in_minutes));
-
-    function handleColor(minutes) {
-      if (!journal) return;
-
-      if (minutes > 1 && minutes <= 60)
-        return "bg-heatmapExercise1 border-heatmapExercise1";
-      if (minutes > 60 && minutes <= 120)
-        return "bg-heatmapExercise2 border-heatmapExercise2 text-white";
-      if (minutes > 120)
-        return "bg-heatmapExercise3 border-heatmapExercise3  text-white";
-
-      if (journal[0]?.entry_type_id === 2)
-        return "bg-bgRest border-bgRest text-white";
-      if (journal[0]?.entry_type_id === 3)
-        return "bg-bgSick border-bgSick text-white";
-
-      return null;
-    }
-
-    return (
-      <div
-        className={cc(
-          "MonthDate border-borderPrimary border w-5 lg:w-7 clickableCalendarDay",
-          user.role === 1 && "bg-bgPrimary border-bgPrimary",
-          isToday(day) && "border  border-primaryColor",
-          handleColor(minutes)
-        )}
-        onClick={onClick}
-      >
-        {formatDate(day, { day: "numeric" })}
-      </div>
-    );
-  }
 }
+function CalendarDay({ day, journal, onClick }) {
+  const { user } = useAuth();
+  let minutes = 0;
+  journal?.forEach((entry) => (minutes += entry.length_in_minutes));
+
+  function handleColor(minutes) {
+    if (!journal) return;
+
+    if (minutes > 1 && minutes <= 60)
+      return "bg-heatmapExercise1 border-heatmapExercise1";
+    if (minutes > 60 && minutes <= 120)
+      return "bg-heatmapExercise2 border-heatmapExercise2 text-white";
+    if (minutes > 120)
+      return "bg-heatmapExercise3 border-heatmapExercise3  text-white";
+
+    if (journal[0]?.entry_type_id === 2)
+      return "bg-bgRest border-bgRest text-white";
+    if (journal[0]?.entry_type_id === 3)
+      return "bg-bgSick border-bgSick text-white";
+
+    return null;
+  }
+
+  return (
+    <div
+      className={cc(
+        "MonthDate border-borderPrimary border w-5 lg:w-7 clickableCalendarDay",
+        user.role === 1 && "bg-bgPrimary border-bgPrimary",
+        isToday(day) && "border  border-primaryColor",
+        handleColor(minutes)
+      )}
+      onClick={onClick}
+    >
+      {formatDate(day, { day: "numeric" })}
+    </div>
+  );
+}
+
+export default HeatMap_Weeks;

@@ -25,51 +25,51 @@ const RecentJournalEntry = ({ entry }) => {
   const { user } = useAuth();
   const { openBigModal } = useJournalModal();
 
-  if (isOpen)
-    return (
-      <div
-        className=" grid grid-cols-5 md:grid-cols-6 md:grid-rows-2 gap-x-1 md:gap-x-4 px-2 items-center hover:bg-hoverDefault"
-        onClick={() => setIsOpen(!isOpen)}
+  return (
+    <div
+      className={`grid items-center p-2 grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 hover:bg-hoverDefault ${
+        isOpen ? "row-span-2" : ""
+      }`}
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      {/* Date */}
+      <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
+      <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
+
+      <p className="">{entry.workout_category_name}</p>
+
+      {/* Workout Length */}
+      <p>{entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}</p>
+
+      {/* Intensity */}
+      <p className="hidden md:flex">{entry.workout_intensity_name}</p>
+
+      {/* Type of entry (sick, rest, ..) */}
+      <p
+        className={cc(
+          "flex w-24 h-8 justify-center items-center rounded-md",
+          entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+          entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+          entry.entry_type_id === 3 && "bg-bgSick text-textSick"
+        )}
       >
-        {/* Date */}
-        <p className="hidden md:flex">
-          {dayjs(entry.date).format("DD.MM.YYYY")}
-        </p>
-        <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
+        {entry.entry_type_name}
+      </p>
 
-        <p className="">{entry.workout_category_name}</p>
+      {/* Edit button only for student*/}
+      <div className="flex justify-end md:justify-center">
+        {user.role !== 1 && (
+          <button
+            onClick={() => openBigModal("edit", { entryId: entry.id })}
+            className="text-iconGray hover:text-primaryColor"
+          >
+            <FiEdit3 size={20} />
+          </button>
+        )}
+      </div>
 
-        {/* WorkoutLenght */}
-        <p>
-          {" "}
-          {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
-        </p>
-        {/* Intensity */}
-        <p className="hidden md:flex">{entry.workout_intensity_name}</p>
-        {/* Type of entry (sick, rest, ..) */}
-        <p
-          className={cc(
-            "flex w-24 h-8 justify-center items-center rounded-md",
-            entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
-            entry.entry_type_id === 2 && "bg-bgRest text-textRest",
-            entry.entry_type_id === 3 && "bg-bgSick text-textSick"
-          )}
-        >
-          {entry.entry_type_name}
-        </p>
-
-        {/* Edit button only for student*/}
-        <div className="flex justify-end md:justify-center">
-          {user.role !== 1 && (
-            <button
-              onClick={() => openBigModal("edit", { entryId: entry.id })}
-              className="text-iconGray hover:text-primaryColor"
-            >
-              <FiEdit3 size={20} />
-            </button>
-          )}
-        </div>
-        <div className="col-span-6 flex justify-around w-full gap-4">
+      {isOpen && (
+        <div className="flex justify-around w-full col-span-5 gap-4 md:col-span-6">
           <p className="flex flex-col">
             <span className="text-textSecondary">Ajankohta:</span>
             {entry.time_of_day_name ? entry.time_of_day_name : "Ei ajankohtaa"}
@@ -83,52 +83,11 @@ const RecentJournalEntry = ({ entry }) => {
             {entry.details ? entry.details : "Ei lisätietoja"}
           </p>
         </div>
-      </div>
-    );
-
-  return (
-    <div
-      className=" grid grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-hoverDefault"
-      onClick={() => setIsOpen(!isOpen)}
-    >
-      {/* Date */}
-      <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
-      <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
-
-      <p className="">{entry.workout_category_name}</p>
-
-      {/* WorkoutLenght */}
-      <p>
-        {" "}
-        {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
-      </p>
-      {/* Intensity */}
-      <p className="hidden md:flex">{entry.workout_intensity_name}</p>
-      {/* Type of entry (sick, rest, ..) */}
-      <p
-        className={cc(
-          "flex w-24 h-8 justify-center items-center rounded-md",
-          entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
-          entry.entry_type_id === 2 && "bg-bgRest text-textRest",
-          entry.entry_type_id === 3 && "bg-bgSick text-textSick"
-        )}
-      >
-        {entry.entry_type_name}
-      </p>
-      {/* Edit button only for student*/}
-      <div className="flex justify-end md:justify-center">
-        {user.role !== 1 && (
-          <button
-            onClick={() => openBigModal("edit", { entryId: entry.id })}
-            className="text-iconGray hover:text-primaryColor"
-          >
-            <FiEdit3 size={20} />
-          </button>
-        )}
-      </div>
+      )}
     </div>
   );
 };
+
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
 const RecentJournalEntries = ({ journal }) => {
@@ -163,9 +122,9 @@ const RecentJournalEntries = ({ journal }) => {
   }, [journal, selectedTime, showDate]);
 
   return (
-    <div className="p-4 rounded-md border border-borderPrimary">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-2 items-center">
+    <div className="p-4 border rounded-md border-borderPrimary">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
           <p className="IconBox">
             <FiBarChart2 />
           </p>
@@ -175,9 +134,7 @@ const RecentJournalEntries = ({ journal }) => {
           <select
             name="timeFilter"
             id="selectTimeFilter"
-            className="bg-bgSecondary border border-borderPrimary
-               text-textSecondary p-2 rounded-md hover:cursor-pointer
-                focus-visible:outline-none focus:bg-bgPrimary hover:bg-bgPrimary"
+            className="p-2 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer focus-visible:outline-none focus:bg-bgPrimary hover:bg-bgPrimary"
             value={selectedTime}
             onChange={(e) => setSelectedTime(e.target.value)}
           >
@@ -188,8 +145,8 @@ const RecentJournalEntries = ({ journal }) => {
         </div>
       </div>
       <div className="flex h-full overflow-y-auto">
-        <div className="w-full h-full  rounded-md  relative ">
-          <div className="grid grid-cols-5 md:grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
+        <div className="relative w-full h-full rounded-md ">
+          <div className="grid grid-cols-5 gap-4 p-2 border-b md:grid-cols-6 bg-bgGray text-textSecondary border-borderPrimary">
             <span className="hidden md:flex">Päivämäärä</span>
             <span className="flex md:hidden">Pvm</span>
             <span>Laji</span>
@@ -200,7 +157,7 @@ const RecentJournalEntries = ({ journal }) => {
           </div>
           <div className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px] overflow-auto">
             {filteredJournal.length === 0 && (
-              <p className="text-textSecondary text-center m-4">
+              <p className="m-4 text-center text-textSecondary">
                 Ei merkintöjä
               </p>
             )}

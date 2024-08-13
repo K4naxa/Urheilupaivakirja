@@ -340,14 +340,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           checked={newJournalEntryData[name] === value}
           id={`${name}-${value}`}
           onChange={onChangeHandler}
-          className="absolute opacity-0 w-0 h-0 peer"
+          className="absolute w-0 h-0 opacity-0 peer"
           tabIndex="0" // Make sure it's focusable
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:border-primaryColor  peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgSecondary
-          peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor p-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
-          active:scale-95 transition-transform duration-75 hover:border-primaryColor hover:text-primaryColor"
+          className="block p-1 text-center transition-transform duration-75 border rounded cursor-pointer peer-checked:border-primaryColor peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgSecondary peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor border-borderPrimary text-textPrimary active:scale-95 hover:border-primaryColor hover:text-primaryColor"
         >
           {label}
         </label>
@@ -414,22 +412,22 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         declineButton="Peruuta"
         closeOnOutsideClick={false}
       />
-      <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
-        <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
+      <div className="flex flex-col h-full overflow-auto transition-transform duration-300 sm:rounded-md hide-scrollbar ">
+        <div className="relative p-3 text-xl text-center text-white shadow-md bg-primaryColor sm:p-4 sm:rounded-t-md">
           <p className="sm:min-w-[400px] cursor-default	">Uusi merkintä</p>
           <button
             onClick={onClose}
-            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
+            className="absolute text-2xl transition-transform duration-150 translate-y-1/2 bottom-1/2 left-5 hover:scale-125"
           >
             <FiArrowLeft />
           </button>
         </div>
         <form
-          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
+          className="flex flex-col items-center flex-grow gap-1 p-4 sm:gap-2 sm:px-8 bg-bgSecondary sm:rounded-b-md"
           onSubmit={newJournalEntryHandler}
         >
           <div className="flex flex-col items-center w-full p-1">
-            <div className="flex flex-row gap-12 justify-between">
+            <div className="flex flex-row justify-between gap-12">
               <button
                 type="button"
                 onClick={() => entryTypeChangeHandler("2")}
@@ -475,7 +473,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               </label>
               <div className="w-full p-1">
                 <input
-                  className="bg-bgPrimary w-full"
+                  className="w-full bg-bgPrimary"
                   type="range"
                   min="30"
                   max="180"
@@ -582,7 +580,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
             </label>
             {showDetails && (
               <textarea
-                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
+                className="w-full p-2 border rounded-md h-18 border-borderPrimary bg-bgPrimary text-textPrimary"
                 onChange={changeHandler}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
@@ -597,7 +595,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
             )}
           </div>
 
-          <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
+          <div className="flex flex-col items-center w-full gap-4 p-4 mt-auto text-center text-red-400">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
             <button
               className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary

@@ -196,7 +196,6 @@
 
 a.active {
   color: rgb(var(--color-primary));
-  border-color: rgb(var(--color-primary));
 }
 /* Scrollbar Settings */
 ::-webkit-scrollbar {
