@@ -7,7 +7,7 @@ import { MainContextProvider } from "./hooks/mainContext.jsx";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 //import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
-import { JournalModalProvider } from "./hooks/useJournalModal.jsx";
+import { JournalModalProvider } from "./hooks/useBigModal.jsx";
 import { DateModalProvider } from "./hooks/useDateModal.jsx";
 import { HeatmapTooltipContextProvider } from "./hooks/useHeatmapContext.jsx";
 

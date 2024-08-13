@@ -13,12 +13,12 @@ import dayjs from "dayjs";
 import { Tooltip } from "react-tooltip";
 import { isSameDay } from "date-fns";
 import React, { useState } from "react";
-import { useJournalModal } from "../../hooks/useJournalModal";
+import { useBigModal } from "../../hooks/useBigModal";
 import { useAuth } from "../../hooks/useAuth";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 const TeacherHeatmapTooltip = () => {
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
   const { user } = useAuth();
   const { tooltipContent } = useHeatmapContext();
   const { tooltipUser } = useHeatmapContext();
@@ -104,7 +104,7 @@ const TeacherHeatmapTooltip = () => {
                                     className="flex justify-center"
                                     onClick={(e) => {
                                       e.stopPropagation(); // to prevent row toggle
-                                      openBigModal("edit", {
+                                      openBigModal("editJournalEntry", {
                                         entryId: entry.id,
                                       });
                                       simulateClickOutside();
@@ -159,7 +159,7 @@ const TeacherHeatmapTooltip = () => {
                         <button
                           className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
                           onClick={() => {
-                            openBigModal("new", {
+                            openBigModal("newJournalEntry", {
                               date: dayjs(day).format("YYYY-MM-DD"),
                             });
                             simulateClickOutside();
@@ -175,7 +175,7 @@ const TeacherHeatmapTooltip = () => {
                       <button
                         className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
                         onClick={() => {
-                          openBigModal("edit", { entryId: dayEntries[0].id });
+                          openBigModal("editJournalEntry", { entryId: dayEntries[0].id });
                           simulateClickOutside();
                         }}
                       >
@@ -188,7 +188,7 @@ const TeacherHeatmapTooltip = () => {
                   <button
                     className="px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
                     onClick={() => {
-                      openBigModal("new", {
+                      openBigModal("newJournalEntry", {
                         date: dayjs(day).format("YYYY-MM-DD"),
                       });
                       simulateClickOutside();

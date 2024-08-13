@@ -30,6 +30,9 @@ import Visitors from "./pages/teacher/manage/VisitorsPage";
 import GroupsPage from "./pages/teacher/manage/groupsPage";
 import CampusPage from "./pages/teacher/manage/campusPage";
 
+import TeacherNewsPage from "./pages/teacher/news/TeacherNewsPage";
+
+
 import ManageStudentsLayout from "./layouts/manage-layout/manageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
@@ -45,7 +48,6 @@ import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/Fo
 import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
-import TeacherNewsPage from "./pages/teacher/TeacherNewsPage";
 import StatisticsPage from "./pages/teacher/StatisticsPage";
 import VisitorLayout from "./layouts/VisitorLayout";
 import VisitorProfilePage from "./pages/visitor/VisistorProfilePage";

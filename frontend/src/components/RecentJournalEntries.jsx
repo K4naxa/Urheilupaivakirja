@@ -1,5 +1,5 @@
 import { FiBarChart2, FiEdit3 } from "react-icons/fi";
-import { useJournalModal } from "../hooks/useJournalModal";
+import { useBigModal } from "../hooks/useBigModal";
 import { useAuth } from "../hooks/useAuth";
 import dayjs from "dayjs";
 import cc from "../utils/cc";
@@ -23,12 +23,12 @@ const convertTime = (totalMinutes) => {
 const RecentJournalEntry = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
 
   if (isOpen)
     return (
       <div
-        className=" grid grid-cols-5 md:grid-cols-6 md:grid-rows-2 gap-x-1 md:gap-x-4 px-2 items-center hover:bg-hoverDefault"
+      className="grid items-center grid-cols-5 p-2  md:grid-cols-6  md:grid-rows-[auto,1fr] gap-x-1 md:gap-x-4 hover:bg-hoverDefault"
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* Date */}
@@ -62,14 +62,17 @@ const RecentJournalEntry = ({ entry }) => {
         <div className="flex justify-end md:justify-center">
           {user.role !== 1 && (
             <button
-              onClick={() => openBigModal("edit", { entryId: entry.id })}
+              onClick={(event) => {
+                event.stopPropagation();
+                openBigModal("editJournalEntry", { entryId: entry.id });
+              }}
               className="text-iconGray hover:text-primaryColor"
             >
               <FiEdit3 size={20} />
             </button>
           )}
         </div>
-        <div className="col-span-6 flex justify-around w-full gap-4">
+        <div className="col-span-6 flex justify-around w-full gap-5">
           <p className="flex flex-col">
             <span className="text-textSecondary">Ajankohta:</span>
             {entry.time_of_day_name ? entry.time_of_day_name : "Ei ajankohtaa"}
@@ -119,7 +122,10 @@ const RecentJournalEntry = ({ entry }) => {
       <div className="flex justify-end md:justify-center">
         {user.role !== 1 && (
           <button
-            onClick={() => openBigModal("edit", { entryId: entry.id })}
+            onClick={(event) => {
+              event.stopPropagation();
+              openBigModal("editJournalEntry", { entryId: entry.id });
+            }}
             className="text-iconGray hover:text-primaryColor"
           >
             <FiEdit3 size={20} />
@@ -189,7 +195,7 @@ const RecentJournalEntries = ({ journal }) => {
       </div>
       <div className="flex h-full overflow-y-auto">
         <div className="w-full h-full  rounded-md  relative ">
-          <div className="grid grid-cols-5 md:grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
+          <div className="grid grid-cols-5 md:grid-cols-6 gap-4 px-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
             <span className="hidden md:flex">Päivämäärä</span>
             <span className="flex md:hidden">Pvm</span>
             <span>Laji</span>

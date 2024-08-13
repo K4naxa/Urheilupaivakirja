@@ -42,7 +42,6 @@ const GroupMultiSelect = ({
   return (
     <Select
       isMulti
-      components={makeAnimated()}
       formatOptionLabel={CustomOption}
       value={selectedGroups}
       openMenuOnFocus={false}
@@ -118,7 +117,7 @@ const GroupMultiSelect = ({
       closeMenuOnSelect={false}
       className="basic-multi-select"
       classNamePrefix="select"
-      placeholder="Select Groups"
+      placeholder="Valitse ryhmät"
     />
   );
 };

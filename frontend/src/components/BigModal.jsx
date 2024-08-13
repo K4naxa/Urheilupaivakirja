@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-const JournalEntryModal = ({ isOpen, onClose, content }) => {
+const BigModal = ({ isOpen, onClose, content }) => {
   useEffect(() => {
     // ESC to close
     const handleEscape = (event) => {
@@ -9,15 +9,20 @@ const JournalEntryModal = ({ isOpen, onClose, content }) => {
     };
 
     if (isOpen) {
+      document.body.style.overflow = "hidden";
+
       document.addEventListener("keydown", handleEscape);
-      return () => document.removeEventListener("keydown", handleEscape);
+      return () => {
+        document.removeEventListener("keydown", handleEscape);
+        document.body.style.overflow = "auto";
+      };
     }
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 flex items-start justify-center bg-black bg-opacity-50 z-20 overflow-hidden">
+    <div className="fixed inset-0 z-20 flex items-start justify-center overflow-hidden bg-black bg-opacity-50">
       <div className="w-full h-full sm:w-auto sm:h-auto sm:rounded-md sm:shadow-lg overflow-hidden flex flex-col sm:mt-[8vh]">
         <div className="flex flex-col h-full max-h-full sm:max-h-[90vh] overflow-auto">
           {content}
@@ -28,4 +33,4 @@ const JournalEntryModal = ({ isOpen, onClose, content }) => {
   );
 };
 
-export default JournalEntryModal;
+export default BigModal;

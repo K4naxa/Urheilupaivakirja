@@ -14,6 +14,9 @@ import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSel
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
+import { TbPin, TbPinFilled, TbPinnedOff } from "react-icons/tb";
+
+
 import {
   addMonths,
   addWeeks,
@@ -261,6 +264,7 @@ function TeacherHome() {
       ></div>
     );
   };
+
   const renderFavouriteMark = (journal) => {
     let isPinned = false;
     if (pinnedStudentsData) {
@@ -268,7 +272,9 @@ function TeacherHome() {
         (pinnedStudent) => pinnedStudent.pinned_user_id === journal.user_id
       );
     }
-
+  
+    const [hover, setHover] = useState(false);
+  
     const handlePinClick = async () => {
       if (isPinned) {
         await userService.unpinStudent(journal.user_id).then(() => {
@@ -280,15 +286,33 @@ function TeacherHome() {
         });
       }
     };
-
+  
     return (
       <div
-        className={cc(
-          "absolute -top-2 -left-2 h-4 w-4 rounded-sm cursor-pointer group-hover/studentCard:border group-hover/studentCard:border-yellow-500",
-          isPinned ? "bg-yellow-500" : null
-        )}
+        className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center cursor-pointer"
         onClick={() => handlePinClick()}
-      ></div>
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        {isPinned ? (
+          hover ? (
+            <TbPinnedOff
+              size={20}
+              className="text-primaryColor"
+            />
+          ) : (
+            <TbPinFilled
+              size={20}
+              className="text-primaryColor"
+            />
+          )
+        ) : (
+          <TbPin
+            size={20}
+            className="text-textPrimary opacity-10 hover:text-primaryColor hover:opacity-100"
+          />
+        )}
+      </div>
     );
   };
 

@@ -25,7 +25,7 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 
-import { useJournalModal } from "../../hooks/useJournalModal";
+import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
@@ -34,7 +34,7 @@ import userService from "../../services/userService";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
 
   const {
     data: studentData,
@@ -146,7 +146,7 @@ function StudentHome() {
             </div>
             <div className="flex gap-4">
               <button
-                onClick={() => openBigModal("new")}
+                onClick={() => openBigModal("newJournalEntry")}
                 className="px-4 py-2 border border-borderPrimary rounded-md bg-primaryColor text-white
               hover:bg-hoverPrimary"
               >

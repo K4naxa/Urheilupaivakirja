@@ -45,12 +45,12 @@ const UnreadNewsIndicator = ({ type }) => {
     return null;
   }
 
-  const size = type === "phone" ? "w-2 h-2" : "w-1.5 h-1.5";
+  const size = type === "phone" ? "w-2 h-2" : "w-2 h-2";
 
   const position =
     type === "phone"
       ? "top-neg-one right-neg-one"
-      : "top-2.5 right-neg-one-point-five";
+      : "top-1 right-5";
 
   return (
     hasUnreadNews && (

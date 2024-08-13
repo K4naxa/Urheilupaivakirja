@@ -31,7 +31,6 @@ const StudentMultiSelect = ({
   return (
     <Select
       isMulti
-      components={makeAnimated()}
       value={selectedStudents}
       openMenuOnFocus={false}
       openMenuOnClick={false}

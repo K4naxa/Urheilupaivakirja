@@ -1,13 +1,15 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import JournalEntryModal from "../components/JournalEntryModal";
+import BigModal from "../components/BigModal";
 import NewJournalEntryPage from "../pages/student/journal-entry/NewJournalEntryPage";
 import EditJournalEntryPage from "../pages/student/journal-entry/EditJournalEntryPage";
+import NewNewsEntryPage from "../pages/teacher/news/NewNewsEntryPage";
+import EditNewsEntryPage from "../pages/teacher/news/EditNewsEntryPage";
 
-const JournalModalContext = createContext();
+const BigModalContext = createContext();
 
-export function useJournalModal() {
-  return useContext(JournalModalContext);
+export function useBigModal() {
+  return useContext(BigModalContext);
 }
 
 export const JournalModalProvider = ({ children }) => {
@@ -18,7 +20,7 @@ export const JournalModalProvider = ({ children }) => {
     payload = payload || {};
     let content;
     switch (type) {
-      case "new":
+      case "newJournalEntry":
         content = (
           <NewJournalEntryPage
             onClose={closeBigModal}
@@ -26,7 +28,7 @@ export const JournalModalProvider = ({ children }) => {
           />
         );
         break;
-      case "edit":
+      case "editJournalEntry":
         content = (
           <EditJournalEntryPage
             onClose={closeBigModal}
@@ -34,6 +36,24 @@ export const JournalModalProvider = ({ children }) => {
           />
         );
         break;
+
+      case "newNewsEntry":
+        content = (
+          <NewNewsEntryPage
+            onClose={closeBigModal}
+            date={payload.date || null}
+          />
+        );
+        break;
+
+        case "editNewsEntry":
+          content = (
+            <EditNewsEntryPage
+              onClose={closeBigModal}
+              entryId={payload.entryId}
+            />
+          );
+          break;
       default:
         content = <div>Jokin meni vikaan</div>;
     }
@@ -66,17 +86,17 @@ export const JournalModalProvider = ({ children }) => {
   }, [isBigModalOpen]);
 
   return (
-    <JournalModalContext.Provider value={{ openBigModal, closeBigModal }}>
+    <BigModalContext.Provider value={{ openBigModal, closeBigModal }}>
       {children}
       {isBigModalOpen &&
         createPortal(
-          <JournalEntryModal
+          <BigModal
             isOpen={isBigModalOpen}
             onClose={closeBigModal}
             content={bigModalContent}
           />,
           document.getElementById("big-modal-container")
         )}
-    </JournalModalContext.Provider>
+    </BigModalContext.Provider>
   );
 };

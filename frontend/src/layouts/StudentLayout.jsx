@@ -10,7 +10,7 @@ import { useState } from "react";
 import { FiInbox } from "react-icons/fi";
 
 import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
-import { useJournalModal } from "../hooks/useJournalModal";
+import { useBigModal } from "../hooks/useBigModal";
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -22,7 +22,7 @@ import siteLogo from "/pwa-192x192.png";
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
 
   const linkClass =
     "flex flex-col items-center text-textPrimary py-2 rounded-md text-xl hover:underline decoration-primaryColor ";
@@ -50,7 +50,8 @@ const StudentLayout = () => {
             className="flex flex-col items-center
             gap-1 p-2 rounded-md
             select-none 
-            hover:cursor-pointer hover:bg-bgGray"
+            hover:cursor-pointer hover:bg-bgGray
+            relative"
           >
             <FiInbox size={24} />
 
@@ -154,7 +155,7 @@ const StudentLayout = () => {
                 className="bg-bgSecondary border-primaryColor text-primaryColor
        shadow-upper-shadow size-16 rounded-full border-t-2
         text-3xl drop-shadow-xl duration-100 active:scale-110"
-                onClick={() => openBigModal("new")}
+                onClick={() => openBigModal("newJournalEntry")}
               >
                 +
               </button>

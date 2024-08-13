@@ -175,6 +175,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
   };
 
+  const handleDetailsTextareaChange = (e) => {
+
+    changeHandler(e);
+  };
+
   const errorCheckJournalEntry = () => {
     //TODO: regex here
     let hasMissingInputs = false;
@@ -581,19 +586,33 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               )}
             </label>
             {showDetails && (
-              <textarea
-                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
-                onChange={changeHandler}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.stopPropagation();
-                  }
-                }}
-                type="text"
-                name="details"
-                id="details-textarea"
-                value={newJournalEntryData.details}
-              />
+              <div className="relative w-full">
+                <textarea
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
+                  onChange={handleDetailsTextareaChange}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.stopPropagation();
+                    }
+                  }}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={newJournalEntryData.details}
+                  rows={2}
+                  maxLength={200}
+                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  required
+                ></textarea>
+  <p
+    className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? '100' : '40'} ${
+      newJournalEntryData.details.length === 200 ? 'text-red-500 bg-bgPrimary z-10' : 'text-textPrimary'
+    }`}
+    style={{ pointerEvents: 'none' }} // Make sure it doesn't interfere with textarea interactions
+  >
+    {newJournalEntryData.details.length}/200
+  </p>
+              </div>
             )}
           </div>
 

@@ -207,19 +207,93 @@ router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
 
 // Get all news
 router.get("/news", async (req, res, next) => {
-  knex("news")
-    .select("*")
-    .orderBy("created_at", "desc")
-    .then((rows) => {
-      res.json(rows);
-    })
-    .catch((err) => {
-      console.log("Error fetching news data", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while fetching news data" });
-    });
+  try {
+    const newsRows = await knex("news")
+      .select(
+        "news.id",  // Explicitly selecting each column except 'teacher_id'
+        "news.title",
+        "news.content",
+        "news.created_at",
+        "news.public",
+        "news.pinned",
+        knex.raw("concat(teachers.first_name, ' ', teachers.last_name) as author")
+      )
+      .leftJoin("teachers", "news.teacher_id", "teachers.id")
+      .orderBy("created_at", "desc");
+
+    const newsIds = newsRows.map(news => news.id);
+
+    const campuses = await knex("news_campuses")
+      .select("news_id", "name")
+      .join("campuses", "news_campuses.campus_id", "campuses.id")
+      .whereIn("news_id", newsIds);
+
+    const sports = await knex("news_sports")
+      .select("news_id", "name")
+      .join("sports", "news_sports.sport_id", "sports.id")
+      .whereIn("news_id", newsIds);
+
+    const studentGroups = await knex("news_student_groups")
+      .select("news_id", "group_identifier as name")
+      .join("student_groups", "news_student_groups.student_group_id", "student_groups.id")
+      .whereIn("news_id", newsIds);
+
+    const newsWithDetails = newsRows.map(newsItem => ({
+      ...newsItem,
+      campuses: campuses.filter(c => c.news_id === newsItem.id).map(c => c.name.split(',')[0].trim()),
+      sports: sports.filter(s => s.news_id === newsItem.id).map(s => s.name),
+      student_groups: studentGroups.filter(g => g.news_id === newsItem.id).map(g => g.name)
+    }));
+
+    res.json(newsWithDetails);
+  } catch (err) {
+    console.log("Error fetching news data", err);
+    res.status(500).json({ error: "An error occurred while fetching news data" });
+  }
 });
+
+// Get all news as a teacher (includes teacher_id of the teacher who created the news)
+router.get("/teacher_news", async (req, res, next) => {
+  try {
+    const newsRows = await knex("news")
+      .select(
+        "news.*",
+        knex.raw("concat(teachers.first_name, ' ', teachers.last_name) as author")
+      )
+      .leftJoin("teachers", "news.teacher_id", "teachers.id")
+      .orderBy("created_at", "desc");
+
+    const newsIds = newsRows.map(news => news.id);
+
+    const campuses = await knex("news_campuses")
+      .select("news_id", "name")
+      .join("campuses", "news_campuses.campus_id", "campuses.id")
+      .whereIn("news_id", newsIds);
+
+    const sports = await knex("news_sports")
+      .select("news_id", "name")
+      .join("sports", "news_sports.sport_id", "sports.id")
+      .whereIn("news_id", newsIds);
+
+    const studentGroups = await knex("news_student_groups")
+      .select("news_id", "group_identifier as name")
+      .join("student_groups", "news_student_groups.student_group_id", "student_groups.id")
+      .whereIn("news_id", newsIds);
+
+    const newsWithDetails = newsRows.map(newsItem => ({
+      ...newsItem,
+      campuses: campuses.filter(c => c.news_id === newsItem.id).map(c => c.name.split(',')[0].trim()),
+      sports: sports.filter(s => s.news_id === newsItem.id).map(s => s.name),
+      student_groups: studentGroups.filter(g => g.news_id === newsItem.id).map(g => g.name)
+    }));
+
+    res.json(newsWithDetails);
+  } catch (err) {
+    console.log("Error fetching news data", err);
+    res.status(500).json({ error: "An error occurred while fetching news data" });
+  }
+});
+
 
 // Get unread news count
 router.get("/news/unread", async (req, res, next) => {

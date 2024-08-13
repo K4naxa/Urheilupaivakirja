@@ -42,7 +42,6 @@ const SportsMultiSelect = ({
   return (
     <Select
       isMulti
-      components={makeAnimated()}
       formatOptionLabel={CustomOption}
       value={selectedSports}
       openMenuOnFocus={false}
