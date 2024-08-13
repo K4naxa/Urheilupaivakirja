@@ -71,13 +71,11 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
   if (isEditing) {
     return (
       <div className="flex flex-col">
-        <div className="flex justify-between rounded-md p-2 my-2 gap-4 items-center">
+        <div className="flex items-center justify-between gap-4 p-2 my-2 rounded-md">
           <input
             autoFocus
             type="text"
-            className="text-textPrimary bg-bgGray p-1 w-full
-            border border-borderPrimary rounded-md
-              focus-visible:outline-none"
+            className="w-full p-1 border rounded-md text-textPrimary bg-bgGray border-borderPrimary focus-visible:outline-none"
             data-testid="editCampus"
             defaultValue={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -104,14 +102,14 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
             </button>
           </div>
         </div>
-        {error && <p className="text-btnRed px-2">{error}</p>}
+        {error && <p className="px-2 text-btnRed">{error}</p>}
       </div>
     );
   } else {
     return (
       <div className="flex flex-col">
         {/* main Container */}
-        <div className="grid grid-cols-controlpanel3 hover:bg-bgGray rounded-md  p-2 items-center">
+        <div className="grid items-center p-2 rounded-md grid-cols-controlpanel3 hover:bg-bgGray">
           <p className="">{campus.name}</p>
           <p className="text-center">{campus.student_count}</p>
           <div className="flex gap-4">
@@ -134,7 +132,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
 
         {/* error container */}
         {error && (
-          <p className="bg-bgSecondary text-red-500 text-center p-2">{error}</p>
+          <p className="p-2 text-center text-red-500 bg-bgSecondary">{error}</p>
         )}
       </div>
     );
@@ -232,24 +230,20 @@ const CampusPage = () => {
   };
 
   return (
-    <div className="w-full items-center bg-bgSecondary rounded-md">
+    <div className="items-center w-full rounded-md bg-bgSecondary">
       {/* header for mobile*/}
-      <div
-        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
-       rounded-b-md shadow-md"
-      >
+      <div className="w-full py-4 text-2xl text-center shadow-md md:hidden bg-primaryColor rounded-b-md">
         Toimipaikat
       </div>
       {/* Error Header */}
       {errorMessage && (
         <div
           id="errorHeader"
-          className="bg-btnRed w-full text-textPrimary text-center text-lg p-2
-          mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
+          className="relative w-full p-2 mb-4 text-lg text-center shadow-md bg-btnRed text-textPrimary animate-menu-appear-top rounded-b-md"
         >
           <button
             onClick={() => setErrorMessage("")}
-            className="absolute right-4 bottom-1/2 translate-y-1/2"
+            className="absolute translate-y-1/2 right-4 bottom-1/2"
           >
             X
           </button>
@@ -258,19 +252,14 @@ const CampusPage = () => {
       )}
 
       {/* Campus Container */}
-      <div
-        className="flex flex-col gap-8 p-4 w-full 
-      border border-borderPrimary rounded-md"
-      >
+      <div className="flex flex-col w-full gap-8 p-4 border rounded-md border-borderPrimary">
         {/* New campus input */}
         {/* New Sport input */}
-        <div className=" flex justify-center mt-4">
+        <div className="flex justify-center mt-4 ">
           <input
-            className="text-textPrimary bg-bgGray p-1 
-            border border-borderPrimary rounded-l-md
-              focus-visible:outline-none"
+            className="p-1 border text-textPrimary bg-bgGray border-borderPrimary rounded-l-md focus-visible:outline-none"
             type="text"
-            data-testid="newSportInput"
+            data-testid="newCampusInput"
             placeholder="Luo toimipaikka"
             value={newCampus}
             onChange={(e) => setNewCampus(e.target.value)}
@@ -282,14 +271,13 @@ const CampusPage = () => {
           />
           <p
             onClick={() => handleNewCampus()}
-            className="py-2 px-4 rounded-r-md bg-primaryColor text-white
-             hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
+            className="px-4 py-2 text-white duration-75 select-none rounded-r-md bg-primaryColor hover:bg-hoverPrimary active:scale-95"
           >
             +
           </p>
         </div>
         <div className="flex flex-col gap-2" id="campusesContainer">
-          <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">
+          <div className="grid items-center px-2 grid-cols-controlpanel3 text-textSecondary ">
             <p
               onClick={() => {
                 handleNameSorting();
@@ -314,7 +302,10 @@ const CampusPage = () => {
             </p>
             <p className="w-16" />
           </div>
-          <div className="flex flex-col divide-y divide-borderPrimary">
+          <div
+            className="flex flex-col divide-y divide-borderPrimary"
+            id="campusContainer"
+          >
             {sortedCampuses.map((campus) => (
               <CreateCampusContainer
                 campus={campus}
