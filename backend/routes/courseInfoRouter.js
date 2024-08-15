@@ -8,7 +8,8 @@ const { getUserId } = require("../middleware/auth");
 
 const { getRole } = require("../middleware/auth");
 
-router.get("/courseInfo/complition_requirement/", async (req, res, next) => {
+router.get("/complition_requirement/", async (req, res, next) => {
+  console.log(" trying to get complition requirement");
   const user_id = req.params.id;
   try {
     const requirementCount = await knex("course_infos")
@@ -21,7 +22,7 @@ router.get("/courseInfo/complition_requirement/", async (req, res, next) => {
   }
 });
 
-router.put("/courseInfo/complition_requirement/", async (req, res, next) => {
+router.put("/complition_requirement/", async (req, res, next) => {
   const user_id = req.params.id;
 
   //   return user if not admin (role 1)

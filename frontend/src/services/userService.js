@@ -200,8 +200,9 @@ const visitorRegistration = async (email, password, firstName, lastName) => {
   return response.data;
 };
 
-const getVisitorData = async () => {
-  const response = await axios.get(`/spectator/data`, makeHeader());
+// Profile Data -------------------------------------------------------------------
+const getProfileData = async () => {
+  const response = await axios.get(`/user/profiledata`, makeHeader());
   return response.data;
 };
 
@@ -228,6 +229,6 @@ export default {
   unpinStudent,
   getSpectators,
   visitorRegistration,
-  getVisitorData,
+  getProfileData,
 };
 // Path: frontEnd/src/services/userService.js

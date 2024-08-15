@@ -32,6 +32,7 @@ app.use("/spectator", spectatorRouter);
 
 app.use("/courseInfo", isAuthenticated, courseInfoRouter);
 app.use("/user", userRouter);
+app.use("/user/profiledata", isAuthenticated, userRouter);
 app.use("/user/verify", isAuthenticated, verifyRouter);
 app.use("/user/login", loginRouter);
 app.use("/user/register", registerRouter);
