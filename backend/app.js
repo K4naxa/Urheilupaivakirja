@@ -7,6 +7,7 @@ var logger = require("morgan");
 var { isAuthenticated } = require("./middleware/auth");
 
 var indexRouter = require("./routes/index");
+var courseInfoRouter = require("./routes/courseInfoRouter");
 var loginRouter = require("./routes/user/loginRouter.js");
 var spectatorRouter = require("./routes/user/spectatorRouter.js");
 var registerRouter = require("./routes/user/registerRouter.js");
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use("/spectator/register", spectatorRouter);
 app.use("/spectator", spectatorRouter);
 
+app.use("/courseInfo", isAuthenticated, courseInfoRouter);
 app.use("/user", userRouter);
 app.use("/user/verify", isAuthenticated, verifyRouter);
 app.use("/user/login", loginRouter);

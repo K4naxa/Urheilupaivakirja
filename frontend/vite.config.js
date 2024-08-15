@@ -51,6 +51,10 @@ export default defineConfig({
         target: "http://localhost:3001",
         changeOrigin: true,
       },
+      "/courseInfo/complition_requirement": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
       "/user/register": {
         target: "http://localhost:3001",
         changeOrigin: true,
