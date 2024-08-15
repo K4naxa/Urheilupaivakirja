@@ -31,6 +31,7 @@ import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
 import userService from "../../services/userService";
+import trainingService from "../../services/trainingService";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
@@ -46,9 +47,15 @@ function StudentHome() {
     staleTime: 15 * 60 * 1000,
   });
 
-  if (studentDataLoading) {
+  const { data: courseComplitionRequirement } = useQuery({
+    queryKey: ["courseComplitionRequirement"],
+    queryFn: () => trainingService.getComplitionRequirement(),
+    staleTime: 15 * 60 * 1000,
+  });
+
+  if (studentDataLoading || !courseComplitionRequirement) {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex items-center justify-center">
         <LoadingScreen />
       </div>
     );
@@ -89,23 +96,23 @@ function StudentHome() {
 
   if (studentDataError) {
     return (
-      <div className="flex justify-center items-center w-full">
+      <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 w-full m-2 lg:m-8 gap-4 lg:gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
+    <div className="grid w-full grid-cols-1 gap-4 m-2 overflow-x-auto lg:m-8 lg:gap-8 bg-bgPrimary text-textPrimary">
       <StudentHeatmapTooltip />
       {/* first row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
+      <div className="grid w-full h-full grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-3 lg:gap-8">
         {/* left Side */}
-        <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
+        <div className="box-border flex flex-col p-4 text-center border rounded-md border-borderPrimary bg-bgSecondary">
           <div className="text-textSecondary">{showDate.getFullYear()}</div>
-          <div className="w-full flex justify-center items-center mb-4">
+          <div className="flex items-center justify-center w-full mb-4">
             <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              className="select-none text-textPrimary hover:text-primaryColor hover:cursor-pointer"
               onClick={() => {
                 setShowDate(subMonths(showDate, 1));
               }}
@@ -116,7 +123,7 @@ function StudentHome() {
               {formatDate(showDate, { month: "long" })}
             </p>
             <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              className="select-none text-textPrimary hover:text-primaryColor hover:cursor-pointer"
               onClick={() => {
                 setShowDate(addMonths(showDate, 1));
               }}
@@ -124,17 +131,17 @@ function StudentHome() {
               <FiChevronRight />
             </p>
           </div>
-          <div className="w-full flex justify-center">
+          <div className="flex justify-center w-full">
             <HeatMap_Month journal={studentData.journal_entries} />
           </div>
         </div>
 
         {/* rightSide */}
-        <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
+        <div className="flex-col rounded-md lg:col-span-2 bg-bgSecondary lg:p-4 lg:border border-borderPrimary">
           {/* right hello messaage */}
-          <div className="hidden lg:flex justify-between">
+          <div className="justify-between hidden lg:flex">
             <div className="">
-              <div className="text-2xl font-medium flex gap-2">
+              <div className="flex gap-2 text-2xl font-medium">
                 <p className="text-textSecondary">{formatHelloMessage()}</p>
                 <p className="text-textPrimary">
                   {studentData.first_name} {studentData.last_name[0]}.
@@ -147,8 +154,7 @@ function StudentHome() {
             <div className="flex gap-4">
               <button
                 onClick={() => openBigModal("newJournalEntry")}
-                className="px-4 py-2 border border-borderPrimary rounded-md bg-primaryColor text-white
-              hover:bg-hoverPrimary"
+                className="px-4 py-2 text-white border rounded-md border-borderPrimary bg-primaryColor hover:bg-hoverPrimary"
               >
                 {`+ Uusi harjoitus`}
               </button>
@@ -161,24 +167,24 @@ function StudentHome() {
         </div>
       </div>
       {/* second row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
         <div>
           <WeekDayActivity journal={studentData.journal_entries} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 bg-bgSecondary bg-transparent gap-4">
-          <div className=" bg-bgSecondary border border-borderPrimary rounded-md p-4">
-            <div className="flex gap-2 items-center">
+        <div className="grid grid-cols-1 gap-4 bg-transparent sm:grid-cols-2 bg-bgSecondary">
+          <div className="p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+            <div className="flex items-center gap-2">
               {" "}
               <p className="IconBox">
                 <FiTrendingUp />
               </p>
               <p className="text-lg">Seuranta</p>
             </div>
-            <div className=" grid grid-cols-2 h-full w-full items-center co">
+            <div className="grid items-center w-full h-full grid-cols-2 co">
               <div className="flex flex-col gap-4">
                 <p className="font-medium ">Merkintä aktiivisuus: </p>
-                <p className="text-textSecondary text-sm">
+                <p className="text-sm text-textSecondary">
                   Viimeisin merkintä:{" "}
                   {studentData.journal_entries.length > 0
                     ? format(studentData.journal_entries[0].date, "dd.MM.yyyy")
@@ -189,29 +195,28 @@ function StudentHome() {
             </div>
           </div>
 
-          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-4">
-            <div className="flex gap-2 items-center">
+          <div className="p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+            <div className="flex items-center gap-2">
               {" "}
               <p className="IconBox">
                 <FiTrendingUp />
               </p>
               <p className="text-lg">Seuranta</p>
             </div>
-            <div className="flex flex-col justify-center items-center">
-              <CourseComplitionBar value={calcJournalEntriesCount()} />
+            <div className="flex flex-col items-center justify-center">
+              <CourseComplitionBar
+                value={calcJournalEntriesCount()}
+                REQUIRED_COMPLETION={courseComplitionRequirement[0].value}
+              />
             </div>
           </div>
         </div>
       </div>
 
       {/* thrid Row */}
-      <div
-        className="flex flex-col bg-bgSecondary
-      p-4
-        rounded-md"
-      >
+      <div className="flex flex-col p-4 rounded-md bg-bgSecondary">
         <div className="flex justify-between">
-          <div className="flex gap-2  mb-4 items-center">
+          <div className="flex items-center gap-2 mb-4">
             {" "}
             <p className="IconBox">
               <FiZap />

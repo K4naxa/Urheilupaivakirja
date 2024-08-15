@@ -2,6 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 import { FiUser, FiHome, FiLogOut } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
@@ -37,7 +38,7 @@ const StudentLayout = () => {
 }
 
   const linkClass =
-    "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl";
+    "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl active:text-primaryColor";
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
@@ -167,33 +168,35 @@ const StudentLayout = () => {
           {/* new journal entry button */}
           <div className="flex justify-center">
             <div className="absolute z-20 flex bottom-6 justify">
-              <button
-                className="bg-bgSecondary border-primaryColor text-primaryColor
-       shadow-upper-shadow size-16 rounded-full border-t-2
-        text-3xl drop-shadow-xl duration-100 active:scale-110"
-                onClick={() => openBigModal("new")}
-              >
-                +
-              </button>
+              <div className="flex items-center justify-center text-white rounded-full bg-bgPrimary drop-shadow-t-md shadow-upper-shadow size-16 active:scale-110">
+                <button
+                  className="flex items-center justify-center text-white duration-100 rounded-full bg-primaryColor size-14 active:scale-110"
+                  onClick={() => openBigModal("new")}
+                >
+                  <FiPlus size={24} />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* right of navigation bar */}
           <div className="grid grid-cols-2 ">
-            <button
+            <NavLink
+              to="/profiili"
               className={cc(
                 linkClass,
                 showUserMenu
                   ? "border-primaryColor rounded-b-md rounded-t-none transition-colors duration-200"
                   : " bg-bgPrimary"
               )}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 setShowUserMenu(!showUserMenu);
               }}
             >
               <FiUser />
               <p className={linkTextClass}>Käyttäjä</p>
-            </button>
+            </NavLink>
           </div>
         </nav>
 

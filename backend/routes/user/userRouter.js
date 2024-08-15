@@ -362,4 +362,34 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+router.get("/profiledata", async (req, res) => {
+  try {
+    if (getRole(req) !== 1 && getRole(req) !== 2) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const role = getRole(req);
+    const userId = getUserId(req);
+
+    const userData = await knex("users")
+      .select("id", "email", "created_at")
+      .where("id", userId);
+
+    const userNames =
+      role === 2
+        ? await knex("spectators")
+            .select("first_name", "last_name")
+            .where("user_id", userId)
+        : await knex("teachers")
+            .select("first_name", "last_name")
+            .where("user_id", userId);
+    const combined = userData.map((user) => {
+      const spectator = userNames.find((s) => s.id === user.user_id);
+      return { ...user, ...spectator };
+    });
+    res.json(combined[0]);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

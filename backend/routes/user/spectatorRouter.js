@@ -97,28 +97,4 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.get("/data", async (req, res) => {
-  try {
-    if (getRole(req) !== 1 && getRole(req) !== 2) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    const userId = getUserId(req);
-
-    const visitorData = await knex("users")
-      .select("id", "email", "created_at")
-      .where("id", userId);
-
-    const visitor = await knex("spectators")
-      .select("first_name", "last_name")
-      .where("user_id", userId);
-    const combined = visitorData.map((user) => {
-      const spectator = visitor.find((s) => s.id === user.user_id);
-      return { ...user, ...spectator };
-    });
-    res.json(combined[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 module.exports = router;

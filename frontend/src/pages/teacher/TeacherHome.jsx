@@ -33,6 +33,7 @@ import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherH
 import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSelect.jsx";
 import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
 import cc from "../../utils/cc.js";
+import trainingService from "../../services/trainingService.js";
 
 function TeacherHome() {
   const queryClient = useQueryClient();
@@ -54,7 +55,11 @@ function TeacherHome() {
   const { setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
-  const COURSE_COMPLETION_REQUIREMENT = 300;
+  const { data: courseComplitionRequirement } = useQuery({
+    queryKey: ["courseComplitionRequirement"],
+    queryFn: () => trainingService.getComplitionRequirement(),
+    staleTime: 15 * 60 * 1000,
+  });
 
   // all Students and their journals
   const {
@@ -244,7 +249,7 @@ function TeacherHome() {
 
   const countCourseProgression = (student) => {
     const total = student.journal_entries.length;
-    let progression = total / COURSE_COMPLETION_REQUIREMENT;
+    let progression = total / courseComplitionRequirement[0].value;
     progression *= 100;
 
     if (progression > 100) return 100;
@@ -318,7 +323,7 @@ function TeacherHome() {
 
   const renderSortingSelect = () => {
     return (
-      <div className="flex flex-col md:absolute right-0 mt-4 md:mt-0">
+      <div className="right-0 flex flex-col mt-4 lg:absolute md:mt-0">
         <label htmlFor="sorting" className="px-2 text-xs text-textSecondary">
           Järjestys:
         </label>
@@ -326,8 +331,7 @@ function TeacherHome() {
           name="sorting"
           id="sortingSelect"
           value={selectedSorting}
-          className="bg-bgSecondary border border-borderPrimary text-textSecondary
-               p-1 rounded-md hover:cursor-pointer "
+          className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
           onChange={(e) => setSelectedSorting(e.target.value)}
         >
           <option value="default">Oletus</option>
@@ -356,8 +360,8 @@ function TeacherHome() {
       return (
         <div className="flex flex-col justify-center">
           {/* Date controls */}
-          <div className="flex w-full flex-col text-center mb-4 relative">
-            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+          <div className="relative flex flex-col w-full mb-4 text-center">
+            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>{" "}
             <h2 className="text-textSecondary">
               {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
@@ -375,8 +379,7 @@ function TeacherHome() {
                 month: "long",
               })}
             </h2>
-
-            <div className="hover: flex justify-center gap-4">
+            <div className="flex justify-center gap-4 hover:">
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
@@ -406,13 +409,13 @@ function TeacherHome() {
             {renderSortingSelect()}
           </div>
           {/* Student list */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {journals?.map((journal) => {
               const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col rounded-md p-2 border border-borderPrimary hover:bg-hoverDefault w-full relative overflow-hidden group/studentCard"
+                  className="relative flex flex-col w-full p-2 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
                   {renderFavouriteMark(journal)}
@@ -444,9 +447,9 @@ function TeacherHome() {
     } else
       return (
         <div className="flex flex-col justify-center">
-          <div className="flex flex-col text-center mb-8 relative">
+          <div className="relative flex flex-col mb-8 text-center">
             <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
-            <div className="hover: flex justify-center gap-4">
+            <div className="flex justify-center gap-4 hover:">
               <button
                 className="hover:underline"
                 onClick={() => {
@@ -459,7 +462,7 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl w-24">
+              <p className="w-24 text-xl">
                 {formatDate(showDate, { month: "long" })}
               </p>
               <button
@@ -477,13 +480,13 @@ function TeacherHome() {
             </div>
             {renderSortingSelect()}
           </div>
-          <div className="flex flex-wrap lg:gap-8 gap-4 justify-center">
+          <div className="flex flex-wrap justify-center gap-4 lg:gap-8">
             {journals.map((journal) => {
               const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col gap-2 w-64 rounded-md border border-borderPrimary p-4 hover:bg-hoverDefault relative overflow-hidden group/studentCard"
+                  className="relative flex flex-col w-64 gap-2 p-4 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
                   {renderFavouriteMark(journal)}
@@ -537,8 +540,8 @@ function TeacherHome() {
     } else
       return (
         <div className="flex flex-col justify-center w-full">
-          <div className="flex flex-col text-center mb-8 relative">
-            <div className="hover: flex justify-center gap-4">
+          <div className="relative flex flex-col mb-8 text-center">
+            <div className="flex justify-center gap-4 hover:">
               <button
                 className="hover:text-primaryColor"
                 onClick={handlePreviousYearClick}
@@ -555,21 +558,20 @@ function TeacherHome() {
             </div>
             {renderSortingSelect()}
           </div>
-          <div className="flex flex-col lg:gap-8 gap-4 justify-center overflow-x-hidden">
+          <div className="flex flex-col justify-center gap-4 overflow-x-hidden lg:gap-8">
             {journals.map((journal) => {
               const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
-                  className="flex flex-col relative gap-2 p-4 rounded-md  border overflow-hidden group/studentCard
-                   border-borderPrimary hover:bg-hoverDefault"
+                  className="relative flex flex-col gap-2 p-4 overflow-hidden border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
                   {renderFavouriteMark(journal)}
-                  <div className="flex flex-wrap gap-4  leading-none items-end p-2">
+                  <div className="flex flex-wrap items-end gap-4 p-2 leading-none">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
-                      className="text-lg text-center leading-none hover:cursor-pointer hover:underline"
+                      className="text-lg leading-none text-center hover:cursor-pointer hover:underline"
                     >
                       {journal.first_name} {journal.last_name}
                     </Link>
@@ -602,21 +604,22 @@ function TeacherHome() {
     setShowDate(new Date());
   }, [setShowDate]);
 
-  if (studentsAndJournalsDataLoading) {
+  if (
+    studentsAndJournalsDataLoading ||
+    !optionsData ||
+    !pinnedStudentsData ||
+    !courseComplitionRequirement
+  ) {
     return <LoadingScreen />;
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
         <TeacherHeatmapTooltip />
 
-        <div
-          className="flex flex-col w-full mx-auto
-          bg-bgSecondary items-center justify-around
-           rounded-md p-4 gap-8 border border-borderPrimary"
-        >
+        <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
           {/* Aika filtteri */}
-          <div className="flex w-full text-sm justify-center relative">
-            <div className="text-textSecondary text-sm justify-center relative flex">
+          <div className="relative flex justify-center w-full text-sm">
+            <div className="relative flex justify-center text-sm text-textSecondary">
               <p
                 onClick={() => {
                   setShowWeeks(true);
@@ -650,7 +653,7 @@ function TeacherHome() {
             </div>
           </div>
 
-          <div className="hidden text-sm lg:flex  flex-wrap justify-center w-full items-center gap-2 lg:gap-8">
+          <div className="flex-wrap items-center justify-center hidden w-full gap-2 text-sm lg:flex lg:gap-8">
             <StudentMultiSelect
               studentArray={studentsAndJournalsData}
               selectedStudents={selectedStudents}
@@ -676,7 +679,7 @@ function TeacherHome() {
               availableGroups={availableOptions.groups}
             />
 
-            <div className="flex lg:gap-8 justify-center text-sm">
+            <div className="flex justify-center text-sm lg:gap-8">
               <button
                 className="Button bg-btnGray hover:bg-hoverGray"
                 onClick={handleFilterReset}
@@ -687,10 +690,9 @@ function TeacherHome() {
           </div>
 
           {/* filtres for mobile  */}
-          <div className="flex flex-col lg:hidden w-full">
+          <div className="flex flex-col w-full lg:hidden">
             <div
-              className="flex gap-8 text-textSecondary w-full py-2 border-b border-borderPrimary
-              justify-center items-center cursor-pointer select-none"
+              className="flex items-center justify-center w-full gap-8 py-2 border-b cursor-pointer select-none text-textSecondary border-borderPrimary"
               onClick={() => {
                 setShowMobileFilters(!showMobileFilters);
               }}
@@ -730,7 +732,7 @@ function TeacherHome() {
                   availableGroups={availableOptions.groups}
                 />
 
-                <div className="flex lg:gap-8 justify-center text-sm">
+                <div className="flex justify-center text-sm lg:gap-8">
                   <button
                     className="Button bg-btnGray hover:bg-hoverGray"
                     onClick={handleFilterReset}
@@ -746,7 +748,7 @@ function TeacherHome() {
         {/* student list */}
         <div
           id="studentList"
-          className="flex w-full gap-8 rounded-md bg-bgSecondary p-4 justify-center border border-borderPrimary"
+          className="flex justify-center w-full gap-8 p-4 border rounded-md bg-bgSecondary border-borderPrimary"
         >
           {showWeeks && <RenderWeeks journals={filteredStudents} />}
           {showMonths && <RenderMonths journals={filteredStudents} />}
