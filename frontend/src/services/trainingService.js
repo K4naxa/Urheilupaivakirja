@@ -62,7 +62,7 @@ const getJournalEntryForForm = async (id) => {
     time_of_day: journalEntry.time_of_day_id
       ? journalEntry.time_of_day_id.toString()
       : "",
-    workout_intensity: journalEntry.workout_intensity_id
+    intensity: journalEntry.workout_intensity_id
       ? journalEntry.workout_intensity_id.toString()
       : "",
     date: journalEntry.date

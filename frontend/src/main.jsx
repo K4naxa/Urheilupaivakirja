@@ -7,10 +7,10 @@ import { MainContextProvider } from "./hooks/mainContext.jsx";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 //import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
-import { JournalModalProvider } from "./hooks/useBigModal.jsx";
+import { BigModalProvider } from "./hooks/useBigModal.jsx";
 import { DateModalProvider } from "./hooks/useDateModal.jsx";
 import { HeatmapTooltipContextProvider } from "./hooks/useHeatmapContext.jsx";
-
+import { ConfirmModalProvider } from "./hooks/useConfirmModal.jsx";
 import App from "./App.jsx";
 import "./index.css";
 
@@ -24,7 +24,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <MainContextProvider>
       <ToastProvider>
-        <JournalModalProvider>
+        <ConfirmModalProvider>
+        <BigModalProvider>
           <HeatmapTooltipContextProvider>
             <DateModalProvider>
               <RouterProvider router={router}>
@@ -34,7 +35,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               </RouterProvider>
             </DateModalProvider>
           </HeatmapTooltipContextProvider>
-        </JournalModalProvider>
+        </BigModalProvider>
+        </ConfirmModalProvider>
       </ToastProvider>
     </MainContextProvider>
   </QueryClientProvider>

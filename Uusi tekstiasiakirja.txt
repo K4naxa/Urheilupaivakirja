@@ -405,8 +405,8 @@ const NewJournalEntryPage = () => {
         onDecline={() => setShowConfirmModal(false)}
         onAgree={handleUserConfirmation}
         text={conflict.message}
-        agreeButton="Jatka"
-        declineButton="Peruuta"
+        agreeButtonText="Jatka"
+        declineButtonText="Peruuta"
         closeOnOutsideClick={false}
       />
 

@@ -289,7 +289,7 @@ const GroupsPage = () => {
             className="p-1 border text-textPrimary bg-bgGray border-borderPrimary rounded-l-md focus-visible:outline-none"
             type="text"
             data-testid="newSportInput"
-            placeholder="Luo Ryhmä"
+            placeholder="Uusi ryhmä"
             value={newGroup}
             onChange={(e) => setNewGroup(e.target.value)}
             onKeyDown={(e) => {

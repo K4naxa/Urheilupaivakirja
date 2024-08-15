@@ -7,6 +7,7 @@ import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { format } from "date-fns";
 import { useParams } from "react-router-dom";
 import { FiTrash2 } from "react-icons/fi";
+import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -15,6 +16,7 @@ const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
 const EditJournalEntryPage = ({ onClose, entryId }) => {
+  const { openConfirmModal } = useConfirmModal();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -25,7 +27,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     workout_category: "1",
     length_in_minutes: "60",
     time_of_day: "",
-    workout_intensity: "",
+    intensity: "",
     date: "",
     details: "",
   });
@@ -34,7 +36,6 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
 
   const EntryIdForQuery = entryId || entry_id;
 
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
@@ -160,7 +161,13 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     }
 
     if (conflict.value) {
-      setShowConfirmModal(true);
+      openConfirmModal({
+        text: conflict.message,
+        agreeButtonText: "Jatka",
+        declineButtonText: "Peruuta",
+        onAgree: handleUserConfirmation,
+        closeOnOutsideClick: false,
+      });
       return; // Open modal for conflicts and wait for user decision
     }
 
@@ -173,16 +180,28 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
 
   const deleteJournalEntryHandler = async (e) => {
     e.preventDefault();
-
-    try {
-      await deleteEntry.mutate({ journalEntryData });
-    } catch (error) {
-      console.error("Error adding journal entry:", error);
-    }
+  
+    const onConfirmDelete = async () => {
+      try {
+        await deleteEntry.mutate({ journalEntryData });
+        console.log('Journal entry deleted successfully');
+      } catch (error) {
+        console.error("Error deleting journal entry:", error);
+      }
+    };
+  
+    openConfirmModal({
+      text: "Merkintä poistetaan pysyvästi",
+      agreeButtonText: "Jatka",
+      agreeStyle: "red", 
+      declineButtonText: "Peruuta",
+      onAgree: onConfirmDelete, 
+      closeOnOutsideClick: false,
+    });
   };
+  
 
   const handleUserConfirmation = async () => {
-    setShowConfirmModal(false);
     try {
       await editJournalEntry.mutate({ journalEntryData });
     } catch (error) {
@@ -291,8 +310,8 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
         "time_of_day"
       );
       hasMissingInputs |= checkIfEmpty(
-        journalEntryData.workout_intensity,
-        "workout_intensity"
+        journalEntryData.intensity,
+        "intensity"
       );
     }
 
@@ -453,15 +472,6 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   } else {
     return (
       <>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={conflict.message}
-          agreeButton="Jatka"
-          declineButton="Peruuta"
-          closeOnOutsideClick={false}
-        />
         <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
           <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
             <p className="sm:min-w-[400px] cursor-default	">Muokkaa merkintää</p>
@@ -599,14 +609,14 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
 
             {journalEntryData.entry_type === "1" && (
               <div
-                className={`${inputContainer} ${errors.workout_intensity ? "shadow-error" : ""}`}
+                className={`${inputContainer} ${errors.intensity ? "shadow-error" : ""}`}
               >
                 <label className={inputLabel}>Rankkuus</label>
                 <div className={optionContainer}>
                   {console.log(optionsData.workout_intensities[0].id)}
                   {optionsData.workout_intensities.map((intensity) =>
                     renderRadioButton(
-                      "workout_intensity",
+                      "intensity",
                       intensity.id.toString(),
                       intensity.name,
                       changeHandler
@@ -672,5 +682,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     );
   }
 };
+
+
 
 export default EditJournalEntryPage;

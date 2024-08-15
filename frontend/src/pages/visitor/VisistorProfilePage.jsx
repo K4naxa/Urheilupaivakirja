@@ -116,8 +116,8 @@ function VisitorProfilePage() {
           onDecline={() => setShowConfirmModal(false)}
           onAgree={handleUserConfirmation}
           text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
+          agreeButtonText={continueButton}
+          declineButtonText={"Peruuta"}
           agreeStyle={agreeStyle}
         />
       </div>

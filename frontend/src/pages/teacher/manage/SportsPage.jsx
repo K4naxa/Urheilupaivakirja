@@ -311,7 +311,7 @@ const SportsPage = () => {
                     focus-visible:outline-none"
               type="text"
               data-testid="newSportInput"
-              placeholder="Luo laji"
+              placeholder="Uusi laji"
               value={newSport}
               onChange={(e) => setNewSport(e.target.value)}
               onKeyDown={(e) => {

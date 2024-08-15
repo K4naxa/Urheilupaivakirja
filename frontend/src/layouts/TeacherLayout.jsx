@@ -34,12 +34,9 @@ const TeacherLayout = () => {
   let iconSize = 20;
   return (
     <div className="text-textPrimary">
-      <header
-        id="desktop-header"
-        className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
-        border-b-2 px-4 py-2 md:flex z-10"
-      >
-        <nav id="top-nav" className="flex justify-center gap-8 ">
+      <div className="bg-bgSecondary border border-b-2 border-borderPrimary fixed-header">
+      <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between" >
+        <nav id="top-nav" className="flex justify-center gap-8">
           <div className="text-textPrimary flex justify-center gap-4 ">
             <Link to={"/opettaja/"} className="text-xl flex items-center gap-2">
               <img src={siteLogo} alt="site logo" className="w-8 h-8" />
@@ -149,6 +146,7 @@ const TeacherLayout = () => {
           </Menu>
         </div>
       </header>
+      </div>
       {/* header for mobile */}
 
       <header

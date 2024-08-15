@@ -5,29 +5,16 @@ import userService from "../../../services/userService";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
 
 const VisitorsPage = () => {
   const queryClient = useQueryClient();
+  const { openConfirmModal } = useConfirmModal();
 
   const [errorMessage, setErrorMessage] = useState("");
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
+
 
   const handleDelete = (spectator) => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa vierailijan ${spectator.first_name} ${spectator.last_name}?
-      Tämä poistaa kaikki vierailijan tiedot pysyvästi.`
-    );
-    setContinueButton("Poista");
 
     const handleUserConfirmation = async () => {
       await userService.deleteUser(spectator.user_id).then(() => {
@@ -35,10 +22,27 @@ const VisitorsPage = () => {
           queryKey: ["studentsAndJournals"],
         });
       });
-      setShowConfirmModal(false);
       queryClient.invalidateQueries({ spectators });
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa vierailijan
+        <br/>
+        <strong>{spectator.first_name} {spectator.last_name}?</strong>
+        <br />
+        Tämä poistaa kaikki vierailijan tiedot pysyvästi.`
+      </span>
+    );    
+
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
 
   const { data: spectators, isLoading: spectatorsLoading } = useQuery({
@@ -117,15 +121,6 @@ const VisitorsPage = () => {
             )}
           </div>
         </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
       </div>
     </div>
   );

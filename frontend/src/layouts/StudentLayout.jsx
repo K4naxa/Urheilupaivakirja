@@ -23,12 +23,26 @@ const StudentLayout = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { openBigModal } = useBigModal();
 
+  const checkVerticalScrollbar = (element) => {
+    // Determine if a vertical scrollbar is visible
+    const hasVerticalScrollbar = element.offsetWidth > element.clientWidth;
+
+    // Calculate the width of the vertical scrollbar
+    const scrollbarWidth = hasVerticalScrollbar ? element.offsetWidth - element.clientWidth : 0;
+
+    return {
+        hasVerticalScrollbar,
+        scrollbarWidth
+    };
+}
+
   const linkClass =
     "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl";
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
-      <header className="z-10 hidden px-4 py-2 border border-b-2 fixed-header bg-bgSecondary border-borderPrimary md:flex">
+      <div className="bg-bgSecondary border border-b-2 border-borderPrimary fixed-header">
+      <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between" >
         <Link to={"/"} className="flex items-center gap-2 text-xl">
           <img src={siteLogo} alt="site logo" className="w-8 h-8" />
           Urheilupäiväkirja
@@ -116,6 +130,7 @@ const StudentLayout = () => {
           </Menu>
         </div>
       </header>
+      </div>
       {/* header for mobile */}
 
       <header

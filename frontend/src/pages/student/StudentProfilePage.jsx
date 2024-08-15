@@ -3,25 +3,15 @@ import userService from "../../services/userService";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen";
 import { format } from "date-fns";
-import ConfirmModal from "../../components/confirm-modal/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
+import { useConfirmModal } from "../../hooks/useConfirmModal";
 
 function StudentProfilePage() {
   const { user, logout } = useAuth();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
+  const { openConfirmModal } = useConfirmModal();
 
   const { data: userData, isLoading: userDataLoading } = useQuery({
     queryKey: ["studentData"],
@@ -38,26 +28,23 @@ function StudentProfilePage() {
   };
 
   const handleAccountDelete = () => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? 
-  
-      Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
-    );
-    setContinueButton("Poista");
-
     const handleUserConfirmation = async () => {
       try {
         await userService.deleteUser(userData.user_id);
         await logout(); // Ensure this clears tokens/sessions
       } catch (error) {
         console.error("Error deleting user or logging out:", error);
-      } finally {
-        setShowConfirmModal(false);
       }
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? 
+    Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+    });
   };
 
   if (userDataLoading) {
@@ -148,15 +135,6 @@ function StudentProfilePage() {
             </button>
           </div>
         </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
       </div>
     );
 }

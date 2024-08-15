@@ -260,7 +260,7 @@ const CampusPage = () => {
             className="p-1 border text-textPrimary bg-bgGray border-borderPrimary rounded-l-md focus-visible:outline-none"
             type="text"
             data-testid="newCampusInput"
-            placeholder="Luo toimipaikka"
+            placeholder="Uusi toimipaikka"
             value={newCampus}
             onChange={(e) => setNewCampus(e.target.value)}
             onKeyDown={(e) => {

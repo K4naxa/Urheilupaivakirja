@@ -12,7 +12,7 @@ export function useBigModal() {
   return useContext(BigModalContext);
 }
 
-export const JournalModalProvider = ({ children }) => {
+export const BigModalProvider = ({ children }) => {
   const [isBigModalOpen, setBigModalOpen] = useState(false);
   const [bigModalContent, setBigModalContent] = useState(null);
 
