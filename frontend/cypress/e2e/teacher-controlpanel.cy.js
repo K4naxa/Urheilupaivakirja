@@ -80,10 +80,12 @@ describe("Teacher basic functionalitys", () => {
   it("should navigate to hallinta and edit a group", () => {
     cy.get("#desktop-header").contains("Hallinta").click();
     cy.get("#manage-nav").contains("Ryhmät").click();
-    cy.get("#groupsContainer").contains("CypressTestInput");
-    cy.contains("CypressTestInput").parent().find("button#editBtn").click();
-    cy.get("input#editInput").clear();
-    cy.get("input#editInput").type("CypressTestInputEdit{enter}");
+    cy.contains("CypressTestInput")
+      .parent()
+      .find("[data-testid = editBtn]")
+      .click();
+    cy.get("[data-testid = editInput]").clear();
+    cy.get("[data-testid = editInput]").type("CypressTestInputEdit{enter}");
     cy.get("#groupsContainer").contains("CypressTestInputEdit");
   });
 
@@ -93,7 +95,7 @@ describe("Teacher basic functionalitys", () => {
     cy.get("#groupsContainer").contains("CypressTestInputEdit");
     cy.contains("CypressTestInputEdit")
       .parent()
-      .find("button#deleteBtn")
+      .find("[data-testid = deleteBtn]")
       .click();
     cy.get("#groupsContainer").should("not.contain", "CypressTestInputEdit");
   });

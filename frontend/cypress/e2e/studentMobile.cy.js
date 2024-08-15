@@ -1,6 +1,7 @@
 describe("Student basic functionalitys", () => {
   beforeEach(() => {
     cy.visit("localhost:5173");
+    cy.viewport("iphone-6");
     cy.contains("Kirjautuminen");
 
     cy.get('input[type="email"]').type("student@example.com");
