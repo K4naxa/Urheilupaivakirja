@@ -29,6 +29,7 @@ import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import userService from "../../services/userService";
 import { useParams } from "react-router-dom";
+import trainingService from "../../services/trainingService";
 
 function StudentHome() {
   const { id } = useParams();
@@ -41,6 +42,12 @@ function StudentHome() {
   } = useQuery({
     queryKey: ["studentData", id],
     queryFn: () => userService.getStudentData(id),
+    staleTime: 15 * 60 * 1000,
+  });
+
+  const { data: courseComplitionRequirement } = useQuery({
+    queryKey: ["courseComplitionRequirement"],
+    queryFn: () => trainingService.getComplitionRequirement(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -73,7 +80,7 @@ function StudentHome() {
     return studentData.journal_entries.length;
   };
 
-  if (studentDataError) {
+  if (studentDataError || !studentData || !courseComplitionRequirement) {
     return (
       <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>
@@ -197,7 +204,10 @@ function StudentHome() {
               <p className="text-lg">Seuranta</p>
             </div>
             <div className="flex flex-col items-center justify-center">
-              <CourseComplitionBar value={calcJournalEntriesCount()} />
+              <CourseComplitionBar
+                value={calcJournalEntriesCount()}
+                REQUIRED_COMPLETION={courseComplitionRequirement[0].value}
+              />
             </div>
           </div>
         </div>
