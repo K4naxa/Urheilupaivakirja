@@ -110,7 +110,7 @@ function StudentHome() {
                 </div>
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Ryhmä:</p>{" "}
-                  <p>{studentData.group_identifier}</p>
+                  <p>{studentData.name}</p>
                 </div>
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Laji:</p>{" "}

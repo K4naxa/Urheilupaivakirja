@@ -8,7 +8,7 @@ import cc from "../../../utils/cc";
 // renders a container for a group while checking if it is being edited
 function CreateGroupContainer({ group, setGroups, groups }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedGroup, setEditedGroup] = useState(group.group_identifier);
+  const [editedGroup, setEditedGroup] = useState(group.name);
   const [cellError, setCellError] = useState(false);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     if (
       groups.find(
         (oGroup) =>
-          oGroup.group_identifier.toLowerCase() === editedGroup.toLowerCase()
+          oGroup.name.toLowerCase() === editedGroup.toLowerCase()
       )
     ) {
       setCellError("Ryhmä on jo olemassa.");
@@ -38,7 +38,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     const newGroup = {
       id: group.id,
       student_count: group.student_count,
-      group_identifier: editedGroup,
+      name: editedGroup,
     };
     publicService
       .editGroup(newGroup)
@@ -73,7 +73,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
   const handleEdit = () => {
     setIsEditing(!isEditing);
     if (isEditing) {
-      setEditedGroup(group.group_identifier);
+      setEditedGroup(group.name);
       setIsEditing(false);
     }
     if (!isEditing) {
@@ -123,7 +123,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
       <div className="flex flex-col">
         {/* main Container */}
         <div className="grid items-center p-2 rounded-md grid-cols-controlpanel3 hover:bg-bgGray">
-          <p className="">{group.group_identifier}</p>
+          <p className="">{group.name}</p>
           <p className="text-center">{group.student_count}</p>
           <div className="flex gap-4 ">
             <button
@@ -220,7 +220,7 @@ const GroupsPage = () => {
     if (
       groups.some(
         (group) =>
-          group.group_identifier.toLowerCase() === newGroup.toLocaleLowerCase()
+          group.name.toLowerCase() === newGroup.toLocaleLowerCase()
       )
     ) {
       setErrorMessage("Ryhmä on jo olemassa");
@@ -340,7 +340,7 @@ const GroupsPage = () => {
                 groups={sortedGroups}
                 setGroups={setSortedGroups}
                 group={group}
-                key={group.group_identifier}
+                key={group.name}
               />
             ))}
           </div>

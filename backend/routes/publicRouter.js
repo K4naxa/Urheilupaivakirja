@@ -56,13 +56,13 @@ router.put("/groups/:id", async (req, res, next) => {
     return res.status(401).json({ error: "Unauthorized" });
 
   const { id } = req.params;
-  const { group_identifier } = req.body;
+  const { name } = req.body;
 
   knex("student_groups")
     .where({ id })
-    .update({ group_identifier })
+    .update({ name })
     .then(() => {
-      res.status(200).json({ id, group_identifier });
+      res.status(200).json({ id, name });
     })
     .catch((err) => {
       console.log("Error updating group", err);
@@ -77,12 +77,12 @@ router.post("/groups", async (req, res, next) => {
   if (getRole(req) !== 1)
     return res.status(401).json({ error: "Unauthorized" });
 
-  const { group_identifier } = req.body;
+  const { name } = req.body;
 
   knex("student_groups")
-    .insert({ group_identifier })
+    .insert({ name })
     .then((id) => {
-      res.status(201).json({ id: id[0], group_identifier });
+      res.status(201).json({ id: id[0], name });
     })
     .catch((err) => {
       console.log("Error adding group", err);
@@ -234,7 +234,7 @@ router.get("/news", async (req, res, next) => {
       .whereIn("news_id", newsIds);
 
     const studentGroups = await knex("news_student_groups")
-      .select("news_id", "group_identifier as name")
+      .select("news_id", "name")
       .join("student_groups", "news_student_groups.student_group_id", "student_groups.id")
       .whereIn("news_id", newsIds);
 
@@ -276,7 +276,7 @@ router.get("/teacher_news", async (req, res, next) => {
       .whereIn("news_id", newsIds);
 
     const studentGroups = await knex("news_student_groups")
-      .select("news_id", "group_identifier as name")
+      .select("news_id", "name")
       .join("student_groups", "news_student_groups.student_group_id", "student_groups.id")
       .whereIn("news_id", newsIds);
 

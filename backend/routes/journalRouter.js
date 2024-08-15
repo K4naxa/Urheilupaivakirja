@@ -107,7 +107,7 @@ router.get("/user/:id", async (req, res, next) => {
         "students.first_name",
         "students.last_name",
         "sports.name as sport_name",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus_name"
       )
       .where("students.user_id", user_id)
@@ -123,7 +123,7 @@ router.get("/user/:id", async (req, res, next) => {
         first_name: studentInfo.first_name,
         last_name: studentInfo.last_name,
         sport_name: studentInfo.sport_name,
-        group_identifier: studentInfo.group_identifier,
+        name: studentInfo.name,
         campus_name: studentInfo.campus_name,
         journal_entries: allEntries,
       };

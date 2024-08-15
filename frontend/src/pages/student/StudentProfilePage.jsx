@@ -219,7 +219,7 @@ function StudentProfilePage() {
                 Ryhmä
               </label>
               <input
-                value={userData.group_identifier}
+                value={userData.name}
                 disabled
                 className={cc(inputClass, "disabled:text-opacity-80")}
               />

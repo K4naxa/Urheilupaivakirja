@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
         "first_name",
         "last_name",
         "sports.name as sport",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus"
       )
       .from("students")
@@ -44,7 +44,7 @@ router.get("/", async (req, res) => {
         first_name: student.first_name,
         last_name: student.last_name,
         sport: student.sport,
-        group: student.group_identifier,
+        group: student.name,
         campus: student.campus,
         journal_entries: studentJournalEntries,
       };
@@ -109,7 +109,7 @@ router.get("/entries", async (req, res) => {
         "students.first_name",
         "students.last_name",
         "sports.name as sport_name",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus_name"
       )
       .where("students.archived", false)
@@ -124,7 +124,7 @@ router.get("/entries", async (req, res) => {
       first_name: student.first_name,
       last_name: student.last_name,
       sport_name: student.sport_name,
-      group_identifier: student.group_identifier,
+      name: student.name,
       campus_name: student.campus_name,
       journal_entries: allEntries.filter(
         (entry) => entry.user_id === student.user_id
@@ -154,7 +154,7 @@ router.get("/archived", async (req, res) => {
         "first_name",
         "last_name",
         "sports.name as sport",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus"
       )
       .from("students")
@@ -236,7 +236,7 @@ router.get("/data/:userId?", async (req, res) => {
       .select(
         "students.*",
         "sports.name as sport_name",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus_name",
         "users.email",
         "users.created_at",

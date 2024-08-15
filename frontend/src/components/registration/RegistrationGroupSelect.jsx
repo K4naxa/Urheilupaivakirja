@@ -23,7 +23,7 @@ const GroupSelect = ({
 
   const groupOptions = options.student_groups.map((group) => ({
     value: group.id,
-    label: group.group_identifier,
+    label: group.name,
   }));
 
   const formatCreateLabel = (inputValue) => `Luo uusi ryhmä: "${inputValue}"`;

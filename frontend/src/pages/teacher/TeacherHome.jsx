@@ -116,7 +116,7 @@ function TeacherHome() {
       if (filterType !== "groups" && selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
           selectedGroups.some(
-            (group) => group.label === student.group_identifier
+            (group) => group.label === student.name
           )
         );
       }
@@ -153,7 +153,7 @@ function TeacherHome() {
     );
     const availableGroupsCount = countStudents(
       getAvailableOptions("groups"),
-      "group_identifier"
+      "name"
     );
 
     return {
@@ -194,8 +194,8 @@ function TeacherHome() {
     name2: (a, b) => b.first_name.localeCompare(a.first_name),
     sport1: (a, b) => a.sport_name.localeCompare(b.sport_name),
     sport2: (a, b) => b.sport_name.localeCompare(a.sport_name),
-    group1: (a, b) => a.group_identifier.localeCompare(b.group_identifier),
-    group2: (a, b) => b.group_identifier.localeCompare(a.group_identifier),
+    group1: (a, b) => a.name.localeCompare(b.name),
+    group2: (a, b) => b.name.localeCompare(a.name),
     campus1: (a, b) => a.campus_name.localeCompare(b.campus_name),
     campus2: (a, b) => b.campus_name.localeCompare(a.campus_name),
     progression1: (a, b) =>
@@ -222,7 +222,7 @@ function TeacherHome() {
     }
     if (selectedGroups.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedGroups.some((group) => group.label === student.group_identifier)
+        selectedGroups.some((group) => group.label === student.name)
       );
     }
     if (selectedStudents.length > 0) {
@@ -580,7 +580,7 @@ function TeacherHome() {
                       Toimipiste: {journal.campus_name}
                     </p>
                     <p className="text-textSecondary">
-                      ryhmä: {journal.group_identifier}
+                      ryhmä: {journal.name}
                     </p>
                     <p className="flex text-textSecondary">
                       Laji: {journal.sport_name}

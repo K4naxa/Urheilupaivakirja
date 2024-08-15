@@ -1,7 +1,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable('student_groups', function(table) {
       table.increments('id').primary();
-      table.string('group_identifier').notNullable();
+      table.string('name').notNullable();
     });
   };
   
