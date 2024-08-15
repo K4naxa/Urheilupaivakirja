@@ -30,6 +30,7 @@ import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherH
 import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSelect.jsx";
 import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
 import cc from "../../utils/cc.js";
+import trainingService from "../../services/trainingService.js";
 
 function TeacherHome() {
   const queryClient = useQueryClient();
@@ -51,7 +52,11 @@ function TeacherHome() {
   const { setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
-  const COURSE_COMPLETION_REQUIREMENT = 300;
+  const { data: courseComplitionRequirement } = useQuery({
+    queryKey: ["courseComplitionRequirement"],
+    queryFn: () => trainingService.getComplitionRequirement(),
+    staleTime: 15 * 60 * 1000,
+  });
 
   // all Students and their journals
   const {
@@ -241,7 +246,7 @@ function TeacherHome() {
 
   const countCourseProgression = (student) => {
     const total = student.journal_entries.length;
-    let progression = total / COURSE_COMPLETION_REQUIREMENT;
+    let progression = total / courseComplitionRequirement[0].value;
     progression *= 100;
 
     if (progression > 100) return 100;
@@ -575,7 +580,12 @@ function TeacherHome() {
     setShowDate(new Date());
   }, [setShowDate]);
 
-  if (studentsAndJournalsDataLoading) {
+  if (
+    studentsAndJournalsDataLoading ||
+    !optionsData ||
+    !pinnedStudentsData ||
+    !courseComplitionRequirement
+  ) {
     return <LoadingScreen />;
   } else
     return (
