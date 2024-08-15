@@ -91,17 +91,9 @@ function StudentProfilePage() {
     } catch (error) {
       addToast("Virhe päivitettäessä salasanaa", { style: "error" });
     }
+  };
 
   const handleAccountDelete = () => {
-    const handleUserConfirmation = async () => {
-      try {
-        await userService.deleteUser(userData.user_id);
-        await logout(); // Ensure this clears tokens/sessions
-      } catch (error) {
-        console.error("Error deleting user or logging out:", error);
-      }
-    };
-
     const handleUserConfirmation = async () => {
       try {
         await userService.deleteUser(userData.user_id);
@@ -119,17 +111,7 @@ function StudentProfilePage() {
       agreeStyle: "red",
       declineButtonText: "Peruuta",
     });
-
-  const [trainedHours, setTrainedHours] = useState(0);
-  const [trainedMinutes, setTrainedMinutes] = useState(0);
-  const countTrainedTime = (totalMinutes) => {
-    setTrainedHours(Math.floor(totalMinutes / 60));
-    setTrainedMinutes(totalMinutes % 60);
-    return;
-  };
-
-  const inputClass =
-    "text-lg text-textPrimary border-borderPrimary disabled:text-opacity-70 border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
+  }
 
   const [trainedHours, setTrainedHours] = useState(0);
   const [trainedMinutes, setTrainedMinutes] = useState(0);
@@ -359,88 +341,7 @@ function StudentProfilePage() {
           </div>
         </div>
 
-        {/* <div className="flex flex-col p-4 border divide-y rounded-md bg-bgSecondary border-borderPrimary divide-borderPrimary">
-          <div className="px-2 py-4">
-            <header className="mb-4 text-xl text-center">
-              Profiili tiedot
-            </header>
-            <div className="flex justify-around gap-4">
-              <div className="px-4 py-2 text-white border rounded-md border-borderPrimary bg-primaryColor ">
-                <p>{userData.total_entries_count} merkintää</p>
-              </div>
-              <div className="px-4 py-2 text-white border rounded-md border-borderPrimary bg-primaryColor">
-                {userData.entry_type_1_count} harjoitusta
-              </div>
-              <div className="px-4 py-2 text-white border rounded-md border-borderPrimary bg-primaryColor ">
-                {userData.unique_days_count} aktiivista päivää
-              </div>
-            </div>
-          </div>
-          <div className="px-2 py-2">
-            <div className="flex gap-2 mb-1">
-              <p className="text-textSecondary">Etunimi:</p>{" "}
-              <p>{userData.first_name}</p>
-            </div>
-            <div className="flex gap-2 mt-1">
-              <p className="text-textSecondary">Sukunimi:</p>{" "}
-              <p>{userData.last_name}</p>
-            </div>
-          </div>
-          <div className="px-2 py-2">
-            <div className="flex gap-2">
-              <p className="text-textSecondary">Sähköposti:</p>{" "}
-              <p>{userData.email}</p>
-            </div>
-          </div>
-          <div className="px-2 py-2">
-            <div className="flex gap-2">
-              <p className="text-textSecondary">Laji:</p>{" "}
-              <p>{userData.sport_name}</p>
-            </div>
-          </div>
-          <div className="px-2 py-2">
-            <div className="flex gap-2">
-              <p className="text-textSecondary">Ryhmä:</p>{" "}
-              <p>{userData.group_identifier}</p>
-            </div>
-          </div>
-          <div className="px-2 py-2">
-            <div className="flex gap-2">
-              <p className="text-textSecondary">Toimipaikka:</p>{" "}
-              <p>{userData.campus_name}</p>
-            </div>
-          </div>
-          <div className="px-2 py-2">
-            <div className="flex gap-2 mb-1">
-              <p className="text-textSecondary">Käyttäjä luotu:</p>{" "}
-              <p>{format(new Date(userData.created_at), "dd.MM.yyyy")}</p>
-            </div>
-            <div className="flex gap-2 mt-1">
-              <p className="text-textSecondary">Käyttäjän ikä:</p>{" "}
-              <p>{getAccountAge(userData.created_at)}vrk</p>
-            </div>
-          </div>
-
-          <div className="flex justify-center w-full gap-2 px-2 py-4 ">
-            <button
-              className="w-32 text-white Button bg-iconRed"
-              onClick={() => {
-                handleAccountDelete();
-              }}
-            >
-              Poista Käyttäjä
-            </button>
-          </div>
-        </div> */}
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
+    
       </div>
     );
 }

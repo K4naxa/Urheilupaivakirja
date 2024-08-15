@@ -52,6 +52,7 @@ const CampusSelect = ({
             },
           })
         }
+        
         options={campusOptions}
         placeholder="Valitse kampus"
         isClearable

@@ -332,7 +332,7 @@ const RegistrationPage = () => {
           </Link>
         </div>
         <form
-          className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid w-full"
+          className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid h-[650px] w-full"
           onSubmit={registerHandler}
         >
           {/* First Name */}
@@ -480,6 +480,7 @@ const RegistrationPage = () => {
               registrationData={registrationData}
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
+              
             />
             {/* registrationData.sportId === "new" && (
               <input
@@ -505,6 +506,7 @@ const RegistrationPage = () => {
               registrationData={registrationData}
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
+              
             />
             {errors.groupId && errors.groupId.message && (
               <p className={errorClass}>{errors.groupId.message}</p>
@@ -520,6 +522,7 @@ const RegistrationPage = () => {
               registrationData={registrationData}
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
+              
             />
             {errors.campusId && errors.campusId.message && (
               <p className={errorClass}>{errors.campusId.message}</p>

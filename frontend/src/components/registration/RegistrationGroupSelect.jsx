@@ -56,6 +56,7 @@ const GroupSelect = ({
           })
         }
         options={groupOptions}
+        
         placeholder="Valitse ryhmä"
         isClearable
         formatCreateLabel={formatCreateLabel}
