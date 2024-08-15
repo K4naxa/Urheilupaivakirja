@@ -36,12 +36,11 @@ const TeacherLayout = () => {
     <div className="text-textPrimary">
       <header
         id="desktop-header"
-        className="fixed-header bg-bgSecondary border border-borderPrimary hidden  
-        border-b-2 px-4 py-2 md:flex z-10"
+        className="z-10 hidden px-4 py-2 border border-b-2 fixed-header bg-bgSecondary border-borderPrimary md:flex"
       >
         <nav id="top-nav" className="flex justify-center gap-8 ">
-          <div className="text-textPrimary flex justify-center gap-4 ">
-            <Link to={"/opettaja/"} className="text-xl flex items-center gap-2">
+          <div className="flex justify-center gap-4 text-textPrimary ">
+            <Link to={"/opettaja/"} className="flex items-center gap-2 text-xl">
               <img src={siteLogo} alt="site logo" className="w-8 h-8" />
               Urheilupäiväkirja
             </Link>
@@ -107,7 +106,7 @@ const TeacherLayout = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 w-36 mt-1 origin-top-right bg-bgSecondary text-lg divide-y divide-secondaryColor rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 mt-1 text-lg origin-top-right divide-y rounded-md shadow-lg w-36 bg-bgSecondary divide-secondaryColor ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     {({ active }) => (
@@ -115,7 +114,7 @@ const TeacherLayout = () => {
                         to="/opettaja/profiili"
                         className={`${
                           active
-                            ? "bg-primaryColor text-bgSecondary"
+                            ? "bg-primaryColor text-bgSecondary hover:text-white"
                             : "text-textPrimary"
                         } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
                       >
@@ -155,7 +154,7 @@ const TeacherLayout = () => {
         className={`bg-bgPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl md:hidden z-10`}
         id="mobile-header"
       >
-        <nav id="top-nav" className="grid-cols-5 grid gap-4 w-full">
+        <nav id="top-nav" className="grid w-full grid-cols-5 gap-4">
           <NavLink to="/opettaja" end className={linkClass}>
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
@@ -314,7 +313,7 @@ const TeacherLayout = () => {
         </div>
       </header>
 
-      <div className="flex w-full  md:mt-24">
+      <div className="flex w-full md:mt-24">
         <main className=" w-full mx-auto max-w-[1480px] pb-16 ">
           <Outlet />
         </main>
