@@ -191,6 +191,23 @@ const deleteSport = async (id) => {
   return response.data;
 };
 
+// ................................................................................
+const getComplitionRequirement = async () => {
+  const response = await axios.get(
+    "/courseInfo/complition_requirement",
+    makeHeader()
+  );
+  return response.data;
+};
+const updateComplitionRequirement = async (value) => {
+  const response = await axios.put(
+    "/courseInfo/complition_requirement",
+    { value },
+    makeHeader()
+  );
+  return response.data;
+};
+
 export default {
   getAllUserJournalEntries,
   getUserJournalEntriesByUserId,
@@ -206,4 +223,6 @@ export default {
   addSport,
   editSport,
   deleteSport,
+  getComplitionRequirement,
+  updateComplitionRequirement,
 };

@@ -256,7 +256,8 @@ router.get("/data/:userId?", async (req, res) => {
         knex.raw(
           "COUNT(CASE WHEN entry_type_id = 1 THEN 1 END) as entry_type_1_count" // Count entries of type 1
         ),
-        knex.raw("COUNT(*) as total_entries_count") // Count total entries
+        knex.raw("COUNT(*) as total_entries_count"), // Count total entries
+        knex.raw("CAST(SUM(length_in_minutes) AS UNSIGNED) as total_minutes") // Sum total minutes
       )
       .where("user_id", userId) // Match the user ID
       .first(); // Get the first match
@@ -310,6 +311,7 @@ router.get("/data/:userId?", async (req, res) => {
       unique_days_count: journalData.unique_days_count, // Add unique days count
       entry_type_1_count: journalData.entry_type_1_count, // Add entry type 1 count
       total_entries_count: journalData.total_entries_count, // Add total entries count
+      total_minutes: journalData.total_minutes, // Add total minutes
     };
 
     // Send the combined data as a JSON response

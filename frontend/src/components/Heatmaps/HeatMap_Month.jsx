@@ -37,10 +37,10 @@ function HeatMap_Month({ journal }) {
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-      setShowDate(startOfDay(subMonths(showDate, 1)));
+      setShowDate(startOfDay(addMonths(showDate, 1)));
     },
     onSwipedRight: () => {
-      setShowDate(startOfDay(addMonths(showDate, 1)));
+      setShowDate(startOfDay(subMonths(showDate, 1)));
     },
   });
 
@@ -108,7 +108,7 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
       onClick={onClick}
     >
       {showWeekName && (
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-textSecondary visible text-xs">
+        <div className="absolute visible text-xs transform -translate-x-1/2 -top-6 left-1/2 text-textSecondary">
           {formatDate(day, { weekday: "short" })}
         </div>
       )}
