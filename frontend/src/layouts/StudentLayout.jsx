@@ -2,6 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 import { FiUser, FiHome, FiLogOut } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
@@ -148,12 +149,14 @@ const StudentLayout = () => {
           {/* new journal entry button */}
           <div className="flex justify-center">
             <div className="absolute z-20 flex bottom-6 justify">
-              <button
-                className="text-3xl duration-100 border-t-2 rounded-full bg-bgSecondary border-primaryColor text-primaryColor shadow-upper-shadow size-16 drop-shadow-xl active:scale-110"
-                onClick={() => openBigModal("new")}
-              >
-                +
-              </button>
+              <div className="flex items-center justify-center text-white rounded-full bg-bgPrimary shadow-upper-shadow size-16 active:scale-110">
+                <button
+                  className="flex items-center justify-center text-white duration-100 rounded-full bg-gradient-to-br from-50% to-99% from-primaryColor to-secondaryColor size-14 active:scale-110"
+                  onClick={() => openBigModal("new")}
+                >
+                  <FiPlus size={24} />
+                </button>
+              </div>
             </div>
           </div>
 
