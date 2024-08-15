@@ -46,7 +46,7 @@ function StudentHome() {
 
   if (studentDataLoading) {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex items-center justify-center">
         <LoadingScreen />
       </div>
     );
@@ -75,28 +75,28 @@ function StudentHome() {
 
   if (studentDataError) {
     return (
-      <div className="flex justify-center items-center w-full">
+      <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 w-full m-2 gap-4 lg:gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
+    <div className="grid w-full grid-cols-1 gap-4 p-2 overflow-x-auto lg:gap-8 bg-bgPrimary text-textPrimary">
       <StudentHeatmapTooltip />
       {/* first row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
+      <div className="grid w-full h-full grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-3 lg:gap-8">
         {/* rightSide */}
-        <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
-          <div className="flex flex-col lg:flex-row justify-center lg:justify-between gap-8 w-full mb-4">
+        <div className="flex-col rounded-md lg:col-span-2 lg:bg-bgSecondary lg:p-4 lg:border border-borderPrimary">
+          <div className="flex flex-col justify-center w-full gap-8 p-2 mb-4 border rounded-md bg-bgSecondary lg:flex-row lg:justify-between border-borderPrimary lg:border-none">
             <div className="flex flex-col">
               {/* Student Name */}
-              <div className="flex  mb-2 font-medium  text-2xl text-textPrimary w-full justify-center lg:justify-normal ">
-                <p className="w-fit border-b border-primaryColor">
+              <div className="flex justify-center w-full mb-2 text-2xl font-medium text-textPrimary lg:justify-normal ">
+                <p className="border-b w-fit border-primaryColor">
                   {studentData.first_name} {studentData.last_name}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-x-4  w-full justify-center lg:justify-normal">
+              <div className="flex flex-wrap justify-center w-full gap-x-4 lg:justify-normal">
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Toimipaikka:</p>{" "}
                   <p>{studentData.campus_name}</p>
@@ -113,27 +113,29 @@ function StudentHome() {
             </div>
 
             {/* student journal entry counts  */}
-            <div className="flex  gap-2  w-full justify-center lg:justify-end ">
-              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
+            <div className="flex justify-center w-full gap-2 lg:justify-end ">
+              <div className="px-4 py-2 text-white border rounded-md border-borderPrimary h-fit bg-primaryColor ">
                 <p>{studentData.total_entries_count} merkintää</p>
               </div>
-              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white">
+              <div className="px-4 py-2 text-white border rounded-md border-borderPrimary h-fit bg-primaryColor">
                 {studentData.entry_type_1_count} harjoitusta
               </div>
-              <div className="border border-borderPrimary px-4 py-2 h-fit rounded-md bg-primaryColor text-white ">
+              <div className="px-4 py-2 text-white border rounded-md border-borderPrimary h-fit bg-primaryColor ">
                 {studentData.unique_days_count} aktiivista päivää
               </div>
             </div>
           </div>
 
-          <RecentJournalEntries journal={studentData.journal_entries} />
+          <div className="bg-bgSecondary">
+            <RecentJournalEntries journal={studentData.journal_entries} />
+          </div>
         </div>
         {/* left Side */}
-        <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
+        <div className="box-border flex flex-col p-4 text-center border rounded-md border-borderPrimary bg-bgSecondary">
           <div className="text-textSecondary">{showDate.getFullYear()}</div>
-          <div className="w-full flex justify-center items-center mb-4">
+          <div className="flex items-center justify-center w-full mb-4">
             <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              className="select-none text-textPrimary hover:text-primaryColor hover:cursor-pointer"
               onClick={() => {
                 setShowDate(subMonths(showDate, 1));
               }}
@@ -144,7 +146,7 @@ function StudentHome() {
               {formatDate(showDate, { month: "long" })}
             </p>
             <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              className="select-none text-textPrimary hover:text-primaryColor hover:cursor-pointer"
               onClick={() => {
                 setShowDate(addMonths(showDate, 1));
               }}
@@ -152,30 +154,30 @@ function StudentHome() {
               <FiChevronRight />
             </p>
           </div>
-          <div className="w-full flex justify-center">
+          <div className="flex justify-center w-full">
             <HeatMap_Month journal={studentData.journal_entries} />
           </div>
         </div>
       </div>
       {/* second row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
         <div>
           <WeekDayActivity journal={studentData.journal_entries} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 bg-bgSecondary bg-transparent gap-4">
-          <div className=" bg-bgSecondary border border-borderPrimary rounded-md p-4">
-            <div className="flex gap-2 items-center">
+        <div className="grid grid-cols-1 gap-4 bg-transparent sm:grid-cols-2 bg-bgSecondary">
+          <div className="p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+            <div className="flex items-center gap-2">
               {" "}
               <p className="IconBox">
                 <FiTrendingUp />
               </p>
               <p className="text-lg">Seuranta</p>
             </div>
-            <div className=" grid grid-cols-2 h-full w-full items-center co">
+            <div className="grid items-center w-full h-full grid-cols-2 co">
               <div className="flex flex-col gap-4">
                 <p className="font-medium ">Merkintä aktiivisuus: </p>
-                <p className="text-textSecondary text-sm">
+                <p className="text-sm text-textSecondary">
                   Viimeisin merkintä:{" "}
                   {studentData.journal_entries.length > 0
                     ? format(studentData?.journal_entries[0].date, "dd.MM.yyyy")
@@ -186,15 +188,15 @@ function StudentHome() {
             </div>
           </div>
 
-          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-4">
-            <div className="flex gap-2 items-center">
+          <div className="p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+            <div className="flex items-center gap-2">
               {" "}
               <p className="IconBox">
                 <FiTrendingUp />
               </p>
               <p className="text-lg">Seuranta</p>
             </div>
-            <div className="flex flex-col justify-center items-center">
+            <div className="flex flex-col items-center justify-center">
               <CourseComplitionBar value={calcJournalEntriesCount()} />
             </div>
           </div>
@@ -202,13 +204,9 @@ function StudentHome() {
       </div>
 
       {/* thrid Row */}
-      <div
-        className="flex flex-col bg-bgSecondary
-      p-4
-        rounded-md"
-      >
+      <div className="flex flex-col p-4 rounded-md bg-bgSecondary">
         <div className="flex justify-between">
-          <div className="flex gap-2  mb-4 items-center">
+          <div className="flex items-center gap-2 mb-4">
             {" "}
             <p className="IconBox">
               <FiZap />
