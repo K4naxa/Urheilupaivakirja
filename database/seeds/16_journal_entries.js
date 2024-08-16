@@ -11,7 +11,8 @@ formatDate = (date) => {
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
   await knex("journal_entries").del();
-  await knex("journal_entries").insert([
+
+  const user3Entries = [
     {
       user_id: 3,
       entry_type_id: 1,
@@ -424,6 +425,9 @@ exports.seed = async function (knex) {
       date: formatDate(new Date(2024, 1, 7, 0, 0)),
       created_at: new Date(2024, 1, 7, 0, 0),
     },
+  ];
+
+  const user7Entries = [
     {
       user_id: 7,
       entry_type_id: 1,
@@ -532,5 +536,23 @@ exports.seed = async function (knex) {
       date: formatDate(new Date(2024, 1, 7, 0, 0)),
       created_at: new Date(2024, 1, 7, 0, 0),
     },
-  ]);
+  ];
+
+  for (const entry of user3Entries) {
+    await knex("journal_entries").insert(entry);
+
+    // Increment total_entry_count for the user
+    await knex("students")
+      .where({ id: entry.user_id })
+      .increment("total_entry_count", 1);
+  }
+
+  for (const entry of user7Entries) {
+    await knex("journal_entries").insert(entry);
+
+    // Increment total_entry_count for the user
+    await knex("students")
+      .where({ id: entry.user_id })
+      .increment("total_entry_count", 1);
+  }
 };
