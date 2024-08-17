@@ -82,11 +82,11 @@ const TeachersPage = () => {
         <div className="flex flex-col w-full p-4 ">
           <div className="flex gap-4 justify-center w-full items-end">
             <div className="flex flex-col w-3/4">
-              <label htmlFor="newVisitorInput">Kutsu uusi vierailija</label>
+              <label htmlFor="newSpectatorInput">Kutsu uusi vierailija</label>
               <input
                 type="text"
-                name="newVisitorInput"
-                id="newVisitorInput"
+                name="newSpectatorInput"
+                id="newSpectatorInput"
                 placeholder="Vierailijan sähköposti"
                 className="text-textPrimary bg-bgGray p-1 
                   border border-borderPrimary rounded-md

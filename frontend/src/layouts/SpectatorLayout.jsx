@@ -22,7 +22,7 @@ import cc from "../utils/cc";
 
 import siteLogo from "/pwa-192x192.png";
 
-const VisitorLayout = () => {
+const SpectatorLayout = () => {
   const { logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showControlPanel, setShowControlPanel] = useState(false);
@@ -206,4 +206,4 @@ const VisitorLayout = () => {
   );
 };
 
-export default VisitorLayout;
+export default SpectatorLayout;

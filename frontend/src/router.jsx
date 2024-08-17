@@ -14,8 +14,8 @@ import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPa
 import EditJournalEntryPage from "./pages/student/journal-entry/EditJournalEntryPage";
 import StudentNewsPage from "./pages/student/StudentNewsPage";
 
-// Visitor
-import VisitorRegistrationPage from "./pages/VisitorRegistrationPage";
+// Spectator
+import SpectatorRegistrationPage from "./pages/SpectatorRegistrationPage";
 
 //teacher
 import TeacherLayout from "./layouts/TeacherLayout";
@@ -25,7 +25,7 @@ import StudentPage from "./pages/teacher/Studentpage";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
-import VisitorsPage from "./pages/teacher/manage/VisitorsPage";
+import SpectatorsPage from "./pages/teacher/manage/SpectatorsPage";
 import TeachersPage from "./pages/teacher/manage/TeachersPage";
 import GroupsPage from "./pages/teacher/manage/groupsPage";
 import CampusPage from "./pages/teacher/manage/campusPage";
@@ -52,8 +52,8 @@ import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import StatisticsPage from "./pages/teacher/StatisticsPage";
-import VisitorLayout from "./layouts/VisitorLayout";
-import VisitorProfilePage from "./pages/visitor/VisistorProfilePage";
+import SpectatorLayout from "./layouts/SpectatorLayout";
+import SpectatorProfilePage from "./pages/spectator/SpectatorProfilePage";
 import VerificationPage from "./pages/teacher/verify/VerificationPage";
 
 export const router = createBrowserRouter([
@@ -111,7 +111,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "/vierailijan-rekisterointi",
-            element: <VisitorRegistrationPage />,
+            element: <SpectatorRegistrationPage />,
           },
           //{ path: "/opettajan-rekisterointi", element: <TeacherRegistrationPage /> },
           {
@@ -172,7 +172,7 @@ export const router = createBrowserRouter([
                     children: [
                       {
                         index: true,
-                        element: <VisitorsPage />,
+                        element: <SpectatorsPage />,
                       },
                       {
                         path: "opettajat",
@@ -202,12 +202,12 @@ export const router = createBrowserRouter([
           },
           {
             path: "/vierailija",
-            element: <VisitorLayout />,
+            element: <SpectatorLayout />,
             children: [
               { index: true, element: <TeacherHome /> },
               { path: "tilastot", element: <StatisticsPage /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
-              { path: "profiili", element: <VisitorProfilePage /> },
+              { path: "profiili", element: <SpectatorProfilePage /> },
             ],
           },
         ],

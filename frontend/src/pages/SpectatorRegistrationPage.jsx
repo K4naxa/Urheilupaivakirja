@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 
 // TODO: Sivulle pääsee vain linkinkautta, jossa aktiivinen token mukana
 // TODO: Email pitää vaihtaa tokenissa tulleen sähköpostin mukaan, eikä tätä pitäisi pystyä muuttamaan
-const VisitorRegistrationPage = () => {
+const SpectatorRegistrationPage = () => {
   const { addToast } = useToast();
   const { login } = useAuth();
   const [errors, setErrors] = useState({ email: { value: "success" } });
@@ -31,7 +31,7 @@ const VisitorRegistrationPage = () => {
     mutationFn: (newRegistrationData) =>
       userService.registerSpectator(newRegistrationData),
     onError: (error) => {
-      console.error("Error registering visitor:", error);
+      console.error("Error registering spectator:", error);
       addToast("Virhe rekisteröitäessä käyttäjää", { style: "error" });
     },
     onSuccess: (user) => {
@@ -403,4 +403,4 @@ const VisitorRegistrationPage = () => {
   );
 };
 
-export default VisitorRegistrationPage;
+export default SpectatorRegistrationPage;

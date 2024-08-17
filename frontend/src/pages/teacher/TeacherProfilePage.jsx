@@ -40,8 +40,8 @@ function TeacherProfilePage() {
     setCourseComplitionRequirementError,
   ] = useState("");
 
-  const { data: visitorData, isLoading: visitorDataLoading } = useQuery({
-    queryKey: ["visitorData"],
+  const { data: spectatorData, isLoading: spectatorDataLoading } = useQuery({
+    queryKey: ["spectatorData"],
     queryFn: () => userService.getProfileData(),
     staleTime: 15 * 60 * 1000,
   });
@@ -59,7 +59,7 @@ function TeacherProfilePage() {
       setEmailError("Sähköpostiosoite ei voi olla tyhjä");
       return false;
     }
-    if (email === visitorData.email) {
+    if (email === spectatorData.email) {
       setEmailError("Sähköpostiosoite on jo käytössä");
       return false;
     }
@@ -171,7 +171,7 @@ function TeacherProfilePage() {
     setShowConfirmModal(true);
     setAgreeStyle("red");
     setModalMessage(
-      `Haluatko varmasti poistaa käyttäjän ${visitorData.first_name} ${visitorData.last_name}? 
+      `Haluatko varmasti poistaa käyttäjän ${spectatorData.first_name} ${spectatorData.last_name}? 
   
       Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
     );
@@ -179,7 +179,7 @@ function TeacherProfilePage() {
 
     const handleUserConfirmation = async () => {
       try {
-        await userService.deleteUser(visitorData.id);
+        await userService.deleteUser(spectatorData.id);
         await logout();
         addToast("Käyttäjä poistettu", { style: "success" });
       } catch (error) {
@@ -192,10 +192,10 @@ function TeacherProfilePage() {
   };
 
   useEffect(() => {
-    if (visitorData) {
-      setUpdatedEmail(visitorData.email);
+    if (spectatorData) {
+      setUpdatedEmail(spectatorData.email);
     }
-  }, [visitorData]);
+  }, [spectatorData]);
   useEffect(() => {
     if (courseComplitionRequirement) {
       setUpdatedCourseComplitionRequirement(
@@ -207,7 +207,7 @@ function TeacherProfilePage() {
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (visitorDataLoading) {
+  if (spectatorDataLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -278,7 +278,7 @@ function TeacherProfilePage() {
                 type="text"
                 name="name"
                 disabled
-                value={visitorData.first_name + " " + visitorData.last_name}
+                value={spectatorData.first_name + " " + spectatorData.last_name}
                 className={cc(
                   inputClass,
                   "cursor-not-allowed",

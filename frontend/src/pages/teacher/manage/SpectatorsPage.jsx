@@ -7,10 +7,10 @@ import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";
 import { useConfirmModal } from "../../../hooks/useConfirmModal";
 
-const VisitorsPage = () => {
+const SpectatorsPage = () => {
   const queryClient = useQueryClient();
   const { openConfirmModal } = useConfirmModal();
-  const [newSpectatorEmail, setNewVisitorEmail] = useState("");
+  const [newSpectatorEmail, setNewSpectatorEmail] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -69,7 +69,7 @@ const VisitorsPage = () => {
     await userService.inviteSpectator(newSpectatorEmail).then(() => {
       queryClient.invalidateQueries({ spectators });
     });
-    setNewVisitorEmail("");
+    setNewSpectatorEmail("");
    }
 
   const { data: spectators, isLoading: spectatorsLoading } = useQuery({
@@ -80,9 +80,9 @@ const VisitorsPage = () => {
     },
   });
 
-  const { data: invitedVisitors } = useQuery({
-    queryKey: ["invitedVisitors"],
-    queryFn: () => userService.getInvitedVisitors(),
+  const { data: invitedSpectators } = useQuery({
+    queryKey: ["invitedSpectators"],
+    queryFn: () => userService.getInvitedSpectators(),
     config: {
       enabled: false,
     },
@@ -111,7 +111,7 @@ const VisitorsPage = () => {
         <div className="flex flex-col w-full px-4 ">
           <div className="flex gap-4 justify-center w-full items-end">
             <form onSubmit={handleSendInvitation}className="flex flex-col w-3/4">
-              <label htmlFor="newVisitorInput" className="my-0.5">
+              <label htmlFor="newSpectatorInput" className="my-0.5">
                 Kutsu uusi vierailija
               </label>
               <div className="flex">
@@ -122,8 +122,8 @@ const VisitorsPage = () => {
                   type="text"
                   placeholder="Vierailijan sähköpostiosoite"
                   value={newSpectatorEmail}
-                  onChange={(e) => setNewVisitorEmail(e.target.value)}
-                  id="newVisitorInput"
+                  onChange={(e) => setNewSpectatorEmail(e.target.value)}
+                  id="newSpectatorInput"
                 />
 
                 <button className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor whitespace-nowrap align-bottom">
@@ -206,4 +206,4 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
   );
 };
 
-export default VisitorsPage;
+export default SpectatorsPage;
