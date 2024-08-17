@@ -24,8 +24,8 @@ const ManageLayout = () => {
           Toimipaikat
         </NavLink>
 
-        <NavLink to="/opettaja/hallitse/vierailijat" className={linkClass}>
-          Vierailijat
+        <NavLink to="/opettaja/hallitse/henkilokunta" className={linkClass}>
+          Henkilökunta
         </NavLink>
 
         <NavLink to="/opettaja/hallitse/opiskelijat/" className={linkClass}>

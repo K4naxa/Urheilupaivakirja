@@ -298,12 +298,12 @@ const GroupsPage = () => {
               }
             }}
           />
-          <p
+          <button
             onClick={() => handleNewGroup()}
             className="px-4 py-2 text-white duration-75 select-none rounded-r-md bg-primaryColor hover:bg-hoverPrimary active:scale-95"
           >
             +
-          </p>
+          </button>
         </div>
         <div className="flex flex-col gap-2" id="groupsContainer">
           <div className="grid w-full px-2 grid-cols-controlpanel3 text-textSecondary">

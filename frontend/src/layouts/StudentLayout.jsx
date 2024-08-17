@@ -171,7 +171,7 @@ const StudentLayout = () => {
               <div className="flex items-center justify-center text-white rounded-full bg-bgPrimary drop-shadow-t-md shadow-upper-shadow size-16 active:scale-110">
                 <button
                   className="flex items-center justify-center text-white duration-100 rounded-full bg-primaryColor size-14 active:scale-110"
-                  onClick={() => openBigModal("new")}
+                  onClick={() => openBigModal("newJournalEntry")}
                 >
                   <FiPlus size={24} />
                 </button>

@@ -93,19 +93,31 @@ const deleteUser = async (id) => {
   return response.data;
 };
 
-// Unverified users -------------------------------------------------------------------
+// Unverified Management -------------------------------------------------------------------
 
 const getAllUnverified = async () => {
-  const response = await axios.get("/user/unverified", makeHeader());
+  const response = await axios.get("/user/unverified/", makeHeader());
   return response.data;
 };
 
-const verifyUser = async (userid) => {
+const verifyStudent = async (userid) => {
   const response = await axios.put(`/user/verify/${userid}`, {}, makeHeader());
   return response.data;
 };
 
-// Stundent Management -------------------------------------------------------------------
+const verifySport = async (sportId) => {
+  const response = await axios.put(`/activate/sport/${sportId}`, {}, makeHeader());
+  return response.data;
+};
+
+
+const verifyStudentGroup = async (studentGroupId) => {
+  const response = await axios.put(`/activate/student_group/${studentGroupId}`, {}, makeHeader());
+  return response.data;
+}
+
+
+// Student Management -------------------------------------------------------------------
 
 const getStudents = async () => {
   const response = await axios.get("/students", makeHeader());
@@ -184,21 +196,40 @@ const getNewStudentsBetweenDates = async (date1, date2) => {
   }
 };
 
-// Visitor Management -------------------------------------------------------------------
+// Spectator  Management -------------------------------------------------------------------
 const getSpectators = async () => {
   const response = await axios.get("/spectator", makeHeader());
   return response.data;
 };
 
-const visitorRegistration = async (email, password, firstName, lastName) => {
+const getInvitedSpectators = async () => {
+  const response = await axios.get("/spectator/invited", makeHeader());
+  return response.data;
+}
+
+const registerSpectator = async (data) => {
   const response = await axios.post("/spectator/register", {
-    email: email,
-    password: password,
-    first_name: firstName,
-    last_name: lastName,
+    token: data.token,
+    email: data.email,
+    password: data.password,
+    first_name: data.firstName,
+    last_name: data.lastName,
   });
   return response.data;
 };
+
+const inviteSpectator = async (email) => {
+  const response = await axios.post("/spectator/invite", { email }, makeHeader());
+  return response.data;
+}
+
+
+const deactivateSpectator = async (id) => {
+  const response = await axios.put(`/spectator/deactivate/${id}`, {}, makeHeader()); 
+  return response.data;
+}
+
+
 
 // Profile Data -------------------------------------------------------------------
 const getProfileData = async () => {
@@ -206,11 +237,15 @@ const getProfileData = async () => {
   return response.data;
 };
 
+
+
+// Spectator Management -------------------------------------------------------------------
+
 export default {
   login,
   register,
   getAllUnverified,
-  verifyUser,
+  verifyStudent,
   deleteUser,
   getStudents,
   getStudentsAndEntries,
@@ -228,7 +263,12 @@ export default {
   pinStudent,
   unpinStudent,
   getSpectators,
-  visitorRegistration,
+  getInvitedSpectators,
+  registerSpectator,
+  inviteSpectator,
+  deactivateSpectator,
   getProfileData,
+  verifySport,
+  verifyStudentGroup
 };
 // Path: frontEnd/src/services/userService.js

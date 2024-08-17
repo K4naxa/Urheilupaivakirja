@@ -58,7 +58,7 @@ const TeacherLayout = () => {
               className={linkClass}
             >
               <FiUserCheck size={iconSize} />
-              Verifoi
+              Hyväksy
             </NavLink>
 
             <NavLink
@@ -240,7 +240,7 @@ const TeacherLayout = () => {
                 <p className={linkTextClass}>Toimipaikat</p>
               </NavLink>
               <NavLink
-                to="/opettaja/hallitse/vierailijat"
+                to="/opettaja/hallitse/henkilokunta"
                 className={linkClass}
                 onClick={() => {
                   setShowMenu(false);
@@ -248,7 +248,7 @@ const TeacherLayout = () => {
                 }}
               >
                 <GrUserNew size={iconSize} />
-                <p className={linkTextClass}>Vierailijat</p>
+                <p className={linkTextClass}>Henkilökunta</p>
               </NavLink>
               <NavLink
                 to="/opettaja/hallitse/opiskelijat"

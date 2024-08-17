@@ -137,7 +137,7 @@ function StudentProfilePage() {
           {/* Merkinnät container */}
           <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-primaryColor">
             <div>
-              <h1 className="text-xl">Merkintä tiedot</h1>
+              <h1 className="text-xl">Merkinnät</h1>
               <small className="text-textSecondary">
                 Näe tilastoja tehdyistä merkinnöistä
               </small>
@@ -174,7 +174,7 @@ function StudentProfilePage() {
           {/* Profiilin tiedot container */}
           <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
             <div>
-              <h1 className="text-xl">Profiilin tiedot</h1>
+              <h1 className="text-xl">Käyttäjä</h1>
               <small className="text-textSecondary">
                 Tarkistele tai päivitä käyttäjäsi tietoja
               </small>

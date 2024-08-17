@@ -36,6 +36,12 @@ function VisitorProfilePage() {
     staleTime: 15 * 60 * 1000,
   });
 
+  const { data: invitedVisitors, isLoading: invitedVisitorsLoading } = useQuery({
+    queryKey: ["invitedVisitors"],
+    queryFn: () => userService.getInvitedVisitors(),
+    staleTime: 15 * 60 * 1000,
+  })
+
   const validateEmail = (email) => {
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 

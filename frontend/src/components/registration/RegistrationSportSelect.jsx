@@ -11,15 +11,41 @@ const SportSelect = ({
 }) => {
   const customStyles = {
     control: (provided) => ({
-      ...provided,
-      borderColor:
-        errors.sportId && errors.sportId.value === 'error'
+        ...provided,
+        backgroundColor: "rgb(var(--color-bg-secondary))",
+        color: "rgb(var(--color-text-primary))",
+        borderColor: errors.sportId && errors.sportId.value === 'error'
           ? 'red'
           : errors.sportId && errors.sportId.value === 'success'
           ? 'green'
           : provided.borderColor,
     }),
+    input: (provided) => ({
+      ...provided,
+      color: "rgb(var(--color-text-primary))",
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "rgb(var(--color-primary))"
+        : state.isFocused
+          ? "rgb(var(--color-hover-select))"
+          : "rgb(var(--color-bg-secondary))",
+      color: state.isDisabled
+        ? "rgb(var(--color-text-secondary))"
+        : "rgb(var(--color-text-primary))",
+      ":active": {
+        backgroundColor: "rgb(var(--color-bg-primary))",
+        color: "rgb(var(--color-text-primary))",
+      },
+    }),
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: "rgb(var(--color-bg-secondary))",
+      color: "rgb(var(--color-text-primary))",
+    }),
   };
+  
 
   const sportOptions = options.sports.map((sport) => ({
     value: sport.id,
@@ -33,14 +59,7 @@ const SportSelect = ({
         styles={customStyles}
         createOptionPosition="first"
         className={
-          inputClass +
-          (errors.sportId && errors.sportId.value
-            ? errors.sportId.value === 'error'
-              ? ' border-red-500'
-              : errors.sportId.value === 'success'
-              ? ' border-green-500'
-              : ''
-            : '')
+          inputClass
         }
         value={
           registrationData.sportId
@@ -56,9 +75,13 @@ const SportSelect = ({
           })
         }
         options={sportOptions}
-        placeholder="Valitse ryhmä"
+        placeholder="Valitse tai luo laji"
         isClearable
         formatCreateLabel={formatCreateLabel}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuShouldScrollIntoView={true}
+
       />
   );
 };

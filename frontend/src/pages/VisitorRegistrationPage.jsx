@@ -3,20 +3,42 @@ import userService from "../services/userService";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useAuth } from "../hooks/useAuth";
 import cc from "../utils/cc";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import LoadingScreen from "../components/LoadingScreen";
+import { useSearchParams } from "react-router-dom";
 
 // TODO: Sivulle pääsee vain linkinkautta, jossa aktiivinen token mukana
-//TODO: Email pitää vaihtaa tokenissa tulleen sähköpostin mukaan, eikä tätä pitäisi pystyä muuttamaan
-const RegistrationPage = () => {
+// TODO: Email pitää vaihtaa tokenissa tulleen sähköpostin mukaan, eikä tätä pitäisi pystyä muuttamaan
+const VisitorRegistrationPage = () => {
+  const { addToast } = useToast();
+  const { login } = useAuth();
+  const [errors, setErrors] = useState({ email: { value: "success" } });
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  const token = searchParams.get("token");
+  const email = searchParams.get("email") || ""; // Default to empty string if no email in params
+
+  // Set initial state with email from search params
   const [registrationData, setRegistrationData] = useState({
-    email: "",
+    email: email, // Use email from URL if available
     password: "",
     passwordAgain: "",
     firstName: "",
     lastName: "",
   });
-  const [errors, setErrors] = useState({});
-  const { addToast } = useToast();
-  const { login } = useAuth();
+
+  const registerSpectator = useMutation({
+    mutationFn: (newRegistrationData) =>
+      userService.registerSpectator(newRegistrationData),
+    onError: (error) => {
+      console.error("Error registering visitor:", error);
+      addToast("Virhe rekisteröitäessä käyttäjää", { style: "error" });
+    },
+    onSuccess: (user) => {
+      addToast("Käyttäjä rekisteröity", { style: "success" });
+      login(user);
+    },
+  });
 
   useEffect(() => {
     console.log("Errors changed: ", errors);
@@ -92,27 +114,24 @@ const RegistrationPage = () => {
     return isValid;
   };
 
-  const registerHandler = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!errorCheckRegistration()) {
       return;
     }
-    try {
-      let user = await userService.visitorRegistration(
-        registrationData.email,
-        registrationData.password,
-        registrationData.firstName,
-        registrationData.lastName
-      );
-      addToast("Rekisteröityminen onnistui", { style: "success" });
-      login(user);
-    } catch (error) {
-      addToast("Rekisteröityminen epäonnistui", {
-        style: "error",
-        autoDismiss: false,
-      });
-      console.error("Error registering:", error);
+    const registrationDataToSend = {
+      token: token,
+      email: registrationData.email,
+      password: registrationData.password,
+      firstName: registrationData.firstName,
+      lastName: registrationData.lastName, 
     }
+    try {
+      registerSpectator.mutate(registrationDataToSend);
+    } catch (error) {
+      console.error("Error adding journal entry:", error);
+    }
+    ;
   };
 
   const errorCheckSimpleInput = (fieldValue, fieldName) => {
@@ -195,7 +214,7 @@ const RegistrationPage = () => {
       ) {
         newErrors.passwordAgain = {
           value: "error",
-          message: "Salasanat eivät täsmää", // "Passwords do not match"
+          message: "Salasanat eivät täsmää",
         };
       } else if (registrationData.passwordAgain) {
         // Set passwordAgain as valid if it matches
@@ -217,6 +236,9 @@ const RegistrationPage = () => {
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
+  const disabledInputClass =
+    "text-lg text-textPrimary border-borderPrimary rounded-t-lg h-10 w-full r border-b p-1 pl-0 text-opacity-40 bg-bgPrimary focus-visible:outline-none focus-visible:border-primaryColor";
+
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center border-none h-screen w-screen">
       <div
@@ -228,7 +250,7 @@ const RegistrationPage = () => {
         </div>
         <form
           className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid w-full"
-          onSubmit={registerHandler}
+          onSubmit={handleSubmit}
         >
           {/* First Name */}
           <div className={containerClass}>
@@ -287,13 +309,13 @@ const RegistrationPage = () => {
           </div>
 
           {/* Email */}
-          <div className="flex flex-col gap-1 sm:col-span-2 relative">
+          <div className="flex flex-col gap-1 text-opacity-70 sm:col-span-2 relative">
             <input
-              disabled={false} // todo: enable when email is available in token
-              type="text"
+              disabled
+              type="email"
               name="email"
               id="email-input"
-              value={registrationData.email}
+              value={email}
               placeholder="Vierailijan@sähköposti.fi"
               onChange={(e) => {
                 setRegistrationData({
@@ -302,7 +324,7 @@ const RegistrationPage = () => {
                 });
               }}
               className={cc(
-                inputClass,
+                disabledInputClass,
                 errors.email && errors.email.value
                   ? errors.email.value === "error"
                     ? " border-red-500"
@@ -381,4 +403,4 @@ const RegistrationPage = () => {
   );
 };
 
-export default RegistrationPage;
+export default VisitorRegistrationPage;

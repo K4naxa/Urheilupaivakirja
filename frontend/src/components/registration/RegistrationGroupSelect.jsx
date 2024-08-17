@@ -33,14 +33,7 @@ const GroupSelect = ({
         styles={customStyles}
         createOptionPosition="first"
         className={
-          inputClass +
-          (errors.groupId && errors.groupId.value
-            ? errors.groupId.value === 'error'
-              ? ' border-red-500'
-              : errors.groupId.value === 'success'
-              ? ' border-green-500'
-              : ''
-            : '')
+          inputClass
         }
         value={
           registrationData.groupId
@@ -57,9 +50,12 @@ const GroupSelect = ({
         }
         options={groupOptions}
         
-        placeholder="Valitse ryhmä"
+        placeholder="Valitse tai luo ryhmä"
         isClearable
         formatCreateLabel={formatCreateLabel}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuShouldScrollIntoView={true}
       />
   );
 };

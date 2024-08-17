@@ -194,7 +194,8 @@ const SportsPage = () => {
   });
 
   // logic behind creating a new sport
-  const handleNewSport = () => {
+  const handleNewSport = (e) => {
+    e.preventDefault();
     if (newSport === "") return;
     if (
       sports.find(
@@ -304,7 +305,7 @@ const SportsPage = () => {
             border border-borderPrimary rounded-md"
         >
           {/* New Sport input */}
-          <div className=" flex justify-center mt-4">
+          <form onSubmit={handleNewSport} className=" flex justify-center mt-4">
             <input
               className="text-textPrimary bg-bgGray p-1 
                   border border-borderPrimary rounded-l-md
@@ -314,20 +315,14 @@ const SportsPage = () => {
               placeholder="Uusi laji"
               value={newSport}
               onChange={(e) => setNewSport(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleNewSport();
-                }
-              }}
             />
-            <p
-              onClick={() => handleNewSport()}
+            <button
               className="py-2 px-4 rounded-r-md bg-primaryColor text-white
                    hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
             >
               +
-            </p>
-          </div>
+            </button>
+          </form>
 
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">

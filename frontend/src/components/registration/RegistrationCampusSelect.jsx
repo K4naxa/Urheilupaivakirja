@@ -56,6 +56,10 @@ const CampusSelect = ({
         options={campusOptions}
         placeholder="Valitse kampus"
         isClearable
+        noOptionsMessage={() => 'Ei tuloksia'}
+        menuShouldScrollIntoView={true}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
       />
   );
 };

@@ -52,11 +52,11 @@ router.post("/new-email-verification", async (req, res) => {
           .first();
         firstName = teacher ? teacher.first_name : null;
         break;
-      case 2: // visitor
-        const visitor = await knex("visitors")
+      case 2: // Spectator
+        const spectator = await knex("spectators")
           .where({ user_id: user.id })
           .first();
-        firstName = visitor ? visitor.first_name : null;
+        firstName = spectator ? spectator.first_name : null;
         break;
       case 3: // Student
         const student = await knex("students")
@@ -115,7 +115,7 @@ router.post("/new-email-verification", async (req, res) => {
     // Send the email
     sendEmail(
       user.email,
-      "UPK - Vahvista sähköpostiosoitteesi",
+      "Urheilupäiväkirja - Vahvista sähköpostiosoitteesi",
       { name: firstName, otp: resetOTP },
       "./template/verifyEmail.handlebars"
     );
@@ -203,11 +203,11 @@ router.post("/request-password-reset", async (req, res) => {
           .first();
         firstName = teacher ? teacher.first_name : null;
         break;
-      case 2: // visitor
-        const visitor = await knex("visitors")
+      case 2: // Spectator
+        const spectator = await knex("spectators")
           .where({ user_id: user.id })
           .first();
-        firstName = visitor ? visitor.first_name : null;
+        firstName = spectator ? spectator.first_name : null;
         break;
       case 3: // Student
         const student = await knex("students")
@@ -278,6 +278,32 @@ router.post("/request-password-reset", async (req, res) => {
     res.status(500).json({ message: "Error generating reset token" });
   }
 });
+
+router.put("/change-password", async (req, res) => {
+  const userId = getUserId(req);
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await knex("users").where({ id: userId }).first();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      return res.status(401).json({ message: "Invalid old password" });
+    }
+
+    const hash = await bcrypt.hash(newPassword, Number(saltRounds));
+
+    await knex("users").where({ id: userId }).update({ password: hash });
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ message: "Error updating password" });
+  }
+})
 
 router.post("/verify-password-reset", async (req, res) => {
   const { email, otp } = req.body;
@@ -391,5 +417,8 @@ router.get("/profiledata", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
+
 
 module.exports = router;

@@ -20,13 +20,13 @@ import VisitorRegistrationPage from "./pages/VisitorRegistrationPage";
 //teacher
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
-import Verify from "./pages/teacher/verify/Verify";
 
 import StudentPage from "./pages/teacher/Studentpage";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
-import Visitors from "./pages/teacher/manage/VisitorsPage";
+import VisitorsPage from "./pages/teacher/manage/VisitorsPage";
+import TeachersPage from "./pages/teacher/manage/TeachersPage";
 import GroupsPage from "./pages/teacher/manage/groupsPage";
 import CampusPage from "./pages/teacher/manage/campusPage";
 
@@ -36,6 +36,9 @@ import TeacherNewsPage from "./pages/teacher/news/TeacherNewsPage";
 import ManageStudentsLayout from "./layouts/manage-layout/manageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
+import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
+
+
 //misc
 import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
@@ -51,6 +54,7 @@ import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import StatisticsPage from "./pages/teacher/StatisticsPage";
 import VisitorLayout from "./layouts/VisitorLayout";
 import VisitorProfilePage from "./pages/visitor/VisistorProfilePage";
+import VerificationPage from "./pages/teacher/verify/VerificationPage";
 
 export const router = createBrowserRouter([
   {
@@ -109,6 +113,7 @@ export const router = createBrowserRouter([
             path: "/vierailijan-rekisterointi",
             element: <VisitorRegistrationPage />,
           },
+          //{ path: "/opettajan-rekisterointi", element: <TeacherRegistrationPage /> },
           {
             path: "/unohditko-salasanasi",
             element: (
@@ -150,7 +155,7 @@ export const router = createBrowserRouter([
             ),
             children: [
               { index: true, element: <TeacherHome /> },
-              { path: "hyvaksy", element: <Verify /> },
+              { path: "hyvaksy", element: <VerificationPage /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
               { path: "profiili", element: <TeacherProfilePage /> },
               { path: "tiedotteet", element: <TeacherNewsPage /> },
@@ -161,7 +166,20 @@ export const router = createBrowserRouter([
                 element: <ManageLayout />,
                 children: [
                   { element: <SportsPage />, index: true },
-                  { path: "vierailijat", element: <Visitors /> },
+                  {
+                    path: "henkilokunta/",
+                    element: <ManageStaffLayout/>,
+                    children: [
+                      {
+                        index: true,
+                        element: <VisitorsPage />,
+                      },
+                      {
+                        path: "opettajat",
+                        element: <TeachersPage />,
+                      },
+                    ],
+                  },
                   { path: "ryhmat", element: <GroupsPage /> },
                   { path: "toimipaikat", element: <CampusPage /> },
                   {

@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
+const options = config.DATABASE_OPTIONS;
+const knex = require("knex")(options);
 
 const getTokenFrom = (request) => {
   const authorization = request.get("authorization");
@@ -57,6 +59,46 @@ const getUserId = (req) => {
   return decodedToken.user_id;
 };
 
+const getUserFullName = async (req) => {
+  try {
+    const token = getTokenFrom(req);
+    if (!token) throw new Error("No token provided");
+
+    const userId = getUserId(req);
+
+    const role = getRole(req);
+
+    switch (role) {
+      case 1: // Teacher
+        const teacher = await knex("teachers")
+          .where({ user_id: userId })
+          .first();
+        return teacher
+          ? `${teacher.first_name} ${teacher.last_name}`
+          : "No name found";
+      case 2: // Spectator
+        const spectator = await knex("spectators")
+          .where({ user_id: userId })
+          .first();
+        return spectator
+          ? `${spectator.first_name} ${spectator.last_name}`
+          : "No name found";
+      case 3: // Student
+        const student = await knex("students")
+          .where({ user_id: userId })
+          .first();
+        return student
+          ? `${student.first_name} ${student.last_name}`
+          : "No name found";
+      default:
+        throw new Error("Invalid user role");
+    }
+  } catch (error) {
+    console.error("Error retrieving user name:", error);
+    throw error;
+  }
+};
+
 const getEmailVerified = (req) => {
   const token = getTokenFrom(req);
   if (!token) throw new Error("No token provided");
@@ -80,4 +122,5 @@ module.exports = {
   getUserId,
   createToken,
   getEmailVerified,
+  getUserFullName,
 };

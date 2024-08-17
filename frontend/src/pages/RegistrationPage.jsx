@@ -310,6 +310,7 @@ const RegistrationPage = () => {
   };
 
   const containerClass = "flex flex-col gap-1 relative";
+  const dropdownContainerClass = "flex flex-col gap-1 mb-4 sm:mb-0 relative";
   const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
@@ -332,7 +333,7 @@ const RegistrationPage = () => {
           </Link>
         </div>
         <form
-          className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid h-[650px] w-full"
+          className="p-8 sm:p-12 grid grid-cols-1 gap-6 sm:gap-12 sm:grid-cols-regGrid w-full"
           onSubmit={registerHandler}
         >
           {/* First Name */}
@@ -395,7 +396,7 @@ const RegistrationPage = () => {
           <div className="flex flex-col gap-1 sm:col-span-2 relative">
             <input
               onChange={changeHandler}
-              type="text"
+              type="email"
               name="email"
               id="email-input"
               placeholder="Sähköposti"
@@ -446,7 +447,7 @@ const RegistrationPage = () => {
           </div>
 
           {/* Password Repeat */}
-          <div className={containerClass}>
+          <div className={`${containerClass} mb-4 sm:mb-0`}>
             <input
               onChange={changeHandler}
               type="password"
@@ -470,9 +471,8 @@ const RegistrationPage = () => {
               <p className={errorClass}>{errors.passwordAgain.message}</p>
             )}
           </div>
-
           {/* Sport */}
-          <div className={containerClass}>
+          <div className={dropdownContainerClass}>
             <SportSelect
               inputClass="input-class"
               errorClass="error-class"
@@ -498,7 +498,7 @@ const RegistrationPage = () => {
           </div>
 
           {/* Group */}
-          <div className={containerClass}>
+          <div className={dropdownContainerClass}>
             <GroupSelect
               inputClass="input-class"
               errorClass="error-class"
@@ -514,7 +514,7 @@ const RegistrationPage = () => {
           </div>
 
           {/* Campus */}
-          <div className={containerClass}>
+          <div className={dropdownContainerClass}>
             <CampusSelect
               inputClass="input-class"
               errorClass="error-class"
