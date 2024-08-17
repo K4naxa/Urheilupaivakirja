@@ -192,16 +192,13 @@ const deleteSport = async (id) => {
 };
 
 // ................................................................................
-const getComplitionRequirement = async () => {
-  const response = await axios.get(
-    "/courseInfo/complition_requirement",
-    makeHeader()
-  );
+const getCourseSegments = async () => {
+  const response = await axios.get("/courseInfo/courseSegments", makeHeader());
   return response.data;
 };
-const updateComplitionRequirement = async (value) => {
+const updateCourseSegments = async (value) => {
   const response = await axios.put(
-    "/courseInfo/complition_requirement",
+    "/courseInfo/courseSegments",
     { value },
     makeHeader()
   );
@@ -223,6 +220,6 @@ export default {
   addSport,
   editSport,
   deleteSport,
-  getComplitionRequirement,
-  updateComplitionRequirement,
+  getCourseSegments,
+  updateCourseSegments,
 };

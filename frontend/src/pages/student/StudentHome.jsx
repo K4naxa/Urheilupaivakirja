@@ -47,13 +47,13 @@ function StudentHome() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
-  if (studentDataLoading || !courseComplitionRequirement) {
+  if (studentDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center">
         <LoadingScreen />
@@ -204,10 +204,10 @@ function StudentHome() {
               <p className="text-lg">Seuranta</p>
             </div>
             <div className="flex flex-col items-center justify-center">
-              <CourseComplitionBar
+              {/* <CourseComplitionBar
                 value={calcJournalEntriesCount()}
-                REQUIRED_COMPLETION={courseComplitionRequirement[0].value}
-              />
+                REQUIRED_COMPLETION={courseSegments}
+              /> */}
             </div>
           </div>
         </div>

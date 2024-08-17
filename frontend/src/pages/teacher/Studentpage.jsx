@@ -45,9 +45,9 @@ function StudentHome() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -80,7 +80,7 @@ function StudentHome() {
     return studentData.journal_entries.length;
   };
 
-  if (studentDataError || !studentData || !courseComplitionRequirement) {
+  if (studentDataError || !studentData || !courseSegments) {
     return (
       <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>
@@ -206,7 +206,7 @@ function StudentHome() {
             <div className="flex flex-col items-center justify-center">
               <CourseComplitionBar
                 value={calcJournalEntriesCount()}
-                REQUIRED_COMPLETION={courseComplitionRequirement[0].value}
+                REQUIRED_COMPLETION={courseSegments}
               />
             </div>
           </div>

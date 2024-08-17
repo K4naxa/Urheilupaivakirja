@@ -8,6 +8,8 @@ import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
 import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
+import { Tooltip } from "react-tooltip";
+
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
@@ -38,6 +40,8 @@ function TeacherHome() {
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
 
+  const [segmentContent, setSegmentContent] = useState("");
+
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -52,9 +56,9 @@ function TeacherHome() {
   const { setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -244,28 +248,82 @@ function TeacherHome() {
     showMobileFilters,
   ]);
 
-  const countCourseProgression = (student) => {
-    const total = student.journal_entries.length;
-    let progression = total / courseComplitionRequirement[0].value;
-    progression *= 100;
-
-    if (progression > 100) return 100;
-    return Math.round(progression * 100) / 100;
-  };
-
   // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
-  const renderProgressionBar = (progression) => {
+  const renderProgressionBar = ({ student }) => {
+    if (!courseSegments) return null;
+
+    console.log("student", student);
+
+    // student.total_entry_count
+    let unUsedEntires = 220 || 0;
+
+    const total_requirement = courseSegments.reduce(
+      (acc, segment) => acc + segment.value,
+      0
+    );
+
     return (
-      <div
-        className={cc(
-          "absolute bottom-0 left-0 h-1",
-          progression < 100 && "bg-primaryColor",
-          progression === 100 && "bg-bgExercise"
-        )}
-        style={{ width: `${progression}%` }}
-      ></div>
+      <div className="absolute bottom-0 left-0 flex w-full h-1 gap-1">
+        {/* Progress bar */}
+        {courseSegments.map((segment, index) => {
+          // Calculate the proportional width of the segment based on its value
+          const segmentLength = (segment.value / total_requirement) * 100;
+          console.log("segment.value", segment.value);
+          console.log("total_requirement", total_requirement);
+          console.log("segmentLength", segmentLength);
+
+          console.log("unUsedEntires", unUsedEntires);
+
+          const TooltipDataContent = () => {
+            return (
+              <div className="flex flex-col gap-2 p-2 text-textPrimary">
+                <h2 className="text-lg font-semibold">
+                  {segment.name} - {segment.value} / {total_requirement}
+                </h2>
+                <p className="text-sm">{segment.description}</p>
+              </div>
+            );
+          };
+
+          // Calculate the progression for this segment
+          let segmentProgression = Math.min(
+            (unUsedEntires / segment.value) * 100,
+            100
+          );
+          if (segmentProgression < 0) segmentProgression = 0;
+
+          console.log("segmentProgression", segmentProgression);
+
+          // Reduce the total_entry_count by the segment's value
+          unUsedEntires -= segment.value;
+
+          return (
+            <div
+              key={index}
+              className={cc("bottom-0 h-1 segment hover:cursor-pointer")}
+              onClick={() => {
+                setSegmentContent(<TooltipDataContent />);
+              }}
+              style={{ width: `${segmentLength}%` }}
+            >
+              <div
+                className={cc(
+                  "h-full bg-primaryColor relative rounded-md",
+                  segmentProgression === 100 && "bg-green-500"
+                )}
+                style={{ width: `${segmentProgression}%` }}
+              >
+                {/* {segmentProgression === 100 && (
+                  <div className="absolute top-0 right-0 w-[3px] h-full bg-bgSecondary"></div>
+                )} */}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     );
   };
+
   const renderFavouriteMark = (journal) => {
     let isPinned = false;
     if (pinnedStudentsData) {
@@ -328,6 +386,7 @@ function TeacherHome() {
   };
 
   const RenderWeeks = ({ journals }) => {
+    console.log("journals", journals);
     const { showDate, setShowDate } = useMainContext();
 
     if (journals?.length === 0) {
@@ -387,7 +446,7 @@ function TeacherHome() {
           {/* Student list */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {journals?.map((journal) => {
-              const progression = countCourseProgression(journal);
+              // const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -406,7 +465,7 @@ function TeacherHome() {
                     <HeatMap_Weeks journal={journal} />
                   </div>
                   {/* Progress bar */}
-                  {renderProgressionBar(progression)}
+                  {renderProgressionBar({ student: journal })}
                 </div>
               );
             })}
@@ -458,7 +517,6 @@ function TeacherHome() {
           </div>
           <div className="flex flex-wrap justify-center gap-4 lg:gap-8">
             {journals.map((journal) => {
-              const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -475,7 +533,7 @@ function TeacherHome() {
                     </p>
                   </Link>
                   <HeatMap_Month journal={journal} />
-                  {renderProgressionBar(progression)}
+                  {renderProgressionBar({ student: journal })}
                 </div>
               );
             })}
@@ -536,7 +594,6 @@ function TeacherHome() {
           </div>
           <div className="flex flex-col justify-center gap-4 overflow-x-hidden lg:gap-8">
             {journals.map((journal) => {
-              const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -563,7 +620,7 @@ function TeacherHome() {
                     </p>
                   </div>
                   <HeatMap_Year journal={journal} />
-                  {renderProgressionBar(progression)}
+                  {renderProgressionBar({ student: journal })}
                 </div>
               );
             })}
@@ -584,7 +641,7 @@ function TeacherHome() {
     studentsAndJournalsDataLoading ||
     !optionsData ||
     !pinnedStudentsData ||
-    !courseComplitionRequirement
+    !courseSegments
   ) {
     return <LoadingScreen />;
   } else
@@ -730,6 +787,21 @@ function TeacherHome() {
           {showMonths && <RenderMonths journals={filteredStudents} />}
           {showYears && <RenderYears journals={filteredStudents} />}
         </div>
+        <Tooltip
+          anchorSelect=".segment"
+          className="z-10 text-black border nice-shadow border-borderPrimary"
+          place="bottom"
+          openOnClick={true}
+          opacity={1}
+          offset="3"
+          style={{
+            backgroundColor: "rgb(var(--color-bg-secondary))",
+            padding: "0.5rem",
+            color: "rgb(var(--color-text-primary))",
+          }}
+        >
+          {segmentContent}
+        </Tooltip>
       </div>
     );
 }

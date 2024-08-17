@@ -543,7 +543,7 @@ exports.seed = async function (knex) {
 
     // Increment total_entry_count for the user
     await knex("students")
-      .where({ id: entry.user_id })
+      .where({ user_id: entry.user_id })
       .increment("total_entry_count", 1);
   }
 
@@ -552,7 +552,7 @@ exports.seed = async function (knex) {
 
     // Increment total_entry_count for the user
     await knex("students")
-      .where({ id: entry.user_id })
+      .where({ user_id: entry.user_id })
       .increment("total_entry_count", 1);
   }
 };

@@ -48,7 +48,7 @@ function TeacherProfilePage() {
 
   const { data: courseComplitionRequirement } = useQuery({
     queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -152,7 +152,7 @@ function TeacherProfilePage() {
     setContinueButton("Päivitä");
     const handleUpdate = async () => {
       try {
-        trainingService.updateComplitionRequirement(
+        trainingService.updateCourseSegments(
           updatedCourseComplitionRequirement
         );
 
