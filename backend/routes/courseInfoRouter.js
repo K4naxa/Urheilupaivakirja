@@ -29,14 +29,30 @@ router.put("/courseSegments", async (req, res, next) => {
     return res.status(403).json({ error: "Unauthorized access" });
   } else
     try {
-      const segment = await knex("course_segments")
-        .where({ id: req.body.id })
-        .update({
-          value: req.body.value,
-          name: req.body.name,
-          order_number: req.body.order_number,
+      const oldSegments = await knex("course_segments").select("*");
+      const newSegments = req.body.segments;
+      try {
+        await knex.transaction(async (trx) => {
+          for (const oldSegment of oldSegments) {
+            const newSegment = newSegments.find(
+              (segment) => segment.id === oldSegment.id
+            );
+            if (newSegment) {
+              const updatedSegment = { ...newSegment, updated_at: new Date() };
+              delete updatedSegment.created_at;
+              await trx("course_segments")
+                .where({ id: oldSegment.id })
+                .update(updatedSegment);
+            } else {
+              console.error("Failed to update data: no matching segment found");
+            }
+          }
         });
-      res.json(segment);
+      } catch (err) {
+        console.error("Failed to update data", err);
+      }
+
+      res.status(200).json({ message: "Data updated" });
     } catch (err) {
       console.error("Failed to update data", err);
       res.status(500).json({ error: "Failed to update data" });

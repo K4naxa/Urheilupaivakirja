@@ -196,10 +196,10 @@ const getCourseSegments = async () => {
   const response = await axios.get("/courseInfo/courseSegments", makeHeader());
   return response.data;
 };
-const updateCourseSegments = async (value) => {
+const updateCourseSegments = async (segments) => {
   const response = await axios.put(
     "/courseInfo/courseSegments",
-    { value },
+    { segments },
     makeHeader()
   );
   return response.data;

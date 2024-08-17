@@ -255,7 +255,7 @@ function TeacherHome() {
     console.log("student", student);
 
     // student.total_entry_count
-    let unUsedEntires = 220 || 0;
+    let unUsedEntires = student.total_entry_count || 0;
 
     const total_requirement = courseSegments.reduce(
       (acc, segment) => acc + segment.value,

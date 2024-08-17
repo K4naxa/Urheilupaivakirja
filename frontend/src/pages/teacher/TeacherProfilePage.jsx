@@ -9,6 +9,23 @@ import { useToast } from "../../hooks/toast-messages/useToast";
 import cc from "../../utils/cc";
 import trainingService from "../../services/trainingService";
 
+import {
+  closestCorners,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 function TeacherProfilePage() {
   const { logout } = useAuth();
   const { addToast } = useToast();
@@ -22,10 +39,7 @@ function TeacherProfilePage() {
     () => {}
   );
 
-  const [
-    updatedCourseComplitionRequirement,
-    setUpdatedCourseComplitionRequirement,
-  ] = useState(0);
+  const [updatedCourseSegments, setUpdatedCourseSegments] = useState([]);
 
   const [updatedEmail, setUpdatedEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -35,10 +49,7 @@ function TeacherProfilePage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
-  const [
-    courseComplitionRequirementError,
-    setCourseComplitionRequirementError,
-  ] = useState("");
+  const [courseSegmentsError, setCourseSegmentsError] = useState("");
 
   const { data: visitorData, isLoading: visitorDataLoading } = useQuery({
     queryKey: ["visitorData"],
@@ -46,8 +57,8 @@ function TeacherProfilePage() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
     queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
@@ -118,43 +129,19 @@ function TeacherProfilePage() {
     }
   };
 
-  const validateCourseComplitionRequirement = () => {
-    if (updatedCourseComplitionRequirement.length === 0) {
-      setCourseComplitionRequirementError(
-        "Merkintöjen määrä ei voi olla tyhjä"
-      );
-      return false;
-    }
-    if (updatedCourseComplitionRequirement < 1) {
-      setCourseComplitionRequirementError(
-        "Merkintöjen määrän oltava vähintään 1"
-      );
-      return false;
-    }
-    if (
-      updatedCourseComplitionRequirement ===
-      courseComplitionRequirement[0].value
-    ) {
-      setCourseComplitionRequirementError(
-        "Merkintöjen määrä on jo asetettu tähän arvoon"
-      );
-      return false;
-    }
-    return true;
-  };
-
-  const handleCourseComplitionRequirementUpdate = async () => {
+  const handleCourseSegmentsUpdate = async () => {
     setShowConfirmModal(true);
     setAgreeStyle("");
     setModalMessage(
-      `Haluatko varmasti päivittää merkintöjen määrä vaatimuksen arvoon ${updatedCourseComplitionRequirement}?`
+      `Haluatko varmasti tallentaa kurssin muutokset: ${updatedCourseSegments.map((segment) => " " + segment.name + " = " + segment.value)}?`
     );
     setContinueButton("Päivitä");
     const handleUpdate = async () => {
       try {
-        trainingService.updateCourseSegments(
-          updatedCourseComplitionRequirement
-        );
+        let updatedPositions = updatedCourseSegments.map((segment, index) => {
+          return { ...segment, order_number: index + 1 };
+        });
+        trainingService.updateCourseSegments(updatedPositions);
 
         addToast("Merkintöjen määrä vaatimus päivitetty", { style: "success" });
         setShowConfirmModal(false);
@@ -197,17 +184,62 @@ function TeacherProfilePage() {
     }
   }, [visitorData]);
   useEffect(() => {
-    if (courseComplitionRequirement) {
-      setUpdatedCourseComplitionRequirement(
-        courseComplitionRequirement[0].value
-      );
+    if (courseSegments) {
+      setUpdatedCourseSegments([...courseSegments]);
     }
-  }, [courseComplitionRequirement]);
+  }, [courseSegments]);
+
+  // Drag and drop segment sorting functions
+  const getSegmentPosition = (id) =>
+    updatedCourseSegments.findIndex((task) => task.id === id);
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id === over.id) return;
+
+    setUpdatedCourseSegments((segments) => {
+      const oldIndex = getSegmentPosition(active.id);
+      const newIndex = getSegmentPosition(over.id);
+
+      return arrayMove(segments, oldIndex, newIndex);
+    });
+  };
+
+  function SortableItem({ segment, inputClass }) {
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id: segment.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="flex items-center justify-between p-2 border rounded-md shadow-sm bg-bgPrimary touch-none"
+      >
+        <span>{segment.name}</span>
+        <input
+          type="number"
+          value={segment.value}
+          onChange={(e) => {
+            segment.value = parseInt(e.target.value);
+          }}
+          className={inputClass}
+        />
+      </div>
+    );
+  }
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (visitorDataLoading) {
+  if (visitorDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -222,37 +254,56 @@ function TeacherProfilePage() {
             <div>
               <h1 className="text-xl">Kurssin tiedot</h1>
               <small className="text-textSecondary">
-                Tarkistele tai päivitä kurssin tietoja
+                Voit luoda uuden segmentin, muokata olemassa olevia segmenttejä
+                tai muuttaa näiden järjestystä vetämällä ja pudottamalla niitä
               </small>
             </div>
 
             <form className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="name">
-                Merkintöjen määrä vaatimus
-              </label>
-              <small className="text-textSecondary">
-                Kuinka monta merkintää vaaditaan opiskelijalta, jotta kurssi
-                näytetään suoritetuksi
-              </small>
-              <input
-                type="number"
-                name="name"
-                value={updatedCourseComplitionRequirement}
-                onChange={(e) => {
-                  setUpdatedCourseComplitionRequirement(e.target.value);
-                }}
-                className={cc(inputClass, "disabled:text-opacity-70")}
-              />
-              <small className="text-red-500">
-                {courseComplitionRequirementError}
-              </small>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragEnd={handleDragEnd}
+              >
+                {" "}
+                {/* segment edition container */}
+                <div className="flex flex-col w-full gap-4">
+                  <SortableContext
+                    items={updatedCourseSegments.map((segment) => segment.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {updatedCourseSegments?.map((segment, index) => (
+                      <SortableItem
+                        key={segment.id}
+                        segment={segment}
+                        inputClass={inputClass}
+                      />
+                    ))}
+                  </SortableContext>
+                </div>
+              </DndContext>
+
+              {/* <input
+              //   type="number"
+              //   name="name"
+              //   value={updatedCourseComplitionRequirement}
+              //   onChange={(e) => {
+              //     setUpdatedCourseComplitionRequirement(e.target.value);
+              //   }}
+              //   className={cc(inputClass, "disabled:text-opacity-70")}
+              // />
+              // <small className="text-red-500">
+              //   {courseComplitionRequirementError}
+              // </small>
+              */}
+
               <button
                 className="p-2 mt-4 text-white w-fit Button"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (validateCourseComplitionRequirement()) {
-                    setCourseComplitionRequirementError("");
-                    handleCourseComplitionRequirementUpdate();
+                  if (courseSegments) {
+                    setCourseSegmentsError("");
+                    handleCourseSegmentsUpdate();
                   }
                 }}
               >
