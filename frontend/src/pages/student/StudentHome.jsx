@@ -204,10 +204,10 @@ function StudentHome() {
               <p className="text-lg">Seuranta</p>
             </div>
             <div className="flex flex-col items-center justify-center">
-              {/* <CourseComplitionBar
-                value={calcJournalEntriesCount()}
-                REQUIRED_COMPLETION={courseSegments}
-              /> */}
+              <CourseComplitionBar
+                student={studentData}
+                courseSegments={courseSegments}
+              />
             </div>
           </div>
         </div>

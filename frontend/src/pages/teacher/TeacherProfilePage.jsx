@@ -267,6 +267,7 @@ function TeacherProfilePage() {
       "option",
       "svg",
       "polyline",
+      "path",
     ];
 
     if (interactiveElements.includes(element.tagName.toLowerCase())) {
@@ -323,55 +324,70 @@ function TeacherProfilePage() {
         style={style}
         {...attributes}
         {...listeners}
-        className="flex items-center justify-between p-2 border rounded-md shadow-sm border-borderPrimary touch-none"
+        className="flex items-center justify-between p-2 border rounded-md shadow-sm border-borderPrimary touch-none hover:shadow-md"
       >
-        <div>
+        <div className="flex items-center gap-2">
           {" "}
           <small className="text-textSecondary">Nimi: </small>
-          <input
-            type="text"
-            value={segmentName}
-            disabled={!isEditing}
-            onChange={(e) => setSegmentName(e.target.value)}
-            className={cc(inputClass, "disabled:border-bgSecondary")}
-          />
+          {isEditing ? (
+            <input
+              type="text"
+              value={segmentName}
+              disabled={!isEditing}
+              onChange={(e) => setSegmentName(e.target.value)}
+              className={cc(inputClass, "disabled:border-bgSecondary")}
+            />
+          ) : (
+            <div className={cc(inputClass, "w-full border-bgSecondary")}>
+              {segmentName}
+            </div>
+          )}
         </div>
-        <div>
+        <div className="flex items-center gap-2">
           {" "}
           <small className="text-textSecondary">Vaaditut merkinnät: </small>
-          <input
-            type="number"
-            value={segmentValue}
-            disabled={!isEditing}
-            onChange={(e) => setSegmentValue(e.target.value)}
-            className={cc(inputClass, "max-w-20 disabled:border-bgSecondary")}
-          />
+          {isEditing ? (
+            <input
+              type="number"
+              value={segmentValue}
+              disabled={!isEditing}
+              onChange={(e) => setSegmentValue(e.target.value)}
+              className={cc(inputClass, "max-w-20 disabled:border-bgSecondary")}
+            />
+          ) : (
+            <div className={cc(inputClass, "border-bgSecondary")}>
+              {segmentValue}
+            </div>
+          )}
         </div>
 
-        {isEditing ? (
+        <div>
+          {" "}
+          {isEditing ? (
+            <button
+              className="border rounded-md IconBox bg-bgSecondary text-btnGreen border-bgSecondary hover:border-borderPrimary"
+              onClick={() => {
+                setIsEditing(false);
+                handleSegmentChanges();
+              }}
+            >
+              <FiCheck />
+            </button>
+          ) : (
+            <button
+              className="border rounded-md IconBox bg-bgSecondary text-btnGray border-bgSecondary hover:border-borderPrimary hover:text-hoverGray"
+              onClick={() => setIsEditing(true)}
+            >
+              <FiEdit3 />
+            </button>
+          )}
           <button
-            onClick={() => {
-              setIsEditing(false);
-              handleSegmentChanges();
-            }}
+            className="border rounded-md IconBox bg-bgSecondary text-btnRed border-bgSecondary hover:border-borderPrimary"
+            onClick={() => handleSegmentDelete(segment)}
           >
-            <FiCheck />
+            <FiTrash2 />
           </button>
-        ) : (
-          <button
-            className="IconBox bg-bgSecondary text-btnGray"
-            onClick={() => setIsEditing(true)}
-          >
-            <FiEdit3 />
-          </button>
-        )}
-
-        <button
-          className="IconBox bg-bgSecondary text-btnRed"
-          onClick={() => handleSegmentDelete(segment)}
-        >
-          <FiTrash2 />
-        </button>
+        </div>
       </div>
     );
   }
