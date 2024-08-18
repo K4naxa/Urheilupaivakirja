@@ -6,11 +6,13 @@ import LoadingScreen from "../../../components/LoadingScreen";
 import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";
 import { useConfirmModal } from "../../../hooks/useConfirmModal";
+import { useToast } from "../../../hooks/toast-messages/useToast";
 
 const SpectatorsPage = () => {
   const queryClient = useQueryClient();
   const { openConfirmModal } = useConfirmModal();
   const [newSpectatorEmail, setNewSpectatorEmail] = useState("");
+  const { addToast } = useToast();
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -23,20 +25,6 @@ const SpectatorsPage = () => {
       });
       queryClient.invalidateQueries({ spectators });
     };
-
-    const inviteSpectator = useMutation({
-      mutationFn: () =>
-        userService.inviteSpectator(newSpectatorEmail),
-      onError: (error) => {
-        console.error("Error inviting spectator:", error);
-        addToast("Virhe kutsuttaessa vierailijaa", { style: "error" });
-      },
-      onSuccess: (user) => {
-        addToast("Vierailijakutsu lähetetty", { style: "success" });
-        login(user);
-      },
-    });
-
 
     const modalText = (
       <span>
@@ -60,15 +48,26 @@ const SpectatorsPage = () => {
     });
   };
 
-  handleSendInvitation = async (e) => {
+  const inviteSpectator = useMutation({
+    mutationFn: () =>
+      userService.inviteSpectator(newSpectatorEmail),
+    onError: (error) => {
+      console.error("Error inviting spectator:", error);
+      addToast("Virhe kutsuttaessa vierailijaa", { style: "error" });
+    },
+    onSuccess: (user) => {
+      addToast("Vierailijakutsu lähetetty", { style: "success" });
+      queryClient.invalidateQueries({invitedSpectators});
+    },
+  });
+
+  const handleSendInvitation = async (e) => {
     e.preventDefault();
     if (!newSpectatorEmail) {
       setErrorMessage("Syötä sähköpostiosoite");
       return;
     }
-    await userService.inviteSpectator(newSpectatorEmail).then(() => {
-      queryClient.invalidateQueries({ spectators });
-    });
+    await inviteSpectator.mutate();
     setNewSpectatorEmail("");
    }
 

@@ -14,7 +14,7 @@ import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPa
 import EditJournalEntryPage from "./pages/student/journal-entry/EditJournalEntryPage";
 import StudentNewsPage from "./pages/student/StudentNewsPage";
 
-// Spectator
+//spectator
 import SpectatorRegistrationPage from "./pages/SpectatorRegistrationPage";
 
 //teacher
@@ -43,7 +43,6 @@ import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
 import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
-import TestPage from "./pages/testPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
 import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
@@ -100,7 +99,6 @@ export const router = createBrowserRouter([
               </RedirectIfAuthenticated>
             ),
           },
-          { path: "/test", element: <TestPage /> },
           {
             path: "/rekisteroidy",
             element: (

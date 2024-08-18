@@ -35,6 +35,7 @@ const UnreadNewsIndicator = ({ type }) => {
   // update news_last_viewed_at and mark news as read when students visits the news page
   useEffect(() => {
     if (location.pathname === "/tiedotteet/") {
+      console.log("update news last viewed at");
       updateNewsLastViewedAtMutation.mutate();
       setHasUnreadNews(false);
       queryClient.invalidateQueries(["checkUnreadNews"]);

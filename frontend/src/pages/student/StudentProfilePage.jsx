@@ -4,12 +4,15 @@ import { useAuth } from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen";
 import ConfirmModal from "../../components/confirm-modal/confirmModal";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
+import { add, format } from "date-fns";
 import cc from "../../utils/cc";
 import { useConfirmModal } from "../../hooks/useConfirmModal";
+import { useToast } from "../../hooks/toast-messages/useToast";
 
 function StudentProfilePage() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const { addToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,18 +32,18 @@ function StudentProfilePage() {
     staleTime: 15 * 60 * 1000,
   });
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await userService.getStudentData();
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, []);
+  const deleteUser = useMutation({
+    mutationFn: (password) => userService.deleteUserSelf(password),
+    onError: (error) => {
+      console.error("Error deleting account:", error);
+      addToast("Virhe poistettaessa käyttäjätunnusta", { style: "error" });
+    },
+    // Invalidate and refetch the query after the mutation
+    onSuccess: () => {
+      addToast("Käyttäjätunnuksesi on poistettu", { style: "success" });
+      logout();
+    },
+  });
 
   const getAccountAge = (date) => {
     const today = new Date();
@@ -94,24 +97,21 @@ function StudentProfilePage() {
   };
 
   const handleAccountDelete = () => {
-    const handleUserConfirmation = async () => {
-      try {
-        await userService.deleteUser(userData.user_id);
-        await logout(); // Ensure this clears tokens/sessions
-      } catch (error) {
-        console.error("Error deleting user or logging out:", error);
-      }
-    };
 
+  const logoutHandler = () => {
+    logout();
+  }
     openConfirmModal({
-      onAgree: handleUserConfirmation,
-      text: `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? 
-    Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
+      handleLogout: logoutHandler,
+      text: `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
+      type: "accountDelete",
+      inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
+      inputType: "password",
       agreeButtonText: "Poista",
       agreeStyle: "red",
       declineButtonText: "Peruuta",
     });
-  }
+  };
 
   const [trainedHours, setTrainedHours] = useState(0);
   const [trainedMinutes, setTrainedMinutes] = useState(0);
@@ -326,8 +326,7 @@ function StudentProfilePage() {
               {" "}
               <h1 className="text-xl ">Poista käyttäjä</h1>
               <small className="text-textSecondary">
-                Kun käyttäjä on poistettu, kaikki käyttäjän tiedot poistetaan
-                pysyvästi. Tämä toiminto on peruuttamaton
+                Tämä poistaa kaikki käyttäjän tiedot. Toiminto on peruuttamaton.
               </small>
             </div>
             <button
@@ -336,12 +335,10 @@ function StudentProfilePage() {
                 handleAccountDelete();
               }}
             >
-              Poista Käyttäjä
+              Poista käyttäjä
             </button>
           </div>
         </div>
-
-    
       </div>
     );
 }

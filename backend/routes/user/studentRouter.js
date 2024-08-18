@@ -205,6 +205,7 @@ router.put("/archive/:id", async (req, res) => {
 // update student.news_last_viewed_at
 
 router.put("/news", async (req, res) => {
+  console.log("update news last viewed at");
   const user_id = getUserId(req);
   if (!user_id) {
     return res.status(401).json({ error: "Unauthorized" });
