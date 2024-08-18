@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tooltip } from "react-tooltip";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";

@@ -40,8 +40,6 @@ function TeacherHome() {
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
 
-  const [tooltipContent, setTooltipContent] = useState(null);
-
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -248,6 +246,7 @@ function TeacherHome() {
     showMobileFilters,
   ]);
 
+  const [tooltipContent, setTooltipContent] = useState(null);
   // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
   const renderProgressionBar = ({ student }) => {
     if (!courseSegments) return null;
@@ -280,6 +279,7 @@ function TeacherHome() {
             unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
             progression: Math.min(Math.max(segmentProgression, 0), 100),
           };
+
           // Reduce the total_entry_count by the segment's value
           unUsedEntires -= segment.value;
 
@@ -287,23 +287,23 @@ function TeacherHome() {
             <div
               key={index}
               className={cc(
-                "bottom-0 h-1 hover:cursor-pointer clickableCourseSegment"
+                "bottom-0 h-1 clickableCourseSegment rounded-xl hover:cursor-pointer"
               )}
-              onClick={() => setTooltipContent(TooltipInfo)}
-              onMouseLeave={() => setTooltipContent(null)}
+              onMouseEnter={() => {
+                setTooltipContent(TooltipInfo);
+              }}
+              onMouseLeave={() => {
+                setTooltipContent(null);
+              }}
               style={{ width: `${segmentLength}%` }}
             >
               <div
                 className={cc(
-                  "h-full bg-primaryColor relative rounded-md",
+                  "h-full bg-primaryColor relative rounded-xl",
                   segmentProgression === 100 && "bg-green-500"
                 )}
                 style={{ width: `${segmentProgression}%` }}
-              >
-                {/* {segmentProgression === 100 && (
-                  <div className="absolute top-0 right-0 w-[3px] h-full bg-bgSecondary"></div>
-                )} */}
-              </div>
+              ></div>
             </div>
           );
         })}
@@ -389,6 +389,7 @@ function TeacherHome() {
   };
 
   const RenderWeeks = ({ journals }) => {
+    console.log("journals", journals);
     const { showDate, setShowDate } = useMainContext();
 
     if (journals?.length === 0) {
@@ -649,22 +650,6 @@ function TeacherHome() {
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
-        <Tooltip
-          id="segment-tooltip"
-          anchorSelect=".clickableCourseSegment"
-          className="z-10 border nice-shadow border-borderPrimary"
-          place="bottom"
-          openOnClick={true}
-          opacity={1}
-          offset="2"
-          style={{
-            backgroundColor: "rgb(var(--color-bg-secondary))",
-            color: "rgb(var(--color-text-primary))",
-            padding: "0.5rem",
-          }}
-        >
-          {tooltipContent && getSegmentTooltipContent()}
-        </Tooltip>
         <TeacherHeatmapTooltip />
 
         <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
@@ -805,6 +790,22 @@ function TeacherHome() {
           {showMonths && <RenderMonths journals={filteredStudents} />}
           {showYears && <RenderYears journals={filteredStudents} />}
         </div>
+        <Tooltip
+          id="segment-tooltip"
+          anchorSelect=".clickableCourseSegment"
+          className="z-10 border nice-shadow border-borderPrimary"
+          place="bottom"
+          openOnClick={true}
+          opacity={1}
+          offset="2"
+          style={{
+            backgroundColor: "rgb(var(--color-bg-secondary))",
+            color: "rgb(var(--color-text-primary))",
+            padding: "0.5rem",
+          }}
+        >
+          {tooltipContent && getSegmentTooltipContent()}
+        </Tooltip>
       </div>
     );
 }
