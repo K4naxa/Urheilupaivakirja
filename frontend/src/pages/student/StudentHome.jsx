@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { Tooltip } from "react-tooltip";
+import { useEffect, useState } from "react";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
@@ -27,8 +28,6 @@ import {
 
 import { useJournalModal } from "../../hooks/useJournalModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import JournalActivityBar from "../../components/charts/JournalActivityBar";
-import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
 import userService from "../../services/userService";
 import trainingService from "../../services/trainingService";
@@ -37,6 +36,7 @@ import cc from "../../utils/cc";
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
   const { openBigModal } = useJournalModal();
+  const [tooltipContent, setTooltipContent] = useState(null);
 
   const {
     data: studentData,
@@ -94,9 +94,6 @@ function StudentHome() {
   const renderProgressionBar = ({ student }) => {
     if (!courseSegments) return null;
 
-    console.log("student", student);
-
-    // student.total_entry_count
     let unUsedEntires = student.total_entry_count || 0;
 
     const total_requirement = courseSegments.reduce(
@@ -106,32 +103,37 @@ function StudentHome() {
 
     return (
       <div className="flex w-full h-5 gap-1">
-        {/* Progress bar */}
         {courseSegments.map((segment, index) => {
-          // Calculate the proportional width of the segment based on its value
           const segmentLength = (segment.value / total_requirement) * 100;
-
-          // Calculate the progression for this segment
           let segmentProgression = Math.min(
             (unUsedEntires / segment.value) * 100,
             100
           );
+
           if (segmentProgression < 0) segmentProgression = 0;
 
-          // Reduce the total_entry_count by the segment's value
+          const TooltipInfo = {
+            name: segment.name,
+            requirement: segment.value,
+            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
+            progression: Math.min(Math.max(segmentProgression, 0), 100),
+          };
+
           unUsedEntires -= segment.value;
 
           return (
             <div
               key={index}
               className={cc(
-                "h-full segment hover:cursor-pointer border border-borderPrimary rounded-xl bg-bgGray"
+                "h-full segment hover:cursor-pointer border border-borderPrimary rounded-xl clickableCourseSegment bg-bgGray"
               )}
               style={{ width: `${segmentLength}%` }}
+              onClick={() => setTooltipContent(TooltipInfo)}
+              onMouseLeave={() => setTooltipContent(null)}
             >
               <div
                 className={cc(
-                  "h-full bg-primaryColor flex justify-centerrelative rounded-xl shadow-md",
+                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md",
                   segmentProgression === 100 && "bg-green-500"
                 )}
                 style={{ width: `${segmentProgression}%` }}
@@ -140,6 +142,22 @@ function StudentHome() {
           );
         })}
       </div>
+    );
+  };
+
+  const getSegmentTooltipContent = () => {
+    console.log(tooltipContent);
+    return (
+      <>
+        <div className="flex flex-col gap-2 p-2 w-42">
+          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
+          <span>Suoritettu: {tooltipContent.progression}%</span>
+          <span className="">
+            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
+            {tooltipContent.requirement}
+          </span>
+        </div>
+      </>
     );
   };
 
@@ -286,6 +304,23 @@ function StudentHome() {
         </div>
         <HeatMap_Year journal={studentData.journal_entries} />
       </div>
+
+      <Tooltip
+        id="segment-tooltip"
+        anchorSelect=".clickableCourseSegment"
+        className="z-10 border nice-shadow border-borderPrimary"
+        place="bottom"
+        openOnClick={true}
+        opacity={1}
+        offset="2"
+        style={{
+          backgroundColor: "rgb(var(--color-bg-secondary))",
+          color: "rgb(var(--color-text-primary))",
+          padding: "0.5rem",
+        }}
+      >
+        {tooltipContent && getSegmentTooltipContent()}
+      </Tooltip>
     </div>
   );
 }
