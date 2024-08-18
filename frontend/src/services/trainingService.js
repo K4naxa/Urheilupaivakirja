@@ -214,6 +214,14 @@ const createCourseSegment = async (segment) => {
   return response.data;
 };
 
+const deleteCourseSegment = async (id) => {
+  const response = await axios.delete(
+    `/courseInfo/courseSegments/${id}`,
+    makeHeader()
+  );
+  return response.data;
+};
+
 export default {
   getAllUserJournalEntries,
   getUserJournalEntriesByUserId,
@@ -232,4 +240,5 @@ export default {
   getCourseSegments,
   updateCourseSegments,
   createCourseSegment,
+  deleteCourseSegment,
 };

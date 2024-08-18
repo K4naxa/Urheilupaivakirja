@@ -200,19 +200,43 @@ function TeacherProfilePage() {
     }
   }, [courseSegments]);
 
-  const handleCourseCreation = async () => {
+  const handleSegmentCreation = async () => {
     try {
       await trainingService.createCourseSegment({
         name: newSegmentName,
         value: newSegmentValue,
       });
       addToast("Segmentti luotu", { style: "success" });
+      setNewSegmentName("");
+      setNewSegmentValue("");
       queryclient.invalidateQueries("courseSegments");
     } catch (error) {
       addToast("Virhe luotaessa segmenttiä", { style: "error" });
     }
   };
 
+  const handleSegmentDelete = async (segment) => {
+    setShowConfirmModal(true);
+    setAgreeStyle("red");
+    setModalMessage(
+      `Haluatko varmasti poistaa segmentin <br>
+      nimi: ${segment.name} Vaaditut merkinnät: ${segment.value}? 
+`
+    );
+    setContinueButton("Poista");
+
+    const handleUserConfirmation = async () => {
+      try {
+        await trainingService.deleteCourseSegment(segment.id);
+        addToast("Segmentti poistettu", { style: "success" });
+        queryclient.invalidateQueries("courseSegments");
+      } catch (error) {
+        addToast("Virhe poistettaessa segmenttiä", { style: "error" });
+      }
+      setShowConfirmModal(false);
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
+  };
   // Drag and drop segment sorting functions
 
   class MyPointerSensor extends PointerSensor {
@@ -220,6 +244,7 @@ function TeacherProfilePage() {
       {
         eventName: "onPointerDown",
         handler: ({ nativeEvent: event }) => {
+          console.log(event.target);
           if (
             !event.isPrimary ||
             event.button !== 0 ||
@@ -240,6 +265,8 @@ function TeacherProfilePage() {
       "textarea",
       "select",
       "option",
+      "svg",
+      "polyline",
     ];
 
     if (interactiveElements.includes(element.tagName.toLowerCase())) {
@@ -267,13 +294,13 @@ function TeacherProfilePage() {
   };
 
   function SortableItem({ segment, inputClass }) {
-    const toggleEditing = () => setIsEditing(!isEditing);
+    const [isEditing, setIsEditing] = useState(false);
     const [segmentID, setSegmentID] = useState(segment.id);
     const [segmentName, setSegmentName] = useState(segment.name);
     const [segmentValue, setSegmentValue] = useState(segment.value);
 
     const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id: segment.id });
+      useSortable({ id: segment.id, disabled: isEditing });
 
     const handleSegmentChanges = () => {
       setUpdatedCourseSegments((segments) =>
@@ -304,11 +331,9 @@ function TeacherProfilePage() {
           <input
             type="text"
             value={segmentName}
+            disabled={!isEditing}
             onChange={(e) => setSegmentName(e.target.value)}
-            onBlur={() => {
-              handleSegmentChanges();
-            }}
-            className={cc(inputClass)}
+            className={cc(inputClass, "disabled:border-bgSecondary")}
           />
         </div>
         <div>
@@ -317,13 +342,36 @@ function TeacherProfilePage() {
           <input
             type="number"
             value={segmentValue}
+            disabled={!isEditing}
             onChange={(e) => setSegmentValue(e.target.value)}
-            onBlur={() => {
-              handleSegmentChanges();
-            }}
-            className={cc(inputClass, "max-w-20")}
+            className={cc(inputClass, "max-w-20 disabled:border-bgSecondary")}
           />
         </div>
+
+        {isEditing ? (
+          <button
+            onClick={() => {
+              setIsEditing(false);
+              handleSegmentChanges();
+            }}
+          >
+            <FiCheck />
+          </button>
+        ) : (
+          <button
+            className="IconBox bg-bgSecondary text-btnGray"
+            onClick={() => setIsEditing(true)}
+          >
+            <FiEdit3 />
+          </button>
+        )}
+
+        <button
+          className="IconBox bg-bgSecondary text-btnRed"
+          onClick={() => handleSegmentDelete(segment)}
+        >
+          <FiTrash2 />
+        </button>
       </div>
     );
   }
@@ -356,7 +404,7 @@ function TeacherProfilePage() {
               </small>
             </div>
 
-            <form className="flex flex-col max-w-xl">
+            <div className="flex flex-col">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCorners}
@@ -379,7 +427,7 @@ function TeacherProfilePage() {
                   </SortableContext>
 
                   {creatingSegment ? (
-                    <div className="flex items-center justify-between p-2 border rounded-md shadow-sm border-borderPrimary touch-none">
+                    <div className="flex items-center gap-4 p-2 border rounded-md shadow-sm border-borderPrimary touch-none">
                       <div>
                         {" "}
                         <small className="text-textSecondary">Nimi: </small>
@@ -401,22 +449,34 @@ function TeacherProfilePage() {
                           className={cc(inputClass, "max-w-20")}
                         />
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (newSegmentName && newSegmentValue) {
-                            handleCourseCreation();
+                      <div className="flex self-end gap-4 justify-self-end">
+                        <button
+                          onClick={() => {
                             setCreatingSegment(false);
                             setNewSegmentErrorMessage("");
-                          } else {
-                            setNewSegmentErrorMessage(
-                              "Nimi ja vaaditut merkinnät ovat pakollisia"
-                            );
-                          }
-                        }}
-                      >
-                        Luo
-                      </button>
+                            setNewSegmentName("");
+                            setNewSegmentValue("");
+                          }}
+                        >
+                          peruuta
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (newSegmentName && newSegmentValue) {
+                              handleSegmentCreation();
+                              setCreatingSegment(false);
+                              setNewSegmentErrorMessage("");
+                            } else {
+                              setNewSegmentErrorMessage(
+                                "Nimi ja vaaditut merkinnät ovat pakollisia"
+                              );
+                            }
+                          }}
+                        >
+                          Luo
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <button
@@ -446,7 +506,7 @@ function TeacherProfilePage() {
               >
                 Tallenna
               </button>
-            </form>
+            </div>
           </div>
 
           {/* Profiilin tiedot container */}

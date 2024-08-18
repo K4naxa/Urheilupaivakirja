@@ -90,4 +90,50 @@ router.put("/courseSegments", async (req, res) => {
     }
 });
 
+router.delete("/courseSegments/:id", async (req, res) => {
+  console.log("trying to delete course segment");
+  const user_id = req.params.id;
+
+  //   return user if not admin (role 1)
+  if (getRole(req) !== 1) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  } else
+    try {
+      const id = req.params.id;
+      try {
+        await knex("course_segments").where({ id }).del();
+      } catch (err) {
+        console.error("Failed to delete data", err);
+      }
+
+      const unSortedSegments = await knex("course_segments").select("*");
+      const segments = unSortedSegments.sort(
+        (a, b) => a.order_number - b.order_number
+      );
+      const updatedSegments = segments.map((segment, index) => ({
+        ...segment,
+        order_number: index + 1,
+      }));
+
+      console.log(updatedSegments);
+
+      try {
+        await knex.transaction(async (trx) => {
+          for (const updatedSegment of updatedSegments) {
+            await trx("course_segments")
+              .where({ id: updatedSegment.id })
+              .update(updatedSegment);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to update data", err);
+      }
+
+      res.status(200).json({ message: "Data deleted" });
+    } catch (err) {
+      console.error("Failed to delete data", err);
+      res.status(500).json({ error: "Failed to delete data" });
+    }
+});
+
 module.exports = router;
