@@ -205,6 +205,15 @@ const updateCourseSegments = async (segments) => {
   return response.data;
 };
 
+const createCourseSegment = async (segment) => {
+  const response = await axios.post(
+    "/courseInfo/courseSegments",
+    segment,
+    makeHeader()
+  );
+  return response.data;
+};
+
 export default {
   getAllUserJournalEntries,
   getUserJournalEntriesByUserId,
@@ -222,4 +231,5 @@ export default {
   deleteSport,
   getCourseSegments,
   updateCourseSegments,
+  createCourseSegment,
 };

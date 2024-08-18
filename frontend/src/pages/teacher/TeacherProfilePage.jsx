@@ -6,7 +6,7 @@ import ConfirmModal from "../../components/confirm-modal/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "../../hooks/toast-messages/useToast";
 
-import { FiEdit3 } from "react-icons/fi";
+import { FiCheck, FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
 import cc from "../../utils/cc";
@@ -54,6 +54,11 @@ function TeacherProfilePage() {
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
   const [courseSegmentsError, setCourseSegmentsError] = useState("");
+
+  const [creatingSegment, setCreatingSegment] = useState(false);
+  const [newSegmentName, setNewSegmentName] = useState("");
+  const [newSegmentValue, setNewSegmentValue] = useState("");
+  const [newSegmentErrorMessage, setNewSegmentErrorMessage] = useState("");
 
   const queryclient = useQueryClient();
 
@@ -194,6 +199,19 @@ function TeacherProfilePage() {
       setUpdatedCourseSegments([...courseSegments]);
     }
   }, [courseSegments]);
+
+  const handleCourseCreation = async () => {
+    try {
+      await trainingService.createCourseSegment({
+        name: newSegmentName,
+        value: newSegmentValue,
+      });
+      addToast("Segmentti luotu", { style: "success" });
+      queryclient.invalidateQueries("courseSegments");
+    } catch (error) {
+      addToast("Virhe luotaessa segmenttiä", { style: "error" });
+    }
+  };
 
   // Drag and drop segment sorting functions
 
@@ -359,6 +377,60 @@ function TeacherProfilePage() {
                       />
                     ))}
                   </SortableContext>
+
+                  {creatingSegment ? (
+                    <div className="flex items-center justify-between p-2 border rounded-md shadow-sm border-borderPrimary touch-none">
+                      <div>
+                        {" "}
+                        <small className="text-textSecondary">Nimi: </small>
+                        <input
+                          type="text"
+                          value={newSegmentName}
+                          onChange={(e) => setNewSegmentName(e.target.value)}
+                          className={cc(inputClass)}
+                        />
+                      </div>
+                      <div>
+                        <small className="text-textSecondary">
+                          Vaaditut merkinnät:{" "}
+                        </small>
+                        <input
+                          type="number"
+                          value={newSegmentValue}
+                          onChange={(e) => setNewSegmentValue(e.target.value)}
+                          className={cc(inputClass, "max-w-20")}
+                        />
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (newSegmentName && newSegmentValue) {
+                            handleCourseCreation();
+                            setCreatingSegment(false);
+                            setNewSegmentErrorMessage("");
+                          } else {
+                            setNewSegmentErrorMessage(
+                              "Nimi ja vaaditut merkinnät ovat pakollisia"
+                            );
+                          }
+                        }}
+                      >
+                        Luo
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className={cc(
+                        "border rounded-md  border-borderPrimary  hover:bg-hoverDefault hover:text-primaryColor p-1  text-lg"
+                      )}
+                      onClick={() => setCreatingSegment(true)}
+                    >
+                      +
+                    </button>
+                  )}
+                  <small className="mt-0 text-red-500">
+                    {newSegmentErrorMessage}
+                  </small>
                 </div>
               </DndContext>
 

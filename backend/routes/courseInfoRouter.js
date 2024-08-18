@@ -7,7 +7,8 @@ const knex = require("knex")(options);
 const { getUserId } = require("../middleware/auth");
 const { getRole } = require("../middleware/auth");
 
-router.get("/courseSegments", async (req, res, next) => {
+// get course info
+router.get("/courseSegments", async (req, res) => {
   console.log(" trying to get course segments");
   const user_id = req.params.id;
   try {
@@ -21,7 +22,37 @@ router.get("/courseSegments", async (req, res, next) => {
   }
 });
 
-router.put("/courseSegments", async (req, res, next) => {
+// add a new course segment
+router.post("/courseSegments", async (req, res) => {
+  const user_id = req.params.id;
+
+  //   return user if not admin (role 1)
+  if (getRole(req) !== 1) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  } else
+    try {
+      const oldSegmentsCount = await knex("course_segments").count("*", {
+        as: "count",
+      });
+      const segment = req.body;
+      segment.created_at = new Date();
+      segment.updated_at = new Date();
+      segment.order_number = oldSegmentsCount[0].count + 1;
+      try {
+        await knex("course_segments").insert(segment);
+      } catch (err) {
+        console.error("Failed to insert data", err);
+      }
+
+      res.status(200).json({ message: "Data inserted" });
+    } catch (err) {
+      console.error("Failed to insert data", err);
+      res.status(500).json({ error: "Failed to insert data" });
+    }
+});
+
+// update course segments
+router.put("/courseSegments", async (req, res) => {
   const user_id = req.params.id;
 
   //   return user if not admin (role 1)
