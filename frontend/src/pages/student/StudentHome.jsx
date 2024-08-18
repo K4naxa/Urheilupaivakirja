@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { Tooltip } from "react-tooltip";
+import { useState } from "react";
 import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
@@ -27,15 +28,15 @@ import {
 
 import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import JournalActivityBar from "../../components/charts/JournalActivityBar";
-import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
 import userService from "../../services/userService";
 import trainingService from "../../services/trainingService";
+import cc from "../../utils/cc";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
   const { openBigModal } = useBigModal();
+  const [tooltipContent, setTooltipContent] = useState(null);
 
   const {
     data: studentData,
@@ -47,13 +48,13 @@ function StudentHome() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
-  if (studentDataLoading || !courseComplitionRequirement) {
+  if (studentDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center">
         <LoadingScreen />
@@ -87,11 +88,77 @@ function StudentHome() {
       }
     });
 
-    return (activeDaysInMonth.size / monthDays.length) * 100;
+    return Math.round((activeDaysInMonth.size / monthDays.length) * 100) || 0;
   };
 
-  const calcJournalEntriesCount = () => {
-    return studentData.journal_entries.length;
+  const renderProgressionBar = ({ student }) => {
+    if (!courseSegments) return null;
+
+    let unUsedEntires = student.total_entry_count || 0;
+
+    const total_requirement = courseSegments.reduce(
+      (acc, segment) => acc + segment.value,
+      0
+    );
+
+    return (
+      <div className="flex w-full h-5 gap-1">
+        {courseSegments.map((segment, index) => {
+          const segmentLength = (segment.value / total_requirement) * 100;
+          let segmentProgression = Math.min(
+            (unUsedEntires / segment.value) * 100,
+            100
+          );
+
+          if (segmentProgression < 0) segmentProgression = 0;
+
+          const TooltipInfo = {
+            name: segment.name,
+            requirement: segment.value,
+            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
+            progression: Math.min(Math.max(segmentProgression, 0), 100),
+          };
+
+          unUsedEntires -= segment.value;
+
+          return (
+            <div
+              key={index}
+              className={cc(
+                "h-full segment hover:cursor-pointer border border-borderPrimary rounded-xl clickableCourseSegment bg-bgGray"
+              )}
+              style={{ width: `${segmentLength}%` }}
+              onClick={() => setTooltipContent(TooltipInfo)}
+              onMouseLeave={() => setTooltipContent(null)}
+            >
+              <div
+                className={cc(
+                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md",
+                  segmentProgression === 100 && "bg-green-500"
+                )}
+                style={{ width: `${segmentProgression}%` }}
+              ></div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const getSegmentTooltipContent = () => {
+    console.log(tooltipContent);
+    return (
+      <>
+        <div className="flex flex-col gap-2 p-2 w-42">
+          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
+          <span>Suoritettu: {tooltipContent.progression}%</span>
+          <span className="">
+            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
+            {tooltipContent.requirement}
+          </span>
+        </div>
+      </>
+    );
   };
 
   if (studentDataError) {
@@ -172,42 +239,53 @@ function StudentHome() {
           <WeekDayActivity journal={studentData.journal_entries} />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 bg-transparent sm:grid-cols-2 bg-bgSecondary">
-          <div className="p-4 border rounded-md bg-bgSecondary border-borderPrimary">
-            <div className="flex items-center gap-2">
+        <div className="flex flex-col w-full h-full gap-4 p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+          {/* Header */}
+          <div className="flex items-center gap-2">
+            {" "}
+            <p className="IconBox">
+              <FiTrendingUp />
+            </p>
+            <div className="flex flex-col ">
               {" "}
-              <p className="IconBox">
-                <FiTrendingUp />
-              </p>
-              <p className="text-lg">Seuranta</p>
-            </div>
-            <div className="grid items-center w-full h-full grid-cols-2 co">
-              <div className="flex flex-col gap-4">
-                <p className="font-medium ">Merkintä aktiivisuus: </p>
-                <p className="text-sm text-textSecondary">
-                  Viimeisin merkintä:{" "}
-                  {studentData.journal_entries.length > 0
-                    ? format(studentData.journal_entries[0].date, "dd.MM.yyyy")
-                    : "Ei merkintöjä"}
-                </p>
-              </div>
-              <JournalActivityBar percentage={calcJournalActivity()} />
+              <p className="pb-0 mb-0 text-lg leading-none ">Seuranta</p>
+              <small>Seuraa aktiivisuuttasi, sekä kurssin edistymistä</small>
             </div>
           </div>
 
-          <div className="p-4 border rounded-md bg-bgSecondary border-borderPrimary">
-            <div className="flex items-center gap-2">
-              {" "}
-              <p className="IconBox">
-                <FiTrendingUp />
-              </p>
-              <p className="text-lg">Seuranta</p>
+          <div className="flex flex-col justify-around w-full h-full gap-4 ">
+            {/* Kuukauden aktiivusus container */}
+
+            <div className="p-2 py-4 border rounded-md border-borderPrimary">
+              <h3 className="mb-1">Kuukauden merkintä aktiivisuus:</h3>
+              {/* progressbar */}
+              <div className="relative w-full h-5 border rounded-xl border-borderPrimary bg-bgGray">
+                <div
+                  className="flex justify-center h-full align-middle bg-green-500 shadow-md rounded-xl"
+                  style={{ width: `${calcJournalActivity()}%` }}
+                >
+                  <small className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 text-textPrimary ">
+                    {calcJournalActivity()} %
+                  </small>
+                </div>
+              </div>
+              <small className="text-textSecondary">
+                Viimeisin merkintä:{" "}
+                {studentData.journal_entries.length > 0
+                  ? format(studentData.journal_entries[0].date, "dd.MM.yyyy")
+                  : "Ei merkintöjä"}
+              </small>
             </div>
-            <div className="flex flex-col items-center justify-center">
-              <CourseComplitionBar
-                value={calcJournalEntriesCount()}
-                REQUIRED_COMPLETION={courseComplitionRequirement[0].value}
-              />
+            <div className="p-2 py-4 border rounded-md border-borderPrimary">
+              <h3 className="mb-1">Kurssin suoritus:</h3>
+              {renderProgressionBar({ student: studentData })}
+              <small className="text-textSecondary">
+                Olet suorittanut kurssistasi: {studentData.total_entry_count} /{" "}
+                {courseSegments.reduce(
+                  (acc, segment) => acc + segment.value,
+                  0
+                )}
+              </small>
             </div>
           </div>
         </div>
@@ -226,6 +304,23 @@ function StudentHome() {
         </div>
         <HeatMap_Year journal={studentData.journal_entries} />
       </div>
+
+      <Tooltip
+        id="segment-tooltip"
+        anchorSelect=".clickableCourseSegment"
+        className="z-10 border nice-shadow border-borderPrimary"
+        place="bottom"
+        openOnClick={true}
+        opacity={1}
+        offset="2"
+        style={{
+          backgroundColor: "rgb(var(--color-bg-secondary))",
+          color: "rgb(var(--color-text-primary))",
+          padding: "0.5rem",
+        }}
+      >
+        {tooltipContent && getSegmentTooltipContent()}
+      </Tooltip>
     </div>
   );
 }

@@ -8,6 +8,8 @@ import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
 import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
+import { Tooltip } from "react-tooltip";
+
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
@@ -55,9 +57,9 @@ function TeacherHome() {
   const { setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -247,26 +249,84 @@ function TeacherHome() {
     showMobileFilters,
   ]);
 
-  const countCourseProgression = (student) => {
-    const total = student.journal_entries.length;
-    let progression = total / courseComplitionRequirement[0].value;
-    progression *= 100;
+  const [tooltipContent, setTooltipContent] = useState(null);
+  // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
+  const renderProgressionBar = ({ student }) => {
+    if (!courseSegments) return null;
 
-    if (progression > 100) return 100;
-    return Math.round(progression * 100) / 100;
+    // student.total_entry_count
+    let unUsedEntires = student.total_entry_count || 0;
+
+    const total_requirement = courseSegments.reduce(
+      (acc, segment) => acc + segment.value,
+      0
+    );
+
+    return (
+      <div className="absolute bottom-0 left-0 flex w-full h-1 gap-1">
+        {/* Progress bar */}
+        {courseSegments.map((segment, index) => {
+          // Calculate the proportional width of the segment based on its value
+          const segmentLength = (segment.value / total_requirement) * 100;
+
+          // Calculate the progression for this segment
+          let segmentProgression = Math.min(
+            (unUsedEntires / segment.value) * 100,
+            100
+          );
+          if (segmentProgression < 0) segmentProgression = 0;
+
+          const TooltipInfo = {
+            name: segment.name,
+            requirement: segment.value,
+            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
+            progression: Math.min(Math.max(segmentProgression, 0), 100),
+          };
+
+          // Reduce the total_entry_count by the segment's value
+          unUsedEntires -= segment.value;
+
+          return (
+            <div
+              key={index}
+              className={cc(
+                "bottom-0 h-1 clickableCourseSegment rounded-xl hover:cursor-pointer"
+              )}
+              onMouseEnter={() => {
+                setTooltipContent(TooltipInfo);
+              }}
+              onMouseLeave={() => {
+                setTooltipContent(null);
+              }}
+              style={{ width: `${segmentLength}%` }}
+            >
+              <div
+                className={cc(
+                  "h-full bg-primaryColor relative rounded-xl",
+                  segmentProgression === 100 && "bg-green-500"
+                )}
+                style={{ width: `${segmentProgression}%` }}
+              ></div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
-  // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
-  const renderProgressionBar = (progression) => {
+  const getSegmentTooltipContent = () => {
+    console.log(tooltipContent);
     return (
-      <div
-        className={cc(
-          "absolute bottom-0 left-0 h-1",
-          progression < 100 && "bg-primaryColor",
-          progression === 100 && "bg-bgExercise"
-        )}
-        style={{ width: `${progression}%` }}
-      ></div>
+      <>
+        <div className="flex flex-col gap-2 p-2 w-42">
+          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
+          <span>Suoritettu: {tooltipContent.progression}%</span>
+          <span className="">
+            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
+            {tooltipContent.requirement}
+          </span>
+        </div>
+      </>
     );
   };
 
@@ -352,6 +412,7 @@ function TeacherHome() {
   };
 
   const RenderWeeks = ({ journals }) => {
+    console.log("journals", journals);
     const { showDate, setShowDate } = useMainContext();
 
     if (journals?.length === 0) {
@@ -411,7 +472,7 @@ function TeacherHome() {
           {/* Student list */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {journals?.map((journal) => {
-              const progression = countCourseProgression(journal);
+              // const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -430,7 +491,7 @@ function TeacherHome() {
                     <HeatMap_Weeks journal={journal} />
                   </div>
                   {/* Progress bar */}
-                  {renderProgressionBar(progression)}
+                  {renderProgressionBar({ student: journal })}
                 </div>
               );
             })}
@@ -482,7 +543,6 @@ function TeacherHome() {
           </div>
           <div className="flex flex-wrap justify-center gap-4 lg:gap-8">
             {journals.map((journal) => {
-              const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -499,7 +559,7 @@ function TeacherHome() {
                     </p>
                   </Link>
                   <HeatMap_Month journal={journal} />
-                  {renderProgressionBar(progression)}
+                  {renderProgressionBar({ student: journal })}
                 </div>
               );
             })}
@@ -560,7 +620,6 @@ function TeacherHome() {
           </div>
           <div className="flex flex-col justify-center gap-4 overflow-x-hidden lg:gap-8">
             {journals.map((journal) => {
-              const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -587,7 +646,7 @@ function TeacherHome() {
                     </p>
                   </div>
                   <HeatMap_Year journal={journal} />
-                  {renderProgressionBar(progression)}
+                  {renderProgressionBar({ student: journal })}
                 </div>
               );
             })}
@@ -608,7 +667,7 @@ function TeacherHome() {
     studentsAndJournalsDataLoading ||
     !optionsData ||
     !pinnedStudentsData ||
-    !courseComplitionRequirement
+    !courseSegments
   ) {
     return <LoadingScreen />;
   } else
@@ -754,6 +813,22 @@ function TeacherHome() {
           {showMonths && <RenderMonths journals={filteredStudents} />}
           {showYears && <RenderYears journals={filteredStudents} />}
         </div>
+        <Tooltip
+          id="segment-tooltip"
+          anchorSelect=".clickableCourseSegment"
+          className="z-10 border nice-shadow border-borderPrimary"
+          place="bottom"
+          openOnClick={true}
+          opacity={1}
+          offset="2"
+          style={{
+            backgroundColor: "rgb(var(--color-bg-secondary))",
+            color: "rgb(var(--color-text-primary))",
+            padding: "0.5rem",
+          }}
+        >
+          {tooltipContent && getSegmentTooltipContent()}
+        </Tooltip>
       </div>
     );
 }

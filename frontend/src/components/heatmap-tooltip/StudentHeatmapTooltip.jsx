@@ -1,17 +1,12 @@
 import {
-  FiBookOpen,
   FiPlusCircle,
   FiEdit3,
   FiSun,
   FiSunrise,
   FiSunset,
-  FiArrowLeft,
-  FiChevronUp,
-  FiChevronDown,
 } from "react-icons/fi";
 import dayjs from "dayjs";
 import { Tooltip } from "react-tooltip";
-import { isSameDay } from "date-fns";
 import React, { useState } from "react";
 import { useBigModal } from "../../hooks/useBigModal";
 import { useAuth } from "../../hooks/useAuth";
@@ -73,8 +68,8 @@ const StudentHeatmapTooltip = () => {
 
     return (
       <>
-        <div className="flex text-textPrimary flex-col gap-1">
-          <h2 className="text-sm  text-center font-semibold mt-1">
+        <div className="flex flex-col gap-1 text-textPrimary">
+          <h2 className="mt-1 text-sm font-semibold text-center">
             {dayjs(day).format("DD.MM.YYYY")}
           </h2>
 
@@ -86,7 +81,7 @@ const StudentHeatmapTooltip = () => {
                     {dayEntries.map((entry) => (
                       <React.Fragment key={entry.id}>
                         <tr
-                          className="hover:bg-bgGray cursor-pointer"
+                          className="cursor-pointer hover:bg-bgGray"
                           onClick={() => toggleDetails(entry.id)}
                         >
                           <td className="flex justify-center px-2">
@@ -147,9 +142,8 @@ const StudentHeatmapTooltip = () => {
               (dayEntries?.length > 0 ? (
                 allEntriesAreExercises ? (
                   <>
-                
                     <button
-                      className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center hover:bg-hoverPrimary"
+                      className="flex items-center px-4 py-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
                       onClick={() => {
                         openBigModal("newJournalEntry", {
                           date: dayjs(day).format("YYYY-MM-DD"),
@@ -163,7 +157,7 @@ const StudentHeatmapTooltip = () => {
                   </>
                 ) : (
                   <button
-                    className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center hover:bg-hoverPrimary"
+                    className="flex items-center px-4 py-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
                     onClick={() => {
                       openBigModal("editJournalEntry", { entryId: dayEntries[0].id });
                       simulateClickOutside();
@@ -175,7 +169,7 @@ const StudentHeatmapTooltip = () => {
                 )
               ) : (
                 <button
-                  className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center hover:bg-hoverPrimary"
+                  className="flex items-center px-4 py-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
                   onClick={() => {
                     openBigModal("newJournalEntry", {
                       date: dayjs(day).format("YYYY-MM-DD"),
@@ -196,7 +190,7 @@ const StudentHeatmapTooltip = () => {
   return (
     <Tooltip
       anchorSelect=".clickableCalendarDay"
-      className="z-10 nice-shadow border border-borderPrimary"
+      className="z-10 border nice-shadow border-borderPrimary"
       place="bottom"
       openOnClick={true}
       clickable={true}

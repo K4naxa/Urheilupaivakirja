@@ -6,9 +6,30 @@ import ConfirmModal from "../../components/confirm-modal/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "../../hooks/toast-messages/useToast";
 
+import { FiCheck, FiEdit3 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
+
 import cc from "../../utils/cc";
 import trainingService from "../../services/trainingService";
+import { useQueryClient } from "@tanstack/react-query";
 
+import {
+  closestCorners,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 function TeacherProfilePage() {
   const { logout } = useAuth();
   const { addToast } = useToast();
@@ -22,10 +43,7 @@ function TeacherProfilePage() {
     () => {}
   );
 
-  const [
-    updatedCourseComplitionRequirement,
-    setUpdatedCourseComplitionRequirement,
-  ] = useState(0);
+  const [updatedCourseSegments, setUpdatedCourseSegments] = useState([]);
 
   const [updatedEmail, setUpdatedEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -35,10 +53,14 @@ function TeacherProfilePage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
-  const [
-    courseComplitionRequirementError,
-    setCourseComplitionRequirementError,
-  ] = useState("");
+  const [courseSegmentsError, setCourseSegmentsError] = useState("");
+
+  const [creatingSegment, setCreatingSegment] = useState(false);
+  const [newSegmentName, setNewSegmentName] = useState("");
+  const [newSegmentValue, setNewSegmentValue] = useState("");
+  const [newSegmentErrorMessage, setNewSegmentErrorMessage] = useState("");
+
+  const queryclient = useQueryClient();
 
   const { data: visitorData, isLoading: visitorDataLoading } = useQuery({
     queryKey: ["visitorData"],
@@ -46,9 +68,9 @@ function TeacherProfilePage() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseComplitionRequirement } = useQuery({
-    queryKey: ["courseComplitionRequirement"],
-    queryFn: () => trainingService.getComplitionRequirement(),
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -118,51 +140,27 @@ function TeacherProfilePage() {
     }
   };
 
-  const validateCourseComplitionRequirement = () => {
-    if (updatedCourseComplitionRequirement.length === 0) {
-      setCourseComplitionRequirementError(
-        "Merkintöjen määrä ei voi olla tyhjä"
-      );
-      return false;
-    }
-    if (updatedCourseComplitionRequirement < 1) {
-      setCourseComplitionRequirementError(
-        "Merkintöjen määrän oltava vähintään 1"
-      );
-      return false;
-    }
-    if (
-      updatedCourseComplitionRequirement ===
-      courseComplitionRequirement[0].value
-    ) {
-      setCourseComplitionRequirementError(
-        "Merkintöjen määrä on jo asetettu tähän arvoon"
-      );
-      return false;
-    }
-    return true;
-  };
-
-  const handleCourseComplitionRequirementUpdate = async () => {
+  const handleCourseSegmentsUpdate = async () => {
     setShowConfirmModal(true);
     setAgreeStyle("");
     setModalMessage(
-      `Haluatko varmasti päivittää merkintöjen määrä vaatimuksen arvoon ${updatedCourseComplitionRequirement}?`
+      `Haluatko varmasti tallentaa kurssin muutokset: ${updatedCourseSegments.map((segment) => " " + segment.name + " = " + segment.value)}?`
     );
     setContinueButton("Päivitä");
     const handleUpdate = async () => {
       try {
-        trainingService.updateComplitionRequirement(
-          updatedCourseComplitionRequirement
-        );
-
-        addToast("Merkintöjen määrä vaatimus päivitetty", { style: "success" });
-        setShowConfirmModal(false);
+        let updatedPositions = updatedCourseSegments.map((segment, index) => {
+          return { ...segment, order_number: index + 1 };
+        });
+        trainingService.updateCourseSegments(updatedPositions);
       } catch (error) {
         addToast("Virhe päivitettäessä merkintöjen määrä vaatimusta", {
           style: "error",
         });
       }
+      addToast("Merkintöjen määrä vaatimus päivitetty", { style: "success" });
+      queryclient.invalidateQueries("courseSegments");
+      setShowConfirmModal(false);
     };
     setHandleUserConfirmation(() => handleUpdate);
   };
@@ -197,17 +195,212 @@ function TeacherProfilePage() {
     }
   }, [visitorData]);
   useEffect(() => {
-    if (courseComplitionRequirement) {
-      setUpdatedCourseComplitionRequirement(
-        courseComplitionRequirement[0].value
-      );
+    if (courseSegments) {
+      setUpdatedCourseSegments([...courseSegments]);
     }
-  }, [courseComplitionRequirement]);
+  }, [courseSegments]);
+
+  const handleSegmentCreation = async () => {
+    try {
+      await trainingService.createCourseSegment({
+        name: newSegmentName,
+        value: newSegmentValue,
+      });
+      addToast("Segmentti luotu", { style: "success" });
+      setNewSegmentName("");
+      setNewSegmentValue("");
+      queryclient.invalidateQueries("courseSegments");
+    } catch (error) {
+      addToast("Virhe luotaessa segmenttiä", { style: "error" });
+    }
+  };
+
+  const handleSegmentDelete = async (segment) => {
+    setShowConfirmModal(true);
+    setAgreeStyle("red");
+    setModalMessage(
+      `Haluatko varmasti poistaa segmentin <br>
+      nimi: ${segment.name} Vaaditut merkinnät: ${segment.value}? 
+`
+    );
+    setContinueButton("Poista");
+
+    const handleUserConfirmation = async () => {
+      try {
+        await trainingService.deleteCourseSegment(segment.id);
+        addToast("Segmentti poistettu", { style: "success" });
+        queryclient.invalidateQueries("courseSegments");
+      } catch (error) {
+        addToast("Virhe poistettaessa segmenttiä", { style: "error" });
+      }
+      setShowConfirmModal(false);
+    };
+    setHandleUserConfirmation(() => handleUserConfirmation);
+  };
+  // Drag and drop segment sorting functions
+
+  class MyPointerSensor extends PointerSensor {
+    static activators = [
+      {
+        eventName: "onPointerDown",
+        handler: ({ nativeEvent: event }) => {
+          console.log(event.target);
+          if (
+            !event.isPrimary ||
+            event.button !== 0 ||
+            isInteractiveElement(event.target)
+          ) {
+            return false;
+          }
+
+          return true;
+        },
+      },
+    ];
+  }
+  function isInteractiveElement(element) {
+    const interactiveElements = [
+      "button",
+      "input",
+      "textarea",
+      "select",
+      "option",
+      "svg",
+      "polyline",
+      "path",
+    ];
+
+    if (interactiveElements.includes(element.tagName.toLowerCase())) {
+      return true;
+    }
+
+    return false;
+  }
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      setUpdatedCourseSegments((segments) => {
+        const oldIndex = segments.findIndex(
+          (segment) => segment.id === active.id
+        );
+        const newIndex = segments.findIndex(
+          (segment) => segment.id === over.id
+        );
+        return arrayMove(segments, oldIndex, newIndex);
+      });
+    }
+  };
+
+  function SortableItem({ segment, inputClass }) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [segmentID, setSegmentID] = useState(segment.id);
+    const [segmentName, setSegmentName] = useState(segment.name);
+    const [segmentValue, setSegmentValue] = useState(segment.value);
+
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id: segment.id, disabled: isEditing });
+
+    const handleSegmentChanges = () => {
+      setUpdatedCourseSegments((segments) =>
+        segments.map((segment) =>
+          segment.id === segmentID
+            ? { ...segment, name: segmentName, value: segmentValue }
+            : segment
+        )
+      );
+    };
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="flex items-center justify-between p-2 border rounded-md shadow-sm border-borderPrimary touch-none hover:shadow-md"
+      >
+        <div className="flex items-center gap-2">
+          {" "}
+          <small className="text-textSecondary">Nimi: </small>
+          {isEditing ? (
+            <input
+              type="text"
+              value={segmentName}
+              disabled={!isEditing}
+              onChange={(e) => setSegmentName(e.target.value)}
+              className={cc(inputClass, "disabled:border-bgSecondary")}
+            />
+          ) : (
+            <div className={cc(inputClass, "w-full border-bgSecondary")}>
+              {segmentName}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {" "}
+          <small className="text-textSecondary">Vaaditut merkinnät: </small>
+          {isEditing ? (
+            <input
+              type="number"
+              value={segmentValue}
+              disabled={!isEditing}
+              onChange={(e) => setSegmentValue(e.target.value)}
+              className={cc(inputClass, "max-w-20 disabled:border-bgSecondary")}
+            />
+          ) : (
+            <div className={cc(inputClass, "border-bgSecondary")}>
+              {segmentValue}
+            </div>
+          )}
+        </div>
+
+        <div>
+          {" "}
+          {isEditing ? (
+            <button
+              className="border rounded-md IconBox bg-bgSecondary text-btnGreen border-bgSecondary hover:border-borderPrimary"
+              onClick={() => {
+                setIsEditing(false);
+                handleSegmentChanges();
+              }}
+            >
+              <FiCheck />
+            </button>
+          ) : (
+            <button
+              className="border rounded-md IconBox bg-bgSecondary text-btnGray border-bgSecondary hover:border-borderPrimary hover:text-hoverGray"
+              onClick={() => setIsEditing(true)}
+            >
+              <FiEdit3 />
+            </button>
+          )}
+          <button
+            className="border rounded-md IconBox bg-bgSecondary text-btnRed border-bgSecondary hover:border-borderPrimary"
+            onClick={() => handleSegmentDelete(segment)}
+          >
+            <FiTrash2 />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const sensors = useSensors(
+    useSensor(MyPointerSensor),
+    useSensor(TouchSensor)
+  );
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (visitorDataLoading) {
+  if (visitorDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -222,43 +415,114 @@ function TeacherProfilePage() {
             <div>
               <h1 className="text-xl">Kurssin tiedot</h1>
               <small className="text-textSecondary">
-                Tarkistele tai päivitä kurssin tietoja
+                Voit luoda uuden segmentin, muokata olemassa olevia segmenttejä
+                tai muuttaa näiden järjestystä vetämällä ja pudottamalla niitä
               </small>
             </div>
 
-            <form className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="name">
-                Merkintöjen määrä vaatimus
-              </label>
-              <small className="text-textSecondary">
-                Kuinka monta merkintää vaaditaan opiskelijalta, jotta kurssi
-                näytetään suoritetuksi
-              </small>
-              <input
-                type="number"
-                name="name"
-                value={updatedCourseComplitionRequirement}
-                onChange={(e) => {
-                  setUpdatedCourseComplitionRequirement(e.target.value);
-                }}
-                className={cc(inputClass, "disabled:text-opacity-70")}
-              />
-              <small className="text-red-500">
-                {courseComplitionRequirementError}
-              </small>
+            <div className="flex flex-col">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragEnd={handleDragEnd}
+              >
+                {" "}
+                {/* segment edition container */}
+                <div className="flex flex-col w-full gap-4">
+                  <SortableContext
+                    items={updatedCourseSegments.map((segment) => segment.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {updatedCourseSegments?.map((segment, index) => (
+                      <SortableItem
+                        key={segment.id}
+                        segment={segment}
+                        inputClass={inputClass}
+                      />
+                    ))}
+                  </SortableContext>
+
+                  {creatingSegment ? (
+                    <div className="flex items-center gap-4 p-2 border rounded-md shadow-sm border-borderPrimary touch-none">
+                      <div>
+                        {" "}
+                        <small className="text-textSecondary">Nimi: </small>
+                        <input
+                          type="text"
+                          value={newSegmentName}
+                          onChange={(e) => setNewSegmentName(e.target.value)}
+                          className={cc(inputClass)}
+                        />
+                      </div>
+                      <div>
+                        <small className="text-textSecondary">
+                          Vaaditut merkinnät:{" "}
+                        </small>
+                        <input
+                          type="number"
+                          value={newSegmentValue}
+                          onChange={(e) => setNewSegmentValue(e.target.value)}
+                          className={cc(inputClass, "max-w-20")}
+                        />
+                      </div>
+                      <div className="flex self-end gap-4 justify-self-end">
+                        <button
+                          onClick={() => {
+                            setCreatingSegment(false);
+                            setNewSegmentErrorMessage("");
+                            setNewSegmentName("");
+                            setNewSegmentValue("");
+                          }}
+                        >
+                          peruuta
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (newSegmentName && newSegmentValue) {
+                              handleSegmentCreation();
+                              setCreatingSegment(false);
+                              setNewSegmentErrorMessage("");
+                            } else {
+                              setNewSegmentErrorMessage(
+                                "Nimi ja vaaditut merkinnät ovat pakollisia"
+                              );
+                            }
+                          }}
+                        >
+                          Luo
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      className={cc(
+                        "border rounded-md  border-borderPrimary  hover:bg-hoverDefault hover:text-primaryColor p-1  text-lg"
+                      )}
+                      onClick={() => setCreatingSegment(true)}
+                    >
+                      +
+                    </button>
+                  )}
+                  <small className="mt-0 text-red-500">
+                    {newSegmentErrorMessage}
+                  </small>
+                </div>
+              </DndContext>
+
               <button
                 className="p-2 mt-4 text-white w-fit Button"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (validateCourseComplitionRequirement()) {
-                    setCourseComplitionRequirementError("");
-                    handleCourseComplitionRequirementUpdate();
+                  if (courseSegments) {
+                    setCourseSegmentsError("");
+                    handleCourseSegmentsUpdate();
                   }
                 }}
               >
                 Tallenna
               </button>
-            </form>
+            </div>
           </div>
 
           {/* Profiilin tiedot container */}
