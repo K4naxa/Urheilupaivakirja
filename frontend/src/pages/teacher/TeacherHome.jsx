@@ -40,7 +40,7 @@ function TeacherHome() {
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
 
-  const [segmentContent, setSegmentContent] = useState("");
+  const [tooltipContent, setTooltipContent] = useState(null);
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -252,8 +252,6 @@ function TeacherHome() {
   const renderProgressionBar = ({ student }) => {
     if (!courseSegments) return null;
 
-    console.log("student", student);
-
     // student.total_entry_count
     let unUsedEntires = student.total_entry_count || 0;
 
@@ -268,22 +266,6 @@ function TeacherHome() {
         {courseSegments.map((segment, index) => {
           // Calculate the proportional width of the segment based on its value
           const segmentLength = (segment.value / total_requirement) * 100;
-          console.log("segment.value", segment.value);
-          console.log("total_requirement", total_requirement);
-          console.log("segmentLength", segmentLength);
-
-          console.log("unUsedEntires", unUsedEntires);
-
-          const TooltipDataContent = () => {
-            return (
-              <div className="flex flex-col gap-2 p-2 text-textPrimary">
-                <h2 className="text-lg font-semibold">
-                  {segment.name} - {segment.value} / {total_requirement}
-                </h2>
-                <p className="text-sm">{segment.description}</p>
-              </div>
-            );
-          };
 
           // Calculate the progression for this segment
           let segmentProgression = Math.min(
@@ -292,18 +274,23 @@ function TeacherHome() {
           );
           if (segmentProgression < 0) segmentProgression = 0;
 
-          console.log("segmentProgression", segmentProgression);
-
+          const TooltipInfo = {
+            name: segment.name,
+            requirement: segment.value,
+            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
+            progression: Math.min(Math.max(segmentProgression, 0), 100),
+          };
           // Reduce the total_entry_count by the segment's value
           unUsedEntires -= segment.value;
 
           return (
             <div
               key={index}
-              className={cc("bottom-0 h-1 segment hover:cursor-pointer")}
-              onClick={() => {
-                setSegmentContent(<TooltipDataContent />);
-              }}
+              className={cc(
+                "bottom-0 h-1 hover:cursor-pointer clickableCourseSegment"
+              )}
+              onClick={() => setTooltipContent(TooltipInfo)}
+              onMouseLeave={() => setTooltipContent(null)}
               style={{ width: `${segmentLength}%` }}
             >
               <div
@@ -321,6 +308,22 @@ function TeacherHome() {
           );
         })}
       </div>
+    );
+  };
+
+  const getSegmentTooltipContent = () => {
+    console.log(tooltipContent);
+    return (
+      <>
+        <div className="flex flex-col gap-2 p-2 w-42">
+          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
+          <span>Suoritettu: {tooltipContent.progression}%</span>
+          <span className="">
+            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
+            {tooltipContent.requirement}
+          </span>
+        </div>
+      </>
     );
   };
 
@@ -386,7 +389,6 @@ function TeacherHome() {
   };
 
   const RenderWeeks = ({ journals }) => {
-    console.log("journals", journals);
     const { showDate, setShowDate } = useMainContext();
 
     if (journals?.length === 0) {
@@ -647,6 +649,22 @@ function TeacherHome() {
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
+        <Tooltip
+          id="segment-tooltip"
+          anchorSelect=".clickableCourseSegment"
+          className="z-10 border nice-shadow border-borderPrimary"
+          place="bottom"
+          openOnClick={true}
+          opacity={1}
+          offset="2"
+          style={{
+            backgroundColor: "rgb(var(--color-bg-secondary))",
+            color: "rgb(var(--color-text-primary))",
+            padding: "0.5rem",
+          }}
+        >
+          {tooltipContent && getSegmentTooltipContent()}
+        </Tooltip>
         <TeacherHeatmapTooltip />
 
         <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
@@ -787,21 +805,6 @@ function TeacherHome() {
           {showMonths && <RenderMonths journals={filteredStudents} />}
           {showYears && <RenderYears journals={filteredStudents} />}
         </div>
-        <Tooltip
-          anchorSelect=".segment"
-          className="z-10 text-black border nice-shadow border-borderPrimary"
-          place="bottom"
-          openOnClick={true}
-          opacity={1}
-          offset="3"
-          style={{
-            backgroundColor: "rgb(var(--color-bg-secondary))",
-            padding: "0.5rem",
-            color: "rgb(var(--color-text-primary))",
-          }}
-        >
-          {segmentContent}
-        </Tooltip>
       </div>
     );
 }
