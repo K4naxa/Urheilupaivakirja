@@ -29,6 +29,9 @@ router.post("/", async (req, res, next) => {
         user_id: entry.user_id,
         date: entry.date,
       });
+
+      let deletedEntriesCount = 0;
+
       // check if conflicts
       if (conflicts.length > 0) {
         if (entry.entry_type_id == 1) {
@@ -39,7 +42,7 @@ router.post("/", async (req, res, next) => {
 
           if (!allTypeOne) {
             // if not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
-            await trx("journal_entries")
+            deletedEntriesCount += await trx("journal_entries")
               .where({
                 user_id: entry.user_id,
                 date: entry.date,
@@ -48,7 +51,7 @@ router.post("/", async (req, res, next) => {
           }
         } else {
           // for rest or sick days, delete all existing entries
-          await trx("journal_entries")
+          deletedEntriesCount += await trx("journal_entries")
             .where({
               user_id: entry.user_id,
               date: entry.date,
@@ -57,8 +60,20 @@ router.post("/", async (req, res, next) => {
         }
       }
 
+      if (deletedEntriesCount > 0) {
+        await trx("students")
+          .where({ user_id: entry.user_id })
+          .decrement("total_entry_count", deletedEntriesCount);
+      }
+
       // insert entry after handling possible conflicts
       const rows = await trx("journal_entries").insert(entry);
+
+      // increment total_entry_count for the user
+      await trx("students")
+        .where({ user_id: entry.user_id })
+        .increment("total_entry_count", 1);
+
       return rows;
     });
 
@@ -226,6 +241,12 @@ router.delete("/:id", async (req, res, next) => {
   //TODO: Check if the user is authorized to delete the entry
   try {
     const rows = await knex("journal_entries").where("id", id).del();
+
+    // decrement total_entry_count for the user
+    await knex("students")
+      .where({ user_id: getUserId(req) })
+      .decrement("total_entry_count", 1);
+
     res.json({ message: "Entry deleted successfully" });
   } catch (err) {
     console.log("DELETE /journal_entry/:id failed", err);

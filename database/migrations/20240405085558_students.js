@@ -7,6 +7,7 @@ exports.up = function (knex) {
     table.integer("sport_id").unsigned();
     table.integer("group_id").unsigned();
     table.integer("campus_id").unsigned();
+    table.integer("total_entry_count").notNullable().defaultTo(0);
     table.boolean("verified").notNullable().defaultTo(false);
     table.boolean("archived").notNullable().defaultTo(false);
     table.timestamp("archived_at");

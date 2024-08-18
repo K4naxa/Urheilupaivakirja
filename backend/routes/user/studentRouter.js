@@ -26,7 +26,8 @@ router.get("/", async (req, res) => {
         "last_name",
         "sports.name as sport",
         "student_groups.group_identifier",
-        "campuses.name as campus"
+        "campuses.name as campus",
+        "total_entry_count"
       )
       .from("students")
       .where("archived", false)
@@ -108,6 +109,7 @@ router.get("/entries", async (req, res) => {
         "students.user_id",
         "students.first_name",
         "students.last_name",
+        "students.total_entry_count",
         "sports.name as sport_name",
         "student_groups.group_identifier",
         "campuses.name as campus_name"
@@ -126,6 +128,7 @@ router.get("/entries", async (req, res) => {
       sport_name: student.sport_name,
       group_identifier: student.group_identifier,
       campus_name: student.campus_name,
+      total_entry_count: student.total_entry_count,
       journal_entries: allEntries.filter(
         (entry) => entry.user_id === student.user_id
       ),

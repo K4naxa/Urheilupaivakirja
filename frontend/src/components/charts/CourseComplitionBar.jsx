@@ -53,8 +53,12 @@ const Text = ({ value, REQUIRED_COMPLETION }) => {
   );
 };
 
-const CourseComplitionBar = ({ value, REQUIRED_COMPLETION }) => {
+const CourseComplitionBar = ({ student, courseSegments }) => {
   const [animatedPct, setAnimatedPct] = useState(0);
+  const value = student.total_entry_count;
+  const REQUIRED_COMPLETION = courseSegments
+    .map((segment) => segment.value)
+    .reduce((a, b) => a + b, 0);
 
   useEffect(() => {
     const percentage = (value / REQUIRED_COMPLETION) * 100;
