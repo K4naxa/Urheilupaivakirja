@@ -17,8 +17,9 @@ const SpectatorsPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleDelete = (spectator) => {
+    console.log("Deleting spectator:", spectator);
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(spectator.user_id).then(() => {
+      await userService.deleteUser(spectator.id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });

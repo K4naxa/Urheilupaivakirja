@@ -249,7 +249,7 @@ function StudentHome() {
             <div className="flex flex-col ">
               {" "}
               <p className="pb-0 mb-0 text-lg leading-none ">Seuranta</p>
-              <small>Seuraa aktiivisuuttasi, sekä kurssin edistymistä</small>
+              <small>Seuraa aktiivisuuttasi, sekä kurssiesi edistymistä</small>
             </div>
           </div>
 
