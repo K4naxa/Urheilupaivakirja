@@ -33,7 +33,7 @@ const generateFakeJournal_entries = (id) => {
   const created = faker.date.recent({ days: 500 });
   return {
     user_id: id,
-    entry_type_id: faker.number.int({ min: 1, max: 3 }),
+    entry_type_id: 1,
     workout_type_id: faker.number.int({ min: 1, max: 3 }),
     workout_category_id: faker.number.int({ min: 1, max: 3 }),
     time_of_day_id: faker.number.int({ min: 1, max: 3 }),
