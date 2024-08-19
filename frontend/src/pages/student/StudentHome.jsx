@@ -26,7 +26,7 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 
-import { useJournalModal } from "../../hooks/useJournalModal";
+import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
 import userService from "../../services/userService";
@@ -35,7 +35,7 @@ import cc from "../../utils/cc";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
   const [tooltipContent, setTooltipContent] = useState(null);
 
   const {
@@ -220,7 +220,7 @@ function StudentHome() {
             </div>
             <div className="flex gap-4">
               <button
-                onClick={() => openBigModal("new")}
+                onClick={() => openBigModal("newJournalEntry")}
                 className="px-4 py-2 text-white border rounded-md border-borderPrimary bg-primaryColor hover:bg-hoverPrimary"
               >
                 {`+ Uusi harjoitus`}
@@ -249,7 +249,7 @@ function StudentHome() {
             <div className="flex flex-col ">
               {" "}
               <p className="pb-0 mb-0 text-lg leading-none ">Seuranta</p>
-              <small>Seuraa aktiivisuuttasi, sekä kurssin edistymistä</small>
+              <small>Seuraa aktiivisuuttasi, sekä kurssiesi edistymistä</small>
             </div>
           </div>
 

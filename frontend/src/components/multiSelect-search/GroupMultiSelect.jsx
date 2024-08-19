@@ -13,11 +13,11 @@ const GroupMultiSelect = ({
   // Map filtered sports to the format required by react-select
   const groupOptions = groupArray?.map((group) => {
     const availableGroup = availableGroups?.find(
-      (available) => available.name === group.group_identifier
+      (available) => available.name === group.name
     );
     return {
       value: group.id,
-      label: `${group.group_identifier}`,
+      label: `${group.name}`,
       studentCount: availableGroup ? availableGroup.studentCount : 0,
       isDisabled: !availableGroup,
     };
@@ -42,7 +42,6 @@ const GroupMultiSelect = ({
   return (
     <Select
       isMulti
-      components={makeAnimated()}
       formatOptionLabel={CustomOption}
       value={selectedGroups}
       openMenuOnFocus={false}
@@ -118,7 +117,7 @@ const GroupMultiSelect = ({
       closeMenuOnSelect={false}
       className="basic-multi-select"
       classNamePrefix="select"
-      placeholder="Select Groups"
+      placeholder="Valitse ryhmät"
     />
   );
 };

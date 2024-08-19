@@ -14,30 +14,35 @@ import NewJournalEntryPage from "./pages/student/journal-entry/NewJournalEntryPa
 import EditJournalEntryPage from "./pages/student/journal-entry/EditJournalEntryPage";
 import StudentNewsPage from "./pages/student/StudentNewsPage";
 
-// Visitor
-import VisitorRegistrationPage from "./pages/VisitorRegistrationPage";
+//spectator
+import SpectatorRegistrationPage from "./pages/SpectatorRegistrationPage";
 
 //teacher
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
-import Verify from "./pages/teacher/verify/Verify";
 
 import StudentPage from "./pages/teacher/Studentpage";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
-import Visitors from "./pages/teacher/manage/VisitorsPage";
+import SpectatorsPage from "./pages/teacher/manage/SpectatorsPage";
+import TeachersPage from "./pages/teacher/manage/TeachersPage";
 import GroupsPage from "./pages/teacher/manage/groupsPage";
 import CampusPage from "./pages/teacher/manage/campusPage";
+
+import TeacherNewsPage from "./pages/teacher/news/TeacherNewsPage";
+
 
 import ManageStudentsLayout from "./layouts/manage-layout/manageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
+import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
+
+
 //misc
 import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
-import TestPage from "./pages/testPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
 import ForgottenPasswordPage from "./pages/misc/forgotten-password/ForgottenPasswordPage";
@@ -45,10 +50,10 @@ import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/Fo
 import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
-import TeacherNewsPage from "./pages/teacher/TeacherNewsPage";
 import StatisticsPage from "./pages/teacher/StatisticsPage";
-import VisitorLayout from "./layouts/VisitorLayout";
-import VisitorProfilePage from "./pages/visitor/VisistorProfilePage";
+import SpectatorLayout from "./layouts/SpectatorLayout";
+import SpectatorProfilePage from "./pages/spectator/SpectatorProfilePage";
+import VerificationPage from "./pages/teacher/verify/VerificationPage";
 
 export const router = createBrowserRouter([
   {
@@ -94,7 +99,6 @@ export const router = createBrowserRouter([
               </RedirectIfAuthenticated>
             ),
           },
-          { path: "/test", element: <TestPage /> },
           {
             path: "/rekisteroidy",
             element: (
@@ -105,8 +109,9 @@ export const router = createBrowserRouter([
           },
           {
             path: "/vierailijan-rekisterointi",
-            element: <VisitorRegistrationPage />,
+            element: <SpectatorRegistrationPage />,
           },
+          //{ path: "/opettajan-rekisterointi", element: <TeacherRegistrationPage /> },
           {
             path: "/unohditko-salasanasi",
             element: (
@@ -148,7 +153,7 @@ export const router = createBrowserRouter([
             ),
             children: [
               { index: true, element: <TeacherHome /> },
-              { path: "hyvaksy", element: <Verify /> },
+              { path: "hyvaksy", element: <VerificationPage /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
               { path: "profiili", element: <TeacherProfilePage /> },
               { path: "tiedotteet", element: <TeacherNewsPage /> },
@@ -159,7 +164,20 @@ export const router = createBrowserRouter([
                 element: <ManageLayout />,
                 children: [
                   { element: <SportsPage />, index: true },
-                  { path: "vierailijat", element: <Visitors /> },
+                  {
+                    path: "henkilokunta/",
+                    element: <ManageStaffLayout/>,
+                    children: [
+                      {
+                        index: true,
+                        element: <SpectatorsPage />,
+                      },
+                      {
+                        path: "opettajat",
+                        element: <TeachersPage />,
+                      },
+                    ],
+                  },
                   { path: "ryhmat", element: <GroupsPage /> },
                   { path: "toimipaikat", element: <CampusPage /> },
                   {
@@ -182,12 +200,12 @@ export const router = createBrowserRouter([
           },
           {
             path: "/vierailija",
-            element: <VisitorLayout />,
+            element: <SpectatorLayout />,
             children: [
               { index: true, element: <TeacherHome /> },
               { path: "tilastot", element: <StatisticsPage /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
-              { path: "profiili", element: <VisitorProfilePage /> },
+              { path: "profiili", element: <SpectatorProfilePage /> },
             ],
           },
         ],

@@ -16,6 +16,9 @@ import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSel
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
+import { TbPin, TbPinFilled, TbPinnedOff } from "react-icons/tb";
+
+
 import {
   addMonths,
   addWeeks,
@@ -115,7 +118,7 @@ function TeacherHome() {
       if (filterType !== "groups" && selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
           selectedGroups.some(
-            (group) => group.label === student.group_identifier
+            (group) => group.label === student.name
           )
         );
       }
@@ -152,7 +155,7 @@ function TeacherHome() {
     );
     const availableGroupsCount = countStudents(
       getAvailableOptions("groups"),
-      "group_identifier"
+      "name"
     );
 
     return {
@@ -193,8 +196,8 @@ function TeacherHome() {
     name2: (a, b) => b.first_name.localeCompare(a.first_name),
     sport1: (a, b) => a.sport_name.localeCompare(b.sport_name),
     sport2: (a, b) => b.sport_name.localeCompare(a.sport_name),
-    group1: (a, b) => a.group_identifier.localeCompare(b.group_identifier),
-    group2: (a, b) => b.group_identifier.localeCompare(a.group_identifier),
+    group1: (a, b) => a.name.localeCompare(b.name),
+    group2: (a, b) => b.name.localeCompare(a.name),
     campus1: (a, b) => a.campus_name.localeCompare(b.campus_name),
     campus2: (a, b) => b.campus_name.localeCompare(a.campus_name),
     progression1: (a, b) =>
@@ -221,7 +224,7 @@ function TeacherHome() {
     }
     if (selectedGroups.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedGroups.some((group) => group.label === student.group_identifier)
+        selectedGroups.some((group) => group.label === student.name)
       );
     }
     if (selectedStudents.length > 0) {
@@ -334,7 +337,9 @@ function TeacherHome() {
         (pinnedStudent) => pinnedStudent.pinned_user_id === journal.user_id
       );
     }
-
+  
+    const [hover, setHover] = useState(false);
+  
     const handlePinClick = async () => {
       if (isPinned) {
         await userService.unpinStudent(journal.user_id).then(() => {
@@ -346,15 +351,33 @@ function TeacherHome() {
         });
       }
     };
-
+  
     return (
       <div
-        className={cc(
-          "absolute -top-2 -left-2 h-4 w-4 rounded-sm cursor-pointer group-hover/studentCard:border group-hover/studentCard:border-yellow-500",
-          isPinned ? "bg-yellow-500" : null
-        )}
+        className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center cursor-pointer"
         onClick={() => handlePinClick()}
-      ></div>
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        {isPinned ? (
+          hover ? (
+            <TbPinnedOff
+              size={20}
+              className="text-primaryColor"
+            />
+          ) : (
+            <TbPinFilled
+              size={20}
+              className="text-primaryColor"
+            />
+          )
+        ) : (
+          <TbPin
+            size={20}
+            className="text-textPrimary opacity-10 hover:text-primaryColor hover:opacity-100"
+          />
+        )}
+      </div>
     );
   };
 
@@ -616,7 +639,7 @@ function TeacherHome() {
                       Toimipiste: {journal.campus_name}
                     </p>
                     <p className="text-textSecondary">
-                      ryhmä: {journal.group_identifier}
+                      ryhmä: {journal.name}
                     </p>
                     <p className="flex text-textSecondary">
                       Laji: {journal.sport_name}

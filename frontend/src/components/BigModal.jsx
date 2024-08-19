@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-const JournalEntryModal = ({ isOpen, onClose, content }) => {
+const BigModal = ({ isOpen, onClose, content }) => {
   useEffect(() => {
     // ESC to close
     const handleEscape = (event) => {
@@ -33,4 +33,4 @@ const JournalEntryModal = ({ isOpen, onClose, content }) => {
   );
 };
 
-export default JournalEntryModal;
+export default BigModal;

@@ -1,45 +1,76 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import userService from "../../../services/userService";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
+import { useToast } from "../../../hooks/toast-messages/useToast";
 
-const VisitorsPage = () => {
+const SpectatorsPage = () => {
   const queryClient = useQueryClient();
+  const { openConfirmModal } = useConfirmModal();
+  const [newSpectatorEmail, setNewSpectatorEmail] = useState("");
+  const { addToast } = useToast();
 
   const [errorMessage, setErrorMessage] = useState("");
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
 
   const handleDelete = (spectator) => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa vierailijan ${spectator.first_name} ${spectator.last_name}?
-      Tämä poistaa kaikki vierailijan tiedot pysyvästi.`
-    );
-    setContinueButton("Poista");
-
+    console.log("Deleting spectator:", spectator);
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(spectator.user_id).then(() => {
+      await userService.deleteUser(spectator.id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });
       });
-      setShowConfirmModal(false);
       queryClient.invalidateQueries({ spectators });
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa vierailijan
+        <br />
+        <strong>
+          {spectator.first_name} {spectator.last_name}?
+        </strong>
+        <br />
+        Tämä poistaa kaikki vierailijan tiedot pysyvästi.`
+      </span>
+    );
+
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
+
+  const inviteSpectator = useMutation({
+    mutationFn: () =>
+      userService.inviteSpectator(newSpectatorEmail),
+    onError: (error) => {
+      console.error("Error inviting spectator:", error);
+      addToast("Virhe kutsuttaessa vierailijaa", { style: "error" });
+    },
+    onSuccess: (user) => {
+      addToast("Vierailijakutsu lähetetty", { style: "success" });
+      queryClient.invalidateQueries({invitedSpectators});
+    },
+  });
+
+  const handleSendInvitation = async (e) => {
+    e.preventDefault();
+    if (!newSpectatorEmail) {
+      setErrorMessage("Syötä sähköpostiosoite");
+      return;
+    }
+    await inviteSpectator.mutate();
+    setNewSpectatorEmail("");
+   }
 
   const { data: spectators, isLoading: spectatorsLoading } = useQuery({
     queryKey: ["spectators"],
@@ -49,21 +80,17 @@ const VisitorsPage = () => {
     },
   });
 
-  useEffect(() => {
-    if (!spectatorsLoading) console.log(spectators);
-  }, [spectators, spectatorsLoading]);
+  const { data: invitedSpectators } = useQuery({
+    queryKey: ["invitedSpectators"],
+    queryFn: () => userService.getInvitedSpectators(),
+    config: {
+      enabled: false,
+    },
+  });
 
   return (
-    <div className="w-full items-center bg-bgSecondary rounded-md">
-      {/* Mobile header / error Message */}
+    <div className="w-full items-center bg-bgSecondary rounded-md p-2">
       <div>
-        <div
-          className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
-       rounded-b-md shadow-md"
-        >
-          Vierailijat
-        </div>
-
         {/* Error Header */}
         {errorMessage && (
           <div
@@ -81,28 +108,33 @@ const VisitorsPage = () => {
           </div>
         )}
       </div>
-      <div className="flex flex-col w-full gap-8 border border-borderPrimary p-4 rounded-md">
-        <div className="flex flex-col w-full p-4 ">
+        <div className="flex flex-col w-full px-4 ">
           <div className="flex gap-4 justify-center w-full items-end">
-            <div className="flex flex-col w-3/4">
-              <label htmlFor="newVisitorInput">Kutsu uusi vierailija</label>
-              <input
-                type="text"
-                name="newVisitorInput"
-                id="newVisitorInput"
-                placeholder="Vierailijan sähköposti"
-                className="text-textPrimary bg-bgGray p-1 
-                  border border-borderPrimary rounded-md
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryColor mt-1"
-              />
-            </div>
-            <button className="Button bg-bgGray border border-primaryColor h-10 align-bottom">
-              Lähetä
-            </button>
+            <form onSubmit={handleSendInvitation}className="flex flex-col w-3/4">
+              <label htmlFor="newSpectatorInput" className="my-0.5">
+                Kutsu uusi vierailija
+              </label>
+              <div className="flex">
+                <input
+                  className="flex-grow text-textPrimary bg-bgGray p-1 
+                border border-borderPrimary rounded-l-md
+                focus-visible:outline-none"
+                  type="text"
+                  placeholder="Vierailijan sähköpostiosoite"
+                  value={newSpectatorEmail}
+                  onChange={(e) => setNewSpectatorEmail(e.target.value)}
+                  id="newSpectatorInput"
+                />
+
+                <button className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor whitespace-nowrap align-bottom">
+                  Lähetä
+                </button>
+              </div>
+            </form>
           </div>
         </div>
         <div className="flex-col w-full ">
-          <h2 className="text-xl">Vierailijat</h2>
+          <h2 className="text-xl m-2">Vierailijat</h2>
           <div className="flex flex-col gap-4">
             {spectatorsLoading ? (
               <div>{LoadingScreen()}</div>
@@ -117,17 +149,7 @@ const VisitorsPage = () => {
             )}
           </div>
         </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
       </div>
-    </div>
   );
 };
 
@@ -152,7 +174,7 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
     : null;
 
   return (
-    <div className="flex w-full border border-borderPrimary rounded-md">
+    <div className="flex w-full border border-borderPrimary rounded-md p-2">
       <div className="flex flex-col gap-2 p-2  w-full">
         {/* name and email row */}
         <div className="flex flex-wrap gap-4 items-end">
@@ -184,4 +206,4 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
   );
 };
 
-export default VisitorsPage;
+export default SpectatorsPage;

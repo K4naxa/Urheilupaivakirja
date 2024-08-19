@@ -89,7 +89,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
             <button
               data-testid="saveBtn"
               onClick={() => handleSave(newName)}
-              className="Button bg-btnGreen"
+              className="Button text-white bg-primaryColor"
             >
               Tallenna
             </button>{" "}
@@ -260,7 +260,7 @@ const CampusPage = () => {
             className="p-1 border text-textPrimary bg-bgGray border-borderPrimary rounded-l-md focus-visible:outline-none"
             type="text"
             data-testid="newCampusInput"
-            placeholder="Luo toimipaikka"
+            placeholder="Uusi toimipaikka"
             value={newCampus}
             onChange={(e) => setNewCampus(e.target.value)}
             onKeyDown={(e) => {
@@ -269,12 +269,12 @@ const CampusPage = () => {
               }
             }}
           />
-          <p
+          <button
             onClick={() => handleNewCampus()}
             className="px-4 py-2 text-white duration-75 select-none rounded-r-md bg-primaryColor hover:bg-hoverPrimary active:scale-95"
           >
             +
-          </p>
+          </button>
         </div>
         <div className="flex flex-col gap-2" id="campusesContainer">
           <div className="grid items-center px-2 grid-cols-controlpanel3 text-textSecondary ">

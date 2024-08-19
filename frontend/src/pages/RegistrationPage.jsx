@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useAuth } from "../hooks/useAuth";
+import GroupSelect from "../components/registration/RegistrationGroupSelect";
+import CampusSelect from "../components/registration/RegistrationCampusSelect";
+import SportSelect from "../components/registration/RegistrationSportSelect";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -17,7 +20,6 @@ const RegistrationPage = () => {
     sportId: null,
     groupId: null,
     campusId: null,
-    //newSport: "",
   });
   const [options, setOptions] = useState({
     student_groups: [],
@@ -92,13 +94,16 @@ const RegistrationPage = () => {
     const checkForEmptyFieldsOnRegister = () => {
       let isValid = true;
       for (const field in registrationData) {
-        if (registrationData[field] === "" || registrationData[field] === null) {
+        if (
+          registrationData[field] === "" ||
+          registrationData[field] === null
+        ) {
           isValid = false;
           break;
         }
       }
       return isValid;
-    }
+    };
 
     //TODO: Create separate error checking functions for each field
     errorCheckSimpleInput(registrationData.firstName, "firstName");
@@ -114,20 +119,18 @@ const RegistrationPage = () => {
 
     isValid = checkForEmptyFieldsOnRegister();
 
-
     for (const field in errors) {
       if (errors[field].value !== "success") {
         isValid = false;
-        break; 
+        break;
       }
     }
     return isValid;
   };
 
-  
-
   const registerHandler = async (e) => {
     e.preventDefault();
+
     if (!errorCheckRegistration()) {
       return;
     }
@@ -296,12 +299,18 @@ const RegistrationPage = () => {
   };
 
   const handleDropdownChange = (event) => {
-    changeHandler(event);
+    const { name, value } = event.target;
+    setRegistrationData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
 
-    errorCheckDropdown(event.target.value, event.target.name);
+    errorCheckDropdown(value, name); 
+
   };
 
   const containerClass = "flex flex-col gap-1 relative";
+  const dropdownContainerClass = "flex flex-col gap-1 mb-4 sm:mb-0 relative";
   const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
@@ -324,7 +333,7 @@ const RegistrationPage = () => {
           </Link>
         </div>
         <form
-          className="p-8 sm:p-12 grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-regGrid w-full"
+          className="p-8 sm:p-12 grid grid-cols-1 gap-6 sm:gap-12 sm:grid-cols-regGrid w-full"
           onSubmit={registerHandler}
         >
           {/* First Name */}
@@ -387,7 +396,7 @@ const RegistrationPage = () => {
           <div className="flex flex-col gap-1 sm:col-span-2 relative">
             <input
               onChange={changeHandler}
-              type="text"
+              type="email"
               name="email"
               id="email-input"
               placeholder="Sähköposti"
@@ -438,7 +447,7 @@ const RegistrationPage = () => {
           </div>
 
           {/* Password Repeat */}
-          <div className={containerClass}>
+          <div className={`${containerClass} mb-4 sm:mb-0`}>
             <input
               onChange={changeHandler}
               type="password"
@@ -462,35 +471,17 @@ const RegistrationPage = () => {
               <p className={errorClass}>{errors.passwordAgain.message}</p>
             )}
           </div>
-
           {/* Sport */}
-          <div className={containerClass}>
-            <select
-              value={registrationData.sportId || ""}
-              name="sportId"
-              id="sport-select"
-              className={
-                inputClass +
-                (errors.sportId && errors.sportId.value
-                  ? errors.sportId.value === "error"
-                    ? " border-red-500"
-                    : errors.sportId.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              onChange={handleDropdownChange}
-            >
-              {registrationData.sportId === null && (
-                <option value="">Valitse laji</option>
-              )}
-              {options.sports.map((sport) => (
-                <option key={sport.id} value={sport.id}>
-                  {sport.name}
-                </option>
-              ))}
-              {/*<option value="new">+ Lisää uusi</option>*/}
-            </select>
+          <div className={dropdownContainerClass}>
+            <SportSelect
+              inputClass="input-class"
+              errorClass="error-class"
+              errors={errors}
+              registrationData={registrationData}
+              options={options}
+              handleDropdownChange={(event) => handleDropdownChange(event)}
+              
+            />
             {/* registrationData.sportId === "new" && (
               <input
                 type="text"
@@ -507,64 +498,32 @@ const RegistrationPage = () => {
           </div>
 
           {/* Group */}
-          <div className={containerClass}>
-            <select
-              className={
-                inputClass +
-                (errors.groupId && errors.groupId.value
-                  ? errors.groupId.value === "error"
-                    ? " border-red-500"
-                    : errors.groupId.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              value={registrationData.groupId || ""}
-              name="groupId"
-              id="group-select"
-              onChange={handleDropdownChange}
-            >
-              {registrationData.groupId === null && (
-                <option value="">Valitse ryhmä</option>
-              )}
-              {options.student_groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.group_identifier}
-                </option>
-              ))}
-            </select>
+          <div className={dropdownContainerClass}>
+            <GroupSelect
+              inputClass="input-class"
+              errorClass="error-class"
+              errors={errors}
+              registrationData={registrationData}
+              options={options}
+              handleDropdownChange={(event) => handleDropdownChange(event)}
+              
+            />
             {errors.groupId && errors.groupId.message && (
               <p className={errorClass}>{errors.groupId.message}</p>
             )}
           </div>
 
           {/* Campus */}
-          <div className={containerClass}>
-            <select
-              className={
-                inputClass +
-                (errors.campusId && errors.campusId.value
-                  ? errors.campusId.value === "error"
-                    ? " border-red-500"
-                    : errors.campusId.value === "success"
-                      ? " border-green-500"
-                      : ""
-                  : "")
-              }
-              value={registrationData.campusId || ""}
-              name="campusId"
-              id="campus-select"
-              onChange={handleDropdownChange}
-            >
-              {registrationData.campusId === null && (
-                <option value="">Valitse toimipaikka</option>
-              )}
-              {options.campuses.map((campus) => (
-                <option key={campus.id} value={campus.id}>
-                  {campus.name}
-                </option>
-              ))}
-            </select>
+          <div className={dropdownContainerClass}>
+            <CampusSelect
+              inputClass="input-class"
+              errorClass="error-class"
+              errors={errors}
+              registrationData={registrationData}
+              options={options}
+              handleDropdownChange={(event) => handleDropdownChange(event)}
+              
+            />
             {errors.campusId && errors.campusId.message && (
               <p className={errorClass}>{errors.campusId.message}</p>
             )}

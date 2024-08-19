@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
         "first_name",
         "last_name",
         "sports.name as sport",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus",
         "total_entry_count"
       )
@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
         first_name: student.first_name,
         last_name: student.last_name,
         sport: student.sport,
-        group: student.group_identifier,
+        group: student.name,
         campus: student.campus,
         journal_entries: studentJournalEntries,
       };
@@ -111,7 +111,7 @@ router.get("/entries", async (req, res) => {
         "students.last_name",
         "students.total_entry_count",
         "sports.name as sport_name",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus_name"
       )
       .where("students.archived", false)
@@ -126,7 +126,7 @@ router.get("/entries", async (req, res) => {
       first_name: student.first_name,
       last_name: student.last_name,
       sport_name: student.sport_name,
-      group_identifier: student.group_identifier,
+      name: student.name,
       campus_name: student.campus_name,
       total_entry_count: student.total_entry_count,
       journal_entries: allEntries.filter(
@@ -157,7 +157,7 @@ router.get("/archived", async (req, res) => {
         "first_name",
         "last_name",
         "sports.name as sport",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus"
       )
       .from("students")
@@ -208,6 +208,7 @@ router.put("/archive/:id", async (req, res) => {
 // update student.news_last_viewed_at
 
 router.put("/news", async (req, res) => {
+  console.log("update news last viewed at");
   const user_id = getUserId(req);
   if (!user_id) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -239,7 +240,7 @@ router.get("/data/:userId?", async (req, res) => {
       .select(
         "students.*",
         "sports.name as sport_name",
-        "student_groups.group_identifier",
+        "student_groups.name",
         "campuses.name as campus_name",
         "users.email",
         "users.created_at",

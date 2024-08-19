@@ -10,3 +10,5 @@
 */docker-compose.yml
 Docker
 */readme.md
+*/env_local-template
+backend/tests/

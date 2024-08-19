@@ -12,22 +12,99 @@ const sendEmail = require("../../utils/email/sendEmail");
 const otpGenerator = require("otp-generator");
 const { getRole, getUserId, createToken } = require("../../middleware/auth");
 
-// delete user by id (only admin or user themselves can delete their account)
-router.delete("/:id", async (req, res) => {
-  const role = getRole(req);
+//delete self / delete own account -- POST instead of DELETE for password verification (delete has no body)
+router.post("/self", async (req, res) => {
   const user_id = getUserId(req);
-  const userIdToDelete = Number(req.params.id); // Convert req.params.id to a number
+  const password = req.body.password;
+  const user = await knex("users").where({ id: user_id }).first();
+  console.log("User data:", user);
 
-  if (role !== 1 && user_id !== userIdToDelete) {
-    return res.status(401).json({ error: "Unauthorized" });
+  if (user && (user.role_id === 2 || user.role_id === 3)) {
+    try {
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        await knex("users").where("id", "=", user_id).delete();
+        return res.status(200).json({ message: "User deleted" });
+      } else {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
+    } catch (error) {
+      console.error("Error during authentication or deletion:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
   } else {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+});
+
+// admin/teacher delete for spectators and students
+router.delete("/:id", async (req, res) => {
+  const userIdToDelete = Number(req.params.id);
+
+  if (getRole(req) === 1) {
     try {
       await knex("users").where("id", "=", userIdToDelete).delete();
-      res.status(200).json({ message: "User deleted" });
+      return res.status(200).json({ message: "User deleted" });
     } catch (error) {
       console.error("Error deleting user:", error);
-      res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({ error: "Internal server error" });
     }
+  } else {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+});
+
+// verify user password
+router.post("/verify-password", async (req, res) => {
+  const userId = getUserId(req);
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ message: "Password is required" });
+  }
+
+  try {
+    const user = await knex("users").where({ id: userId }).first();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    res.json({ message: "Password verified" });
+  } catch (error) {
+    console.error("Error verifying password:", error);
+    res.status(500).json({ message: "Error verifying password" });
+  }
+});
+
+// admin/teacher delete for teachers (admin cannot be deleted)
+router.delete("/teacher/:id", async (req, res) => {
+  const userIdToDelete = Number(req.params.id);
+  if (getRole(req) === 1) {
+    try {
+      const targetUser = await knex("users")
+        .where("id", "=", userIdToDelete)
+        .first();
+      if (targetUser.role_id === 1) {
+        const isAdmin = await knex("teachers")
+          .where("user_id", "=", userIdToDelete)
+          .andWhere("is_admin", true)
+          .first();
+        if (isAdmin) {
+          return res.status(403).json({ error: "Cannot delete the admin" });
+        }
+      }
+      await knex("users").where("id", "=", userIdToDelete).delete();
+      return res.status(200).json({ message: "User deleted" });
+    } catch (error) {
+      console.error("Error attempting to delete user:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  } else {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 });
 
@@ -52,11 +129,11 @@ router.post("/new-email-verification", async (req, res) => {
           .first();
         firstName = teacher ? teacher.first_name : null;
         break;
-      case 2: // visitor
-        const visitor = await knex("visitors")
+      case 2: // Spectator
+        const spectator = await knex("spectators")
           .where({ user_id: user.id })
           .first();
-        firstName = visitor ? visitor.first_name : null;
+        firstName = spectator ? spectator.first_name : null;
         break;
       case 3: // Student
         const student = await knex("students")
@@ -115,7 +192,7 @@ router.post("/new-email-verification", async (req, res) => {
     // Send the email
     sendEmail(
       user.email,
-      "UPK - Vahvista sähköpostiosoitteesi",
+      "Urheilupäiväkirja - Vahvista sähköpostiosoitteesi",
       { name: firstName, otp: resetOTP },
       "./template/verifyEmail.handlebars"
     );
@@ -203,11 +280,11 @@ router.post("/request-password-reset", async (req, res) => {
           .first();
         firstName = teacher ? teacher.first_name : null;
         break;
-      case 2: // visitor
-        const visitor = await knex("visitors")
+      case 2: // Spectator
+        const spectator = await knex("spectators")
           .where({ user_id: user.id })
           .first();
-        firstName = visitor ? visitor.first_name : null;
+        firstName = spectator ? spectator.first_name : null;
         break;
       case 3: // Student
         const student = await knex("students")
@@ -276,6 +353,32 @@ router.post("/request-password-reset", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error generating reset token" });
+  }
+});
+
+router.put("/change-password", async (req, res) => {
+  const userId = getUserId(req);
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await knex("users").where({ id: userId }).first();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      return res.status(401).json({ message: "Invalid old password" });
+    }
+
+    const hash = await bcrypt.hash(newPassword, Number(saltRounds));
+
+    await knex("users").where({ id: userId }).update({ password: hash });
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ message: "Error updating password" });
   }
 });
 

@@ -1,0 +1,7 @@
+POST http://localhost:3001/spectator/invite HTTP/1.1
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlYWNoZXJAZXhhbXBsZS5jb20iLCJ1c2VyX2lkIjoxLCJyb2xlIjoxLCJlbWFpbF92ZXJpZmllZCI6MSwiaWF0IjoxNzIzODkzNzM1fQ.O3Z3tnGKXN0WVm0-Xu7iAVaPtrMAxt7rD_gxxPSbOR4
+content-type: application/json
+
+{
+    "email": "juho.vasaramaki@edu.tampere.fi"
+}

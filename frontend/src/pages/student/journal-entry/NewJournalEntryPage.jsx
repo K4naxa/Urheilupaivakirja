@@ -1,11 +1,11 @@
 import { useState, useLayoutEffect, useMemo } from "react";
 import trainingService from "../../../services/trainingService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import dayjs from "dayjs";
 import userService from "../../../services/userService.js";
+import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -17,6 +17,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
+  const { openConfirmModal } = useConfirmModal();
 
   const [newJournalEntryData, setNewJournalEntryData] = useState({
     entry_type: "1",
@@ -29,7 +30,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     details: "",
   });
 
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
@@ -109,8 +109,14 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
 
     if (conflict.value) {
-      setShowConfirmModal(true);
-      return; // Open modal for conflicts and wait for user decision
+      openConfirmModal({
+        text: conflict.message,
+        agreeButtonText: "Jatka",
+        declineButtonText: "Peruuta",
+        onAgree: handleUserConfirmation,
+        closeOnOutsideClick: false,
+      });
+      return;
     }
 
     try {
@@ -121,7 +127,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   };
 
   const handleUserConfirmation = async () => {
-    setShowConfirmModal(false);
     try {
       await addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
@@ -173,6 +178,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         return restErrors;
       });
     }
+  };
+
+  const handleDetailsTextareaChange = (e) => {
+
+    changeHandler(e);
   };
 
   const errorCheckJournalEntry = () => {
@@ -403,15 +413,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   return (
     <>
-      <ConfirmModal
-        isOpen={showConfirmModal}
-        onDecline={() => setShowConfirmModal(false)}
-        onAgree={handleUserConfirmation}
-        text={conflict.message}
-        agreeButton="Jatka"
-        declineButton="Peruuta"
-        closeOnOutsideClick={false}
-      />
       <div className="flex flex-col h-full overflow-auto transition-transform duration-300 sm:rounded-md hide-scrollbar ">
         <div className="relative p-3 text-xl text-center text-white shadow-md bg-primaryColor sm:p-4 sm:rounded-t-md">
           <p className="sm:min-w-[400px] cursor-default	">Uusi merkintä</p>
@@ -579,19 +580,33 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               )}
             </label>
             {showDetails && (
-              <textarea
-                className="w-full p-2 border rounded-md h-18 border-borderPrimary bg-bgPrimary text-textPrimary"
-                onChange={changeHandler}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.stopPropagation();
-                  }
-                }}
-                type="text"
-                name="details"
-                id="details-textarea"
-                value={newJournalEntryData.details}
-              />
+              <div className="relative w-full">
+                <textarea
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
+                  onChange={handleDetailsTextareaChange}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.stopPropagation();
+                    }
+                  }}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={newJournalEntryData.details}
+                  rows={2}
+                  maxLength={200}
+                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  required
+                ></textarea>
+  <p
+    className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? '100' : '40'} ${
+      newJournalEntryData.details.length === 200 ? 'text-red-500 bg-bgPrimary z-10' : 'text-textPrimary'
+    }`}
+    style={{ pointerEvents: 'none' }} // Make sure it doesn't interfere with textarea interactions
+  >
+    {newJournalEntryData.details.length}/200
+  </p>
+              </div>
             )}
           </div>
 

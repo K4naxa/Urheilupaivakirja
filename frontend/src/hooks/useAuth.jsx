@@ -52,7 +52,7 @@ export const useAuth = () => {
   const value = useContext(AuthContext);
 
   if (value == null) {
-    throw new Error("useToast must be used within a <ToastProvider>");
+    throw new Error("useAuth must be used within a <AuthProvider>");
   }
 
   return value;

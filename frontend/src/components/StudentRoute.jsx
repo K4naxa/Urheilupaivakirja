@@ -14,7 +14,7 @@ export const StudentRoute = ({ children }) => {
   }
 
   if (user.role !== 3) {
-    //user is not a student but admin/visitor
+    //user is not a student but admin/spectator
     if (user.role === 1) {
       return <Navigate to="/opettaja" />;
     } else if (user.role === 2) {

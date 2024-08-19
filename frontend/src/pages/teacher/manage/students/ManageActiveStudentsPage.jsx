@@ -5,8 +5,7 @@ import { Link } from "react-router-dom";
 
 import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
-
-import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
+import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 
 import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
@@ -94,6 +93,7 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
 
 const ManageActiveStudentsPage = () => {
   const queryClient = useQueryClient();
+  const { openConfirmModal } = useConfirmModal();  
 
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -106,15 +106,6 @@ const ManageActiveStudentsPage = () => {
     campus: 0,
     activity: 0,
   });
-
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
 
   useEffect(() => {
     userService.getStudents().then((data) => {
@@ -259,12 +250,6 @@ const ManageActiveStudentsPage = () => {
   }, [selectedStudents, sorting, students]);
 
   const handleArchive = (student) => {
-    setAgreeStyle("gray");
-    setModalMessage(
-      `Haluatko varmasti arkistoida opiskelijan ${student.first_name} ${student.last_name}?`
-    );
-    setContinueButton("Arkistoi");
-
     const handleUserConfirmation = async () => {
       await userService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
@@ -273,23 +258,28 @@ const ManageActiveStudentsPage = () => {
       });
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
-      setShowConfirmModal(false);
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
-    setShowConfirmModal(true);
+
+    const modalText = (
+      <span>
+      Haluatko varmasti arkistoida opiskelijan
+      <br/>
+      <strong>{student.first_name} {student.last_name}</strong>?
+      <br />
+      Tämä piilottaa käyttäjän, mutta ei poista tietoja.
+    </span>
+    )
+    openConfirmModal({
+      text: modalText,
+      agreeButtonText: "Arkistoi",
+      declineButtonText: "Peruuta",
+      onAgree: handleUserConfirmation, 
+      closeOnOutsideClick: false,
+    }); 
   };
 
   // handle Delete funtion for students
   const handleDelete = (student) => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa opiskelijan ${student.first_name} ${student.last_name}? 
-
-      Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.`
-    );
-    setContinueButton("Poista");
-
     const handleUserConfirmation = async () => {
       await userService.deleteUser(student.user_id).then(() => {
         queryClient.invalidateQueries({
@@ -298,9 +288,26 @@ const ManageActiveStudentsPage = () => {
       });
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
-      setShowConfirmModal(false);
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa opiskelijan
+        <br/>
+        <strong>{student.first_name} {student.last_name}?</strong>
+        <br />
+        Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.
+      </span>
+    );    
+
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
 
   if (loading)
@@ -356,15 +363,6 @@ const ManageActiveStudentsPage = () => {
             <p className="text-center my-2">Ei opiskelijoita</p>
           )}
         </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
       </div>
     );
 };

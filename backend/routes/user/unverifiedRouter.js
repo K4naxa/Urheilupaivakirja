@@ -22,13 +22,14 @@ router.get("/", async (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  // get unverified students
   const getUnverifiedStudents = () => {
     return knex("students as s")
       .select(
         "s.first_name",
         "s.last_name",
         "s.user_id",
-        "sg.group_identifier as group",
+        "sg.name as group",
         "c.name as campus",
         "sp.name as sport",
         "u.email"
@@ -49,42 +50,45 @@ router.get("/", async (req, res) => {
       );
   };
 
-  // Future expansions
+  // get unverified sports
   const getUnverifiedSports = () => {
     return knex("sports")
-      .select("sports.id", "sports.name")
-      .where("verified", false);
+      .select("id", "name")
+      .where("is_verified", false);
   };
 
-  const getUnverifiedCampuses = () => {
-    return knex("campuses")
-      .select("campuses.id", "campuses.name")
-      .where("verified", false);
+  // get unverified student_groups
+  const getUnverifiedStudentGroups = () => {
+    return knex("student_groups")
+      .select("id", "name")
+      .where("is_verified", false);
   };
 
   try {
     const [
       students,
-      // sports,
-      // campuses,
+      sports,
+      student_groups,
     ] = await Promise.all([
       getUnverifiedStudents(),
-      // getUnverifiedSports(),
-      // getUnverifiedCampuses(),
+      getUnverifiedSports(),
+      getUnverifiedStudentGroups(),
     ]);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
       students,
-      // sports,
-      // campuses,
+      sports,
+      student_groups,
     });
   } catch (err) {
-    console.error("Error fetching unverified data", err);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching unverified data" });
+    console.error("Error fetching unverified data: ", err);
+    res.status(500).json({
+      error: "An error occurred while fetching unverified data",
+      details: err.message
+    });
   }
 });
+
 
 module.exports = router;

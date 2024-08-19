@@ -1,11 +1,11 @@
 import { FiBarChart2, FiEdit3 } from "react-icons/fi";
-import { useJournalModal } from "../hooks/useJournalModal";
+import { useBigModal } from "../hooks/useBigModal";
 import { useAuth } from "../hooks/useAuth";
 import dayjs from "dayjs";
 import cc from "../utils/cc";
 
 import { useMainContext } from "../hooks/mainContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { isSameMonth, isSameYear } from "date-fns";
 
 const convertTime = (totalMinutes) => {
@@ -23,11 +23,11 @@ const convertTime = (totalMinutes) => {
 const RecentJournalEntry = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
 
   return (
     <div
-      className={`grid items-center p-2 grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 hover:bg-hoverDefault ${
+      className={`grid items-center p-2 grid-cols-4 md:grid-cols-5 gap-1 md:gap-4 md:gap-y-0 hover:bg-hoverDefault ${
         isOpen ? "row-span-2" : ""
       }`}
       onClick={() => setIsOpen(!isOpen)}
@@ -45,31 +45,37 @@ const RecentJournalEntry = ({ entry }) => {
       <p className="hidden md:flex">{entry.workout_intensity_name}</p>
 
       {/* Type of entry (sick, rest, ..) */}
-      <p
-        className={cc(
-          "flex w-24 h-8 justify-center items-center rounded-md",
-          entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
-          entry.entry_type_id === 2 && "bg-bgRest text-textRest",
-          entry.entry_type_id === 3 && "bg-bgSick text-textSick"
-        )}
-      >
-        {entry.entry_type_name}
-      </p>
+      <div className="flex justify-between">
+        <p
+          className={cc(
+            "flex w-24 h-8 justify-center items-center rounded-md mr-1",
+            entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+            entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+            entry.entry_type_id === 3 && "bg-bgSick text-textSick"
+          )}
+        >
+          {entry.entry_type_name}
+        </p>
 
-      {/* Edit button only for student*/}
-      <div className="flex justify-end md:justify-center">
+        {/* Edit button only for student*/}
+
         {user.role !== 1 && (
-          <button
-            onClick={() => openBigModal("edit", { entryId: entry.id })}
-            className="text-iconGray hover:text-primaryColor"
-          >
-            <FiEdit3 size={20} />
-          </button>
+          <div className="flex justify-end md:justify-center m-auto">
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                openBigModal("editJournalEntry", { entryId: entry.id });
+              }}
+              className="text-iconGray hover:text-primaryColor"
+            >
+              <FiEdit3 size={20} />
+            </button>
+          </div>
         )}
       </div>
 
       {isOpen && (
-        <div className="flex justify-around w-full col-span-5 gap-4 md:col-span-6">
+        <div className="flex justify-around w-full col-span-4 gap-4 md:col-span-5">
           <p className="flex flex-col">
             <span className="text-textSecondary">Ajankohta:</span>
             {entry.time_of_day_name ? entry.time_of_day_name : "Ei ajankohtaa"}
@@ -94,6 +100,39 @@ const RecentJournalEntries = ({ journal }) => {
   const { showDate } = useMainContext();
   const [filteredJournal, setFilteredJournal] = useState([]);
   const [selectedTime, setSelectedTime] = useState("Month");
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
+  const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    const element = scrollContainerRef.current;
+    if (!element) return;
+
+    const checkScrollbar = () => {
+      const hasVerticalScrollbar = element.offsetWidth > element.clientWidth;
+      const width = hasVerticalScrollbar
+        ? element.offsetWidth - element.clientWidth
+        : 0;
+      setScrollbarWidth(width);
+    };
+
+    // Initialize the observer
+    const observer = new MutationObserver(checkScrollbar);
+    observer.observe(element, {
+      childList: true, // observe direct children additions/removals
+      subtree: true, // observe all descendants
+      attributes: true, // observe attributes changes
+      characterData: true, // observe text changes within children
+    });
+
+    // Perform initial check and setup resize listener
+    checkScrollbar();
+    window.addEventListener("resize", checkScrollbar);
+
+    return () => {
+      window.removeEventListener("resize", checkScrollbar);
+      observer.disconnect(); // Clean up the observer when the component unmounts
+    };
+  }, []);
 
   if (journal.journal_entries) journal = journal.journal_entries;
 
@@ -146,7 +185,10 @@ const RecentJournalEntries = ({ journal }) => {
       </div>
       <div className="flex h-full overflow-y-auto">
         <div className="relative w-full h-full rounded-md ">
-          <div className="grid grid-cols-5 gap-4 p-2 border-b md:grid-cols-6 bg-bgGray text-textSecondary border-borderPrimary">
+          <div
+            style={{ paddingRight: `${8 + scrollbarWidth}px` }}
+            className="grid grid-cols-4 gap-4 p-2 border-b md:grid-cols-5 bg-bgGray text-textSecondary border-borderPrimary"
+          >
             <span className="hidden md:flex">Päivämäärä</span>
             <span className="flex md:hidden">Pvm</span>
             <span>Laji</span>
@@ -155,7 +197,10 @@ const RecentJournalEntries = ({ journal }) => {
             <span>Tyyppi</span>
             <span></span>
           </div>
-          <div className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px] overflow-auto">
+          <div
+            ref={scrollContainerRef}
+            className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px] overflow-auto"
+          >
             {filteredJournal.length === 0 && (
               <p className="m-4 text-center text-textSecondary">
                 Ei merkintöjä

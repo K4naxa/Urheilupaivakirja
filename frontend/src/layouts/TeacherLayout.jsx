@@ -34,13 +34,11 @@ const TeacherLayout = () => {
   let iconSize = 20;
   return (
     <div className="text-textPrimary">
-      <header
-        id="desktop-header"
-        className="z-10 hidden px-4 py-2 border border-b-2 fixed-header bg-bgSecondary border-borderPrimary md:flex"
-      >
-        <nav id="top-nav" className="flex justify-center gap-8 ">
-          <div className="flex justify-center gap-4 text-textPrimary ">
-            <Link to={"/opettaja/"} className="flex items-center gap-2 text-xl">
+      <div className="bg-bgSecondary border border-b-2 border-borderPrimary fixed-header">
+      <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between" >
+        <nav id="top-nav" className="flex justify-center gap-8">
+          <div className="text-textPrimary flex justify-center gap-4 ">
+            <Link to={"/opettaja/"} className="text-xl flex items-center gap-2">
               <img src={siteLogo} alt="site logo" className="w-8 h-8" />
               Urheilupäiväkirja
             </Link>
@@ -60,7 +58,7 @@ const TeacherLayout = () => {
               className={linkClass}
             >
               <FiUserCheck size={iconSize} />
-              Verifoi
+              Hyväksy
             </NavLink>
 
             <NavLink
@@ -148,6 +146,7 @@ const TeacherLayout = () => {
           </Menu>
         </div>
       </header>
+      </div>
       {/* header for mobile */}
 
       <header
@@ -241,7 +240,7 @@ const TeacherLayout = () => {
                 <p className={linkTextClass}>Toimipaikat</p>
               </NavLink>
               <NavLink
-                to="/opettaja/hallitse/vierailijat"
+                to="/opettaja/hallitse/henkilokunta"
                 className={linkClass}
                 onClick={() => {
                   setShowMenu(false);
@@ -249,7 +248,7 @@ const TeacherLayout = () => {
                 }}
               >
                 <GrUserNew size={iconSize} />
-                <p className={linkTextClass}>Vierailijat</p>
+                <p className={linkTextClass}>Henkilökunta</p>
               </NavLink>
               <NavLink
                 to="/opettaja/hallitse/opiskelijat"

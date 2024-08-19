@@ -3,6 +3,7 @@ import userService from "../../../../services/userService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 
 import { Link } from "react-router-dom";
+import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 
 import { FiChevronUp } from "react-icons/fi";
 import { FiChevronDown } from "react-icons/fi";
@@ -10,9 +11,9 @@ import { FiUserPlus } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
 import cc from "../../../../utils/cc.js";
-import ConfirmModal from "../../../../components/confirm-modal/confirmModal.jsx";
 import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
+
 //TODO: Ryhmä not showing correctly in the UI
 const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
@@ -71,6 +72,7 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
 
 const ManageArchivedStudentsPage = () => {
   const queryClient = useQueryClient();
+  const { openConfirmModal } = useConfirmModal();
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,14 +84,6 @@ const ManageArchivedStudentsPage = () => {
     campus: 0,
   });
 
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
 
   useEffect(() => {
     userService.getArchivedStudents().then((data) => {
@@ -102,12 +96,6 @@ const ManageArchivedStudentsPage = () => {
   }, []);
 
   const handleActivation = (student) => {
-    setAgreeStyle("");
-    setModalMessage(
-      `Haluatko varmasti aktivoida opiskelijan: ${student.first_name} ${student.last_name}?`
-    );
-    setContinueButton("Aktivoi");
-
     const handleUserConfirmation = async () => {
       await userService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
@@ -116,30 +104,50 @@ const ManageArchivedStudentsPage = () => {
       });
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
-      setShowConfirmModal(false);
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
-    setShowConfirmModal(true);
+
+    const modalText = (
+      <span>
+      Haluatko varmasti aktivoida opiskelijan
+      <br/>
+      <strong>{student.first_name} {student.last_name}</strong>?
+    </span>
+    )
+    openConfirmModal({
+      text: modalText,
+      agreeButtonText: "Aktivoi",
+      declineButtonText: "Peruuta",
+      onAgree: handleUserConfirmation, 
+      closeOnOutsideClick: false,
+    }); 
   };
 
   // handle Delete funtion for students
   const handleDelete = (student) => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa opiskelijan ${student.first_name} ${student.last_name}? 
-
-      Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.`
-    );
-    setContinueButton("Poista");
-
     const handleUserConfirmation = async () => {
       await userService.deleteUser(student.user_id);
       const newStudents = students.filter((s) => s.user_id !== student.user_id);
       setStudents(newStudents);
-      setShowConfirmModal(false);
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa opiskelijan
+        <br/>
+        <strong>{student.first_name} {student.last_name}?</strong>
+        <br />
+        Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.
+      </span>
+    );    
+
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
 
   const handleNameSorting = (type) => {
@@ -308,15 +316,6 @@ const ManageArchivedStudentsPage = () => {
           <p className="text-center my-2">Ei opiskelijoita</p>
         )}
       </div>
-      <ConfirmModal
-        isOpen={showConfirmModal}
-        onDecline={() => setShowConfirmModal(false)}
-        onAgree={handleUserConfirmation}
-        text={modalMessage}
-        agreeButton={continueButton}
-        declineButton={"Peruuta"}
-        agreeStyle={agreeStyle}
-      />
     </div>
   );
 };

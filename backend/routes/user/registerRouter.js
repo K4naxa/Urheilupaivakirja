@@ -26,17 +26,29 @@ router.post("/", async (req, res, next) => {
         created_at: new Date(),
       };
 
+      async function checkIfNew(tableName, id) {
+        const existingId = await trx.select('id').from(tableName).where('id', id).first();
+        if (!existingId) {
+          const [newId] = await trx(tableName).insert({ name: id, created_by: user.first_name + ' ' + user.last_name});
+          return newId;
+        }
+        return id;
+      }
+
       // Insert the new user and get the id of the inserted user
-      const insertResult = await trx("users").insert(newUser);
-      const userId = insertResult[0];
+      const [userId] = await trx("users").insert(newUser);
+
+      // Check and insert sport, and student group if value/id is new
+      const sportId = await checkIfNew('sports', user.sport_id);
+      const groupId = await checkIfNew('student_groups', user.group_id);
 
       // Prepare new student data
       const newStudent = {
         user_id: userId,
         first_name: user.first_name,
         last_name: user.last_name,
-        sport_id: user.sport_id,
-        group_id: user.group_id,
+        sport_id: sportId,
+        group_id: groupId,
         campus_id: user.campus_id,
         created_at: new Date(),
       };
@@ -55,11 +67,13 @@ router.post("/", async (req, res, next) => {
   } catch (err) {
     console.error("POST /user/register transaction error:", err);
     res.status(500).json({
-      error:
-        "An error occurred while creating a new student user: " + err.message,
+      error: "An error occurred while creating a new student user: " + err.message,
     });
   }
 });
+
+
+module.exports = router;
 
 router.delete("/:id", async (req, res, next) => {
   //TODO: IMPLEMENT ADMIN AUTHENTICATION, NOW JUST FOR TESTING PURPOSES

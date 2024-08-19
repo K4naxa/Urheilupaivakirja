@@ -6,7 +6,6 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var { isAuthenticated } = require("./middleware/auth");
 
-var indexRouter = require("./routes/index");
 var courseInfoRouter = require("./routes/courseInfoRouter");
 var loginRouter = require("./routes/user/loginRouter.js");
 var spectatorRouter = require("./routes/user/spectatorRouter.js");
@@ -20,6 +19,7 @@ var publicRouter = require("./routes/publicRouter.js");
 var journalEntryRouter = require("./routes/journalEntryRouter.js");
 var studentRouter = require("./routes/user/studentRouter.js");
 var app = express();
+var activateRouter = require("./routes/activateRouter.js");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -44,6 +44,7 @@ app.use("/sports", isAuthenticated, sportsRouter);
 app.use("/public", publicRouter);
 app.use("/public/groups", isAuthenticated, publicRouter);
 app.use("/journal_entry", isAuthenticated, journalEntryRouter);
+app.use("/activate", isAuthenticated, activateRouter);  
 
 app.get("/*", function (req, res) {
   res.sendFile(path.join(__dirname, "build/index.html"), function (err) {

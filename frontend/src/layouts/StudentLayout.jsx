@@ -9,7 +9,7 @@ import { useState } from "react";
 import { FiInbox } from "react-icons/fi";
 
 import UnreadNewsIndicator from "../components/UnreadNewsIndicator";
-import { useJournalModal } from "../hooks/useJournalModal";
+import { useBigModal } from "../hooks/useBigModal";
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -22,14 +22,28 @@ import cc from "../utils/cc";
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
+
+  const checkVerticalScrollbar = (element) => {
+    // Determine if a vertical scrollbar is visible
+    const hasVerticalScrollbar = element.offsetWidth > element.clientWidth;
+
+    // Calculate the width of the vertical scrollbar
+    const scrollbarWidth = hasVerticalScrollbar ? element.offsetWidth - element.clientWidth : 0;
+
+    return {
+        hasVerticalScrollbar,
+        scrollbarWidth
+    };
+}
 
   const linkClass =
     "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl active:text-primaryColor";
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
-      <header className="z-10 hidden px-4 py-2 border border-b-2 fixed-header bg-bgSecondary border-borderPrimary md:flex">
+      <div className="bg-bgSecondary border border-b-2 border-borderPrimary fixed-header">
+      <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between" >
         <Link to={"/"} className="flex items-center gap-2 text-xl">
           <img src={siteLogo} alt="site logo" className="w-8 h-8" />
           Urheilupäiväkirja
@@ -43,7 +57,11 @@ const StudentLayout = () => {
           <NavLink
             to="/tiedotteet/"
             id="tiedotteetBtn"
-            className="flex flex-col items-center gap-1 p-2 rounded-md select-none hover:cursor-pointer hover:bg-bgGray"
+            className="flex flex-col items-center
+            gap-1 p-2 rounded-md
+            select-none 
+            hover:cursor-pointer hover:bg-bgGray
+            relative"
           >
             <FiInbox size={24} />
 
@@ -113,6 +131,7 @@ const StudentLayout = () => {
           </Menu>
         </div>
       </header>
+      </div>
       {/* header for mobile */}
 
       <header
@@ -152,7 +171,7 @@ const StudentLayout = () => {
               <div className="flex items-center justify-center text-white rounded-full bg-bgPrimary drop-shadow-t-md shadow-upper-shadow size-16 active:scale-110">
                 <button
                   className="flex items-center justify-center text-white duration-100 rounded-full bg-primaryColor size-14 active:scale-110"
-                  onClick={() => openBigModal("new")}
+                  onClick={() => openBigModal("newJournalEntry")}
                 >
                   <FiPlus size={24} />
                 </button>

@@ -14,6 +14,7 @@ const { getRole } = require("../middleware/auth");
 router.get("/", (req, res, next) => {
   knex("sports")
     .select("sports.*")
+    .where("is_verified", 1)
     .leftJoin("students", "sports.id", "students.sport_id")
     .count("students.id as student_count")
     .groupBy("sports.id")
@@ -48,6 +49,7 @@ router.get("/:id", (req, res) => {
 
 // Add a new sport
 router.post("/", (req, res) => {
+  // Check for admin role
   if (getRole(req) !== 1) {
     console.log("Unauthorized user trying to add sport");
     return res.status(401).json({
@@ -55,56 +57,83 @@ router.post("/", (req, res) => {
     });
   }
 
+  let { name } = req.body;
+
+  // Validate input
+  if (!name) {
+    return res.status(400).json({ error: "Sport name is required" });
+  }
+
+  // Trim the name
+  name = name.trim();
+
   // Check if sport already exists
   knex("sports")
-    .select("*")
-    .where("name", "=", req.body.name)
-    .then((rows) => {
-      if (rows.length > 0) {
-        return res.status(400).json({ error: "Sport already exists" });
-      } else {
-        // Add sport
-        const sport = req.body;
-        knex("sports")
-          .insert(sport)
-          .then((id_arr) => {
-            sport.id = id_arr[0];
-            res.json(sport);
-          })
-          .catch((err) => {
-            console.log("Error inserting sport:", err);
-            res.status(500).json({ error: "Internal server error" });
-          });
+    .where("name", "=", name)
+    .first()  // Using first() as we expect 0 or 1 row
+    .then((existingSport) => {
+      if (existingSport) {
+        return res.status(409).json({ error: "Sport already exists" });  // 409 conflict for duplicates
       }
+
+      // Add sport
+      knex("sports")
+        .insert({ name: name, is_verified: 1 })
+        .then((insertedIds) => {
+          // Since MySQL doesn't support returning, fetch the sport after inserting
+          return knex("sports").where("id", "=", insertedIds[0]).first();
+        })
+        .then((newSport) => {
+          res.status(201).json(newSport);  // Returning the inserted sport details
+        })
+        .catch((err) => {
+          console.error("Error inserting sport:", err);
+          res.status(500).json({ error: "Internal server error" });
+        });
     })
     .catch((err) => {
-      console.log("Error checking existing sport:", err);
+      console.error("Error checking existing sport:", err);
       res.status(500).json({ error: "Internal server error" });
     });
 });
 
+
+
 // edit a single sport by sport.id
 router.put("/:id", (req, res) => {
+  // for admin only (role 1)
   if (getRole(req) !== 1) {
     console.log("Unauthorized user trying to edit a sport");
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
+  if (!req.body.name) {
+    return res.status(400).json({ error: "Name is required" });
+  }
+
+  const { id } = req.params;
   const updatedSport = {
-    id: req.params.id,
     name: req.body.name,
+    is_verified: 1,
   };
-  const id = req.params.id;
-  const sport = req.body;
+
   knex("sports")
+    .where("id", id)
     .update(updatedSport)
-    .where("id", "=", id)
-    .then(() => {
-      res.json({ message: `Sport with id ${id} updated` });
+    .then(updateCount => {
+      if (updateCount) {
+        res.status(200);
+        res.json({ message: `Sport with id ${id} updated` });
+      } else {
+        res.status(404).json({ error: "Sport not found" });
+      }
+    })
+    .catch(err => {
+      console.error("Error updating the sport:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
+
 
 // delete a single sport by sport.id
 router.delete("/:id", (req, res, next) => {

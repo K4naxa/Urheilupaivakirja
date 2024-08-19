@@ -8,8 +8,8 @@ const { getRole, isAuthenticated, getUserId } = require("../middleware/auth");
 
 router.get("/options", async (req, res, next) => {
   Promise.all([
-    knex("student_groups").select("*"),
-    knex("sports").select("*"),
+    knex("student_groups").select("*").where("is_verified", 1),
+    knex("sports").select("*").where("is_verified", 1),
     knex("campuses").select("*"),
   ])
     .then((results) => {
@@ -36,6 +36,7 @@ router.get("/options", async (req, res, next) => {
 router.get("/groups", async (req, res, next) => {
   knex("student_groups")
     .select("student_groups.*")
+    .where("is_verified", 1)
     .leftJoin("students", "student_groups.id", "students.group_id")
     .count("students.id as student_count")
     .groupBy("student_groups.id")
@@ -50,45 +51,87 @@ router.get("/groups", async (req, res, next) => {
     });
 });
 
-// check if the user is an admin and then edit the group
-router.put("/groups/:id", async (req, res, next) => {
-  if (getRole(req) !== 1)
-    return res.status(401).json({ error: "Unauthorized" });
+// Add a new group
+router.post("/", (req, res) => {
+  // Check for admin role
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to add group");
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
 
-  const { id } = req.params;
-  const { group_identifier } = req.body;
+  let { name } = req.body;
 
+  // Validate input
+  if (!name) {
+    return res.status(400).json({ error: "Group name is required" });
+  }
+
+  // Trim the name
+  name = name.trim();
+
+  // Check if group already exists
   knex("student_groups")
-    .where({ id })
-    .update({ group_identifier })
-    .then(() => {
-      res.status(200).json({ id, group_identifier });
+    .where("name", "=", name)
+    .first() // Using first() as we expect 0 or 1 row
+    .then((existingGroup) => {
+      if (existingGroup) {
+        return res.status(409).json({ error: "Group already exists" }); // 409 conflict for duplicates
+      }
+
+      // Add group
+      knex("student_groups")
+        .insert({ name: name, is_verified: 1 })
+        .then((insertedIds) => {
+          // Since MySQL doesn't support returning, fetch the group after inserting
+          return knex("student_groups").where("id", "=", insertedIds[0]).first();
+        })
+        .then((newGroup) => {
+          res.status(201).json(newGroup); // Returning the inserted group details
+        })
+        .catch((err) => {
+          console.error("Error inserting group:", err);
+          res.status(500).json({ error: "Internal server error" });
+        });
     })
     .catch((err) => {
-      console.log("Error updating group", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while updating the group" });
+      console.error("Error checking existing group:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
-// adds a new group after checking if user is admin
-router.post("/groups", async (req, res, next) => {
-  if (getRole(req) !== 1)
+// edit a single group by group.id
+router.put("/groups/:id", (req, res) => {
+  // for admin only (role 1)
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to edit a group");
     return res.status(401).json({ error: "Unauthorized" });
+  }
 
-  const { group_identifier } = req.body;
+  if (!req.body.name) {
+    return res.status(400).json({ error: "Name is required" });
+  }
+
+  const { id } = req.params;
+  const updatedGroup = {
+    name: req.body.name,
+  };
 
   knex("student_groups")
-    .insert({ group_identifier })
-    .then((id) => {
-      res.status(201).json({ id: id[0], group_identifier });
+    .where("id", id)
+    .update(updatedGroup)
+    .then((updateCount) => {
+      if (updateCount) {
+        res.status(200);
+        res.json({ message: `Group with id ${id} updated` });
+      } else {
+        res.status(404).json({ error: "Group not found" });
+      }
     })
     .catch((err) => {
-      console.log("Error adding group", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while adding the group" });
+      console.error("Error updating the group:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
@@ -139,42 +182,88 @@ router.get("/campuses", async (req, res, next) => {
     });
 });
 
-// create a new campus
-router.post("/campuses", isAuthenticated, (req, res, next) => {
-  const { name } = req.body;
+// Add a new campus
+router.post("/campuses", (req, res) => {
+  // Check for admin role
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to add campus");
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
 
+  let { name } = req.body;
+
+  // Validate input
+  if (!name) {
+    return res.status(400).json({ error: "Campus name is required" });
+  }
+
+  // Trim the name
+  name = name.trim();
+
+  // Check if campus already exists
   knex("campuses")
-    .insert({ name })
-    .then((id) => {
-      res.status(201).json({ id: id[0], name });
+    .where("name", "=", name)
+    .first() // Using first() as we expect 0 or 1 row
+    .then((existingCampus) => {
+      if (existingCampus) {
+        return res.status(409).json({ error: "Campus already exists" }); // 409 conflict for duplicates
+      }
+
+      // Add campus
+      knex("campuses")
+        .insert({ name: name })
+        .then((insertedIds) => {
+          // fetch the campus after inserting
+          return knex("campuses").where("id", "=", insertedIds[0]).first();
+        })
+        .then((newCampus) => {
+          res.status(201).json(newCampus); // Returning the inserted campus details
+        })
+        .catch((err) => {
+          console.error("Error inserting campus:", err);
+          res.status(500).json({ error: "Internal server error" });
+        });
     })
     .catch((err) => {
-      console.log("Error adding campus", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while adding the campus" });
+      console.error("Error checking existing campus:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
-// check if the user is an admin and then edit the campus
-router.put("/campuses/:id", isAuthenticated, (req, res, next) => {
-  if (getRole(req) !== 1)
+// edit a single campus by campus.id
+router.put("/campuses/:id", (req, res) => {
+  // for admin only (role 1)
+  if (getRole(req) !== 1) {
+    console.log("Unauthorized user trying to edit a campus");
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!req.body.name) {
+    return res.status(400).json({ error: "Name is required" });
+  }
 
   const { id } = req.params;
-  const { name } = req.body;
+  const updatedCampus = {
+    name: req.body.name,
+    is_verified: 1,
+  };
 
   knex("campuses")
-    .where({ id }, "=", "id")
-    .update({ name })
-    .then(() => {
-      res.status(200).json({ id, name });
+    .where("id", id)
+    .update(updatedCampus)
+    .then((updateCount) => {
+      if (updateCount) {
+        res.status(200);
+        res.json({ message: `Campus with id ${id} updated` });
+      } else {
+        res.status(404).json({ error: "Campus not found" });
+      }
     })
     .catch((err) => {
-      console.log("Error updating campus", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while updating the campus" });
+      console.error("Error updating the campus:", err);
+      res.status(500).json({ error: "Internal server error" });
     });
 });
 
@@ -207,18 +296,119 @@ router.delete("/campuses/:id", isAuthenticated, (req, res, next) => {
 
 // Get all news
 router.get("/news", async (req, res, next) => {
-  knex("news")
-    .select("*")
-    .orderBy("created_at", "desc")
-    .then((rows) => {
-      res.json(rows);
-    })
-    .catch((err) => {
-      console.log("Error fetching news data", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while fetching news data" });
-    });
+  try {
+    const newsRows = await knex("news")
+      .select(
+        "news.id", // Explicitly selecting each column except 'teacher_id'
+        "news.title",
+        "news.content",
+        "news.created_at",
+        "news.public",
+        "news.pinned",
+        knex.raw(
+          "concat(teachers.first_name, ' ', teachers.last_name) as author"
+        )
+      )
+      .leftJoin("teachers", "news.teacher_id", "teachers.id")
+      .orderBy("created_at", "desc");
+
+    const newsIds = newsRows.map((news) => news.id);
+
+    const campuses = await knex("news_campuses")
+      .select("news_id", "name")
+      .join("campuses", "news_campuses.campus_id", "campuses.id")
+      .whereIn("news_id", newsIds);
+
+    const sports = await knex("news_sports")
+      .select("news_id", "name")
+      .join("sports", "news_sports.sport_id", "sports.id")
+      .whereIn("news_id", newsIds);
+
+    const studentGroups = await knex("news_student_groups")
+      .select("news_id", "name")
+      .join(
+        "student_groups",
+        "news_student_groups.student_group_id",
+        "student_groups.id"
+      )
+      .whereIn("news_id", newsIds);
+
+    const newsWithDetails = newsRows.map((newsItem) => ({
+      ...newsItem,
+      campuses: campuses
+        .filter((c) => c.news_id === newsItem.id)
+        .map((c) => c.name.split(",")[0].trim()),
+      sports: sports
+        .filter((s) => s.news_id === newsItem.id)
+        .map((s) => s.name),
+      student_groups: studentGroups
+        .filter((g) => g.news_id === newsItem.id)
+        .map((g) => g.name),
+    }));
+
+    res.json(newsWithDetails);
+  } catch (err) {
+    console.log("Error fetching news data", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching news data" });
+  }
+});
+
+// Get all news as a teacher (includes teacher_id of the teacher who created the news)
+router.get("/teacher_news", async (req, res, next) => {
+  try {
+    const newsRows = await knex("news")
+      .select(
+        "news.*",
+        knex.raw(
+          "concat(teachers.first_name, ' ', teachers.last_name) as author"
+        )
+      )
+      .leftJoin("teachers", "news.teacher_id", "teachers.id")
+      .orderBy("created_at", "desc");
+
+    const newsIds = newsRows.map((news) => news.id);
+
+    const campuses = await knex("news_campuses")
+      .select("news_id", "name")
+      .join("campuses", "news_campuses.campus_id", "campuses.id")
+      .whereIn("news_id", newsIds);
+
+    const sports = await knex("news_sports")
+      .select("news_id", "name")
+      .join("sports", "news_sports.sport_id", "sports.id")
+      .whereIn("news_id", newsIds);
+
+    const studentGroups = await knex("news_student_groups")
+      .select("news_id", "name")
+      .join(
+        "student_groups",
+        "news_student_groups.student_group_id",
+        "student_groups.id"
+      )
+      .whereIn("news_id", newsIds);
+
+    const newsWithDetails = newsRows.map((newsItem) => ({
+      ...newsItem,
+      campuses: campuses
+        .filter((c) => c.news_id === newsItem.id)
+        .map((c) => c.name.split(",")[0].trim()),
+      sports: sports
+        .filter((s) => s.news_id === newsItem.id)
+        .map((s) => s.name),
+      student_groups: studentGroups
+        .filter((g) => g.news_id === newsItem.id)
+        .map((g) => g.name),
+    }));
+
+    res.json(newsWithDetails);
+  } catch (err) {
+    console.log("Error fetching news data", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching news data" });
+  }
 });
 
 // Get unread news count

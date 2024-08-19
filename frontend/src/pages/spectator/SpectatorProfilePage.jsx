@@ -8,7 +8,7 @@ import { useToast } from "../../hooks/toast-messages/useToast";
 
 import cc from "../../utils/cc";
 
-function VisitorProfilePage() {
+function SpectatorProfilePage() {
   const { logout } = useAuth();
   const { addToast } = useToast();
 
@@ -30,11 +30,17 @@ function VisitorProfilePage() {
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
 
-  const { data: visitorData, isLoading: visitorDataLoading } = useQuery({
-    queryKey: ["visitorData"],
+  const { data: spectatorData, isLoading: spectatorDataLoading } = useQuery({
+    queryKey: ["spectatorData"],
     queryFn: () => userService.getProfileData(),
     staleTime: 15 * 60 * 1000,
   });
+
+  const { data: invitedSpectators, isLoading: invitedSpectatorsLoading } = useQuery({
+    queryKey: ["invitedSpectators"],
+    queryFn: () => userService.getInvitedSpectators(),
+    staleTime: 15 * 60 * 1000,
+  })
 
   const validateEmail = (email) => {
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
@@ -43,7 +49,7 @@ function VisitorProfilePage() {
       setEmailError("Sähköpostiosoite ei voi olla tyhjä");
       return false;
     }
-    if (email === visitorData.email) {
+    if (email === spectatorData.email) {
       setEmailError("Sähköpostiosoite on jo käytössä");
       return false;
     }
@@ -106,7 +112,7 @@ function VisitorProfilePage() {
     setShowConfirmModal(true);
     setAgreeStyle("red");
     setModalMessage(
-      `Haluatko varmasti poistaa käyttäjän ${visitorData.first_name} ${visitorData.last_name}? 
+      `Haluatko varmasti poistaa käyttäjän ${spectatorData.first_name} ${spectatorData.last_name}? 
   
       Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
     );
@@ -114,7 +120,7 @@ function VisitorProfilePage() {
 
     const handleUserConfirmation = async () => {
       try {
-        await userService.deleteUser(visitorData.id);
+        await userService.deleteUser(spectatorData.id);
         await logout();
         addToast("Käyttäjä poistettu", { style: "success" });
       } catch (error) {
@@ -127,15 +133,15 @@ function VisitorProfilePage() {
   };
 
   useEffect(() => {
-    if (visitorData) {
-      setUpdatedEmail(visitorData.email);
+    if (spectatorData) {
+      setUpdatedEmail(spectatorData.email);
     }
-  }, [visitorData]);
+  }, [spectatorData]);
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (visitorDataLoading) {
+  if (spectatorDataLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -162,7 +168,7 @@ function VisitorProfilePage() {
                 type="text"
                 name="name"
                 disabled
-                value={visitorData.first_name + " " + visitorData.last_name}
+                value={spectatorData.first_name + " " + spectatorData.last_name}
                 className={cc(
                   inputClass,
                   "cursor-not-allowed",
@@ -295,12 +301,12 @@ function VisitorProfilePage() {
           onDecline={() => setShowConfirmModal(false)}
           onAgree={handleUserConfirmation}
           text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
+          agreeButtonText={continueButton}
+          declineButtonText={"Peruuta"}
           agreeStyle={agreeStyle}
         />
       </div>
     );
 }
 
-export default VisitorProfilePage;
+export default SpectatorProfilePage;

@@ -1,5 +1,4 @@
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
 
 const CampusMultiSelect = ({
   campusArray,
@@ -43,7 +42,6 @@ const CampusMultiSelect = ({
   return (
     <Select
       isMulti
-      components={makeAnimated()}
       formatOptionLabel={CustomOption}
       value={selectedCampuses}
       openMenuOnFocus={false}
@@ -120,7 +118,7 @@ const CampusMultiSelect = ({
       closeMenuOnSelect={false}
       className="basic-multi-select"
       classNamePrefix="select"
-      placeholder="Select Campuses"
+      placeholder="Valitse toimipaikat"
     />
   );
 };

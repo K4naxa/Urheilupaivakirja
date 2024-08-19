@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useDateModal } from "../hooks/useDateModal";
 import { FiBookOpen, FiPlusCircle } from "react-icons/fi";
-import { useJournalModal } from "../hooks/useJournalModal";
+import { useBigModal } from "../hooks/useBigModal";
 import dayjs from "dayjs";
 
 const DateModal = () => {
   const { dateModalPos, selectedDate, hideDateModal } = useDateModal();
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
   useEffect(() => {
     const handleClickOutside = (event) => {
       const modal = document.getElementById("date-modal");
@@ -22,11 +22,13 @@ const DateModal = () => {
   }, [hideDateModal]);
 
   const onClickShow = () => {
+    e.stopPropagation()
     hideDateModal();
   };
 
-  const onClickAdd = () => {
-    openBigModal("new", { date: selectedDate });
+  const onClickAdd = (e) => {
+    e.stopPropagation()
+    openBigModal("newJournalEntry", { date: selectedDate });
     hideDateModal();
   };
 
@@ -76,14 +78,14 @@ const DateModal = () => {
       <div className="flex justify-between">
         <div
           className="m-1 px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
-          onClick={onClickShow}
+          onClick={onClickShow(e)}
         >
           <FiBookOpen className="text-xl" />
           <p className="ml-2 text-sm">Näytä</p>
         </div>
         <div
           className="m-1 px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center"
-          onClick={onClickAdd}
+          onClick={onClickAdd(e)}
         >
           <FiPlusCircle className="text-xl" />
           <p className="ml-2 text-sm">Lisää</p>

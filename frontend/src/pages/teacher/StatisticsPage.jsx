@@ -112,7 +112,7 @@ function StatisticsPage() {
       <div className="text-textSecondary text-sm">
         {chartShowDate.getFullYear()}
       </div>
-      <div className="w-full flex justify-center items-center bg-bgSecondary p-2 rounded-md border border-borderPrimary text-textSecondary ">
+      <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary ">
         <p
           className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
           onClick={() => {
@@ -122,7 +122,7 @@ function StatisticsPage() {
           <FiChevronLeft />
         </p>
 
-        <p className="w-32 ">{formatDate(chartShowDate, { month: "long" })}</p>
+        <p className="w-28 ">{formatDate(chartShowDate, { month: "long" })}</p>
 
         <p
           className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
@@ -137,6 +137,7 @@ function StatisticsPage() {
   );
   const timeSelectWithYear = (
     <div className="flex flex-col text-center justify-end">
+      
       <div className="w-full flex justify-center items-center bg-bgSecondary p-1 rounded-md border border-borderPrimary text-textSecondary align-bottom">
         <p
           className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
@@ -147,7 +148,7 @@ function StatisticsPage() {
           <FiChevronLeft />
         </p>
 
-        <p className="w-32 text-lg">{chartShowDate.getFullYear()}</p>
+        <p className="w-28">{chartShowDate.getFullYear()}</p>
 
         <p
           className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
@@ -173,15 +174,15 @@ function StatisticsPage() {
             {/* Select View */}
             <label
               htmlFor="viewSelect"
-              className="text-textSecondary text-xs px-2"
+              className="text-textSecondary text-sm px-2"
             >
-              Näkyvyys:
+              Ryhmitys:
             </label>
             {selectedTime === "Year" || selectedTime === "Month" ? (
               <select
                 name="viewSelect"
                 id="selectView"
-                className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+                className="bg-bgSecondary w-28 border border-borderPrimary text-textSecondary p-2 rounded-md
                     hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
                 value={selectedView}
                 onChange={(e) => setSelectedView(e.target.value)}
@@ -199,14 +200,14 @@ function StatisticsPage() {
             {/* select Time */}
             <label
               htmlFor="timeFilter"
-              className="text-textSecondary text-xs px-2"
+              className="text-textSecondary text-sm px-2"
             >
-              Aika:
+              Ajanjakso:
             </label>
             <select
               name="timeFilter"
               id="selectTimeFilter"
-              className="bg-bgSecondary border border-borderPrimary text-textSecondary p-2 rounded-md
+              className="bg-bgSecondary w-28 border border-borderPrimary text-textSecondary p-2 rounded-md
            hover:cursor-pointer hover:bg-bgPrimary focus-visible:outline-none focus:bg-bgPrimary"
               value={selectedTime}
               onChange={(e) => {
