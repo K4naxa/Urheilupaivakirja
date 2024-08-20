@@ -1,5 +1,4 @@
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
 
 const GroupMultiSelect = ({
   groupArray,
@@ -32,7 +31,7 @@ const GroupMultiSelect = ({
     <div className="flex justify-between">
       <div>{label}</div>
       {studentCount ? (
-        <div className="flex text-xs bg-bgGray aspect-square w-4 justify-center items-center  rounded-full">
+        <div className="flex items-center justify-center w-4 text-xs rounded-full bg-bgGray aspect-square">
           {studentCount}
         </div>
       ) : null}

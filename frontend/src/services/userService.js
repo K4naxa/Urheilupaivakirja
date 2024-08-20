@@ -155,10 +155,6 @@ const getStudentData = async (userId) => {
   const response = await axios.get(`/students/data/${userId}`, makeHeader());
   return response.data;
 };
-const getStudentsForTeacherHome = async () => {
-  const response = await axios.get("/students", makeHeader());
-  return response.data;
-};
 
 const getArchivedStudents = async () => {
   const response = await axios.get("/students/archived", makeHeader());

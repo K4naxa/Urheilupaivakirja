@@ -22,9 +22,12 @@ router.get("/", async (req, res) => {
         "user_id",
         "first_name",
         "last_name",
-        "sports.name as sport",
-        "student_groups.name as group",
-        "campuses.name as campus",
+        "sports.name as sport_name",
+        "student_groups.name as group_name",
+        "campuses.name as campus_name",
+        "sport_id ",
+        "group_id",
+        "campus_id",
         "total_entry_count"
       )
       .from("students")

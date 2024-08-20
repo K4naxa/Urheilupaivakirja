@@ -35,12 +35,14 @@ import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSe
 import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
 import cc from "../../utils/cc.js";
 import trainingService from "../../services/trainingService.js";
+import { useToast } from "../../hooks/toast-messages/useToast.jsx";
 
 function TeacherHome() {
   const queryClient = useQueryClient();
   const [showWeeks, setShowWeeks] = useState(true);
   const [showMonths, setShowMonths] = useState(false);
   const [showYears, setShowYears] = useState(false);
+  const { addToast } = useToast();
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -63,12 +65,9 @@ function TeacherHome() {
   });
 
   // all Students and their journals
-  const {
-    data: studentsAndJournalsData,
-    isLoading: studentsAndJournalsDataLoading,
-  } = useQuery({
-    queryKey: ["studentsAndJournals"],
-    queryFn: () => userService.getStudentsForTeacherHome(),
+  const { data: StudentsList, isLoading: StudentsListLoading } = useQuery({
+    queryKey: ["StudentsList"],
+    queryFn: () => userService.getStudents(),
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
@@ -86,9 +85,9 @@ function TeacherHome() {
   });
 
   // Pagination for students
+  // Pagination logic uses the filteredStudents array to fetch the journal entries for the students
   const [page, setPage] = useState(1);
   const [studentsPerPage, setStudentsPerPage] = useState(20);
-  const [viewableJournalsLoading, setViewableJournalsLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
   const [viewableStudents, setViewableStudents] = useState([]);
   const [viewableJournals, setViewableJournals] = useState([]);
@@ -99,7 +98,6 @@ function TeacherHome() {
 
   useEffect(() => {
     if (filteredStudents.length > 0) {
-      setViewableJournalsLoading(true);
       setTotalPages(Math.ceil(filteredStudents.length / studentsPerPage));
       const indexOfLastStudent = page * studentsPerPage;
       const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
@@ -118,16 +116,11 @@ function TeacherHome() {
       userService
         .getPaginatedStudentsData(requestedStudents, showDate)
         .then((response) => {
-          console.log("response data: ", response);
           setViewableJournals(response);
-          setViewableJournalsLoading(false); // Move this inside
         })
-        .catch((error) => {
-          console.error("Error fetching paginated students data:", error);
-          setViewableJournalsLoading(false); // Move this inside
-        });
-    } else {
-      setViewableJournalsLoading(false); // To handle cases where filteredStudents is empty
+        .catch(() =>
+          addToast("Tietojen hakeminen epäonnistui", { style: "error" })
+        );
     }
   }, [filteredStudents, page, studentsPerPage]);
 
@@ -138,10 +131,11 @@ function TeacherHome() {
 
   // Calculating available options for each filter type
   const availableOptions = useMemo(() => {
-    if (!studentsAndJournalsData) return;
+    if (!StudentsList) return;
 
     const getAvailableOptions = (filterType) => {
-      let newFilteredStudents = studentsAndJournalsData;
+      console.log(StudentsList);
+      let newFilteredStudents = StudentsList;
 
       if (filterType !== "students" && selectedStudents.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((journal) =>
@@ -162,7 +156,7 @@ function TeacherHome() {
       }
       if (filterType !== "groups" && selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedGroups.some((group) => group.label === student.name)
+          selectedGroups.some((group) => group.label === student.group_name)
         );
       }
 
@@ -211,7 +205,7 @@ function TeacherHome() {
     selectedSports,
     selectedCampuses,
     selectedGroups,
-    studentsAndJournalsData,
+    StudentsList,
   ]);
 
   // Sorting function for students.
@@ -249,9 +243,9 @@ function TeacherHome() {
 
   // filter and sort students based on selected filters
   useEffect(() => {
-    if (!studentsAndJournalsData || !pinnedStudentsData) return;
+    if (!StudentsList || !pinnedStudentsData) return;
 
-    let newFilteredStudents = [...studentsAndJournalsData];
+    let newFilteredStudents = [...StudentsList];
 
     if (selectedSports.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
@@ -284,7 +278,7 @@ function TeacherHome() {
     selectedSports,
     selectedCampuses,
     selectedGroups,
-    studentsAndJournalsData,
+    StudentsList,
     pinnedStudentsData,
     selectedSorting,
     showMobileFilters,
@@ -694,7 +688,7 @@ function TeacherHome() {
     setShowDate(new Date());
   }, [setShowDate]);
 
-  if ((optionsDataLoading, studentsAndJournalsDataLoading)) {
+  if ((optionsDataLoading, StudentsListLoading)) {
     return <LoadingScreen />;
   } else
     return (
@@ -741,7 +735,7 @@ function TeacherHome() {
 
           <div className="flex-wrap items-center justify-center hidden w-full gap-2 text-sm lg:flex lg:gap-8">
             <StudentMultiSelect
-              studentArray={studentsAndJournalsData}
+              studentArray={StudentsList}
               selectedStudents={selectedStudents}
               setSelectedStudents={setSelectedStudents}
               filter={selectedStudents}
@@ -794,7 +788,7 @@ function TeacherHome() {
                 )}
               >
                 <StudentMultiSelect
-                  studentArray={studentsAndJournalsData}
+                  studentArray={StudentsList}
                   selectedStudents={selectedStudents}
                   setSelectedStudents={setSelectedStudents}
                   filter={selectedStudents}
