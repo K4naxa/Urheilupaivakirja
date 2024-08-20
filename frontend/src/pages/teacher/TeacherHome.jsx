@@ -53,7 +53,7 @@ function TeacherHome() {
 
   const [selectedSorting, setSelectedSorting] = useState("default");
 
-  const { setShowDate } = useMainContext();
+  const { showDate, setShowDate } = useMainContext();
 
   // Course completion requirement for passing the course
   const { data: courseSegments } = useQuery({
@@ -68,7 +68,7 @@ function TeacherHome() {
     isLoading: studentsAndJournalsDataLoading,
   } = useQuery({
     queryKey: ["studentsAndJournals"],
-    queryFn: () => userService.getStudentsAndEntries(),
+    queryFn: () => userService.getStudentsForTeacherHome(),
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
@@ -80,10 +80,56 @@ function TeacherHome() {
   });
 
   // all  sports / campuses / student groups for filtering
-  const { data: optionsData } = useQuery({
+  const { data: optionsData, isLoading: optionsDataLoading } = useQuery({
     queryKey: ["options"],
     queryFn: () => publicService.getOptions(),
   });
+
+  // Pagination for students
+  const [page, setPage] = useState(1);
+  const [studentsPerPage, setStudentsPerPage] = useState(20);
+  const [viewableJournalsLoading, setViewableJournalsLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(0);
+  const [viewableStudents, setViewableStudents] = useState([]);
+  const [viewableJournals, setViewableJournals] = useState([]);
+
+  useEffect(() => {
+    console.log(viewableJournals);
+  }, [viewableJournals]);
+
+  useEffect(() => {
+    if (filteredStudents.length > 0) {
+      setViewableJournalsLoading(true);
+      setTotalPages(Math.ceil(filteredStudents.length / studentsPerPage));
+      const indexOfLastStudent = page * studentsPerPage;
+      const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+      const currentViewableStudents = filteredStudents.slice(
+        indexOfFirstStudent,
+        indexOfLastStudent
+      );
+
+      setViewableStudents(currentViewableStudents);
+
+      const requestedStudents = currentViewableStudents.map((student) => ({
+        ...student,
+        journal_entries: undefined,
+      }));
+
+      userService
+        .getPaginatedStudentsData(requestedStudents, showDate)
+        .then((response) => {
+          console.log("response data: ", response);
+          setViewableJournals(response);
+          setViewableJournalsLoading(false); // Move this inside
+        })
+        .catch((error) => {
+          console.error("Error fetching paginated students data:", error);
+          setViewableJournalsLoading(false); // Move this inside
+        });
+    } else {
+      setViewableJournalsLoading(false); // To handle cases where filteredStudents is empty
+    }
+  }, [filteredStudents, page, studentsPerPage]);
 
   const options = useMemo(() => {
     if (optionsData) return optionsData;
@@ -197,10 +243,8 @@ function TeacherHome() {
     group2: (a, b) => b.name.localeCompare(a.name),
     campus1: (a, b) => a.campus_name.localeCompare(b.campus_name),
     campus2: (a, b) => b.campus_name.localeCompare(a.campus_name),
-    progression1: (a, b) =>
-      countCourseProgression(b) - countCourseProgression(a),
-    progression2: (a, b) =>
-      countCourseProgression(a) - countCourseProgression(b),
+    progression1: (a, b) => b.total_entry_count - a.total_entry_count,
+    progression2: (a, b) => a.total_entry_count - b.total_entry_count,
   };
 
   // filter and sort students based on selected filters
@@ -402,7 +446,6 @@ function TeacherHome() {
   };
 
   const RenderWeeks = ({ journals }) => {
-    console.log("journals", journals);
     const { showDate, setShowDate } = useMainContext();
 
     if (journals?.length === 0) {
@@ -651,18 +694,14 @@ function TeacherHome() {
     setShowDate(new Date());
   }, [setShowDate]);
 
-  if (
-    studentsAndJournalsDataLoading ||
-    !optionsData ||
-    !pinnedStudentsData ||
-    !courseSegments
-  ) {
+  if ((optionsDataLoading, studentsAndJournalsDataLoading)) {
     return <LoadingScreen />;
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
         <TeacherHeatmapTooltip />
 
+        {/* filtering controls */}
         <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
           {/* Aika filtteri */}
           <div className="relative flex justify-center w-full text-sm">
@@ -792,15 +831,18 @@ function TeacherHome() {
           </div>
         </div>
 
-        {/* student list */}
-        <div
-          id="studentList"
-          className="flex justify-center w-full gap-8 p-4 border rounded-md bg-bgSecondary border-borderPrimary"
-        >
-          {showWeeks && <RenderWeeks journals={filteredStudents} />}
-          {showMonths && <RenderMonths journals={filteredStudents} />}
-          {showYears && <RenderYears journals={filteredStudents} />}
-        </div>
+        {viewableJournals && pinnedStudentsData && courseSegments ? (
+          <div
+            id="studentList"
+            className="flex justify-center w-full gap-8 p-4 border rounded-md bg-bgSecondary border-borderPrimary"
+          >
+            {showWeeks && <RenderWeeks journals={viewableJournals} />}
+            {showMonths && <RenderMonths journals={viewableJournals} />}
+            {showYears && <RenderYears journals={viewableJournals} />}
+          </div>
+        ) : (
+          "Loading"
+        )}
         <Tooltip
           id="segment-tooltip"
           anchorSelect=".clickableCourseSegment"

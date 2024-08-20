@@ -16,8 +16,6 @@ router.get("/", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    // Get all journal entries
-    const allEntries = await knex.select("*").from("journal_entries");
     // Get all students
     const allStudents = await knex
       .select(
@@ -25,7 +23,7 @@ router.get("/", async (req, res) => {
         "first_name",
         "last_name",
         "sports.name as sport",
-        "student_groups.name",
+        "student_groups.name as group",
         "campuses.name as campus",
         "total_entry_count"
       )
@@ -36,105 +34,8 @@ router.get("/", async (req, res) => {
       .leftJoin("campuses", "students.campus_id", "campuses.id");
 
     // Map all students to include their journal entries
-    const studentEntries = allStudents.map((student) => {
-      const studentJournalEntries = allEntries.filter(
-        (entry) => entry.user_id === student.user_id
-      );
-      return {
-        user_id: student.user_id,
-        first_name: student.first_name,
-        last_name: student.last_name,
-        sport: student.sport,
-        group: student.name,
-        campus: student.campus,
-        journal_entries: studentJournalEntries,
-      };
-    });
 
-    res.json(studentEntries);
-  } catch (err) {
-    console.error("Failed to fetch data", err);
-    res.status(500).json({ error: "Failed to fetch data" });
-  }
-});
-
-// Get all students and the names of their sport, group, campus and all journal entries
-router.get("/entries", async (req, res) => {
-  try {
-    const role = getRole(req);
-    if (role !== 1 && role !== 2) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    // Fetch all journal entries
-    const allEntries = await knex("journal_entries")
-      .select(
-        "journal_entries.*",
-        "journal_entry_types.name as entry_type_name",
-        "workout_types.name as workout_type_name",
-        "workout_categories.name as workout_category_name",
-        "time_of_day.name as time_of_day_name",
-        "workout_intensities.name as workout_intensity_name"
-      )
-      .leftJoin(
-        "journal_entry_types",
-        "journal_entries.entry_type_id",
-        "journal_entry_types.id"
-      )
-      .leftJoin(
-        "workout_types",
-        "journal_entries.workout_type_id",
-        "workout_types.id"
-      )
-      .leftJoin(
-        "workout_categories",
-        "journal_entries.workout_category_id",
-        "workout_categories.id"
-      )
-      .leftJoin(
-        "time_of_day",
-        "journal_entries.time_of_day_id",
-        "time_of_day.id"
-      )
-      .leftJoin(
-        "workout_intensities",
-        "journal_entries.workout_intensity_id",
-        "workout_intensities.id"
-      )
-      .orderBy("journal_entries.date", "desc");
-
-    // Fetch all students with their associated sports, groups, and campus information
-    const allStudents = await knex("students")
-      .select(
-        "students.user_id",
-        "students.first_name",
-        "students.last_name",
-        "students.total_entry_count",
-        "sports.name as sport_name",
-        "student_groups.name",
-        "campuses.name as campus_name"
-      )
-      .where("students.archived", false)
-      .where("students.verified", true)
-      .leftJoin("sports", "students.sport_id", "sports.id")
-      .leftJoin("student_groups", "students.group_id", "student_groups.id")
-      .leftJoin("campuses", "students.campus_id", "campuses.id")
-      .orderBy("students.last_name", "asc");
-
-    const studentEntries = allStudents.map((student) => ({
-      user_id: student.user_id,
-      first_name: student.first_name,
-      last_name: student.last_name,
-      sport_name: student.sport_name,
-      name: student.name,
-      campus_name: student.campus_name,
-      total_entry_count: student.total_entry_count,
-      journal_entries: allEntries.filter(
-        (entry) => entry.user_id === student.user_id
-      ),
-    }));
-
-    res.json(studentEntries);
+    res.json(allStudents);
   } catch (err) {
     console.error("Failed to fetch data", err);
     res.status(500).json({ error: "Failed to fetch data" });
@@ -459,6 +360,41 @@ router.put("/unpin/:id", async (req, res) => {
     res.status(200).json({ message: "Student unpinned successfully" });
   } catch (error) {
     console.error("Error unpinning student:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/paginated", async (req, res) => {
+  try {
+    const role = getRole(req);
+    if (role !== 1 && role !== 2) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const requestedStudents = req.body.students;
+    const showDate = new Date(req.body.showDate);
+    const showYear = showDate.getFullYear(); // Extract the year from showDate
+
+    const studentsWithJournalEntries = await Promise.all(
+      requestedStudents.map(async (student) => {
+        const journalEntries = await knex("journal_entries")
+          .select("*")
+          .where({
+            user_id: student.user_id,
+          })
+          .andWhere(knex.raw("YEAR(date) = ?", [showYear])) // Filter by the same year
+          .orderBy("date", "desc");
+
+        return {
+          ...student,
+          journal_entries: journalEntries,
+        };
+      })
+    );
+
+    res.status(200).json(studentsWithJournalEntries);
+  } catch (error) {
+    console.error("Error fetching paginated students:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

@@ -52,7 +52,7 @@ const generateFakeUsers = (count) => {
     const id = i + 30;
     users.users.push(generateFakeUser(id));
     users.students.push(generateFakeStudent(id));
-    for (let j = 0; j < 800; j++) {
+    for (let j = 0; j < 100; j++) {
       users.entries.push(generateFakeJournal_entries(id));
     }
   }

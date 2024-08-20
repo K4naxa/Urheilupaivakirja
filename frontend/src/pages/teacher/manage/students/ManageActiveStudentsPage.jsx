@@ -11,35 +11,13 @@ import StudentMultiSelect from "../../../../components/multiSelect-search/Studen
 import { useQueryClient } from "@tanstack/react-query";
 
 const createStudentContainer = (student, handleArchive, handleDelete) => {
-  const daysSinceLastEntry = () => {
-    if (student.journal_entries.length === 0) return "Ei merkintöjä";
-    const lastEntry =
-      student.journal_entries[student.journal_entries.length - 1];
-    const lastEntryDate = new Date(lastEntry.created_at);
-    const today = new Date();
-    const differenceInTime = today.getTime() - lastEntryDate.getTime();
-    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-
-    if (differenceInDays < 1) return "<24h";
-    else if (differenceInDays < 2) return "<48h";
-    else if (differenceInDays < 3) return "<72h";
-    else if (differenceInDays < 7) return "<7vrk";
-    else if (differenceInDays < 14) return "<14vrk";
-    else if (differenceInDays < 30) return "<1kk";
-    else if (differenceInDays < 60) return "<2kk";
-    else if (differenceInDays < 90) return "<3kk";
-    else if (differenceInDays < 180) return "<6kk";
-    else if (differenceInDays < 365) return "<1v";
-    return ">1v";
-  };
-
   return (
     <div
-      className="flex justify-between border border-borderPrimary p-2 rounded-md"
+      className="flex justify-between p-2 border rounded-md border-borderPrimary"
       key={student.user_id}
     >
       <div className="flex flex-col">
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap items-center gap-4">
           <Link
             to={`/opettaja/opiskelijat/${student.user_id}`}
             className="student-info-name"
@@ -48,10 +26,6 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
               {student.first_name} {student.last_name}
             </div>
           </Link>
-          <div className="text-textSecondary flex text-sm gap-1">
-            <p>Aktiivisuus: </p>{" "}
-            <p className="text-textPrimary">{daysSinceLastEntry()}</p>
-          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="flex gap-2 text-sm">
@@ -69,7 +43,7 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
         </div>
       </div>
 
-      <div className="flex flex-col justify-center items-center gap-2">
+      <div className="flex flex-col items-center justify-center gap-2">
         <button
           className="text-iconRed"
           onClick={() => {
@@ -93,7 +67,7 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
 
 const ManageActiveStudentsPage = () => {
   const queryClient = useQueryClient();
-  const { openConfirmModal } = useConfirmModal();  
+  const { openConfirmModal } = useConfirmModal();
 
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -104,7 +78,6 @@ const ManageActiveStudentsPage = () => {
     sport: 0,
     group: 0,
     campus: 0,
-    activity: 0,
   });
 
   useEffect(() => {
@@ -144,15 +117,6 @@ const ManageActiveStudentsPage = () => {
 
     setSorting(newSorting);
   };
-
-  const handleActivitySorting = (type) => {
-    let newSorting = { ...sorting, sport: 0, group: 0, name: 0, campus: 0 };
-    if (type === 1) newSorting = { ...newSorting, activity: 1 };
-    if (type === -1) newSorting = { ...newSorting, activity: -1 };
-
-    setSorting(newSorting);
-  };
-
   const handleSortingChange = (value) => {
     switch (value) {
       case "name1":
@@ -178,12 +142,6 @@ const ManageActiveStudentsPage = () => {
         break;
       case "campus2":
         handleCampusSorting(-1);
-        break;
-      case "activity1":
-        handleActivitySorting(1);
-        break;
-      case "activity2":
-        handleActivitySorting(-1);
         break;
       default:
         break;
@@ -219,28 +177,6 @@ const ManageActiveStudentsPage = () => {
       newFiltered.sort((a, b) => (a.campus < b.campus ? 1 : -1));
     }
 
-    if (sorting.activity === 1) {
-      newFiltered.sort((a, b) => {
-        const dateA = new Date(
-          a.journal_entries[a.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        const dateB = new Date(
-          b.journal_entries[b.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        return dateA - dateB;
-      });
-    } else if (sorting.activity === -1) {
-      newFiltered.sort((a, b) => {
-        const dateA = new Date(
-          a.journal_entries[a.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        const dateB = new Date(
-          b.journal_entries[b.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        return dateB - dateA;
-      });
-    }
-
     // check if student is being searched
     if (selectedStudents.length > 0)
       newFiltered = newFiltered.filter((student) =>
@@ -262,20 +198,23 @@ const ManageActiveStudentsPage = () => {
 
     const modalText = (
       <span>
-      Haluatko varmasti arkistoida opiskelijan
-      <br/>
-      <strong>{student.first_name} {student.last_name}</strong>?
-      <br />
-      Tämä piilottaa käyttäjän, mutta ei poista tietoja.
-    </span>
-    )
+        Haluatko varmasti arkistoida opiskelijan
+        <br />
+        <strong>
+          {student.first_name} {student.last_name}
+        </strong>
+        ?
+        <br />
+        Tämä piilottaa käyttäjän, mutta ei poista tietoja.
+      </span>
+    );
     openConfirmModal({
       text: modalText,
       agreeButtonText: "Arkistoi",
       declineButtonText: "Peruuta",
-      onAgree: handleUserConfirmation, 
+      onAgree: handleUserConfirmation,
       closeOnOutsideClick: false,
-    }); 
+    });
   };
 
   // handle Delete funtion for students
@@ -293,12 +232,14 @@ const ManageActiveStudentsPage = () => {
     const modalText = (
       <span>
         Haluatko varmasti poistaa opiskelijan
-        <br/>
-        <strong>{student.first_name} {student.last_name}?</strong>
+        <br />
+        <strong>
+          {student.first_name} {student.last_name}?
+        </strong>
         <br />
         Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.
       </span>
-    );    
+    );
 
     openConfirmModal({
       onAgree: handleUserConfirmation,
@@ -312,14 +253,14 @@ const ManageActiveStudentsPage = () => {
 
   if (loading)
     return (
-      <div className="flex w-full items-center p-8">
+      <div className="flex items-center w-full p-8">
         <LoadingScreen />
       </div>
     );
   else
     return (
-      <div className="bg-bgSecondary rounded-md p-2">
-        <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
+      <div className="p-2 rounded-md bg-bgSecondary">
+        <div className="flex flex-wrap items-end justify-center gap-4 mb-4 sm:justify-between">
           <StudentMultiSelect
             studentArray={students}
             selectedStudents={selectedStudents}
@@ -336,8 +277,7 @@ const ManageActiveStudentsPage = () => {
             <select
               name="sorting"
               id="sortingSelect"
-              className="bg-bgSecondary border border-borderPrimary text-textSecondary
-               p-1 rounded-md hover:cursor-pointer "
+              className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
               onChange={(e) => handleSortingChange(e.target.value)}
             >
               <option value="name1">Nimi A-Ö</option>
@@ -348,9 +288,6 @@ const ManageActiveStudentsPage = () => {
               <option value="group2">Ryhmä Ö-A</option>
               <option value="campus1">Toimipaikka A-Ö</option>
               <option value="campus2">Toimipaikka Ö-A</option>
-
-              <option value="activity2">Uusin merkintä ensin</option>
-              <option value="activity1">Vanhin merkintä ensin</option>
             </select>
           </div>
         </div>
@@ -360,7 +297,7 @@ const ManageActiveStudentsPage = () => {
               createStudentContainer(student, handleArchive, handleDelete)
             )
           ) : (
-            <p className="text-center my-2">Ei opiskelijoita</p>
+            <p className="my-2 text-center">Ei opiskelijoita</p>
           )}
         </div>
       </div>
