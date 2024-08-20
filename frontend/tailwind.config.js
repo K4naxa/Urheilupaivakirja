@@ -74,18 +74,18 @@ export default {
       keyframes: {
         slideInFromRight: {
           "0%": {
-            transform: "translateX(80%) translateY(100%) scale(0)",
+            transform: "scale(0.7)",
             opacity: "0",
           },
 
           "100%": {
-            transform: "translateX(0) translateY(0) scale(1)",
+            transform: " scale(1)",
             opacity: "1",
           },
         },
         slideInFromMiddle: {
           "0%": {
-            transform: "translateX(0%) translateY(100%) scale(0)",
+            transform: "translateX(0%) translateY(50%) scale(0.7)",
             opacity: "0",
           },
 
