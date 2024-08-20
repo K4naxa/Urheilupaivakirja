@@ -18,7 +18,6 @@ import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
 import { TbPin, TbPinFilled, TbPinnedOff } from "react-icons/tb";
 
-
 import {
   addMonths,
   addWeeks,
@@ -117,9 +116,7 @@ function TeacherHome() {
       }
       if (filterType !== "groups" && selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedGroups.some(
-            (group) => group.label === student.name
-          )
+          selectedGroups.some((group) => group.label === student.name)
         );
       }
 
@@ -315,7 +312,6 @@ function TeacherHome() {
   };
 
   const getSegmentTooltipContent = () => {
-    console.log(tooltipContent);
     return (
       <>
         <div className="flex flex-col gap-2 p-2 w-42">
@@ -337,9 +333,9 @@ function TeacherHome() {
         (pinnedStudent) => pinnedStudent.pinned_user_id === journal.user_id
       );
     }
-  
+
     const [hover, setHover] = useState(false);
-  
+
     const handlePinClick = async () => {
       if (isPinned) {
         await userService.unpinStudent(journal.user_id).then(() => {
@@ -351,25 +347,19 @@ function TeacherHome() {
         });
       }
     };
-  
+
     return (
       <div
-        className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center cursor-pointer"
+        className="absolute flex items-center justify-center w-6 h-6 cursor-pointer top-1 right-1"
         onClick={() => handlePinClick()}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
         {isPinned ? (
           hover ? (
-            <TbPinnedOff
-              size={20}
-              className="text-primaryColor"
-            />
+            <TbPinnedOff size={20} className="text-primaryColor" />
           ) : (
-            <TbPinFilled
-              size={20}
-              className="text-primaryColor"
-            />
+            <TbPinFilled size={20} className="text-primaryColor" />
           )
         ) : (
           <TbPin
@@ -638,9 +628,7 @@ function TeacherHome() {
                     <p className="text-textSecondary">
                       Toimipiste: {journal.campus_name}
                     </p>
-                    <p className="text-textSecondary">
-                      ryhmä: {journal.name}
-                    </p>
+                    <p className="text-textSecondary">ryhmä: {journal.name}</p>
                     <p className="flex text-textSecondary">
                       Laji: {journal.sport_name}
                     </p>

@@ -1,7 +1,7 @@
 const { generateFakeUsers } = require("../faker/generateFakeData");
 
 exports.seed = async function (knex) {
-  const { users, students, entries } = generateFakeUsers(10);
+  const { users, students, entries } = generateFakeUsers(200);
 
   if (users.length > 0) {
     await knex("users").insert(users);

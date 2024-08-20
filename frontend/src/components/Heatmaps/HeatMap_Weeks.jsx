@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   addWeeks,
   eachDayOfInterval,
@@ -76,8 +76,14 @@ function HeatMap_Weeks({ journal }) {
 }
 function CalendarDay({ day, journal, onClick }) {
   const { user } = useAuth();
-  let minutes = 0;
-  journal?.forEach((entry) => (minutes += entry.length_in_minutes));
+  const minutes = useMemo(
+    () => journal?.reduce((acc, entry) => acc + entry.length_in_minutes, 0),
+    [journal]
+  );
+  const memoizedColor = useMemo(
+    () => handleColor(minutes),
+    [day, journal, minutes]
+  );
 
   function handleColor(minutes) {
     if (!journal) return;
@@ -103,7 +109,7 @@ function CalendarDay({ day, journal, onClick }) {
         "MonthDate border-borderPrimary border w-5 lg:w-7 clickableCalendarDay",
         user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-primaryColor",
-        handleColor(minutes)
+        memoizedColor
       )}
       onClick={onClick}
     >

@@ -24,21 +24,6 @@ const StudentLayout = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { openBigModal } = useBigModal();
 
-  const checkVerticalScrollbar = (element) => {
-    // Determine if a vertical scrollbar is visible
-    const hasVerticalScrollbar = element.offsetWidth > element.clientWidth;
-
-    // Calculate the width of the vertical scrollbar
-    const scrollbarWidth = hasVerticalScrollbar
-      ? element.offsetWidth - element.clientWidth
-      : 0;
-
-    return {
-      hasVerticalScrollbar,
-      scrollbarWidth,
-    };
-  };
-
   const linkClass =
     "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl active:text-primaryColor";
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";

@@ -74,8 +74,14 @@ function HeatMap_Month({ journal }) {
 }
 
 function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
-  let minutes = 0;
-  journal?.map((entry) => (minutes += entry.length_in_minutes));
+  const minutes = useMemo(
+    () => journal?.reduce((acc, entry) => acc + entry.length_in_minutes, 0),
+    [journal]
+  );
+  const memoizedColor = useMemo(
+    () => handleColor(minutes),
+    [day, journal, minutes]
+  );
 
   function handleColor(minutes) {
     if (!isSameMonth(day, showDate)) return;
@@ -103,7 +109,7 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
         "MonthDate border-borderPrimary border clickableCalendarDay relative",
         !isSameMonth(day, showDate) && "invisible",
         isToday(day) && "border  border-primaryColor",
-        handleColor(minutes)
+        memoizedColor
       )}
       onClick={onClick}
     >
