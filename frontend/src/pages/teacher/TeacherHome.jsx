@@ -835,7 +835,7 @@ function TeacherHome() {
             {showYears && <RenderYears journals={viewableJournals} />}
           </div>
         ) : (
-          "Loading"
+          <LoadingScreen />
         )}
         <Tooltip
           id="segment-tooltip"

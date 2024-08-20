@@ -49,10 +49,10 @@ const generateFakeJournal_entries = (id) => {
 const generateFakeUsers = (count) => {
   const users = { users: [], students: [], entries: [] };
   for (let i = 0; i < count; i++) {
-    const id = i + 30;
+    const id = i + 300;
     users.users.push(generateFakeUser(id));
     users.students.push(generateFakeStudent(id));
-    for (let j = 0; j < 100; j++) {
+    for (let j = 0; j < 800; j++) {
       users.entries.push(generateFakeJournal_entries(id));
     }
   }
