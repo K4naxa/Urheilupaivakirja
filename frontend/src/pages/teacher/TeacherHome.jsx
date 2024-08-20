@@ -156,7 +156,7 @@ function TeacherHome() {
       }
       if (filterType !== "groups" && selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedGroups.some((group) => group.label === student.group_name)
+          selectedGroups.some((group) => group.label === student.name)
         );
       }
 

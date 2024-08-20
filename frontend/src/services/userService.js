@@ -282,7 +282,6 @@ export default {
   verifyStudent,
   deleteUser,
   getStudents,
-  getStudentsForTeacherHome,
   toggleStudentArchive,
   getArchivedStudents,
   createEmailVerificationOTP,

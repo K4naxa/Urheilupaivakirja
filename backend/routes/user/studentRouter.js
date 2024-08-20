@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
         "first_name",
         "last_name",
         "sports.name as sport_name",
-        "student_groups.name as group_name",
+        "student_groups.name as name",
         "campuses.name as campus_name",
         "sport_id ",
         "group_id",
