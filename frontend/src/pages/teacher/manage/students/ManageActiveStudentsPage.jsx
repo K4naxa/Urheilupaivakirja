@@ -30,15 +30,15 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
         <div className="flex flex-wrap gap-2">
           <div className="flex gap-2 text-sm">
             <p className="text-textSecondary">laji:</p>
-            {student.sport}
+            {student.sport_name}
           </div>
           <div className="flex gap-2 text-sm">
             <p className="text-textSecondary">ryhmä: </p>
-            {student.group}
+            {student.name}
           </div>
           <div className="flex gap-2 text-sm">
             <p className="text-textSecondary">toimipaikka: </p>
-            {student.campus}
+            {student.campus_name}
           </div>
         </div>
       </div>
