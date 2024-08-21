@@ -98,10 +98,6 @@ function TeacherHome() {
   const [viewableJournals, setViewableJournals] = useState([]);
 
   useEffect(() => {
-    console.log(viewableJournals);
-  }, [viewableJournals]);
-
-  useEffect(() => {
     if (filteredStudents.length > 0) {
       setTotalPages(Math.ceil(filteredStudents.length / studentsPerPage));
       const indexOfLastStudent = page * studentsPerPage;
@@ -289,7 +285,6 @@ function TeacherHome() {
     showMobileFilters,
   ]);
 
-  const [tooltipContent, setTooltipContent] = useState(null);
   // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
   const renderProgressionBar = ({ student }) => {
     if (!courseSegments) return null;
@@ -316,12 +311,15 @@ function TeacherHome() {
           );
           if (segmentProgression < 0) segmentProgression = 0;
 
-          const TooltipInfo = {
-            name: segment.name,
-            requirement: segment.value,
-            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
-            progression: Math.min(Math.max(segmentProgression, 0), 100),
-          };
+          const tooltipContent = `
+          <div class="flex flex-col gap-2 p-2 w-42">
+            <h3 class="font-bold text-center">${segment.name}</h3>
+            <span>Suoritettu: ${segmentProgression}%</span>
+            <span class="">
+              Merkinnät: ${Math.min(Math.max(unUsedEntires, 0), segment.value)} / ${segment.value}
+            </span>
+          </div>
+        `;
 
           // Reduce the total_entry_count by the segment's value
           unUsedEntires -= segment.value;
@@ -332,12 +330,7 @@ function TeacherHome() {
               className={cc(
                 "bottom-0 h-1 clickableCourseSegment rounded-xl hover:cursor-pointer"
               )}
-              onMouseEnter={() => {
-                setTooltipContent(TooltipInfo);
-              }}
-              onMouseLeave={() => {
-                setTooltipContent(null);
-              }}
+              data-tooltip-html={tooltipContent}
               style={{ width: `${segmentLength}%` }}
             >
               <div
@@ -351,21 +344,6 @@ function TeacherHome() {
           );
         })}
       </div>
-    );
-  };
-
-  const getSegmentTooltipContent = () => {
-    return (
-      <>
-        <div className="flex flex-col gap-2 p-2 w-42">
-          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
-          <span>Suoritettu: {tooltipContent.progression}%</span>
-          <span className="">
-            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
-            {tooltipContent.requirement}
-          </span>
-        </div>
-      </>
     );
   };
 
@@ -504,7 +482,6 @@ function TeacherHome() {
           {/* Student list */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {journals?.map((journal) => {
-              // const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
@@ -520,7 +497,7 @@ function TeacherHome() {
                       <p>{journal.first_name}</p>
                       <p>{journal.last_name}</p>
                     </Link>
-                    <HeatMap_Weeks journal={journal} />
+                    <HeatMap_Weeks_Memoized journal={journal} />
                   </div>
                   {/* Progress bar */}
                   {renderProgressionBar({ student: journal })}
@@ -590,7 +567,7 @@ function TeacherHome() {
                       {journal.first_name} {journal.last_name}
                     </p>
                   </Link>
-                  <HeatMap_Month journal={journal} />
+                  <HeatMap_Month_Memoized journal={journal} />
                   {renderProgressionBar({ student: journal })}
                 </div>
               );
@@ -855,9 +832,7 @@ function TeacherHome() {
             color: "rgb(var(--color-text-primary))",
             padding: "0.5rem",
           }}
-        >
-          {tooltipContent && getSegmentTooltipContent()}
-        </Tooltip>
+        />
       </div>
     );
 }
