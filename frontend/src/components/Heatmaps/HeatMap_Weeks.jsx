@@ -17,8 +17,7 @@ import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 function HeatMap_Weeks({ journal }) {
   const { showDate } = useMainContext();
-  const { setTooltipContent, setTooltipUser, setTooltipDate } =
-    useHeatmapContext();
+  const { setTooltipContent, setTooltipDate } = useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
 
   let calendarWeeks = useMemo(() => {

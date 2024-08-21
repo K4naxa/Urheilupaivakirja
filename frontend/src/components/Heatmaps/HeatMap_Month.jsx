@@ -44,12 +44,9 @@ function HeatMap_Month({ journal }) {
     },
   });
 
-  const handleClick = (day) => {
-    const dayEntries = journal.filter((entry) =>
-      isSameDay(new Date(entry.date), day)
-    );
+  const handleClick = (dayJournal, day) => {
     setTooltipDate(day);
-    setTooltipContent(dayEntries);
+    setTooltipContent(dayJournal);
   };
 
   return (
@@ -57,18 +54,26 @@ function HeatMap_Month({ journal }) {
       {...handlers}
       className="MonthGrid max-w-[600px] w-full h-full pt-6 gap-1"
     >
-      {calendarDays.map((day, index) => (
-        <CalendarDay
-          key={day.getTime()}
-          day={day}
-          journal={journal?.filter((journal) =>
-            isSameDay(new Date(journal.date), day)
-          )}
-          showWeekName={index < 7}
-          showDate={showDate}
-          onClick={() => handleClick(day)}
-        />
-      ))}
+      {calendarDays.map((day, index) => {
+        const dayJournal = journal?.filter((journalEntry) => {
+          const journalDate = new Date(journalEntry.date);
+          return (
+            journalDate.getDate() === day.getDate() &&
+            journalDate.getMonth() === day.getMonth() &&
+            journalDate.getFullYear() === day.getFullYear()
+          );
+        });
+        return (
+          <CalendarDay
+            key={day.getTime()}
+            day={day}
+            showWeekName={index < 7}
+            showDate={showDate}
+            journal={dayJournal}
+            onClick={() => handleClick(dayJournal, day)}
+          />
+        );
+      })}
     </div>
   );
 }

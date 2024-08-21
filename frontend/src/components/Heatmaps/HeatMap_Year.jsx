@@ -64,7 +64,11 @@ export default function HeatMap_Year({ journal }) {
                 // Why does the isSameDay keep using resources when it's already defined?
                 const dayJournal = journal?.filter((journalEntry) => {
                   const journalDate = new Date(journalEntry.date);
-                  return isSameDay(journalDate, day);
+                  return (
+                    journalDate.getDate() === day.getDate() &&
+                    journalDate.getMonth() === day.getMonth() &&
+                    journalDate.getFullYear() === day.getFullYear()
+                  );
                 });
 
                 return (

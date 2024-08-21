@@ -455,8 +455,8 @@ function TeacherHome() {
           <option value="campus1">Toimipaikka A-Ö</option>
           <option value="campus2">Toimipaikka Ö-A</option>
 
-          <option value="progression1">Edistyminen ^</option>
-          <option value="progression2">Edistyminen vähiten</option>
+          <option value="progression1">Edistyminen laskeva</option>
+          <option value="progression2">Edistyminen nouseva</option>
         </select>
       </div>
     );
