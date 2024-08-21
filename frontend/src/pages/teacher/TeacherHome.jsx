@@ -250,7 +250,6 @@ function TeacherHome() {
     if (!StudentsList) return;
 
     const getAvailableOptions = (filterType) => {
-      console.log(StudentsList);
       let newFilteredStudents = StudentsList;
 
       if (filterType !== "students" && state.selectedStudents.length > 0) {
