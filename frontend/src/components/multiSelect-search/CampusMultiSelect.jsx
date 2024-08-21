@@ -3,7 +3,7 @@ import Select from "react-select";
 const CampusMultiSelect = ({
   campusArray,
   state,
-  setState,
+  handleViewUpdate,
   availableCampuses,
 }) => {
   if (!campusArray) {
@@ -25,7 +25,7 @@ const CampusMultiSelect = ({
 
   // Handle change in selected campuses
   const handleSelectChange = (selectedOptions) => {
-    setState({ ...state, selectedCampuses: selectedOptions });
+    handleViewUpdate({ ...state, selectedCampuses: selectedOptions });
   };
 
   const CustomOption = ({ label, studentCount }) => (

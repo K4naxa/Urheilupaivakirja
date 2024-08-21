@@ -18,7 +18,6 @@ import { useMainContext } from "../../hooks/mainContext";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 export default function HeatMap_Year({ journal }) {
-  console.log("HeatMap_Year");
   if (journal.journal_entries) journal = journal.journal_entries;
   const { setTooltipContent, setTooltipDate } = useHeatmapContext();
 
@@ -42,13 +41,10 @@ export default function HeatMap_Year({ journal }) {
     return months;
   }, [calendaryYear]);
 
-  const handleClick = useCallback(
-    (dayJournal, day) => {
-      setTooltipDate(day);
-      setTooltipContent(journal);
-    },
-    [journal, setTooltipContent, setTooltipDate]
-  );
+  const handleClick = (dayJournal, day) => {
+    setTooltipDate(day);
+    setTooltipContent(dayJournal);
+  };
 
   const MemoizedCalendarDay = useCallback(CalendarDay, []);
 
@@ -68,11 +64,7 @@ export default function HeatMap_Year({ journal }) {
                 // Why does the isSameDay keep using resources when it's already defined?
                 const dayJournal = journal?.filter((journalEntry) => {
                   const journalDate = new Date(journalEntry.date);
-                  return (
-                    journalDate.getDate() === day.getDate() &&
-                    journalDate.getMonth() === day.getMonth() &&
-                    journalDate.getFullYear() === day.getFullYear()
-                  );
+                  return isSameDay(journalDate, day);
                 });
 
                 return (
@@ -82,7 +74,7 @@ export default function HeatMap_Year({ journal }) {
                     journal={dayJournal}
                     month={month}
                     showDate={showDate}
-                    // onClick={() => handleClick(dayJournal, day)}
+                    onClick={() => handleClick(dayJournal, day)}
                   />
                 );
               })}

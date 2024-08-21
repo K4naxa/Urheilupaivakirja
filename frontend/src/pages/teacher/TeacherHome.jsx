@@ -24,6 +24,8 @@ import {
   addWeeks,
   endOfWeek,
   getWeek,
+  getYear,
+  isSameYear,
   startOfWeek,
   subMonths,
   subWeeks,
@@ -50,6 +52,7 @@ function TeacherHome() {
 
   // all States for the component to reduce the amount of rerenders on multiple state changes
   const [state, setState] = useState({
+    showDateYear: getYear(showDate),
     showWeeks: true,
     showMonths: false,
     showYears: false,
@@ -61,7 +64,7 @@ function TeacherHome() {
     selectedGroups: [],
     selectedSorting: "default",
     page: 1,
-    studentsPerPage: 20,
+    studentsPerPage: 12,
     totalPages: 0,
     viewableStudents: [],
     viewableJournals: [],
@@ -94,124 +97,136 @@ function TeacherHome() {
     queryFn: () => publicService.getOptions(),
   });
 
-  const applyFiltersAndSorting = useCallback(() => {
+  const options = useMemo(() => {
+    if (optionsData) return optionsData;
+    return { sports: [], student_groups: [], campuses: [] };
+  }, [optionsData]);
+
+  useEffect(() => {
+    if (StudentsList && pinnedStudentsData) {
+      handleViewUpdate(state);
+    }
+  }, [StudentsList, pinnedStudentsData, showDate]);
+
+  // useEffect(() => {
+  //   if (!isSameYear(showDate, state.showDateYear)) {
+  //     handleViewUpdate(state);
+  //   }
+  // }, [showDate]);
+
+  const handleViewUpdate = (newStates) => {
     if (!StudentsList || !pinnedStudentsData) return;
+    console.log(newStates);
 
     let newFilteredStudents = [...StudentsList];
 
-    if (state.selectedSports.length > 0) {
+    // Apply Filters
+    if (newStates.selectedSports.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        state.selectedSports.some((sport) => sport.label === student.sport_name)
+        newStates.selectedSports.some(
+          (sport) => sport.label === student.sport_name
+        )
       );
     }
-    if (state.selectedCampuses.length > 0) {
+    if (newStates.selectedCampuses.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        state.selectedCampuses.some(
+        newStates.selectedCampuses.some(
           (campus) => campus.label === student.campus_name
         )
       );
     }
-    if (state.selectedGroups.length > 0) {
+    if (newStates.selectedGroups.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        state.selectedGroups.some((group) => group.label === student.name)
+        newStates.selectedGroups.some((group) => group.label === student.name)
       );
     }
-    if (state.selectedStudents.length > 0) {
+    if (newStates.selectedStudents.length > 0) {
       newFilteredStudents = newFilteredStudents.filter((student) =>
-        state.selectedStudents.some(
+        newStates.selectedStudents.some(
           (selected) => selected.value === student.user_id
         )
       );
     }
 
-    if (sortingFunctions[state.selectedSorting]) {
-      newFilteredStudents.sort(sortingFunctions[state.selectedSorting]);
+    // Apply Sorting
+    if (sortingFunctions[newStates.selectedSorting]) {
+      newFilteredStudents.sort(sortingFunctions[newStates.selectedSorting]);
     }
 
+    // Pagination
     const totalPages = Math.ceil(
-      newFilteredStudents.length / state.studentsPerPage
+      newFilteredStudents.length / newStates.studentsPerPage
     );
-    const indexOfLastStudent = state.page * state.studentsPerPage;
-    const indexOfFirstStudent = indexOfLastStudent - state.studentsPerPage;
+    const indexOfLastStudent = newStates.page * newStates.studentsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - newStates.studentsPerPage;
     const viewableStudents = newFilteredStudents.slice(
       indexOfFirstStudent,
       indexOfLastStudent
     );
 
-    setState((prevState) => ({
-      ...prevState,
-      filteredStudents: newFilteredStudents,
-      totalPages,
-      viewableStudents,
-    }));
-  }, [
-    StudentsList,
-    pinnedStudentsData,
-    state.selectedStudents,
-    state.selectedSports,
-    state.selectedCampuses,
-    state.selectedGroups,
-    state.selectedSorting,
-    state.page,
-    state.studentsPerPage,
-  ]);
+    // Fetch Journal Data
+    const fetchJournals = async () => {
+      if (viewableStudents.length > 0) {
+        if (
+          viewableStudents === state.viewableStudents &&
+          isSameYear(showDate, state.showDateYear)
+        ) {
+          return state.viewableJournals;
+        } else {
+          const requestedStudents = viewableStudents.map((student) => ({
+            ...student,
+            journal_entries: undefined,
+          }));
 
-  useEffect(() => {
-    applyFiltersAndSorting();
-  }, [
-    state.selectedStudents,
-    state.selectedSports,
-    state.selectedCampuses,
-    state.selectedGroups,
-    StudentsList,
-    pinnedStudentsData,
-    state.selectedSorting,
-  ]);
+          try {
+            const response = await userService.getPaginatedStudentsData(
+              requestedStudents,
+              showDate
+            );
+            return response;
+          } catch {
+            addToast("Tietojen hakeminen epäonnistui", { style: "error" });
+            return [];
+          }
+        }
+      }
 
-  useEffect(() => {
-    if (state.filteredStudents.length > 0) {
-      const requestedStudents = state.viewableStudents.map((student) => ({
-        ...student,
-        journal_entries: undefined,
-      }));
+      return [];
+    };
 
-      userService
-        .getPaginatedStudentsData(requestedStudents, showDate)
-        .then((response) =>
-          setState((prevState) => ({
-            ...prevState,
-            viewableJournals: response,
-          }))
-        )
-        .catch(() =>
-          addToast("Tietojen hakeminen epäonnistui", { style: "error" })
-        );
-    }
-  }, [state.filteredStudents, state.page, state.studentsPerPage]);
+    fetchJournals().then((viewableJournals) => {
+      setState({
+        ...newStates,
+        filteredStudents: newFilteredStudents,
+        totalPages,
+        viewableStudents,
+        viewableJournals,
+      });
+    });
+  };
 
   const handleFilterReset = () => {
-    setState((prevState) => ({
-      ...prevState,
+    handleViewUpdate({
+      ...state,
       selectedStudents: [],
       selectedSports: [],
       selectedCampuses: [],
       selectedGroups: [],
       selectedSorting: "default",
       showMobileFilters: false,
-    }));
-    setShowDate(new Date());
+    });
   };
 
-  const RenderPaginationNav = (page, setPage, totalPages) => {
+  const RenderPaginationNav = () => {
     const handlePrevPage = () => {
-      if (page > 1) {
-        setPage(page - 1);
+      if (state.page > 1) {
+        handleViewUpdate({ ...state, page: state.page - 1 });
       }
     };
 
     const handleNextPage = () => {
-      if (page < totalPages) {
-        setPage(page + 1);
+      if (state.page < state.totalPages) {
+        handleViewUpdate({ ...state, page: state.page + 1 });
       }
     };
 
@@ -220,30 +235,23 @@ function TeacherHome() {
         <button
           className="hover:underline"
           onClick={handlePrevPage}
-          disabled={page === 1}
+          disabled={state.page === 1}
         >
           Edellinen
         </button>
         <p>
-          {page} / {totalPages}
+          {state.page} / {state.totalPages}
         </p>
         <button
           className="hover:underline"
           onClick={handleNextPage}
-          disabled={page === totalPages}
+          disabled={state.page === state.totalPages}
         >
           Seuraava
         </button>
       </div>
     );
   };
-
-  // Options for filtering students
-
-  const options = useMemo(() => {
-    if (optionsData) return optionsData;
-    return { sports: [], student_groups: [], campuses: [] };
-  }, [optionsData]);
 
   // Calculating available options for each filter type
   const availableOptions = useMemo(() => {
@@ -433,9 +441,9 @@ function TeacherHome() {
           id="sortingSelect"
           value={state.selectedSorting}
           className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
-          onChange={(e) =>
-            setState({ ...state, selectedSorting: e.target.value })
-          }
+          onChange={(e) => {
+            handleViewUpdate({ ...state, selectedSorting: e.target.value });
+          }}
         >
           <option value="default">Oletus</option>
           <option value="name1">Nimi A-Ö</option>
@@ -770,25 +778,25 @@ function TeacherHome() {
             <StudentMultiSelect
               studentArray={StudentsList}
               state={state}
-              setState={setState}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               filter={state.selectedStudents}
             />
             <SportsMultiSelect
               sportsArray={options.sports}
               state={state}
-              setState={setState}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               availableSports={availableOptions.sports}
             />
             <CampusMultiSelect
               campusArray={options.campuses}
               state={state}
-              setState={setState}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               availableCampuses={availableOptions.campuses}
             />
             <GroupMultiSelect
               groupArray={options.student_groups}
               state={state}
-              setState={setState}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               availableGroups={availableOptions.groups}
             />
 
@@ -827,26 +835,26 @@ function TeacherHome() {
               >
                 <StudentMultiSelect
                   studentArray={StudentsList}
-                  selectedStudents={state.selectedStudents}
-                  setSelectedStudents={state.setSelectedStudents}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   filter={state.selectedStudents}
                 />
                 <SportsMultiSelect
                   sportsArray={options.sports}
-                  selectedSports={state.selectedSports}
-                  setSelectedSports={state.setSelectedSports}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   availableSports={availableOptions.sports}
                 />
                 <CampusMultiSelect
                   campusArray={options.campuses}
-                  selectedCampuses={state.selectedCampuses}
-                  setSelectedCampuses={state.setSelectedCampuses}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   availableCampuses={availableOptions.campuses}
                 />
                 <GroupMultiSelect
                   groupArray={options.student_groups}
-                  selectedGroups={state.selectedGroups}
-                  setSelectedGroups={state.setSelectedGroups}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   availableGroups={availableOptions.groups}
                 />
 
@@ -879,9 +887,7 @@ function TeacherHome() {
           ) : (
             <LoadingScreen />
           )}
-          <div className="mx-auto my-8">
-            {RenderPaginationNav(state.page, state.setPage, state.totalPages)}
-          </div>
+          <div className="mx-auto my-8">{RenderPaginationNav()}</div>
         </div>
         <Tooltip
           id="segment-tooltip"

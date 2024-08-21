@@ -1,6 +1,11 @@
 import Select from "react-select";
 
-const StudentMultiSelect = ({ studentArray, state, setState, filter }) => {
+const StudentMultiSelect = ({
+  studentArray,
+  state,
+  handleViewUpdate,
+  filter,
+}) => {
   // Ensure filter is a string
   const filterString = typeof filter === "string" ? filter.toLowerCase() : "";
 
@@ -19,7 +24,7 @@ const StudentMultiSelect = ({ studentArray, state, setState, filter }) => {
 
   // Handle change in selected students
   const handleSelectChange = (selectedOptions) => {
-    setState((state) => ({ ...state, selectedStudents: selectedOptions }));
+    handleViewUpdate({ ...state, selectedStudents: selectedOptions });
   };
 
   return (

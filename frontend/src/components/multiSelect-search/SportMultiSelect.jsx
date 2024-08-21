@@ -3,7 +3,7 @@ import Select from "react-select";
 const SportsMultiSelect = ({
   sportsArray,
   state,
-  setState,
+  handleViewUpdate,
   availableSports,
 }) => {
   if (!sportsArray) {
@@ -24,7 +24,7 @@ const SportsMultiSelect = ({
 
   // Handle change in selected sports
   const handleSelectChange = (selectedOptions) => {
-    setState({ ...state, selectedSports: selectedOptions });
+    handleViewUpdate({ ...state, selectedSports: selectedOptions });
   };
 
   const CustomOption = ({ label, studentCount }) => (
