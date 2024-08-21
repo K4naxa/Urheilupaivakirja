@@ -13,6 +13,8 @@ import { Tooltip } from "react-tooltip";
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
+import RenderFavouriteMark from "../../components/RenderFavouriteMark.jsx";
+
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
@@ -124,6 +126,44 @@ function TeacherHome() {
         );
     }
   }, [filteredStudents, page, studentsPerPage]);
+
+  const RenderPaginationNav = (page, setPage, totalPages) => {
+    const handlePrevPage = () => {
+      if (page > 1) {
+        setPage(page - 1);
+      }
+    };
+
+    const handleNextPage = () => {
+      if (page < totalPages) {
+        setPage(page + 1);
+      }
+    };
+
+    return (
+      <div className="flex justify-center gap-4">
+        <button
+          className="hover:underline"
+          onClick={handlePrevPage}
+          disabled={page === 1}
+        >
+          Edellinen
+        </button>
+        <p>
+          {page} / {totalPages}
+        </p>
+        <button
+          className="hover:underline"
+          onClick={handleNextPage}
+          disabled={page === totalPages}
+        >
+          Seuraava
+        </button>
+      </div>
+    );
+  };
+
+  // Options for filtering students
 
   const options = useMemo(() => {
     if (optionsData) return optionsData;
@@ -347,51 +387,6 @@ function TeacherHome() {
     );
   };
 
-  const renderFavouriteMark = (journal) => {
-    let isPinned = false;
-    if (pinnedStudentsData) {
-      isPinned = pinnedStudentsData.find(
-        (pinnedStudent) => pinnedStudent.pinned_user_id === journal.user_id
-      );
-    }
-
-    const [hover, setHover] = useState(false);
-
-    const handlePinClick = async () => {
-      if (isPinned) {
-        await userService.unpinStudent(journal.user_id).then(() => {
-          queryClient.invalidateQueries("pinnedStudents");
-        });
-      } else {
-        await userService.pinStudent(journal.user_id).then(() => {
-          queryClient.invalidateQueries("pinnedStudents");
-        });
-      }
-    };
-
-    return (
-      <div
-        className="absolute flex items-center justify-center w-6 h-6 cursor-pointer top-1 right-1"
-        onClick={() => handlePinClick()}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-      >
-        {isPinned ? (
-          hover ? (
-            <TbPinnedOff size={20} className="text-primaryColor" />
-          ) : (
-            <TbPinFilled size={20} className="text-primaryColor" />
-          )
-        ) : (
-          <TbPin
-            size={20}
-            className="text-textPrimary opacity-10 hover:text-primaryColor hover:opacity-100"
-          />
-        )}
-      </div>
-    );
-  };
-
   const renderSortingSelect = () => {
     return (
       <div className="right-0 flex flex-col mt-4 lg:absolute md:mt-0">
@@ -488,7 +483,13 @@ function TeacherHome() {
                   className="relative flex flex-col w-full p-2 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
-                  {renderFavouriteMark(journal)}
+                  {
+                    <RenderFavouriteMark
+                      journal={journal}
+                      queryClient={queryClient}
+                      pinnedStudentsData={pinnedStudentsData}
+                    />
+                  }
                   <div className="flex-col items-center justify-between gap-2">
                     <Link
                       to={`opiskelijat/${journal.user_id}`}
@@ -558,7 +559,13 @@ function TeacherHome() {
                   className="relative flex flex-col w-64 gap-2 p-4 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
-                  {renderFavouriteMark(journal)}
+                  {
+                    <RenderFavouriteMark
+                      journal={journal}
+                      queryClient={queryClient}
+                      pinnedStudentsData={pinnedStudentsData}
+                    />
+                  }
                   <Link
                     to={`/opettaja/opiskelijat/${journal.user_id}`}
                     className="flex flex-col pt-2 "
@@ -635,7 +642,13 @@ function TeacherHome() {
                   className="relative flex flex-col gap-2 p-4 overflow-hidden border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
-                  {renderFavouriteMark(journal)}
+                  {
+                    <RenderFavouriteMark
+                      journal={journal}
+                      queryClient={queryClient}
+                      pinnedStudentsData={pinnedStudentsData}
+                    />
+                  }
                   <div className="flex flex-wrap items-end gap-4 p-2 leading-none">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
@@ -807,18 +820,20 @@ function TeacherHome() {
           </div>
         </div>
 
-        {viewableJournals && pinnedStudentsData && courseSegments ? (
-          <div
-            id="studentList"
-            className="flex justify-center w-full gap-8 p-4 border rounded-md bg-bgSecondary border-borderPrimary"
-          >
-            {showWeeks && <RenderWeeks journals={viewableJournals} />}
-            {showMonths && <RenderMonths journals={viewableJournals} />}
-            {showYears && <RenderYears journals={viewableJournals} />}
+        <div className="w-full p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+          {viewableJournals && pinnedStudentsData && courseSegments ? (
+            <div id="studentList" className="flex justify-center w-full gap-8">
+              {showWeeks && <RenderWeeks journals={viewableJournals} />}
+              {showMonths && <RenderMonths journals={viewableJournals} />}
+              {showYears && <RenderYears journals={viewableJournals} />}
+            </div>
+          ) : (
+            <LoadingScreen />
+          )}
+          <div className="mx-auto my-8">
+            {RenderPaginationNav(page, setPage, totalPages)}
           </div>
-        ) : (
-          <LoadingScreen />
-        )}
+        </div>
         <Tooltip
           id="segment-tooltip"
           anchorSelect=".clickableCourseSegment"

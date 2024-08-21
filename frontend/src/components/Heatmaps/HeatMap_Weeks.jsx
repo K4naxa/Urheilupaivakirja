@@ -5,7 +5,6 @@ import {
   eachWeekOfInterval,
   endOfDay,
   endOfWeek,
-  isSameDay,
   isToday,
   startOfDay,
   startOfWeek,
@@ -44,12 +43,9 @@ function HeatMap_Weeks({ journal }) {
     return newCalendar;
   }, [calendarWeeks]);
 
-  const handleClick = (day) => {
-    const dayEntries = journal.filter((entry) =>
-      isSameDay(new Date(entry.date), day)
-    );
+  const handleClick = (dayJournal, day) => {
     setTooltipDate(day);
-    setTooltipContent(dayEntries);
+    setTooltipContent(dayJournal);
   };
 
   return (
@@ -57,17 +53,25 @@ function HeatMap_Weeks({ journal }) {
       {calendar.map((week, index) => (
         <div key={index}>
           <div className="grid grid-cols-7 gap-1">
-            {week.map((day) => (
-              <CalendarDay
-                key={day.getTime()}
-                day={day}
-                showDate={showDate}
-                journal={journal?.filter((journal) =>
-                  isSameDay(journal.date, day)
-                )}
-                onClick={() => handleClick(day)}
-              />
-            ))}
+            {week.map((day) => {
+              const dayJournal = journal?.filter((journalEntry) => {
+                const journalDate = new Date(journalEntry.date);
+                return (
+                  journalDate.getDate() === day.getDate() &&
+                  journalDate.getMonth() === day.getMonth() &&
+                  journalDate.getFullYear() === day.getFullYear()
+                );
+              });
+              return (
+                <CalendarDay
+                  key={day.getTime()}
+                  day={day}
+                  showDate={showDate}
+                  journal={dayJournal}
+                  onClick={() => handleClick(dayJournal, day)}
+                />
+              );
+            })}
           </div>
         </div>
       ))}
