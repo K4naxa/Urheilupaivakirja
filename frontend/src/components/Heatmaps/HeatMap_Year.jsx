@@ -4,6 +4,7 @@ import {
   eachMonthOfInterval,
   endOfMonth,
   endOfYear,
+  format,
   isSameDay,
   isSameMonth,
   isSameYear,
@@ -19,9 +20,21 @@ import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 export default function HeatMap_Year({ journal }) {
   if (journal.journal_entries) journal = journal.journal_entries;
-  const { setTooltipContent, setTooltipDate } = useHeatmapContext();
 
+  const { setTooltipContent, setTooltipDate } = useHeatmapContext();
   const { showDate } = useMainContext();
+
+  const journalMap = useMemo(() => {
+    const map = new Map();
+    journal.forEach((journalEntry) => {
+      const dateStr = format(new Date(journalEntry.date), "yyyy-MM-dd");
+      if (!map.has(dateStr)) {
+        map.set(dateStr, []);
+      }
+      map.get(dateStr).push(journalEntry);
+    });
+    return map;
+  }, [journal]);
 
   const calendaryYear = useMemo(() => {
     const firstMonthStart = startOfMonth(startOfYear(showDate));
@@ -30,15 +43,12 @@ export default function HeatMap_Year({ journal }) {
   }, [showDate]);
 
   const calendarMonths = useMemo(() => {
-    const months = [];
-    calendaryYear.forEach((month) => {
-      const daysOfMonth = eachDayOfInterval({
+    return calendaryYear.map((month) => {
+      return eachDayOfInterval({
         start: startOfWeek(startOfMonth(month), { weekStartsOn: 1 }),
         end: endOfMonth(month),
       });
-      months.push(daysOfMonth);
     });
-    return months;
   }, [calendaryYear]);
 
   const handleClick = (dayJournal, day) => {
@@ -61,15 +71,8 @@ export default function HeatMap_Year({ journal }) {
             </div>
             <div className=" YearMonthGrid gap-[2px]">
               {month.map((day) => {
-                // Why does the isSameDay keep using resources when it's already defined?
-                const dayJournal = journal?.filter((journalEntry) => {
-                  const journalDate = new Date(journalEntry.date);
-                  return (
-                    journalDate.getDate() === day.getDate() &&
-                    journalDate.getMonth() === day.getMonth() &&
-                    journalDate.getFullYear() === day.getFullYear()
-                  );
-                });
+                const dayStr = format(day, "yyyy-MM-dd");
+                const dayJournal = journalMap.get(dayStr) || [];
 
                 return (
                   <MemoizedCalendarDay
