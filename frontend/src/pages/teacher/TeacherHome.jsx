@@ -52,11 +52,11 @@ function TeacherHome() {
 
   // all States for the component to reduce the amount of rerenders on multiple state changes
   const [state, setState] = useState({
-    showDateYear: getYear(showDate),
     showWeeks: true,
     showMonths: false,
     showYears: false,
     showMobileFilters: false,
+    previousShowDate: showDate,
     filteredStudents: [],
     selectedStudents: [],
     selectedSports: [],
@@ -108,12 +108,6 @@ function TeacherHome() {
     }
   }, [StudentsList, pinnedStudentsData, showDate]);
 
-  // useEffect(() => {
-  //   if (!isSameYear(showDate, state.showDateYear)) {
-  //     handleViewUpdate(state);
-  //   }
-  // }, [showDate]);
-
   const handleViewUpdate = (newStates) => {
     if (!StudentsList || !pinnedStudentsData) return;
     console.log(newStates);
@@ -164,30 +158,40 @@ function TeacherHome() {
       indexOfLastStudent
     );
 
+    function areArraysEqual(arr1, arr2) {
+      if (arr1.length !== arr2.length) return false;
+      for (let i = 0; i < arr1.length; i++) {
+        if (JSON.stringify(arr1[i]) !== JSON.stringify(arr2[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     // Fetch Journal Data
     const fetchJournals = async () => {
       if (viewableStudents.length > 0) {
         if (
-          viewableStudents === state.viewableStudents &&
-          isSameYear(showDate, state.showDateYear)
+          isSameYear(newStates.previousShowDate, showDate) &&
+          areArraysEqual(newStates.viewableStudents, viewableStudents)
         ) {
-          return state.viewableJournals;
-        } else {
-          const requestedStudents = viewableStudents.map((student) => ({
-            ...student,
-            journal_entries: undefined,
-          }));
+          return newStates.viewableJournals;
+        }
 
-          try {
-            const response = await userService.getPaginatedStudentsData(
-              requestedStudents,
-              showDate
-            );
-            return response;
-          } catch {
-            addToast("Tietojen hakeminen epäonnistui", { style: "error" });
-            return [];
-          }
+        const requestedStudents = viewableStudents.map((student) => ({
+          ...student,
+          journal_entries: undefined,
+        }));
+
+        try {
+          const response = await userService.getPaginatedStudentsData(
+            requestedStudents,
+            showDate
+          );
+          return response;
+        } catch {
+          addToast("Tietojen hakeminen epäonnistui", { style: "error" });
+          return [];
         }
       }
 
@@ -201,6 +205,7 @@ function TeacherHome() {
         totalPages,
         viewableStudents,
         viewableJournals,
+        previousShowDate: showDate,
       });
     });
   };

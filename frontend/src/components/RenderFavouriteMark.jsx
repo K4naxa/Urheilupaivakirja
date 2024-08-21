@@ -25,15 +25,6 @@ const RenderFavouriteMark = ({ journal, pinnedStudentsData, queryClient }) => {
       queryClient.invalidateQueries("pinnedStudents");
     }
   };
-  // if (isPinned) {
-  //   await userService.unpinStudent(journal.user_id).then(() => {
-  //     queryClient.invalidateQueries("pinnedStudents");
-  //   });
-  // } else {
-  //   await userService.pinStudent(journal.user_id).then(() => {
-  //     queryClient.invalidateQueries("pinnedStudents");
-  //   });
-  // }
 
   return (
     <div
