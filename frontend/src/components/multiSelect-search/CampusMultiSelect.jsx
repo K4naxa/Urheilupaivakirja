@@ -2,8 +2,8 @@ import Select from "react-select";
 
 const CampusMultiSelect = ({
   campusArray,
-  selectedCampuses,
-  setSelectedCampuses,
+  state,
+  setState,
   availableCampuses,
 }) => {
   if (!campusArray) {
@@ -25,14 +25,14 @@ const CampusMultiSelect = ({
 
   // Handle change in selected campuses
   const handleSelectChange = (selectedOptions) => {
-    setSelectedCampuses(selectedOptions);
+    setState({ ...state, selectedCampuses: selectedOptions });
   };
 
   const CustomOption = ({ label, studentCount }) => (
     <div className="flex justify-between">
       <div>{label}</div>
       {studentCount ? (
-        <div className="flex text-xs bg-bgGray aspect-square w-4 justify-center items-center  rounded-full">
+        <div className="flex items-center justify-center w-4 text-xs rounded-full bg-bgGray aspect-square">
           {studentCount}
         </div>
       ) : null}
@@ -43,7 +43,7 @@ const CampusMultiSelect = ({
     <Select
       isMulti
       formatOptionLabel={CustomOption}
-      value={selectedCampuses}
+      value={state.selectedCampuses}
       openMenuOnFocus={false}
       openMenuOnClick={false}
       styles={{

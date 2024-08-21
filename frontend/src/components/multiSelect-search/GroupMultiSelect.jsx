@@ -1,11 +1,6 @@
 import Select from "react-select";
 
-const GroupMultiSelect = ({
-  groupArray,
-  selectedGroups,
-  setSelectedGroups,
-  availableGroups,
-}) => {
+const GroupMultiSelect = ({ groupArray, state, setState, availableGroups }) => {
   if (!groupArray) {
     return null;
   }
@@ -24,7 +19,7 @@ const GroupMultiSelect = ({
 
   // Handle change in selected groups
   const handleSelectChange = (selectedOptions) => {
-    setSelectedGroups(selectedOptions);
+    setState({ ...state, selectedGroups: selectedOptions });
   };
 
   const CustomOption = ({ label, studentCount }) => (
@@ -42,7 +37,7 @@ const GroupMultiSelect = ({
     <Select
       isMulti
       formatOptionLabel={CustomOption}
-      value={selectedGroups}
+      value={state.selectedGroups}
       openMenuOnFocus={false}
       openMenuOnClick={false}
       styles={{

@@ -1,12 +1,6 @@
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
 
-const StudentMultiSelect = ({
-  studentArray,
-  selectedStudents,
-  setSelectedStudents,
-  filter,
-}) => {
+const StudentMultiSelect = ({ studentArray, state, setState, filter }) => {
   // Ensure filter is a string
   const filterString = typeof filter === "string" ? filter.toLowerCase() : "";
 
@@ -25,13 +19,13 @@ const StudentMultiSelect = ({
 
   // Handle change in selected students
   const handleSelectChange = (selectedOptions) => {
-    setSelectedStudents(selectedOptions);
+    setState((state) => ({ ...state, selectedStudents: selectedOptions }));
   };
 
   return (
     <Select
       isMulti
-      value={selectedStudents}
+      value={state.SelectedStudents}
       openMenuOnFocus={false}
       openMenuOnClick={false}
       styles={{

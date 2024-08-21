@@ -18,7 +18,6 @@ import RenderFavouriteMark from "../../components/RenderFavouriteMark.jsx";
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-import { TbPin, TbPinFilled, TbPinnedOff } from "react-icons/tb";
 
 import {
   addMonths,
@@ -41,34 +40,31 @@ import { useToast } from "../../hooks/toast-messages/useToast.jsx";
 
 function TeacherHome() {
   const queryClient = useQueryClient();
-  const [showWeeks, setShowWeeks] = useState(true);
-  const [showMonths, setShowMonths] = useState(false);
-  const [showYears, setShowYears] = useState(false);
   const { addToast } = useToast();
-
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-
-  const [filteredStudents, setFilteredStudents] = useState([]);
-
-  const [selectedStudents, setSelectedStudents] = useState([]);
-  const [selectedSports, setSelectedSports] = useState([]);
-  const [selectedCampuses, setSelectedCampuses] = useState([]);
-  const [selectedGroups, setSelectedGroups] = useState([]);
-
-  const [selectedSorting, setSelectedSorting] = useState("default");
-
   const { showDate, setShowDate } = useMainContext();
 
+  // Heatmaps for weeks, months and years in memoized components for performance
   const HeatMap_Weeks_Memoized = React.memo(HeatMap_Weeks);
   const HeatMap_Month_Memoized = React.memo(HeatMap_Month);
   const HeatMap_Year_Memoized = React.memo(HeatMap_Year);
 
-  console.log("rendering TeacherHome");
-  // Course completion requirement for passing the course
-  const { data: courseSegments } = useQuery({
-    queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
-    staleTime: 15 * 60 * 1000,
+  // all States for the component to reduce the amount of rerenders on multiple state changes
+  const [state, setState] = useState({
+    showWeeks: true,
+    showMonths: false,
+    showYears: false,
+    showMobileFilters: false,
+    filteredStudents: [],
+    selectedStudents: [],
+    selectedSports: [],
+    selectedCampuses: [],
+    selectedGroups: [],
+    selectedSorting: "default",
+    page: 1,
+    studentsPerPage: 20,
+    totalPages: 0,
+    viewableStudents: [],
+    viewableJournals: [],
   });
 
   // all Students and their journals
@@ -76,6 +72,13 @@ function TeacherHome() {
     queryKey: ["StudentsList"],
     queryFn: () => userService.getStudents(),
     staleTime: 30 * 60 * 1000, //30 minutes
+  });
+
+  // Course completion requirement for passing the course
+  const { data: courseSegments } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => trainingService.getCourseSegments(),
+    staleTime: 15 * 60 * 1000,
   });
 
   // Only pinned students where the user id == pinner_user_id
@@ -91,41 +94,113 @@ function TeacherHome() {
     queryFn: () => publicService.getOptions(),
   });
 
-  // Pagination for students
-  // Pagination logic uses the filteredStudents array to fetch the journal entries for the students
-  const [page, setPage] = useState(1);
-  const [studentsPerPage, setStudentsPerPage] = useState(20);
-  const [totalPages, setTotalPages] = useState(0);
-  const [viewableStudents, setViewableStudents] = useState([]);
-  const [viewableJournals, setViewableJournals] = useState([]);
+  const applyFiltersAndSorting = useCallback(() => {
+    if (!StudentsList || !pinnedStudentsData) return;
+
+    let newFilteredStudents = [...StudentsList];
+
+    if (state.selectedSports.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        state.selectedSports.some((sport) => sport.label === student.sport_name)
+      );
+    }
+    if (state.selectedCampuses.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        state.selectedCampuses.some(
+          (campus) => campus.label === student.campus_name
+        )
+      );
+    }
+    if (state.selectedGroups.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        state.selectedGroups.some((group) => group.label === student.name)
+      );
+    }
+    if (state.selectedStudents.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        state.selectedStudents.some(
+          (selected) => selected.value === student.user_id
+        )
+      );
+    }
+
+    if (sortingFunctions[state.selectedSorting]) {
+      newFilteredStudents.sort(sortingFunctions[state.selectedSorting]);
+    }
+
+    const totalPages = Math.ceil(
+      newFilteredStudents.length / state.studentsPerPage
+    );
+    const indexOfLastStudent = state.page * state.studentsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - state.studentsPerPage;
+    const viewableStudents = newFilteredStudents.slice(
+      indexOfFirstStudent,
+      indexOfLastStudent
+    );
+
+    setState((prevState) => ({
+      ...prevState,
+      filteredStudents: newFilteredStudents,
+      totalPages,
+      viewableStudents,
+    }));
+  }, [
+    StudentsList,
+    pinnedStudentsData,
+    state.selectedStudents,
+    state.selectedSports,
+    state.selectedCampuses,
+    state.selectedGroups,
+    state.selectedSorting,
+    state.page,
+    state.studentsPerPage,
+  ]);
 
   useEffect(() => {
-    if (filteredStudents.length > 0) {
-      setTotalPages(Math.ceil(filteredStudents.length / studentsPerPage));
-      const indexOfLastStudent = page * studentsPerPage;
-      const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-      const currentViewableStudents = filteredStudents.slice(
-        indexOfFirstStudent,
-        indexOfLastStudent
-      );
+    applyFiltersAndSorting();
+  }, [
+    state.selectedStudents,
+    state.selectedSports,
+    state.selectedCampuses,
+    state.selectedGroups,
+    StudentsList,
+    pinnedStudentsData,
+    state.selectedSorting,
+  ]);
 
-      setViewableStudents(currentViewableStudents);
-
-      const requestedStudents = currentViewableStudents.map((student) => ({
+  useEffect(() => {
+    if (state.filteredStudents.length > 0) {
+      const requestedStudents = state.viewableStudents.map((student) => ({
         ...student,
         journal_entries: undefined,
       }));
 
       userService
         .getPaginatedStudentsData(requestedStudents, showDate)
-        .then((response) => {
-          setViewableJournals(response);
-        })
+        .then((response) =>
+          setState((prevState) => ({
+            ...prevState,
+            viewableJournals: response,
+          }))
+        )
         .catch(() =>
           addToast("Tietojen hakeminen epäonnistui", { style: "error" })
         );
     }
-  }, [filteredStudents, page, studentsPerPage]);
+  }, [state.filteredStudents, state.page, state.studentsPerPage]);
+
+  const handleFilterReset = () => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedStudents: [],
+      selectedSports: [],
+      selectedCampuses: [],
+      selectedGroups: [],
+      selectedSorting: "default",
+      showMobileFilters: false,
+    }));
+    setShowDate(new Date());
+  };
 
   const RenderPaginationNav = (page, setPage, totalPages) => {
     const handlePrevPage = () => {
@@ -178,26 +253,30 @@ function TeacherHome() {
       console.log(StudentsList);
       let newFilteredStudents = StudentsList;
 
-      if (filterType !== "students" && selectedStudents.length > 0) {
+      if (filterType !== "students" && state.selectedStudents.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((journal) =>
-          selectedStudents.some((student) => student.value === journal.user_id)
+          state.selectedStudents.some(
+            (student) => student.value === journal.user_id
+          )
         );
       }
-      if (filterType !== "sports" && selectedSports.length > 0) {
+      if (filterType !== "sports" && state.selectedSports.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedSports.some((sport) => sport.label === student.sport_name)
+          state.selectedSports.some(
+            (sport) => sport.label === student.sport_name
+          )
         );
       }
-      if (filterType !== "campuses" && selectedCampuses.length > 0) {
+      if (filterType !== "campuses" && state.selectedCampuses.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedCampuses.some(
+          state.selectedCampuses.some(
             (campus) => campus.label === student.campus_name
           )
         );
       }
-      if (filterType !== "groups" && selectedGroups.length > 0) {
+      if (filterType !== "groups" && state.selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedGroups.some((group) => group.label === student.name)
+          state.selectedGroups.some((group) => group.label === student.name)
         );
       }
 
@@ -242,10 +321,10 @@ function TeacherHome() {
       groups: formatOptions(availableGroupsCount),
     };
   }, [
-    selectedStudents,
-    selectedSports,
-    selectedCampuses,
-    selectedGroups,
+    state.selectedStudents,
+    state.selectedSports,
+    state.selectedCampuses,
+    state.selectedGroups,
     StudentsList,
   ]);
 
@@ -281,49 +360,6 @@ function TeacherHome() {
     progression1: (a, b) => b.total_entry_count - a.total_entry_count,
     progression2: (a, b) => a.total_entry_count - b.total_entry_count,
   };
-
-  // filter and sort students based on selected filters
-  useEffect(() => {
-    if (!StudentsList || !pinnedStudentsData) return;
-
-    let newFilteredStudents = [...StudentsList];
-
-    if (selectedSports.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedSports.some((sport) => sport.label === student.sport_name)
-      );
-    }
-    if (selectedCampuses.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedCampuses.some((campus) => campus.label === student.campus_name)
-      );
-    }
-    if (selectedGroups.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedGroups.some((group) => group.label === student.name)
-      );
-    }
-    if (selectedStudents.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedStudents.some((selected) => selected.value === student.user_id)
-      );
-    }
-
-    if (sortingFunctions[selectedSorting]) {
-      newFilteredStudents.sort(sortingFunctions[selectedSorting]);
-    }
-
-    setFilteredStudents(newFilteredStudents);
-  }, [
-    selectedStudents,
-    selectedSports,
-    selectedCampuses,
-    selectedGroups,
-    StudentsList,
-    pinnedStudentsData,
-    selectedSorting,
-    showMobileFilters,
-  ]);
 
   // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
   const renderProgressionBar = ({ student }) => {
@@ -396,9 +432,11 @@ function TeacherHome() {
         <select
           name="sorting"
           id="sortingSelect"
-          value={selectedSorting}
+          value={state.selectedSorting}
           className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
-          onChange={(e) => setSelectedSorting(e.target.value)}
+          onChange={(e) =>
+            setState({ ...state, selectedSorting: e.target.value })
+          }
         >
           <option value="default">Oletus</option>
           <option value="name1">Nimi A-Ö</option>
@@ -675,14 +713,6 @@ function TeacherHome() {
       );
   };
 
-  const handleFilterReset = useCallback(() => {
-    setSelectedStudents([]);
-    setSelectedSports([]);
-    setSelectedCampuses([]);
-    setSelectedGroups([]);
-    setShowDate(new Date());
-  }, [setShowDate]);
-
   if ((optionsDataLoading, StudentsListLoading)) {
     return <LoadingScreen />;
   } else
@@ -697,31 +727,40 @@ function TeacherHome() {
             <div className="relative flex justify-center text-sm text-textSecondary">
               <p
                 onClick={() => {
-                  setShowWeeks(true);
-                  setShowMonths(false);
-                  setShowYears(false);
+                  setState({
+                    ...state,
+                    showWeeks: true,
+                    showMonths: false,
+                    showYears: false,
+                  });
                 }}
-                className={`cursor-pointer mx-2 ${showWeeks && "text-primaryColor border-b border-primaryColor"}`}
+                className={`cursor-pointer mx-2 ${state.showWeeks && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Viikko
               </p>
               <p
                 onClick={() => {
-                  setShowWeeks(false);
-                  setShowMonths(true);
-                  setShowYears(false);
+                  setState({
+                    ...state,
+                    showWeeks: false,
+                    showMonths: true,
+                    showYears: false,
+                  });
                 }}
-                className={`cursor-pointer mx-2 ${showMonths && "text-primaryColor border-b border-primaryColor"}`}
+                className={`cursor-pointer mx-2 ${state.showMonths && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Kuukausi
               </p>
               <p
                 onClick={() => {
-                  setShowWeeks(false);
-                  setShowMonths(false);
-                  setShowYears(true);
+                  setState({
+                    ...state,
+                    showWeeks: false,
+                    showMonths: false,
+                    showYears: true,
+                  });
                 }}
-                className={`cursor-pointer mx-2 ${showYears && "text-primaryColor border-b border-primaryColor"}`}
+                className={`cursor-pointer mx-2 ${state.showYears && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Vuosi
               </p>
@@ -731,26 +770,26 @@ function TeacherHome() {
           <div className="flex-wrap items-center justify-center hidden w-full gap-2 text-sm lg:flex lg:gap-8">
             <StudentMultiSelect
               studentArray={StudentsList}
-              selectedStudents={selectedStudents}
-              setSelectedStudents={setSelectedStudents}
-              filter={selectedStudents}
+              state={state}
+              setState={setState}
+              filter={state.selectedStudents}
             />
             <SportsMultiSelect
               sportsArray={options.sports}
-              selectedSports={selectedSports}
-              setSelectedSports={setSelectedSports}
+              state={state}
+              setState={setState}
               availableSports={availableOptions.sports}
             />
             <CampusMultiSelect
               campusArray={options.campuses}
-              selectedCampuses={selectedCampuses}
-              setSelectedCampuses={setSelectedCampuses}
+              state={state}
+              setState={setState}
               availableCampuses={availableOptions.campuses}
             />
             <GroupMultiSelect
               groupArray={options.student_groups}
-              selectedGroups={selectedGroups}
-              setSelectedGroups={setSelectedGroups}
+              state={state}
+              setState={setState}
               availableGroups={availableOptions.groups}
             />
 
@@ -769,14 +808,19 @@ function TeacherHome() {
             <div
               className="flex items-center justify-center w-full gap-8 py-2 border-b cursor-pointer select-none text-textSecondary border-borderPrimary"
               onClick={() => {
-                setShowMobileFilters(!showMobileFilters);
+                setState({
+                  ...state,
+                  showMobileFilters: !state.showMobileFilters,
+                });
               }}
             >
-              {showMobileFilters ? "Piilota suodattimet" : "Näytä suodattimet"}
-              {showMobileFilters ? <FiChevronUp /> : <FiChevronDown />}
+              {state.showMobileFilters
+                ? "Piilota suodattimet"
+                : "Näytä suodattimet"}
+              {state.showMobileFilters ? <FiChevronUp /> : <FiChevronDown />}
             </div>
 
-            {showMobileFilters && (
+            {state.showMobileFilters && (
               <div
                 className={cc(
                   "grid lg:hidden w-full items-center gap-2 lg:gap-8"
@@ -784,26 +828,26 @@ function TeacherHome() {
               >
                 <StudentMultiSelect
                   studentArray={StudentsList}
-                  selectedStudents={selectedStudents}
-                  setSelectedStudents={setSelectedStudents}
-                  filter={selectedStudents}
+                  selectedStudents={state.selectedStudents}
+                  setSelectedStudents={state.setSelectedStudents}
+                  filter={state.selectedStudents}
                 />
                 <SportsMultiSelect
                   sportsArray={options.sports}
-                  selectedSports={selectedSports}
-                  setSelectedSports={setSelectedSports}
+                  selectedSports={state.selectedSports}
+                  setSelectedSports={state.setSelectedSports}
                   availableSports={availableOptions.sports}
                 />
                 <CampusMultiSelect
                   campusArray={options.campuses}
-                  selectedCampuses={selectedCampuses}
-                  setSelectedCampuses={setSelectedCampuses}
+                  selectedCampuses={state.selectedCampuses}
+                  setSelectedCampuses={state.setSelectedCampuses}
                   availableCampuses={availableOptions.campuses}
                 />
                 <GroupMultiSelect
                   groupArray={options.student_groups}
-                  selectedGroups={selectedGroups}
-                  setSelectedGroups={setSelectedGroups}
+                  selectedGroups={state.selectedGroups}
+                  setSelectedGroups={state.setSelectedGroups}
                   availableGroups={availableOptions.groups}
                 />
 
@@ -821,17 +865,23 @@ function TeacherHome() {
         </div>
 
         <div className="w-full p-4 border rounded-md bg-bgSecondary border-borderPrimary">
-          {viewableJournals && pinnedStudentsData && courseSegments ? (
+          {state.viewableJournals && pinnedStudentsData && courseSegments ? (
             <div id="studentList" className="flex justify-center w-full gap-8">
-              {showWeeks && <RenderWeeks journals={viewableJournals} />}
-              {showMonths && <RenderMonths journals={viewableJournals} />}
-              {showYears && <RenderYears journals={viewableJournals} />}
+              {state.showWeeks && (
+                <RenderWeeks journals={state.viewableJournals} />
+              )}
+              {state.showMonths && (
+                <RenderMonths journals={state.viewableJournals} />
+              )}
+              {state.showYears && (
+                <RenderYears journals={state.viewableJournals} />
+              )}
             </div>
           ) : (
             <LoadingScreen />
           )}
           <div className="mx-auto my-8">
-            {RenderPaginationNav(page, setPage, totalPages)}
+            {RenderPaginationNav(state.page, state.setPage, state.totalPages)}
           </div>
         </div>
         <Tooltip
