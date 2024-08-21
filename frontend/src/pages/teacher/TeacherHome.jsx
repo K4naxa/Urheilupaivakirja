@@ -231,19 +231,25 @@ function TeacherHome() {
     };
 
     return (
-      <div className="flex justify-center gap-4">
+      <div className="flex items-center justify-center gap-4">
         <button
-          className="hover:underline"
+          className={cc(
+            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs "
+          )}
           onClick={handlePrevPage}
           disabled={state.page === 1}
         >
           Edellinen
         </button>
-        <p>
-          {state.page} / {state.totalPages}
-        </p>
+        <div className="">
+          <p className="text-textSecondary">
+            {state.page} / {state.totalPages}
+          </p>
+        </div>
         <button
-          className="hover:underline"
+          className={cc(
+            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs "
+          )}
           onClick={handleNextPage}
           disabled={state.page === state.totalPages}
         >
