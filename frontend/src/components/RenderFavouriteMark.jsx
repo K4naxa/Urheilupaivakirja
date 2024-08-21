@@ -13,16 +13,27 @@ const RenderFavouriteMark = ({ journal, pinnedStudentsData, queryClient }) => {
   const [hover, setHover] = useState(false);
 
   const handlePinClick = async () => {
-    if (isPinned) {
-      await userService.unpinStudent(journal.user_id).then(() => {
-        queryClient.invalidateQueries("pinnedStudents");
-      });
-    } else {
-      await userService.pinStudent(journal.user_id).then(() => {
-        queryClient.invalidateQueries("pinnedStudents");
-      });
+    try {
+      if (isPinned) {
+        await userService.unpinStudent(journal.user_id).then(() => {});
+      } else {
+        await userService.pinStudent(journal.user_id).then(() => {});
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      queryClient.invalidateQueries("pinnedStudents");
     }
   };
+  // if (isPinned) {
+  //   await userService.unpinStudent(journal.user_id).then(() => {
+  //     queryClient.invalidateQueries("pinnedStudents");
+  //   });
+  // } else {
+  //   await userService.pinStudent(journal.user_id).then(() => {
+  //     queryClient.invalidateQueries("pinnedStudents");
+  //   });
+  // }
 
   return (
     <div

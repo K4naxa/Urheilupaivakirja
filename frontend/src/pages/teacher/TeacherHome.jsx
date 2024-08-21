@@ -43,7 +43,7 @@ import { useToast } from "../../hooks/toast-messages/useToast.jsx";
 function TeacherHome() {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { showDate, setShowDate } = useMainContext();
+  const { showDate } = useMainContext();
 
   // Heatmaps for weeks, months and years in memoized components for performance
   const HeatMap_Weeks_Memoized = React.memo(HeatMap_Weeks);
@@ -64,7 +64,7 @@ function TeacherHome() {
     selectedGroups: [],
     selectedSorting: "default",
     page: 1,
-    studentsPerPage: 12,
+    studentsPerPage: 28,
     totalPages: 0,
     viewableStudents: [],
     viewableJournals: [],
@@ -234,7 +234,7 @@ function TeacherHome() {
       <div className="flex items-center justify-center gap-4">
         <button
           className={cc(
-            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs "
+            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs p-2 px-3 w-auto"
           )}
           onClick={handlePrevPage}
           disabled={state.page === 1}
@@ -248,7 +248,7 @@ function TeacherHome() {
         </div>
         <button
           className={cc(
-            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs "
+            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs p-2 px-3 w-auto"
           )}
           onClick={handleNextPage}
           disabled={state.page === state.totalPages}
