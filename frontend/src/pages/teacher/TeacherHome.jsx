@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import publicService from "../../services/publicService.js";
 import { useMainContext } from "../../hooks/mainContext.jsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -57,6 +57,11 @@ function TeacherHome() {
 
   const { showDate, setShowDate } = useMainContext();
 
+  const HeatMap_Weeks_Memoized = React.memo(HeatMap_Weeks);
+  const HeatMap_Month_Memoized = React.memo(HeatMap_Month);
+  const HeatMap_Year_Memoized = React.memo(HeatMap_Year);
+
+  console.log("rendering TeacherHome");
   // Course completion requirement for passing the course
   const { data: courseSegments } = useQuery({
     queryKey: ["courseSegments"],
@@ -670,7 +675,7 @@ function TeacherHome() {
                       Laji: {journal.sport_name}
                     </p>
                   </div>
-                  <HeatMap_Year journal={journal} />
+                  <HeatMap_Year_Memoized journal={journal} />
                   {renderProgressionBar({ student: journal })}
                 </div>
               );

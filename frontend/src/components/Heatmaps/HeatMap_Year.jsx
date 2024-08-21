@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   eachDayOfInterval,
   eachMonthOfInterval,
@@ -18,9 +18,9 @@ import { useMainContext } from "../../hooks/mainContext";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 export default function HeatMap_Year({ journal }) {
+  console.log("HeatMap_Year");
   if (journal.journal_entries) journal = journal.journal_entries;
-  const { setTooltipContent, setTooltipUser, setTooltipDate } =
-    useHeatmapContext();
+  const { setTooltipContent, setTooltipDate } = useHeatmapContext();
 
   const { showDate } = useMainContext();
 
@@ -42,13 +42,15 @@ export default function HeatMap_Year({ journal }) {
     return months;
   }, [calendaryYear]);
 
-  const handleClick = (day) => {
-    const dayEntries = journal.filter((entry) =>
-      isSameDay(new Date(entry.date), day)
-    );
-    setTooltipDate(day);
-    setTooltipContent(dayEntries);
-  };
+  const handleClick = useCallback(
+    (dayJournal, day) => {
+      setTooltipDate(day);
+      setTooltipContent(journal);
+    },
+    [journal, setTooltipContent, setTooltipDate]
+  );
+
+  const MemoizedCalendarDay = useCallback(CalendarDay, []);
 
   return (
     <div className="gap-1 pb-2 overflow-x-auto YearGrid">
@@ -63,16 +65,24 @@ export default function HeatMap_Year({ journal }) {
             </div>
             <div className=" YearMonthGrid gap-[2px]">
               {month.map((day) => {
+                // Why does the isSameDay keep using resources when it's already defined?
+                const dayJournal = journal?.filter((journalEntry) => {
+                  const journalDate = new Date(journalEntry.date);
+                  return (
+                    journalDate.getDate() === day.getDate() &&
+                    journalDate.getMonth() === day.getMonth() &&
+                    journalDate.getFullYear() === day.getFullYear()
+                  );
+                });
+
                 return (
-                  <CalendarDay
+                  <MemoizedCalendarDay
                     key={day.getTime()}
                     day={day}
-                    journal={journal?.filter((journal) =>
-                      isSameDay(journal.date, day)
-                    )}
+                    journal={dayJournal}
                     month={month}
                     showDate={showDate}
-                    onClick={() => handleClick(day)}
+                    // onClick={() => handleClick(dayJournal, day)}
                   />
                 );
               })}
