@@ -69,10 +69,6 @@ const ManageActiveStudentsPage = () => {
   const queryClient = useQueryClient();
   const { openConfirmModal } = useConfirmModal();
 
-  const [students, setStudents] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedStudents, setSelectedStudents] = useState([]);
   const [sorting, setSorting] = useState({
     name: 1,
     sport: 0,
@@ -80,13 +76,23 @@ const ManageActiveStudentsPage = () => {
     campus: 0,
   });
 
+  const [state, setState] = useState({
+    selectedStudents: [],
+    students: [],
+    filteredStudents: [],
+    loading: true,
+  });
+
   useEffect(() => {
     userService.getStudents().then((data) => {
-      setStudents(data);
-      setFilteredStudents(
-        data.sort((a, b) => (a.first_name > b.first_name ? 1 : -1))
-      );
-      setLoading(false);
+      setState({
+        ...state,
+        students: data,
+        filteredStudents: data.sort((a, b) =>
+          a.first_name > b.first_name ? 1 : -1
+        ),
+        loading: false,
+      });
     });
   }, []);
 
@@ -150,7 +156,7 @@ const ManageActiveStudentsPage = () => {
 
   //useEffect for sorting and filtering students
   useEffect(() => {
-    let newFiltered = [...students];
+    let newFiltered = [...state.students];
 
     // Check for sorting settings
     if (sorting.name === 1) {
@@ -160,30 +166,30 @@ const ManageActiveStudentsPage = () => {
     }
 
     if (sorting.sport === 1) {
-      newFiltered.sort((a, b) => (a.sport > b.sport ? 1 : -1));
+      newFiltered.sort((a, b) => (a.sport_name > b.sport_name ? 1 : -1));
     } else if (sorting.sport === -1) {
-      newFiltered.sort((a, b) => (a.sport < b.sport ? 1 : -1));
+      newFiltered.sort((a, b) => (a.sport_name < b.sport_name ? 1 : -1));
     }
 
     if (sorting.group === 1) {
-      newFiltered.sort((a, b) => (a.group > b.group ? 1 : -1));
+      newFiltered.sort((a, b) => (a.name > b.name ? 1 : -1));
     } else if (sorting.group === -1) {
-      newFiltered.sort((a, b) => (a.group < b.group ? 1 : -1));
+      newFiltered.sort((a, b) => (a.name < b.name ? 1 : -1));
     }
 
     if (sorting.campus === 1) {
-      newFiltered.sort((a, b) => (a.campus > b.campus ? 1 : -1));
+      newFiltered.sort((a, b) => (a.campus_name > b.campus_name ? 1 : -1));
     } else if (sorting.campus === -1) {
-      newFiltered.sort((a, b) => (a.campus < b.campus ? 1 : -1));
+      newFiltered.sort((a, b) => (a.campus_name < b.campus_name ? 1 : -1));
     }
 
     // check if student is being searched
-    if (selectedStudents.length > 0)
+    if (state.selectedStudents.length > 0)
       newFiltered = newFiltered.filter((student) =>
-        selectedStudents.some((s) => s.value === student.user_id)
+        state.selectedStudents.some((s) => s.value === student.user_id)
       );
-    setFilteredStudents(newFiltered);
-  }, [selectedStudents, sorting, students]);
+    setState({ ...state, filteredStudents: newFiltered });
+  }, [state.selectedStudents, sorting, state.students]);
 
   const handleArchive = (student) => {
     const handleUserConfirmation = async () => {
@@ -192,8 +198,10 @@ const ManageActiveStudentsPage = () => {
           queryKey: ["studentsAndJournals"],
         });
       });
-      const newStudents = students.filter((s) => s.user_id !== student.user_id);
-      setStudents(newStudents);
+      const newStudents = state.students.filter(
+        (s) => s.user_id !== student.user_id
+      );
+      setState({ ...state, students: newStudents });
     };
 
     const modalText = (
@@ -225,8 +233,10 @@ const ManageActiveStudentsPage = () => {
           queryKey: ["studentsAndJournals"],
         });
       });
-      const newStudents = students.filter((s) => s.user_id !== student.user_id);
-      setStudents(newStudents);
+      const newStudents = state.students.filter(
+        (s) => s.user_id !== student.user_id
+      );
+      setState({ ...state, students: newStudents });
     };
 
     const modalText = (
@@ -251,7 +261,7 @@ const ManageActiveStudentsPage = () => {
     });
   };
 
-  if (loading)
+  if (state.loading)
     return (
       <div className="flex items-center w-full p-8">
         <LoadingScreen />
@@ -262,9 +272,10 @@ const ManageActiveStudentsPage = () => {
       <div className="p-2 rounded-md bg-bgSecondary">
         <div className="flex flex-wrap items-end justify-center gap-4 mb-4 sm:justify-between">
           <StudentMultiSelect
-            studentArray={students}
-            selectedStudents={selectedStudents}
-            setSelectedStudents={setSelectedStudents}
+            studentArray={state.students}
+            state={state}
+            handleViewUpdate={setState}
+            filter={state.selectedStudents}
           />
 
           <div className="flex flex-col">
@@ -292,8 +303,8 @@ const ManageActiveStudentsPage = () => {
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          {students.length > 0 ? (
-            filteredStudents.map((student) =>
+          {state.students.length > 0 ? (
+            state.filteredStudents.map((student) =>
               createStudentContainer(student, handleArchive, handleDelete)
             )
           ) : (
