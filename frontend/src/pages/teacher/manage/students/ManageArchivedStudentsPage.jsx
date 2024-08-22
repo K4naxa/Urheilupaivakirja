@@ -5,12 +5,9 @@ import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 import { Link } from "react-router-dom";
 import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 
-import { FiChevronUp } from "react-icons/fi";
-import { FiChevronDown } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
-import cc from "../../../../utils/cc.js";
 import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -18,11 +15,11 @@ import { useQueryClient } from "@tanstack/react-query";
 const createStudentContainer = (student, handleActivation, handleDelete) => {
   return (
     <div
-      className="flex justify-between border border-borderPrimary p-2 rounded-md"
+      className="flex justify-between p-2 border rounded-md border-borderPrimary"
       key={student.user_id}
     >
       <div className="flex flex-col">
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap items-center gap-4">
           <Link
             to={`/opettaja/opiskelijat/${student.user_id}`}
             className="student-info-name"
@@ -39,7 +36,7 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
           </div>
           <div className="flex gap-2 text-sm">
             <p className="text-textSecondary">ryhmä: </p>
-            {student.group}
+            {student.name}
           </div>
           <div className="flex gap-2 text-sm">
             <p className="text-textSecondary">toimipaikka: </p>
@@ -48,7 +45,7 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
         </div>
       </div>
 
-      <div className="flex flex-col justify-center items-center gap-2">
+      <div className="flex flex-col items-center justify-center gap-2">
         <button
           className="text-iconRed"
           onClick={() => {
@@ -73,10 +70,6 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
 const ManageArchivedStudentsPage = () => {
   const queryClient = useQueryClient();
   const { openConfirmModal } = useConfirmModal();
-  const [students, setStudents] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedStudents, setSelectedStudents] = useState([]);
   const [sorting, setSorting] = useState({
     name: 1,
     sport: 0,
@@ -84,14 +77,22 @@ const ManageArchivedStudentsPage = () => {
     campus: 0,
   });
 
+  const [state, setState] = useState({
+    students: [],
+    filteredStudents: [],
+    loading: true,
+    selectedStudents: [],
+  });
 
   useEffect(() => {
     userService.getArchivedStudents().then((data) => {
-      setStudents(data);
-      setFilteredStudents(
-        data.sort((a, b) => (a.first_name > b.first_name ? 1 : -1))
-      );
-      setLoading(false);
+      setState({
+        students: data,
+        filteredStudents: data.sort((a, b) =>
+          a.first_name > b.first_name ? 1 : -1
+        ),
+        loading: false,
+      });
     });
   }, []);
 
@@ -102,43 +103,52 @@ const ManageArchivedStudentsPage = () => {
           queryKey: ["studentsAndJournals"],
         });
       });
-      const newStudents = students.filter((s) => s.user_id !== student.user_id);
-      setStudents(newStudents);
+      const newStudents = state.students.filter(
+        (s) => s.user_id !== student.user_id
+      );
+      setState({ ...state, students: newStudents });
     };
 
     const modalText = (
       <span>
-      Haluatko varmasti aktivoida opiskelijan
-      <br/>
-      <strong>{student.first_name} {student.last_name}</strong>?
-    </span>
-    )
+        Haluatko varmasti aktivoida opiskelijan
+        <br />
+        <strong>
+          {student.first_name} {student.last_name}
+        </strong>
+        ?
+      </span>
+    );
     openConfirmModal({
       text: modalText,
       agreeButtonText: "Aktivoi",
       declineButtonText: "Peruuta",
-      onAgree: handleUserConfirmation, 
+      onAgree: handleUserConfirmation,
       closeOnOutsideClick: false,
-    }); 
+    });
   };
 
   // handle Delete funtion for students
   const handleDelete = (student) => {
     const handleUserConfirmation = async () => {
       await userService.deleteUser(student.user_id);
-      const newStudents = students.filter((s) => s.user_id !== student.user_id);
-      setStudents(newStudents);
+      const newStudents = state.students.filter(
+        (s) => s.user_id !== student.user_id
+      );
+      setState({ ...state, students: newStudents });
     };
 
     const modalText = (
       <span>
         Haluatko varmasti poistaa opiskelijan
-        <br/>
-        <strong>{student.first_name} {student.last_name}?</strong>
+        <br />
+        <strong>
+          {student.first_name} {student.last_name}?
+        </strong>
         <br />
         Tämä poistaa myös kaikki opiskelijan tekemät merkinnät pysyvästi.
       </span>
-    );    
+    );
 
     openConfirmModal({
       onAgree: handleUserConfirmation,
@@ -211,7 +221,8 @@ const ManageArchivedStudentsPage = () => {
 
   //useEffect for sorting and filtering students
   useEffect(() => {
-    let newFiltered = [...students];
+    let newFiltered = [...state.students];
+    console.log(newFiltered);
 
     // Check for sorting settings
     if (sorting.name === 1) {
@@ -227,9 +238,9 @@ const ManageArchivedStudentsPage = () => {
     }
 
     if (sorting.group === 1) {
-      newFiltered.sort((a, b) => (a.group > b.group ? 1 : -1));
+      newFiltered.sort((a, b) => (a.name > b.name ? 1 : -1));
     } else if (sorting.group === -1) {
-      newFiltered.sort((a, b) => (a.group < b.group ? 1 : -1));
+      newFiltered.sort((a, b) => (a.name < b.name ? 1 : -1));
     }
 
     if (sorting.campus === 1) {
@@ -238,51 +249,30 @@ const ManageArchivedStudentsPage = () => {
       newFiltered.sort((a, b) => (a.campus < b.campus ? 1 : -1));
     }
 
-    if (sorting.activity === 1) {
-      newFiltered.sort((a, b) => {
-        const dateA = new Date(
-          a.journal_entries[a.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        const dateB = new Date(
-          b.journal_entries[b.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        return dateA - dateB;
-      });
-    } else if (sorting.activity === -1) {
-      newFiltered.sort((a, b) => {
-        const dateA = new Date(
-          a.journal_entries[a.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        const dateB = new Date(
-          b.journal_entries[b.journal_entries.length - 1]?.created_at || 0
-        ).getTime();
-        return dateB - dateA;
-      });
-    }
-
     // check if student is being searched
-    if (selectedStudents.length > 0)
+    if (state.selectedStudents?.length > 0)
       newFiltered = newFiltered.filter((student) => {
-        return selectedStudents.some((s) => s.value === student.user_id);
+        return state.selectedStudents.some((s) => s.value === student.user_id);
       });
-    setFilteredStudents(newFiltered);
-  }, [selectedStudents, sorting, students]);
 
-  if (loading)
+    setState({ ...state, filteredStudents: newFiltered });
+  }, [state.selectedStudents, sorting, state.students]);
+
+  if (state.loading)
     return (
-      <div className="flex w-full items-center p-8">
+      <div className="flex items-center w-full p-8">
         <LoadingScreen />
       </div>
     );
 
   return (
-    <div className="bg-bgSecondary rounded-md p-2">
-      <div className="flex flex-wrap gap-4 justify-center items-end sm:justify-between mb-4">
+    <div className="p-2 rounded-md bg-bgSecondary">
+      <div className="flex flex-wrap items-end justify-center gap-4 mb-4 sm:justify-between">
         <StudentMultiSelect
-          studentArray={students}
-          selectedStudents={selectedStudents}
-          setSelectedStudents={setSelectedStudents}
-          filter={selectedStudents}
+          studentArray={state.students}
+          state={state}
+          handleViewUpdate={setState}
+          filter={state.selectedStudents}
         />
 
         <div className="flex flex-col">
@@ -292,8 +282,7 @@ const ManageArchivedStudentsPage = () => {
           <select
             name="sorting"
             id="sortingSelect"
-            className="bg-bgSecondary border border-borderPrimary text-textSecondary
-               p-1 rounded-md hover:cursor-pointer "
+            className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
             onChange={(e) => handleSortingChange(e.target.value)}
           >
             <option value="name1">Nimi A-Ö</option>
@@ -308,12 +297,12 @@ const ManageArchivedStudentsPage = () => {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        {students.length > 0 ? (
-          filteredStudents.map((student) =>
+        {state.students.length > 0 ? (
+          state.filteredStudents.map((student) =>
             createStudentContainer(student, handleActivation, handleDelete)
           )
         ) : (
-          <p className="text-center my-2">Ei opiskelijoita</p>
+          <p className="my-2 text-center">Ei opiskelijoita</p>
         )}
       </div>
     </div>
