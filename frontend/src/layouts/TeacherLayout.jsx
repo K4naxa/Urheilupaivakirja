@@ -28,7 +28,7 @@ const TeacherLayout = () => {
   const [showControlPanel, setShowControlPanel] = useState(false);
 
   const linkClass =
-    "flex flex-col items-center text-textPrimary border-t-2 border-bgPrimary py-2 px-4 rounded-md hover:bg-bgGray text-[12px] gap-1 active:text-primaryColor";
+    "flex flex-col items-center text-textPrimary  py-2 px-4 rounded-md hover:bg-bgGray text-[12px] gap-1 active:text-primaryColor";
   const linkTextClass = "items-center text-[12px] leading-none mt-2";
   let iconSize = 20;
   return (
@@ -156,11 +156,32 @@ const TeacherLayout = () => {
         id="mobile-header"
       >
         <nav id="top-nav" className="grid w-full grid-cols-5 gap-4">
-          <NavLink to="/opettaja" end className={linkClass}>
+          <NavLink
+            to="/opettaja"
+            onClick={() => {
+              setShowMenu(false);
+              setShowControlPanel(false);
+            }}
+            end
+            className={cc(
+              linkClass,
+              "border-t-2 border-bgPrimary hover:bg-bgPrimary"
+            )}
+          >
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
           </NavLink>
-          <NavLink to="/opettaja/tiedotteet/" className={linkClass}>
+          <NavLink
+            to="/opettaja/tiedotteet/"
+            onClick={() => {
+              setShowMenu(false);
+              setShowControlPanel(false);
+            }}
+            className={cc(
+              linkClass,
+              "border-t-2 border-bgPrimary hover:bg-bgPrimary"
+            )}
+          >
             <FiInbox size={iconSize} />
             <p className={linkTextClass}>Tiedotteet</p>
           </NavLink>
@@ -169,8 +190,9 @@ const TeacherLayout = () => {
             to="/opettaja/hallitse/"
             className={cc(
               linkClass,
+              "border-t-2 border-bgPrimary hover:bg-bgPrimary",
               showControlPanel
-                ? "rounded-b-md rounded-t-none transition-colors duration-150"
+                ? "rounded-b-md rounded-t-none transition-colors border-primaryColor duration-150"
                 : " bg-bgPrimary"
             )}
             onClick={(e) => {
@@ -183,16 +205,29 @@ const TeacherLayout = () => {
             <p className={linkTextClass}>Hallinta</p>
           </NavLink>
 
-          <NavLink to="/opettaja/hyvaksy/" className={linkClass}>
+          <NavLink
+            to="/opettaja/hyvaksy/"
+            onClick={() => {
+              setShowMenu(false);
+              setShowControlPanel(false);
+            }}
+            className={cc(
+              linkClass,
+              "border-t-2 border-bgPrimary hover:bg-bgPrimary"
+            )}
+          >
             <FiUserCheck size={iconSize} />
             <p className={linkTextClass}>Verifoi</p>
           </NavLink>
 
           <button
-            className={
-              linkClass +
-              `${showMenu ? "rounded-b-md rounded-t-none transition-colors border-primaryColor duration-200" : " bg-bgPrimary"}`
-            }
+            className={cc(
+              linkClass,
+              "border-t-2 border-bgPrimary hover:bg-bgPrimary",
+              showMenu
+                ? "rounded-b-md rounded-t-none transition-colors border-primaryColor duration-200"
+                : " bg-bgPrimary"
+            )}
             onClick={() => {
               setShowMenu(!showMenu);
               setShowControlPanel(false);
