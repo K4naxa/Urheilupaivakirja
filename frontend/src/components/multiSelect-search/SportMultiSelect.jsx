@@ -1,10 +1,9 @@
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
 
 const SportsMultiSelect = ({
   sportsArray,
-  selectedSports,
-  setSelectedSports,
+  state,
+  handleViewUpdate,
   availableSports,
 }) => {
   if (!sportsArray) {
@@ -25,14 +24,14 @@ const SportsMultiSelect = ({
 
   // Handle change in selected sports
   const handleSelectChange = (selectedOptions) => {
-    setSelectedSports(selectedOptions);
+    handleViewUpdate({ ...state, selectedSports: selectedOptions });
   };
 
   const CustomOption = ({ label, studentCount }) => (
     <div className="flex justify-between">
       <div>{label}</div>
       {studentCount ? (
-        <div className="flex text-xs bg-bgGray aspect-square w-4 justify-center items-center  rounded-full">
+        <div className="flex items-center justify-center w-4 text-xs rounded-full bg-bgGray aspect-square">
           {studentCount}
         </div>
       ) : null}
@@ -43,7 +42,7 @@ const SportsMultiSelect = ({
     <Select
       isMulti
       formatOptionLabel={CustomOption}
-      value={selectedSports}
+      value={state.selectedSports}
       openMenuOnFocus={false}
       openMenuOnClick={false}
       styles={{

@@ -24,113 +24,96 @@ const StudentLayout = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { openBigModal } = useBigModal();
 
-  const checkVerticalScrollbar = (element) => {
-    // Determine if a vertical scrollbar is visible
-    const hasVerticalScrollbar = element.offsetWidth > element.clientWidth;
-
-    // Calculate the width of the vertical scrollbar
-    const scrollbarWidth = hasVerticalScrollbar ? element.offsetWidth - element.clientWidth : 0;
-
-    return {
-        hasVerticalScrollbar,
-        scrollbarWidth
-    };
-}
-
   const linkClass =
     "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl active:text-primaryColor";
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
-      <div className="bg-bgSecondary border border-b-2 border-borderPrimary fixed-header">
-      <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between" >
-        <Link to={"/"} className="flex items-center gap-2 text-xl">
-          <img src={siteLogo} alt="site logo" className="w-8 h-8" />
-          Urheilupäiväkirja
-        </Link>
+      <div className="border border-b-2 bg-bgSecondary border-borderPrimary fixed-header">
+        <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between">
+          <Link to={"/"} className="flex items-center gap-2 text-xl">
+            <img src={siteLogo} alt="site logo" className="w-8 h-8" />
+            Urheilupäiväkirja
+          </Link>
 
-        <div className="flex items-center gap-2">
-          <div>
-            <ThemeSwitcher />
+          <div className="flex items-center gap-2">
+            <div>
+              <ThemeSwitcher />
+            </div>
+
+            <NavLink
+              to="/tiedotteet/"
+              id="tiedotteetBtn"
+              className="relative flex flex-col items-center gap-1 p-2 rounded-md select-none hover:cursor-pointer hover:bg-bgGray"
+            >
+              <FiInbox size={24} />
+
+              <p className="text-[12px] leading-none">Tiedotteet</p>
+              <UnreadNewsIndicator type="desktop" />
+            </NavLink>
+
+            {/* Profile button */}
+            <Menu as="div" className="relative text-textPrimary">
+              <Menu.Button
+                className="flex flex-col items-center gap-1 p-2 rounded-md select-none hover:cursor-pointer hover:bg-bgGray"
+                id="userMenuBtn"
+              >
+                <FiUser size={24} />
+                <p className="text-[12px] leading-none select-none">Käyttäjä</p>
+              </Menu.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 mt-1 text-lg origin-top-right divide-y rounded-md shadow-lg w-36 bg-bgSecondary divide-secondaryColor ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="px-1 py-1 ">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <NavLink
+                          to="/profiili"
+                          id="profileBtn"
+                          className={`${
+                            active
+                              ? "bg-primaryColor text-bgSecondary"
+                              : "text-textPrimary"
+                          } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                        >
+                          <FiUser size={20} />
+                          <p className={"text-[12px]"}>Profiili</p>
+                        </NavLink>
+                      )}
+                    </Menu.Item>
+                  </div>
+                  <div className="px-1 py-1">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={() => {
+                            logout();
+                          }}
+                          id="logoutBtn"
+                          className={`${
+                            active
+                              ? "bg-primaryColor text-bgSecondary"
+                              : "text-textPrimary"
+                          } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
+                        >
+                          <FiLogOut size={20} />
+                          <p className={"text-[12px]"}>Kirjaudu ulos</p>
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
           </div>
-
-          <NavLink
-            to="/tiedotteet/"
-            id="tiedotteetBtn"
-            className="flex flex-col items-center
-            gap-1 p-2 rounded-md
-            select-none 
-            hover:cursor-pointer hover:bg-bgGray
-            relative"
-          >
-            <FiInbox size={24} />
-
-            <p className="text-[12px] leading-none">Tiedotteet</p>
-            <UnreadNewsIndicator type="desktop" />
-          </NavLink>
-
-          {/* Profile button */}
-          <Menu as="div" className="relative text-textPrimary">
-            <Menu.Button
-              className="flex flex-col items-center gap-1 p-2 rounded-md select-none hover:cursor-pointer hover:bg-bgGray"
-              id="userMenuBtn"
-            >
-              <FiUser size={24} />
-              <p className="text-[12px] leading-none select-none">Käyttäjä</p>
-            </Menu.Button>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <Menu.Items className="absolute right-0 mt-1 text-lg origin-top-right divide-y rounded-md shadow-lg w-36 bg-bgSecondary divide-secondaryColor ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className="px-1 py-1 ">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <NavLink
-                        to="/profiili"
-                        id="profileBtn"
-                        className={`${
-                          active
-                            ? "bg-primaryColor text-bgSecondary"
-                            : "text-textPrimary"
-                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
-                      >
-                        <FiUser size={20} />
-                        <p className={"text-[12px]"}>Profiili</p>
-                      </NavLink>
-                    )}
-                  </Menu.Item>
-                </div>
-                <div className="px-1 py-1">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <button
-                        onClick={() => {
-                          logout();
-                        }}
-                        id="logoutBtn"
-                        className={`${
-                          active
-                            ? "bg-primaryColor text-bgSecondary"
-                            : "text-textPrimary"
-                        } group flex rounded-md items-center gap-2 w-full px-2 py-2`}
-                      >
-                        <FiLogOut size={20} />
-                        <p className={"text-[12px]"}>Kirjaudu ulos</p>
-                      </button>
-                    )}
-                  </Menu.Item>
-                </div>
-              </Menu.Items>
-            </Transition>
-          </Menu>
-        </div>
-      </header>
+        </header>
       </div>
       {/* header for mobile */}
 

@@ -33,7 +33,7 @@ const generateFakeJournal_entries = (id) => {
   const created = faker.date.recent({ days: 500 });
   return {
     user_id: id,
-    entry_type_id: faker.number.int({ min: 1, max: 3 }),
+    entry_type_id: 1,
     workout_type_id: faker.number.int({ min: 1, max: 3 }),
     workout_category_id: faker.number.int({ min: 1, max: 3 }),
     time_of_day_id: faker.number.int({ min: 1, max: 3 }),
@@ -49,7 +49,7 @@ const generateFakeJournal_entries = (id) => {
 const generateFakeUsers = (count) => {
   const users = { users: [], students: [], entries: [] };
   for (let i = 0; i < count; i++) {
-    const id = i + 30;
+    const id = i + 300;
     users.users.push(generateFakeUser(id));
     users.students.push(generateFakeStudent(id));
     for (let j = 0; j < 800; j++) {

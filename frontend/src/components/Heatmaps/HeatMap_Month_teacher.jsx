@@ -1,29 +1,23 @@
 import {
-  addMonths,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
-  isSameDay,
   isSameMonth,
   isToday,
-  startOfDay,
   startOfMonth,
   startOfWeek,
-  subMonths,
 } from "date-fns";
 import { useMemo } from "react";
-import { useSwipeable } from "react-swipeable";
+
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
-import { useMainContext } from "../../hooks/mainContext";
+
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 //import { FootballSoccerBall } from "@vectopus/atlas-icons-react";
 
-function HeatMap_Month({ journal }) {
-  const { showDate, setShowDate } = useMainContext();
-  const { setTooltipContent, setTooltipUser, setTooltipDate } =
-    useHeatmapContext();
+function HeatMap_Month_Teacher({ journal, showDate }) {
+  const { setTooltipContent, setTooltipDate } = useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
 
   // create an array for the month
@@ -35,25 +29,13 @@ function HeatMap_Month({ journal }) {
     return eachDayOfInterval({ start: firstWeekStart, end: lastWeekEnd });
   }, [showDate]);
 
-  const handlers = useSwipeable({
-    onSwipedLeft: () => {
-      setShowDate(startOfDay(addMonths(showDate, 1)));
-    },
-    onSwipedRight: () => {
-      setShowDate(startOfDay(subMonths(showDate, 1)));
-    },
-  });
-
   const handleClick = (dayJournal, day) => {
     setTooltipDate(day);
     setTooltipContent(dayJournal);
   };
 
   return (
-    <div
-      {...handlers}
-      className="MonthGrid max-w-[600px] w-full h-full pt-6 gap-1"
-    >
+    <div className="MonthGrid max-w-[600px] w-full h-full pt-6 gap-1">
       {calendarDays.map((day, index) => {
         const dayJournal = journal?.filter((journalEntry) => {
           const journalDate = new Date(journalEntry.date);
@@ -129,4 +111,4 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
   );
 }
 
-export default HeatMap_Month;
+export default HeatMap_Month_Teacher;

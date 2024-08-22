@@ -96,6 +96,11 @@ export default defineConfig({
         changeOrigin: true,
       },
 
+      "/students/paginated": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+
       "/students/archive": {
         target: "http://localhost:3001",
         changeOrigin: true,
@@ -131,52 +136,3 @@ export default defineConfig({
     },
   },
 });
-
-const manifestForPWAPlugIn = {
-  includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
-  registerType: "autoUpdate",
-  manifest: {
-    name: "Urheilupäiväkirja",
-    short_name: "U-päiväkirja",
-    description: "Sivu urheilusuoritusten kirjaamiseen, sekä seurantaan",
-    icons: [
-      {
-        src: "/frontend/pwa/pwa-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "any",
-      },
-      {
-        src: "/frontend/pwa/pwa-512x512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any",
-      },
-      {
-        src: "pwa-maskable-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "pwa-maskable-512x512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
-      },
-    ],
-    devOptions: {
-      enabled: true,
-    },
-    client: {
-      installPrompt: true,
-    },
-
-    theme_color: "rgb(var(--color-primary))",
-    background_color: "rgb(var(--color-bg-primary))",
-    display: "standalone",
-    scope: "/",
-    start_url: "/",
-    orientation: "portrait",
-  },
-};

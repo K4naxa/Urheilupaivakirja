@@ -1,10 +1,9 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import publicService from "../../services/publicService.js";
-import { useMainContext } from "../../hooks/mainContext.jsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
-import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
+import HeatMap_Month_teacher from "../../components/Heatmaps/HeatMap_Month_teacher.jsx";
 import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
@@ -13,17 +12,19 @@ import { Tooltip } from "react-tooltip";
 import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
 import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
 
+import RenderFavouriteMark from "../../components/RenderFavouriteMark.jsx";
+
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { IconContext } from "react-icons/lib";
-import { TbPin, TbPinFilled, TbPinnedOff } from "react-icons/tb";
-
 
 import {
   addMonths,
   addWeeks,
   endOfWeek,
+  format,
   getWeek,
+  isSameYear,
   startOfWeek,
   subMonths,
   subWeeks,
@@ -36,41 +37,50 @@ import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSe
 import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
 import cc from "../../utils/cc.js";
 import trainingService from "../../services/trainingService.js";
+import { useToast } from "../../hooks/toast-messages/useToast.jsx";
 
 function TeacherHome() {
   const queryClient = useQueryClient();
-  const [showWeeks, setShowWeeks] = useState(true);
-  const [showMonths, setShowMonths] = useState(false);
-  const [showYears, setShowYears] = useState(false);
+  const { addToast } = useToast();
 
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  // Heatmaps for weeks, months and years in memoized components for performance
+  const HeatMap_Weeks_Memoized = React.memo(HeatMap_Weeks);
+  const HeatMap_Month_Memoized = React.memo(HeatMap_Month_teacher);
+  const HeatMap_Year_Memoized = React.memo(HeatMap_Year);
 
-  const [filteredStudents, setFilteredStudents] = useState([]);
+  // all States for the component to reduce the amount of rerenders on multiple state changes
+  const [state, setState] = useState({
+    viewDataHandled: false,
+    showWeeks: true,
+    showMonths: false,
+    showYears: false,
+    showMobileFilters: false,
+    showDate: new Date(),
+    filteredStudents: [],
+    selectedStudents: [],
+    selectedSports: [],
+    selectedCampuses: [],
+    selectedGroups: [],
+    selectedSorting: "default",
+    page: 1,
+    studentsPerPage: 28,
+    totalPages: 0,
+    viewableStudents: [],
+    viewableJournals: [],
+  });
 
-  const [selectedStudents, setSelectedStudents] = useState([]);
-  const [selectedSports, setSelectedSports] = useState([]);
-  const [selectedCampuses, setSelectedCampuses] = useState([]);
-  const [selectedGroups, setSelectedGroups] = useState([]);
-
-  const [selectedSorting, setSelectedSorting] = useState("default");
-
-  const { setShowDate } = useMainContext();
+  // all Students and their journals
+  const { data: StudentsList, isLoading: StudentsListLoading } = useQuery({
+    queryKey: ["StudentsList"],
+    queryFn: () => userService.getStudents(),
+    staleTime: 30 * 60 * 1000, //30 minutes
+  });
 
   // Course completion requirement for passing the course
   const { data: courseSegments } = useQuery({
     queryKey: ["courseSegments"],
     queryFn: () => trainingService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
-  });
-
-  // all Students and their journals
-  const {
-    data: studentsAndJournalsData,
-    isLoading: studentsAndJournalsDataLoading,
-  } = useQuery({
-    queryKey: ["studentsAndJournals"],
-    queryFn: () => userService.getStudentsAndEntries(),
-    staleTime: 30 * 60 * 1000, //30 minutes
   });
 
   // Only pinned students where the user id == pinner_user_id
@@ -81,7 +91,7 @@ function TeacherHome() {
   });
 
   // all  sports / campuses / student groups for filtering
-  const { data: optionsData } = useQuery({
+  const { data: optionsData, isLoading: optionsDataLoading } = useQuery({
     queryKey: ["options"],
     queryFn: () => publicService.getOptions(),
   });
@@ -91,35 +101,209 @@ function TeacherHome() {
     return { sports: [], student_groups: [], campuses: [] };
   }, [optionsData]);
 
+  // useEffect to update the view when the StudentsList or pinnedStudentsData changes
+  useEffect(() => {
+    if (StudentsList && pinnedStudentsData) {
+      handleViewUpdate(state);
+    }
+  }, [StudentsList, pinnedStudentsData]);
+
+  // Function to update the view based on the selected filters and sorting
+  // every new state change that effects the view is passed through this function
+  const handleViewUpdate = (newStates) => {
+    if (!StudentsList || !pinnedStudentsData) return;
+    console.log(newStates);
+
+    let newFilteredStudents = [...StudentsList];
+
+    // Apply Filters
+    if (newStates.selectedSports.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        newStates.selectedSports.some(
+          (sport) => sport.label === student.sport_name
+        )
+      );
+    }
+    if (newStates.selectedCampuses.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        newStates.selectedCampuses.some(
+          (campus) => campus.label === student.campus_name
+        )
+      );
+    }
+    if (newStates.selectedGroups.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        newStates.selectedGroups.some((group) => group.label === student.name)
+      );
+    }
+    if (newStates.selectedStudents.length > 0) {
+      newFilteredStudents = newFilteredStudents.filter((student) =>
+        newStates.selectedStudents.some(
+          (selected) => selected.value === student.user_id
+        )
+      );
+    }
+
+    // Apply Sorting
+    if (sortingFunctions[newStates.selectedSorting]) {
+      newFilteredStudents.sort(sortingFunctions[newStates.selectedSorting]);
+    }
+
+    // Pagination
+    const totalPages = Math.ceil(
+      newFilteredStudents.length / newStates.studentsPerPage
+    );
+    const indexOfLastStudent = newStates.page * newStates.studentsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - newStates.studentsPerPage;
+    const viewableStudents = newFilteredStudents.slice(
+      indexOfFirstStudent,
+      indexOfLastStudent
+    );
+
+    function areArraysEqual(arr1, arr2) {
+      if (arr1.length !== arr2.length) return false;
+      for (let i = 0; i < arr1.length; i++) {
+        if (JSON.stringify(arr1[i]) !== JSON.stringify(arr2[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Fetch Journal Data
+    const fetchJournals = async () => {
+      // Check if the students or year have changed
+      const hasStudentsChanged = !areArraysEqual(
+        newStates.viewableStudents,
+        viewableStudents
+      );
+      const hasYearChanged = !isSameYear(newStates.showDate, state.showDate);
+
+      // If either students or year have changed, refetch data
+      if (hasStudentsChanged || hasYearChanged) {
+        const requestedStudents = viewableStudents.map((student) => ({
+          ...student,
+          journal_entries: undefined,
+        }));
+
+        try {
+          const response = await userService.getPaginatedStudentsData(
+            requestedStudents,
+            newStates.showDate
+          );
+          return response;
+        } catch {
+          addToast("Tietojen hakeminen epäonnistui", { style: "error" });
+          return [];
+        }
+      } else {
+        // Return cached data if no changes
+        return newStates.viewableJournals;
+      }
+    };
+
+    // Fetch journals and update state
+    fetchJournals().then((viewableJournals) => {
+      setState({
+        ...newStates,
+        filteredStudents: newFilteredStudents,
+        totalPages,
+        viewDataHandled: true,
+        viewableStudents,
+        viewableJournals,
+      });
+    });
+  };
+
+  const handleFilterReset = () => {
+    handleViewUpdate({
+      ...state,
+      selectedStudents: [],
+      page: 1,
+      showDate: new Date(),
+      selectedSports: [],
+      selectedCampuses: [],
+      selectedGroups: [],
+      selectedSorting: "default",
+      showMobileFilters: false,
+    });
+  };
+
+  const RenderPaginationNav = () => {
+    const handlePrevPage = () => {
+      if (state.page > 1) {
+        handleViewUpdate({ ...state, page: state.page - 1 });
+        window.moveTo(0, 0);
+      }
+    };
+
+    const handleNextPage = () => {
+      if (state.page < state.totalPages) {
+        handleViewUpdate({ ...state, page: state.page + 1 });
+        window.moveTo(0, 0);
+      }
+    };
+
+    return (
+      <div className="flex items-center justify-center gap-4">
+        <button
+          className={cc(
+            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs p-2 px-3 w-auto"
+          )}
+          onClick={handlePrevPage}
+          disabled={state.page === 1}
+        >
+          Edellinen
+        </button>
+        <div className="">
+          <p className="text-textSecondary">
+            {state.page} / {state.totalPages}
+          </p>
+        </div>
+        <button
+          className={cc(
+            "Button bg-bgSecondary shadow-sm hover:border-hoverGray hover:bg-hoverDefault border-borderPrimary m-2 text-xs p-2 px-3 w-auto"
+          )}
+          onClick={handleNextPage}
+          disabled={state.page === state.totalPages}
+        >
+          Seuraava
+        </button>
+      </div>
+    );
+  };
+
   // Calculating available options for each filter type
   const availableOptions = useMemo(() => {
-    if (!studentsAndJournalsData) return;
+    if (!StudentsList) return;
 
     const getAvailableOptions = (filterType) => {
-      let newFilteredStudents = studentsAndJournalsData;
+      let newFilteredStudents = StudentsList;
 
-      if (filterType !== "students" && selectedStudents.length > 0) {
+      if (filterType !== "students" && state.selectedStudents.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((journal) =>
-          selectedStudents.some((student) => student.value === journal.user_id)
+          state.selectedStudents.some(
+            (student) => student.value === journal.user_id
+          )
         );
       }
-      if (filterType !== "sports" && selectedSports.length > 0) {
+      if (filterType !== "sports" && state.selectedSports.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedSports.some((sport) => sport.label === student.sport_name)
+          state.selectedSports.some(
+            (sport) => sport.label === student.sport_name
+          )
         );
       }
-      if (filterType !== "campuses" && selectedCampuses.length > 0) {
+      if (filterType !== "campuses" && state.selectedCampuses.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedCampuses.some(
+          state.selectedCampuses.some(
             (campus) => campus.label === student.campus_name
           )
         );
       }
-      if (filterType !== "groups" && selectedGroups.length > 0) {
+      if (filterType !== "groups" && state.selectedGroups.length > 0) {
         newFilteredStudents = newFilteredStudents.filter((student) =>
-          selectedGroups.some(
-            (group) => group.label === student.name
-          )
+          state.selectedGroups.some((group) => group.label === student.name)
         );
       }
 
@@ -164,11 +348,11 @@ function TeacherHome() {
       groups: formatOptions(availableGroupsCount),
     };
   }, [
-    selectedStudents,
-    selectedSports,
-    selectedCampuses,
-    selectedGroups,
-    studentsAndJournalsData,
+    state.selectedStudents,
+    state.selectedSports,
+    state.selectedCampuses,
+    state.selectedGroups,
+    StudentsList,
   ]);
 
   // Sorting function for students.
@@ -200,56 +384,10 @@ function TeacherHome() {
     group2: (a, b) => b.name.localeCompare(a.name),
     campus1: (a, b) => a.campus_name.localeCompare(b.campus_name),
     campus2: (a, b) => b.campus_name.localeCompare(a.campus_name),
-    progression1: (a, b) =>
-      countCourseProgression(b) - countCourseProgression(a),
-    progression2: (a, b) =>
-      countCourseProgression(a) - countCourseProgression(b),
+    progression1: (a, b) => b.total_entry_count - a.total_entry_count,
+    progression2: (a, b) => a.total_entry_count - b.total_entry_count,
   };
 
-  // filter and sort students based on selected filters
-  useEffect(() => {
-    if (!studentsAndJournalsData || !pinnedStudentsData) return;
-
-    let newFilteredStudents = [...studentsAndJournalsData];
-
-    if (selectedSports.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedSports.some((sport) => sport.label === student.sport_name)
-      );
-    }
-    if (selectedCampuses.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedCampuses.some((campus) => campus.label === student.campus_name)
-      );
-    }
-    if (selectedGroups.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedGroups.some((group) => group.label === student.name)
-      );
-    }
-    if (selectedStudents.length > 0) {
-      newFilteredStudents = newFilteredStudents.filter((student) =>
-        selectedStudents.some((selected) => selected.value === student.user_id)
-      );
-    }
-
-    if (sortingFunctions[selectedSorting]) {
-      newFilteredStudents.sort(sortingFunctions[selectedSorting]);
-    }
-
-    setFilteredStudents(newFilteredStudents);
-  }, [
-    selectedStudents,
-    selectedSports,
-    selectedCampuses,
-    selectedGroups,
-    studentsAndJournalsData,
-    pinnedStudentsData,
-    selectedSorting,
-    showMobileFilters,
-  ]);
-
-  const [tooltipContent, setTooltipContent] = useState(null);
   // renders Progression bar that is placed at the bottom of the parent element. Length of the bar is determined by the progression value. If progression is 100% the bar color is changed to bgExercise (green)
   const renderProgressionBar = ({ student }) => {
     if (!courseSegments) return null;
@@ -276,12 +414,15 @@ function TeacherHome() {
           );
           if (segmentProgression < 0) segmentProgression = 0;
 
-          const TooltipInfo = {
-            name: segment.name,
-            requirement: segment.value,
-            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
-            progression: Math.min(Math.max(segmentProgression, 0), 100),
-          };
+          const tooltipContent = `
+          <div class="flex flex-col gap-2 p-2 w-42">
+            <h3 class="font-bold text-center">${segment.name}</h3>
+            <span>Suoritettu: ${segmentProgression}%</span>
+            <span class="">
+              Merkinnät: ${Math.min(Math.max(unUsedEntires, 0), segment.value)} / ${segment.value}
+            </span>
+          </div>
+        `;
 
           // Reduce the total_entry_count by the segment's value
           unUsedEntires -= segment.value;
@@ -292,12 +433,7 @@ function TeacherHome() {
               className={cc(
                 "bottom-0 h-1 clickableCourseSegment rounded-xl hover:cursor-pointer"
               )}
-              onMouseEnter={() => {
-                setTooltipContent(TooltipInfo);
-              }}
-              onMouseLeave={() => {
-                setTooltipContent(null);
-              }}
+              data-tooltip-html={tooltipContent}
               style={{ width: `${segmentLength}%` }}
             >
               <div
@@ -314,73 +450,6 @@ function TeacherHome() {
     );
   };
 
-  const getSegmentTooltipContent = () => {
-    console.log(tooltipContent);
-    return (
-      <>
-        <div className="flex flex-col gap-2 p-2 w-42">
-          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
-          <span>Suoritettu: {tooltipContent.progression}%</span>
-          <span className="">
-            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
-            {tooltipContent.requirement}
-          </span>
-        </div>
-      </>
-    );
-  };
-
-  const renderFavouriteMark = (journal) => {
-    let isPinned = false;
-    if (pinnedStudentsData) {
-      isPinned = pinnedStudentsData.find(
-        (pinnedStudent) => pinnedStudent.pinned_user_id === journal.user_id
-      );
-    }
-  
-    const [hover, setHover] = useState(false);
-  
-    const handlePinClick = async () => {
-      if (isPinned) {
-        await userService.unpinStudent(journal.user_id).then(() => {
-          queryClient.invalidateQueries("pinnedStudents");
-        });
-      } else {
-        await userService.pinStudent(journal.user_id).then(() => {
-          queryClient.invalidateQueries("pinnedStudents");
-        });
-      }
-    };
-  
-    return (
-      <div
-        className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center cursor-pointer"
-        onClick={() => handlePinClick()}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-      >
-        {isPinned ? (
-          hover ? (
-            <TbPinnedOff
-              size={20}
-              className="text-primaryColor"
-            />
-          ) : (
-            <TbPinFilled
-              size={20}
-              className="text-primaryColor"
-            />
-          )
-        ) : (
-          <TbPin
-            size={20}
-            className="text-textPrimary opacity-10 hover:text-primaryColor hover:opacity-100"
-          />
-        )}
-      </div>
-    );
-  };
-
   const renderSortingSelect = () => {
     return (
       <div className="right-0 flex flex-col mt-4 lg:absolute md:mt-0">
@@ -390,9 +459,11 @@ function TeacherHome() {
         <select
           name="sorting"
           id="sortingSelect"
-          value={selectedSorting}
+          value={state.selectedSorting}
           className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
-          onChange={(e) => setSelectedSorting(e.target.value)}
+          onChange={(e) => {
+            handleViewUpdate({ ...state, selectedSorting: e.target.value });
+          }}
         >
           <option value="default">Oletus</option>
           <option value="name1">Nimi A-Ö</option>
@@ -404,39 +475,38 @@ function TeacherHome() {
           <option value="campus1">Toimipaikka A-Ö</option>
           <option value="campus2">Toimipaikka Ö-A</option>
 
-          <option value="progression1">Edistyminen ^</option>
-          <option value="progression2">Edistyminen vähiten</option>
+          <option value="progression1">Edistyminen laskeva</option>
+          <option value="progression2">Edistyminen nouseva</option>
         </select>
       </div>
     );
   };
 
   const RenderWeeks = ({ journals }) => {
-    console.log("journals", journals);
-    const { showDate, setShowDate } = useMainContext();
-
     if (journals?.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
       return (
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center w-full">
           {/* Date controls */}
           <div className="relative flex flex-col w-full mb-4 text-center">
-            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>{" "}
             <h2 className="text-textSecondary">
-              {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
+              {state.showDate.getFullYear()}
+            </h2>{" "}
+            <h2 className="text-textSecondary">
+              {formatDate(startOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
               })}
               {". "}
-              {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
+              {formatDate(startOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 month: "long",
               })}{" "}
               <span> - </span>
-              {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
+              {formatDate(endOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
               })}
               {". "}
-              {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
+              {formatDate(endOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 month: "long",
               })}
             </h2>
@@ -444,7 +514,10 @@ function TeacherHome() {
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
-                  setShowDate(subWeeks(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: subWeeks(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -453,11 +526,14 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl">{getWeek(showDate)}</p>
+              <p className="text-xl">{getWeek(state.showDate)}</p>
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
-                  setShowDate(addWeeks(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: addWeeks(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -470,16 +546,21 @@ function TeacherHome() {
             {renderSortingSelect()}
           </div>
           {/* Student list */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 justify-items-center lg:grid-cols-2">
             {journals?.map((journal) => {
-              // const progression = countCourseProgression(journal);
               return (
                 <div
                   key={journal.user_id}
-                  className="relative flex flex-col w-full p-2 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
+                  className="relative flex flex-col w-full max-w-lg p-2 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
-                  {renderFavouriteMark(journal)}
+                  {
+                    <RenderFavouriteMark
+                      journal={journal}
+                      queryClient={queryClient}
+                      pinnedStudentsData={pinnedStudentsData}
+                    />
+                  }
                   <div className="flex-col items-center justify-between gap-2">
                     <Link
                       to={`opiskelijat/${journal.user_id}`}
@@ -488,7 +569,10 @@ function TeacherHome() {
                       <p>{journal.first_name}</p>
                       <p>{journal.last_name}</p>
                     </Link>
-                    <HeatMap_Weeks journal={journal} />
+                    <HeatMap_Weeks_Memoized
+                      journal={journal}
+                      showDate={state.showDate}
+                    />
                   </div>
                   {/* Progress bar */}
                   {renderProgressionBar({ student: journal })}
@@ -501,20 +585,23 @@ function TeacherHome() {
   };
 
   const RenderMonths = ({ journals }) => {
-    const { showDate, setShowDate } = useMainContext();
-
     if (journals.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
       return (
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center w-full">
           <div className="relative flex flex-col mb-8 text-center">
-            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+            <h2 className="text-textSecondary">
+              {state.showDate.getFullYear()}
+            </h2>
             <div className="flex justify-center gap-4 hover:">
               <button
                 className="hover:underline"
                 onClick={() => {
-                  setShowDate(subMonths(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: subMonths(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -524,12 +611,15 @@ function TeacherHome() {
                 </IconContext.Provider>
               </button>
               <p className="w-24 text-xl">
-                {formatDate(showDate, { month: "long" })}
+                {formatDate(state.showDate, { month: "long" })}
               </p>
               <button
                 className="hover:fill-blue-500 hover:underline"
                 onClick={() => {
-                  setShowDate(addMonths(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: addMonths(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -549,7 +639,13 @@ function TeacherHome() {
                   className="relative flex flex-col w-64 gap-2 p-4 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
-                  {renderFavouriteMark(journal)}
+                  {
+                    <RenderFavouriteMark
+                      journal={journal}
+                      queryClient={queryClient}
+                      pinnedStudentsData={pinnedStudentsData}
+                    />
+                  }
                   <Link
                     to={`/opettaja/opiskelijat/${journal.user_id}`}
                     className="flex flex-col pt-2 "
@@ -558,7 +654,10 @@ function TeacherHome() {
                       {journal.first_name} {journal.last_name}
                     </p>
                   </Link>
-                  <HeatMap_Month journal={journal} />
+                  <HeatMap_Month_Memoized
+                    journal={journal}
+                    showDate={state.showDate}
+                  />
                   {renderProgressionBar({ student: journal })}
                 </div>
               );
@@ -570,29 +669,27 @@ function TeacherHome() {
 
   // RenderYears component
   const RenderYears = ({ journals }) => {
-    const { showDate, setShowDate } = useMainContext();
-
     const handlePreviousYearClick = (e) => {
       e.preventDefault();
-      const newDate = new Date(showDate);
+      const newDate = new Date(state.showDate);
       newDate.setFullYear(
-        showDate.getFullYear() - 1,
-        showDate.getMonth(),
-        showDate.getDate()
+        state.showDate.getFullYear() - 1,
+        state.showDate.getMonth(),
+        state.showDate.getDate()
       );
-      setShowDate(newDate);
+      handleViewUpdate({ ...state, showDate: newDate });
     };
 
     const handleNextYearClick = (e) => {
       e.preventDefault();
-      const newDate = new Date(showDate);
+      const newDate = new Date(state.showDate);
       newDate.setFullYear(
-        showDate.getFullYear() + 1,
-        showDate.getMonth(),
-        showDate.getDate()
+        state.showDate.getFullYear() + 1,
+        state.showDate.getMonth(),
+        state.showDate.getDate()
       );
 
-      setShowDate(newDate);
+      handleViewUpdate({ ...state, showDate: newDate });
     };
 
     if (journals.length === 0) {
@@ -608,7 +705,7 @@ function TeacherHome() {
               >
                 <FiChevronLeft />
               </button>
-              <p className="text-xl">{showDate.getFullYear()}</p>
+              <p className="text-xl">{state.showDate.getFullYear()}</p>
               <button
                 className="hover:text-primaryColor"
                 onClick={handleNextYearClick}
@@ -626,7 +723,13 @@ function TeacherHome() {
                   className="relative flex flex-col gap-2 p-4 overflow-hidden border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
-                  {renderFavouriteMark(journal)}
+                  {
+                    <RenderFavouriteMark
+                      journal={journal}
+                      queryClient={queryClient}
+                      pinnedStudentsData={pinnedStudentsData}
+                    />
+                  }
                   <div className="flex flex-wrap items-end gap-4 p-2 leading-none">
                     <Link
                       to={`/opettaja/opiskelijat/${journal.user_id}`}
@@ -638,14 +741,15 @@ function TeacherHome() {
                     <p className="text-textSecondary">
                       Toimipiste: {journal.campus_name}
                     </p>
-                    <p className="text-textSecondary">
-                      ryhmä: {journal.name}
-                    </p>
+                    <p className="text-textSecondary">ryhmä: {journal.name}</p>
                     <p className="flex text-textSecondary">
                       Laji: {journal.sport_name}
                     </p>
                   </div>
-                  <HeatMap_Year journal={journal} />
+                  <HeatMap_Year_Memoized
+                    journal={journal}
+                    showDate={state.showDate}
+                  />
                   {renderProgressionBar({ student: journal })}
                 </div>
               );
@@ -655,57 +759,54 @@ function TeacherHome() {
       );
   };
 
-  const handleFilterReset = useCallback(() => {
-    setSelectedStudents([]);
-    setSelectedSports([]);
-    setSelectedCampuses([]);
-    setSelectedGroups([]);
-    setShowDate(new Date());
-  }, [setShowDate]);
-
-  if (
-    studentsAndJournalsDataLoading ||
-    !optionsData ||
-    !pinnedStudentsData ||
-    !courseSegments
-  ) {
+  if ((optionsDataLoading, StudentsListLoading)) {
     return <LoadingScreen />;
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
         <TeacherHeatmapTooltip />
 
+        {/* filtering controls */}
         <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
           {/* Aika filtteri */}
           <div className="relative flex justify-center w-full text-sm">
             <div className="relative flex justify-center text-sm text-textSecondary">
               <p
                 onClick={() => {
-                  setShowWeeks(true);
-                  setShowMonths(false);
-                  setShowYears(false);
+                  setState({
+                    ...state,
+                    showWeeks: true,
+                    showMonths: false,
+                    showYears: false,
+                  });
                 }}
-                className={`cursor-pointer mx-2 ${showWeeks && "text-primaryColor border-b border-primaryColor"}`}
+                className={`cursor-pointer mx-2 ${state.showWeeks && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Viikko
               </p>
               <p
                 onClick={() => {
-                  setShowWeeks(false);
-                  setShowMonths(true);
-                  setShowYears(false);
+                  setState({
+                    ...state,
+                    showWeeks: false,
+                    showMonths: true,
+                    showYears: false,
+                  });
                 }}
-                className={`cursor-pointer mx-2 ${showMonths && "text-primaryColor border-b border-primaryColor"}`}
+                className={`cursor-pointer mx-2 ${state.showMonths && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Kuukausi
               </p>
               <p
                 onClick={() => {
-                  setShowWeeks(false);
-                  setShowMonths(false);
-                  setShowYears(true);
+                  setState({
+                    ...state,
+                    showWeeks: false,
+                    showMonths: false,
+                    showYears: true,
+                  });
                 }}
-                className={`cursor-pointer mx-2 ${showYears && "text-primaryColor border-b border-primaryColor"}`}
+                className={`cursor-pointer mx-2 ${state.showYears && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Vuosi
               </p>
@@ -714,27 +815,27 @@ function TeacherHome() {
 
           <div className="flex-wrap items-center justify-center hidden w-full gap-2 text-sm lg:flex lg:gap-8">
             <StudentMultiSelect
-              studentArray={studentsAndJournalsData}
-              selectedStudents={selectedStudents}
-              setSelectedStudents={setSelectedStudents}
-              filter={selectedStudents}
+              studentArray={StudentsList}
+              state={state}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
+              filter={state.selectedStudents}
             />
             <SportsMultiSelect
               sportsArray={options.sports}
-              selectedSports={selectedSports}
-              setSelectedSports={setSelectedSports}
+              state={state}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               availableSports={availableOptions.sports}
             />
             <CampusMultiSelect
               campusArray={options.campuses}
-              selectedCampuses={selectedCampuses}
-              setSelectedCampuses={setSelectedCampuses}
+              state={state}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               availableCampuses={availableOptions.campuses}
             />
             <GroupMultiSelect
               groupArray={options.student_groups}
-              selectedGroups={selectedGroups}
-              setSelectedGroups={setSelectedGroups}
+              state={state}
+              handleViewUpdate={(newState) => handleViewUpdate(newState)}
               availableGroups={availableOptions.groups}
             />
 
@@ -753,41 +854,46 @@ function TeacherHome() {
             <div
               className="flex items-center justify-center w-full gap-8 py-2 border-b cursor-pointer select-none text-textSecondary border-borderPrimary"
               onClick={() => {
-                setShowMobileFilters(!showMobileFilters);
+                setState({
+                  ...state,
+                  showMobileFilters: !state.showMobileFilters,
+                });
               }}
             >
-              {showMobileFilters ? "Piilota suodattimet" : "Näytä suodattimet"}
-              {showMobileFilters ? <FiChevronUp /> : <FiChevronDown />}
+              {state.showMobileFilters
+                ? "Piilota suodattimet"
+                : "Näytä suodattimet"}
+              {state.showMobileFilters ? <FiChevronUp /> : <FiChevronDown />}
             </div>
 
-            {showMobileFilters && (
+            {state.showMobileFilters && (
               <div
                 className={cc(
                   "grid lg:hidden w-full items-center gap-2 lg:gap-8"
                 )}
               >
                 <StudentMultiSelect
-                  studentArray={studentsAndJournalsData}
-                  selectedStudents={selectedStudents}
-                  setSelectedStudents={setSelectedStudents}
-                  filter={selectedStudents}
+                  studentArray={StudentsList}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
+                  filter={state.selectedStudents}
                 />
                 <SportsMultiSelect
                   sportsArray={options.sports}
-                  selectedSports={selectedSports}
-                  setSelectedSports={setSelectedSports}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   availableSports={availableOptions.sports}
                 />
                 <CampusMultiSelect
                   campusArray={options.campuses}
-                  selectedCampuses={selectedCampuses}
-                  setSelectedCampuses={setSelectedCampuses}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   availableCampuses={availableOptions.campuses}
                 />
                 <GroupMultiSelect
                   groupArray={options.student_groups}
-                  selectedGroups={selectedGroups}
-                  setSelectedGroups={setSelectedGroups}
+                  state={state}
+                  handleViewUpdate={(newState) => handleViewUpdate(newState)}
                   availableGroups={availableOptions.groups}
                 />
 
@@ -804,15 +910,27 @@ function TeacherHome() {
           </div>
         </div>
 
-        {/* student list */}
-        <div
-          id="studentList"
-          className="flex justify-center w-full gap-8 p-4 border rounded-md bg-bgSecondary border-borderPrimary"
-        >
-          {showWeeks && <RenderWeeks journals={filteredStudents} />}
-          {showMonths && <RenderMonths journals={filteredStudents} />}
-          {showYears && <RenderYears journals={filteredStudents} />}
-        </div>
+        {state.viewDataHandled && courseSegments ? (
+          <div className="w-full p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+            <div id="studentList" className="flex justify-center w-full gap-8">
+              {state.showWeeks && (
+                <RenderWeeks journals={state.viewableJournals} />
+              )}
+              {state.showMonths && (
+                <RenderMonths journals={state.viewableJournals} />
+              )}
+              {state.showYears && (
+                <RenderYears journals={state.viewableJournals} />
+              )}
+            </div>
+            <div className="mx-auto my-8">{RenderPaginationNav()}</div>
+          </div>
+        ) : (
+          <div className="w-full border rounded-md h-fit bg-bgSecondary border-borderPrimary">
+            <LoadingScreen />
+          </div>
+        )}
+
         <Tooltip
           id="segment-tooltip"
           anchorSelect=".clickableCourseSegment"
@@ -826,9 +944,7 @@ function TeacherHome() {
             color: "rgb(var(--color-text-primary))",
             padding: "0.5rem",
           }}
-        >
-          {tooltipContent && getSegmentTooltipContent()}
-        </Tooltip>
+        />
       </div>
     );
 }

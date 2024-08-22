@@ -87,16 +87,20 @@ const resetPassword = async (email, resetToken, newPassword) => {
 };
 
 const verifyPassword = async (password) => {
-  const response = await axios.post("/user/verify-password", { password }, makeHeader());
+  const response = await axios.post(
+    "/user/verify-password",
+    { password },
+    makeHeader()
+  );
   if (response.status === 200) {
     return true;
   }
-}
+};
 
 // User Controls -------------------------------------------------------------------
 
 const deleteUserSelf = async (password) => {
-  const response = await axios.post("/user/self", {password}, makeHeader());
+  const response = await axios.post("/user/self", { password }, makeHeader());
   return response.data;
 };
 
@@ -149,10 +153,6 @@ const getStudents = async () => {
 
 const getStudentData = async (userId) => {
   const response = await axios.get(`/students/data/${userId}`, makeHeader());
-  return response.data;
-};
-const getStudentsAndEntries = async () => {
-  const response = await axios.get("/students/entries", makeHeader());
   return response.data;
 };
 
@@ -265,7 +265,15 @@ const getProfileData = async () => {
   return response.data;
 };
 
-// Spectator Management -------------------------------------------------------------------
+// pagination teacher front page -------------------------------------------------------------------
+const getPaginatedStudentsData = async (students, showDate) => {
+  const response = await axios.post(
+    `/students/paginated/`,
+    { students, showDate },
+    makeHeader()
+  );
+  return response.data;
+};
 
 export default {
   login,
@@ -274,7 +282,6 @@ export default {
   verifyStudent,
   deleteUser,
   getStudents,
-  getStudentsAndEntries,
   toggleStudentArchive,
   getArchivedStudents,
   createEmailVerificationOTP,
@@ -298,6 +305,7 @@ export default {
   verifyStudentGroup,
   deleteUserSelf,
   deleteTeacher,
-  verifyPassword
+  verifyPassword,
+  getPaginatedStudentsData,
 };
 // Path: frontEnd/src/services/userService.js

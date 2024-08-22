@@ -5,21 +5,17 @@ import {
   eachWeekOfInterval,
   endOfDay,
   endOfWeek,
-  isSameDay,
   isToday,
   startOfDay,
   startOfWeek,
 } from "date-fns";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
-import { useMainContext } from "../../hooks/mainContext";
 import { useAuth } from "../../hooks/useAuth";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
-function HeatMap_Weeks({ journal }) {
-  const { showDate } = useMainContext();
-  const { setTooltipContent, setTooltipUser, setTooltipDate } =
-    useHeatmapContext();
+function HeatMap_Weeks({ journal, showDate }) {
+  const { setTooltipContent, setTooltipDate } = useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
 
   let calendarWeeks = useMemo(() => {
@@ -44,12 +40,9 @@ function HeatMap_Weeks({ journal }) {
     return newCalendar;
   }, [calendarWeeks]);
 
-  const handleClick = (day) => {
-    const dayEntries = journal.filter((entry) =>
-      isSameDay(new Date(entry.date), day)
-    );
+  const handleClick = (dayJournal, day) => {
     setTooltipDate(day);
-    setTooltipContent(dayEntries);
+    setTooltipContent(dayJournal);
   };
 
   return (
@@ -57,17 +50,25 @@ function HeatMap_Weeks({ journal }) {
       {calendar.map((week, index) => (
         <div key={index}>
           <div className="grid grid-cols-7 gap-1">
-            {week.map((day) => (
-              <CalendarDay
-                key={day.getTime()}
-                day={day}
-                showDate={showDate}
-                journal={journal?.filter((journal) =>
-                  isSameDay(journal.date, day)
-                )}
-                onClick={() => handleClick(day)}
-              />
-            ))}
+            {week.map((day) => {
+              const dayJournal = journal?.filter((journalEntry) => {
+                const journalDate = new Date(journalEntry.date);
+                return (
+                  journalDate.getDate() === day.getDate() &&
+                  journalDate.getMonth() === day.getMonth() &&
+                  journalDate.getFullYear() === day.getFullYear()
+                );
+              });
+              return (
+                <CalendarDay
+                  key={day.getTime()}
+                  day={day}
+                  showDate={showDate}
+                  journal={dayJournal}
+                  onClick={() => handleClick(dayJournal, day)}
+                />
+              );
+            })}
           </div>
         </div>
       ))}
@@ -76,8 +77,14 @@ function HeatMap_Weeks({ journal }) {
 }
 function CalendarDay({ day, journal, onClick }) {
   const { user } = useAuth();
-  let minutes = 0;
-  journal?.forEach((entry) => (minutes += entry.length_in_minutes));
+  const minutes = useMemo(
+    () => journal?.reduce((acc, entry) => acc + entry.length_in_minutes, 0),
+    [journal]
+  );
+  const memoizedColor = useMemo(
+    () => handleColor(minutes),
+    [day, journal, minutes]
+  );
 
   function handleColor(minutes) {
     if (!journal) return;
@@ -103,7 +110,7 @@ function CalendarDay({ day, journal, onClick }) {
         "MonthDate border-borderPrimary border w-5 lg:w-7 clickableCalendarDay",
         user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-primaryColor",
-        handleColor(minutes)
+        memoizedColor
       )}
       onClick={onClick}
     >
