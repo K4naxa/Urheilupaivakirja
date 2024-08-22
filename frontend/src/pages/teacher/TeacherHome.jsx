@@ -1,10 +1,9 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import publicService from "../../services/publicService.js";
-import { useMainContext } from "../../hooks/mainContext.jsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
-import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month.jsx";
+import HeatMap_Month_teacher from "../../components/Heatmaps/HeatMap_Month_teacher.jsx";
 import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
@@ -23,8 +22,8 @@ import {
   addMonths,
   addWeeks,
   endOfWeek,
+  format,
   getWeek,
-  getYear,
   isSameYear,
   startOfWeek,
   subMonths,
@@ -43,20 +42,20 @@ import { useToast } from "../../hooks/toast-messages/useToast.jsx";
 function TeacherHome() {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { showDate } = useMainContext();
 
   // Heatmaps for weeks, months and years in memoized components for performance
   const HeatMap_Weeks_Memoized = React.memo(HeatMap_Weeks);
-  const HeatMap_Month_Memoized = React.memo(HeatMap_Month);
+  const HeatMap_Month_Memoized = React.memo(HeatMap_Month_teacher);
   const HeatMap_Year_Memoized = React.memo(HeatMap_Year);
 
   // all States for the component to reduce the amount of rerenders on multiple state changes
   const [state, setState] = useState({
+    viewDataHandled: false,
     showWeeks: true,
     showMonths: false,
     showYears: false,
     showMobileFilters: false,
-    previousShowDate: showDate,
+    showDate: new Date(),
     filteredStudents: [],
     selectedStudents: [],
     selectedSports: [],
@@ -102,12 +101,15 @@ function TeacherHome() {
     return { sports: [], student_groups: [], campuses: [] };
   }, [optionsData]);
 
+  // useEffect to update the view when the StudentsList or pinnedStudentsData changes
   useEffect(() => {
     if (StudentsList && pinnedStudentsData) {
       handleViewUpdate(state);
     }
-  }, [StudentsList, pinnedStudentsData, showDate]);
+  }, [StudentsList, pinnedStudentsData]);
 
+  // Function to update the view based on the selected filters and sorting
+  // every new state change that effects the view is passed through this function
   const handleViewUpdate = (newStates) => {
     if (!StudentsList || !pinnedStudentsData) return;
     console.log(newStates);
@@ -170,14 +172,15 @@ function TeacherHome() {
 
     // Fetch Journal Data
     const fetchJournals = async () => {
-      if (viewableStudents.length > 0) {
-        if (
-          isSameYear(newStates.previousShowDate, showDate) &&
-          areArraysEqual(newStates.viewableStudents, viewableStudents)
-        ) {
-          return newStates.viewableJournals;
-        }
+      // Check if the students or year have changed
+      const hasStudentsChanged = !areArraysEqual(
+        newStates.viewableStudents,
+        viewableStudents
+      );
+      const hasYearChanged = !isSameYear(newStates.showDate, state.showDate);
 
+      // If either students or year have changed, refetch data
+      if (hasStudentsChanged || hasYearChanged) {
         const requestedStudents = viewableStudents.map((student) => ({
           ...student,
           journal_entries: undefined,
@@ -186,26 +189,28 @@ function TeacherHome() {
         try {
           const response = await userService.getPaginatedStudentsData(
             requestedStudents,
-            showDate
+            newStates.showDate
           );
           return response;
         } catch {
           addToast("Tietojen hakeminen epäonnistui", { style: "error" });
           return [];
         }
+      } else {
+        // Return cached data if no changes
+        return newStates.viewableJournals;
       }
-
-      return [];
     };
 
+    // Fetch journals and update state
     fetchJournals().then((viewableJournals) => {
       setState({
         ...newStates,
         filteredStudents: newFilteredStudents,
         totalPages,
+        viewDataHandled: true,
         viewableStudents,
         viewableJournals,
-        previousShowDate: showDate,
       });
     });
   };
@@ -214,6 +219,8 @@ function TeacherHome() {
     handleViewUpdate({
       ...state,
       selectedStudents: [],
+      page: 1,
+      showDate: new Date(),
       selectedSports: [],
       selectedCampuses: [],
       selectedGroups: [],
@@ -226,12 +233,14 @@ function TeacherHome() {
     const handlePrevPage = () => {
       if (state.page > 1) {
         handleViewUpdate({ ...state, page: state.page - 1 });
+        window.moveTo(0, 0);
       }
     };
 
     const handleNextPage = () => {
       if (state.page < state.totalPages) {
         handleViewUpdate({ ...state, page: state.page + 1 });
+        window.moveTo(0, 0);
       }
     };
 
@@ -474,30 +483,30 @@ function TeacherHome() {
   };
 
   const RenderWeeks = ({ journals }) => {
-    const { showDate, setShowDate } = useMainContext();
-
     if (journals?.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
       return (
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center w-full">
           {/* Date controls */}
           <div className="relative flex flex-col w-full mb-4 text-center">
-            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>{" "}
             <h2 className="text-textSecondary">
-              {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
+              {state.showDate.getFullYear()}
+            </h2>{" "}
+            <h2 className="text-textSecondary">
+              {formatDate(startOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
               })}
               {". "}
-              {formatDate(startOfWeek(showDate, { weekStartsOn: 1 }), {
+              {formatDate(startOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 month: "long",
               })}{" "}
               <span> - </span>
-              {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
+              {formatDate(endOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 day: "numeric",
               })}
               {". "}
-              {formatDate(endOfWeek(showDate, { weekStartsOn: 1 }), {
+              {formatDate(endOfWeek(state.showDate, { weekStartsOn: 1 }), {
                 month: "long",
               })}
             </h2>
@@ -505,7 +514,10 @@ function TeacherHome() {
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
-                  setShowDate(subWeeks(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: subWeeks(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -514,11 +526,14 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl">{getWeek(showDate)}</p>
+              <p className="text-xl">{getWeek(state.showDate)}</p>
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
-                  setShowDate(addWeeks(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: addWeeks(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -554,7 +569,10 @@ function TeacherHome() {
                       <p>{journal.first_name}</p>
                       <p>{journal.last_name}</p>
                     </Link>
-                    <HeatMap_Weeks_Memoized journal={journal} />
+                    <HeatMap_Weeks_Memoized
+                      journal={journal}
+                      showDate={state.showDate}
+                    />
                   </div>
                   {/* Progress bar */}
                   {renderProgressionBar({ student: journal })}
@@ -567,20 +585,23 @@ function TeacherHome() {
   };
 
   const RenderMonths = ({ journals }) => {
-    const { showDate, setShowDate } = useMainContext();
-
     if (journals.length === 0) {
       return <div className="flex justify-center w-full">Ei hakutuloksia</div>;
     } else
       return (
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center w-full">
           <div className="relative flex flex-col mb-8 text-center">
-            <h2 className="text-textSecondary">{showDate.getFullYear()}</h2>
+            <h2 className="text-textSecondary">
+              {state.showDate.getFullYear()}
+            </h2>
             <div className="flex justify-center gap-4 hover:">
               <button
                 className="hover:underline"
                 onClick={() => {
-                  setShowDate(subMonths(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: subMonths(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -590,12 +611,15 @@ function TeacherHome() {
                 </IconContext.Provider>
               </button>
               <p className="w-24 text-xl">
-                {formatDate(showDate, { month: "long" })}
+                {formatDate(state.showDate, { month: "long" })}
               </p>
               <button
                 className="hover:fill-blue-500 hover:underline"
                 onClick={() => {
-                  setShowDate(addMonths(showDate, 1));
+                  handleViewUpdate({
+                    ...state,
+                    showDate: addMonths(state.showDate, 1),
+                  });
                 }}
               >
                 <IconContext.Provider
@@ -630,7 +654,10 @@ function TeacherHome() {
                       {journal.first_name} {journal.last_name}
                     </p>
                   </Link>
-                  <HeatMap_Month_Memoized journal={journal} />
+                  <HeatMap_Month_Memoized
+                    journal={journal}
+                    showDate={state.showDate}
+                  />
                   {renderProgressionBar({ student: journal })}
                 </div>
               );
@@ -642,29 +669,27 @@ function TeacherHome() {
 
   // RenderYears component
   const RenderYears = ({ journals }) => {
-    const { showDate, setShowDate } = useMainContext();
-
     const handlePreviousYearClick = (e) => {
       e.preventDefault();
-      const newDate = new Date(showDate);
+      const newDate = new Date(state.showDate);
       newDate.setFullYear(
-        showDate.getFullYear() - 1,
-        showDate.getMonth(),
-        showDate.getDate()
+        state.showDate.getFullYear() - 1,
+        state.showDate.getMonth(),
+        state.showDate.getDate()
       );
-      setShowDate(newDate);
+      handleViewUpdate({ ...state, showDate: newDate });
     };
 
     const handleNextYearClick = (e) => {
       e.preventDefault();
-      const newDate = new Date(showDate);
+      const newDate = new Date(state.showDate);
       newDate.setFullYear(
-        showDate.getFullYear() + 1,
-        showDate.getMonth(),
-        showDate.getDate()
+        state.showDate.getFullYear() + 1,
+        state.showDate.getMonth(),
+        state.showDate.getDate()
       );
 
-      setShowDate(newDate);
+      handleViewUpdate({ ...state, showDate: newDate });
     };
 
     if (journals.length === 0) {
@@ -680,7 +705,7 @@ function TeacherHome() {
               >
                 <FiChevronLeft />
               </button>
-              <p className="text-xl">{showDate.getFullYear()}</p>
+              <p className="text-xl">{state.showDate.getFullYear()}</p>
               <button
                 className="hover:text-primaryColor"
                 onClick={handleNextYearClick}
@@ -721,7 +746,10 @@ function TeacherHome() {
                       Laji: {journal.sport_name}
                     </p>
                   </div>
-                  <HeatMap_Year_Memoized journal={journal} />
+                  <HeatMap_Year_Memoized
+                    journal={journal}
+                    showDate={state.showDate}
+                  />
                   {renderProgressionBar({ student: journal })}
                 </div>
               );
@@ -882,8 +910,8 @@ function TeacherHome() {
           </div>
         </div>
 
-        <div className="w-full p-4 border rounded-md bg-bgSecondary border-borderPrimary">
-          {state.viewableJournals && pinnedStudentsData && courseSegments ? (
+        {state.viewDataHandled && courseSegments ? (
+          <div className="w-full p-4 border rounded-md bg-bgSecondary border-borderPrimary">
             <div id="studentList" className="flex justify-center w-full gap-8">
               {state.showWeeks && (
                 <RenderWeeks journals={state.viewableJournals} />
@@ -895,11 +923,14 @@ function TeacherHome() {
                 <RenderYears journals={state.viewableJournals} />
               )}
             </div>
-          ) : (
+            <div className="mx-auto my-8">{RenderPaginationNav()}</div>
+          </div>
+        ) : (
+          <div className="w-full border rounded-md h-fit bg-bgSecondary border-borderPrimary">
             <LoadingScreen />
-          )}
-          <div className="mx-auto my-8">{RenderPaginationNav()}</div>
-        </div>
+          </div>
+        )}
+
         <Tooltip
           id="segment-tooltip"
           anchorSelect=".clickableCourseSegment"

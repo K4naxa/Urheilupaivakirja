@@ -5,7 +5,6 @@ import {
   endOfMonth,
   endOfYear,
   format,
-  isSameDay,
   isSameMonth,
   isSameYear,
   isToday,
@@ -15,14 +14,12 @@ import {
 } from "date-fns";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
-import { useMainContext } from "../../hooks/mainContext";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
-export default function HeatMap_Year({ journal }) {
+export default function HeatMap_Year({ journal, showDate }) {
   if (journal.journal_entries) journal = journal.journal_entries;
 
   const { setTooltipContent, setTooltipDate } = useHeatmapContext();
-  const { showDate } = useMainContext();
 
   const journalMap = useMemo(() => {
     const map = new Map();

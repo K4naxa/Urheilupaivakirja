@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 import {
   addWeeks,
   eachDayOfInterval,
@@ -11,12 +11,10 @@ import {
 } from "date-fns";
 import cc from "../../utils/cc";
 import formatDate from "../../utils/formatDate";
-import { useMainContext } from "../../hooks/mainContext";
 import { useAuth } from "../../hooks/useAuth";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
-function HeatMap_Weeks({ journal }) {
-  const { showDate } = useMainContext();
+function HeatMap_Weeks({ journal, showDate }) {
   const { setTooltipContent, setTooltipDate } = useHeatmapContext();
   if (journal.journal_entries) journal = journal.journal_entries;
 
