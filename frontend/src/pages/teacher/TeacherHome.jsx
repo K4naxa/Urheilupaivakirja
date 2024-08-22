@@ -546,12 +546,12 @@ function TeacherHome() {
             {renderSortingSelect()}
           </div>
           {/* Student list */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 justify-items-center lg:grid-cols-2">
             {journals?.map((journal) => {
               return (
                 <div
                   key={journal.user_id}
-                  className="relative flex flex-col w-full p-2 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
+                  className="relative flex flex-col w-full max-w-lg p-2 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
                   {
