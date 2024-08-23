@@ -1,4 +1,4 @@
-const { generateFakeUsers } = require("../faker/generateFakeData");
+const { generateFakeUsers } = require("../../faker/generateFakeData");
 
 exports.seed = async function (knex) {
   const { users, students, entries } = generateFakeUsers(400);
