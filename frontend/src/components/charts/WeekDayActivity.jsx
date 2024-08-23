@@ -241,7 +241,7 @@ function WeekDayActivity({ journal }) {
           {selectedView === "Month" && <p className="label">{date_long}:</p>}
           {selectedView === "Year" && <p className="label">{label}:</p>}
 
-          <p className="intro">Treenattu {hours}h</p>
+          <p className="intro">Treenattu {Math.round(hours * 100) / 100}h</p>
         </div>
       );
     }
