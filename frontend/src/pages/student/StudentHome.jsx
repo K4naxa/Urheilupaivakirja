@@ -302,7 +302,10 @@ function StudentHome() {
             <p className="text-lg">Vuoden merkinnät</p>
           </div>
         </div>
-        <HeatMap_Year journal={studentData.journal_entries} />
+        <HeatMap_Year
+          journal={studentData.journal_entries}
+          showDate={showDate}
+        />
       </div>
 
       <Tooltip
