@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tooltip } from "react-tooltip";
 import { useState } from "react";
-import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
-import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
+import HeatMap_Month from "../../components/heatmaps/HeatMap_Month";
+import HeatMap_Year from "../../components/heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";

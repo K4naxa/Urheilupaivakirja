@@ -7,7 +7,7 @@ import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 
-import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
+import StudentMultiSelect from "../../../../components/multiselect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 
 const createStudentContainer = (student, handleArchive, handleDelete) => {

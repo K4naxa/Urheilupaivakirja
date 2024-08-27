@@ -1,15 +1,15 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
-import HeatMap_Month_teacher from "../../components/Heatmaps/HeatMap_Month_teacher.jsx";
-import HeatMap_Weeks from "../../components//Heatmaps/HeatMap_Weeks.jsx";
+import HeatMap_Year from "../../components/heatmaps/HeatMap_Year.jsx";
+import HeatMap_Month_teacher from "../../components/heatmaps/HeatMap_Month_teacher.jsx";
+import HeatMap_Weeks from "../../components//heatmaps/HeatMap_Weeks.jsx";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 
 import { Tooltip } from "react-tooltip";
 
-import StudentMultiSelect from "../../components/multiSelect-search/StudentMultiSelect.jsx";
-import SportsMultiSelect from "../../components/multiSelect-search/SportMultiSelect.jsx";
+import StudentMultiSelect from "../../components/multiselect-search/StudentMultiSelect.jsx";
+import SportsMultiSelect from "../../components/multiselect-search/SportMultiSelect.jsx";
 
 import RenderFavouriteMark from "../../components/RenderFavouriteMark.jsx";
 
@@ -36,8 +36,8 @@ import courseService from "../../services/courseService.js";
 import miscService from "../../services/miscService.js";
 
 import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
-import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSelect.jsx";
-import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
+import CampusMultiSelect from "../../components/multiselect-search/CampusMultiSelect.jsx";
+import GroupMultiSelect from "../../components/multiselect-search/GroupMultiSelect.jsx";
 import cc from "../../utils/cc.js";
 
 import { useToast } from "../../hooks/toast-messages/useToast.jsx";

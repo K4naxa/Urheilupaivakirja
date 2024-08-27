@@ -8,7 +8,7 @@ import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 import { FiUserPlus } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
-import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
+import StudentMultiSelect from "../../../../components/multiselect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 
 //TODO: Ryhmä not showing correctly in the UI
