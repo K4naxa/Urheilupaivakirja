@@ -1,12 +1,14 @@
 var express = require("express");
 var router = express.Router();
 
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
+
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
 // get all campuses with student count
-router.get("/", async (req, res, next) => {
+router.get("/", isAuthenticated, isTeacher, async (req, res) => {
   knex("campuses")
     .select("campuses.*")
     .leftJoin("students", "campuses.id", "students.campus_id")
@@ -24,15 +26,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // Add a new campus
-router.post("/", (req, res) => {
-  // Check for admin role
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to add campus");
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
-  }
-
+router.post("/", isAuthenticated, isTeacher, (req, res) => {
   let { name } = req.body;
 
   // Validate input
@@ -74,12 +68,7 @@ router.post("/", (req, res) => {
 });
 
 // edit a single campus by campus.id
-router.put("/:id", (req, res) => {
-  // for admin only (role 1)
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to edit a campus");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
 
   if (!req.body.name) {
     return res.status(400).json({ error: "Name is required" });
@@ -109,9 +98,7 @@ router.put("/:id", (req, res) => {
 });
 
 // check if the user is an admin and then delete the campus
-router.delete("/:id", (req, res, next) => {
-  if (getRole(req) !== 1)
-    return res.status(401).json({ error: "Unauthorized" });
+router.delete("/:id", isAuthenticated, isTeacher, (req, res, next) => {
 
   const { id } = req.params;
 

@@ -6,14 +6,10 @@ const { getRole } = require("../../utils/authMiddleware");
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware"); 
 
 
-router.get("/", async (req, res) => {
-  const role = getRole(req);
-
-  if (role !== 1) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+router.get("/", isAuthenticated, isTeacher, async (req, res) => {
 
   // get unverified students
   const getUnverifiedStudents = () => {

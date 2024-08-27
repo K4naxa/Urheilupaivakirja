@@ -5,55 +5,44 @@ const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
-const { getRole } = require("../../utils/authMiddleware");
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 
 // Get all sports
-router.get("/", (req, res, next) => {
-  knex("sports")
-    .select("sports.*")
-    .where("is_verified", 1)
-    .leftJoin("students", "sports.id", "students.sport_id")
-    .count("students.id as student_count")
-    .groupBy("sports.id")
-    .then((rows) => {
-      res.json(rows);
-    })
-    .catch((err) => {
-      console.log("Error fetching sports data:", err);
-      res.status(500).json({ error: err });
-    });
+router.get("/", isAuthenticated, isTeacher, async (req, res) => {
+  try {
+    const rows = await knex("sports")
+      .select("sports.*")
+      .where("is_verified", 1)
+      .leftJoin("students", "sports.id", "students.sport_id")
+      .count("students.id as student_count")
+      .groupBy("sports.id");
+
+    res.json(rows);
+  } catch (err) {
+    console.log("Error fetching sports data:", err);
+    res.status(500).json({ error: "Failed to fetch sports data" });
+  }
 });
 
 // Get a single sport by sport.id
-router.get("/:id", (req, res) => {
+router.get("/:id", isAuthenticated, isTeacher, async (req, res) => {
   const id = req.params.id;
-  knex("sports")
-    .select("*")
-    .where("id", "=", id)
-    .first()
-    .then((row) => {
-      if (row) {
-        res.json(row);
-      } else {
-        res.status(404).json({ message: "Sport not found" });
-      }
-    })
-    .catch((err) => {
-      console.log("SELECT (with ID) FROM `sports` failed", err);
-      res.status(500).json({ error: "Internal server error" });
-    });
+  try {
+    const row = await knex("sports").select("*").where("id", "=", id).first();
+
+    if (row) {
+      res.json(row);
+    } else {
+      res.status(404).json({ message: "Sport not found" });
+    }
+  } catch (err) {
+    console.log("SELECT (with ID) FROM `sports` failed", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Add a new sport
-router.post("/", (req, res) => {
-  // Check for admin role
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to add sport");
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
-  }
-
+router.post("/", isAuthenticated, isTeacher, async (req, res) => {
   let { name } = req.body;
 
   // Validate input
@@ -64,83 +53,61 @@ router.post("/", (req, res) => {
   // Trim the name
   name = name.trim();
 
-  // Check if sport already exists
-  knex("sports")
-    .where("name", "=", name)
-    .first()  // Using first() as we expect 0 or 1 row
-    .then((existingSport) => {
-      if (existingSport) {
-        return res.status(409).json({ error: "Sport already exists" });  // 409 conflict for duplicates
-      }
+  try {
+    // Check if sport already exists
+    const existingSport = await knex("sports").where("name", "=", name).first();
 
-      // Add sport
-      knex("sports")
-        .insert({ name: name, is_verified: 1 })
-        .then((insertedIds) => {
-          // Since MySQL doesn't support returning, fetch the sport after inserting
-          return knex("sports").where("id", "=", insertedIds[0]).first();
-        })
-        .then((newSport) => {
-          res.status(201).json(newSport);  // Returning the inserted sport details
-        })
-        .catch((err) => {
-          console.error("Error inserting sport:", err);
-          res.status(500).json({ error: "Internal server error" });
-        });
-    })
-    .catch((err) => {
-      console.error("Error checking existing sport:", err);
-      res.status(500).json({ error: "Internal server error" });
+    if (existingSport) {
+      return res.status(409).json({ error: "Sport already exists" }); // 409 Conflict for duplicates
+    }
+
+    // Add sport
+    const insertedIds = await knex("sports").insert({
+      name: name,
+      is_verified: 1,
     });
+
+    // Fetch the sport after inserting
+    const newSport = await knex("sports")
+      .where("id", "=", insertedIds[0])
+      .first();
+
+    res.status(201).json(newSport); // Returning the inserted sport details
+  } catch (err) {
+    console.error("Error in sport handling:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-
-
 // edit a single sport by sport.id
-router.put("/:id", (req, res) => {
-  // for admin only (role 1)
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to edit a sport");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
+router.put("/:id", isAuthenticated, isTeacher, async (req, res) => {
   if (!req.body.name) {
     return res.status(400).json({ error: "Name is required" });
   }
 
   const { id } = req.params;
   const updatedSport = {
-    name: req.body.name,
-    is_verified: 1,
+    name: req.body.name.trim(),
   };
 
-  knex("sports")
-    .where("id", id)
-    .update(updatedSport)
-    .then(updateCount => {
-      if (updateCount) {
-        res.status(200);
-        res.json({ message: `Sport with id ${id} updated` });
-      } else {
-        res.status(404).json({ error: "Sport not found" });
-      }
-    })
-    .catch(err => {
-      console.error("Error updating the sport:", err);
-      res.status(500).json({ error: "Internal server error" });
-    });
+  try {
+    const updateCount = await knex("sports")
+      .where("id", id)
+      .update(updatedSport);
+
+    if (updateCount) {
+      res.json({ message: `Sport with id ${id} updated` });
+    } else {
+      res.status(404).json({ error: "Sport not found" });
+    }
+  } catch (err) {
+    console.error("Error updating the sport:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-
 // delete a single sport by sport.id
-router.delete("/:id", (req, res, next) => {
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to delete sport");
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
-  }
-
+router.delete("/:id", isAuthenticated, isTeacher, (req, res, next) => {
   const id = req.params.id;
   knex("sports")
     .where("id", "=", id)
@@ -150,11 +117,9 @@ router.delete("/:id", (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === "ER_ROW_IS_REFERENCED_2") {
-        return res
-          .status(400)
-          .json({
-            error: "Laji ei voitu poistaa, koska laji sisältää oppilaita",
-          });
+        return res.status(400).json({
+          error: "Laji ei voitu poistaa, koska laji sisältää oppilaita",
+        });
       }
       console.log("Error deleting sport:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -162,27 +127,22 @@ router.delete("/:id", (req, res, next) => {
 });
 
 // Teacher verifies/activates sport by its ID
-router.put("/verify/:id", (req, res) => {
-  const role = getRole(req);
-  if (role !== 1) {
-    return res.status(401).json({ error: "Unauthorized" });
-  } else {
-    const sportId = req.params.id;
+router.put("/verify/:id", isAuthenticated, isTeacher, async (req, res) => {
+  const sportId = req.params.id;
 
-    knex("sports")
+  try {
+    const count = await knex("sports")
       .where("id", sportId)
-      .update({ is_verified: 1 }) // update is_verified to 1
-      .then((count) => {
-        if (count > 0) {
-          res.status(200).json({ message: "Sport verified" });
-        } else {
-          res.status(404).json({ error: "Sport not found" });
-        }
-      })
-      .catch((err) => {
-        console.error("Error verifying sport:", err); // Log the error
-        res.status(500).json({ error: "Failed to verify sport", details: err });
-      });
+      .update({ is_verified: 1 }); // update is_verified to 1
+
+    if (count > 0) {
+      res.status(200).json({ message: "Sport verified" });
+    } else {
+      res.status(404).json({ error: "Sport not found" });
+    }
+  } catch (err) {
+    console.error("Error verifying sport:", err); // Log the error
+    res.status(500).json({ error: "Failed to verify sport" });
   }
 });
 

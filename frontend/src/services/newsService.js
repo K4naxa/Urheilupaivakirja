@@ -2,13 +2,13 @@ import apiClient from "./apiClient";
 
 // get all news
 const getNews = async () => {
-  const response = await apiClient.get("/public/news");
+  const response = await apiClient.get("/news");
   return response.data;
 };
 
 // get unread news count
 const checkUnreadNews = async () => {
-  const response = await apiClient.get("/public/news/unread");
+  const response = await apiClient.get("/news/unread");
   return response.data;
 };
 

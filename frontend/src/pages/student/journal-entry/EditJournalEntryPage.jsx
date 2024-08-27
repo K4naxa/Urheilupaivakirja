@@ -97,8 +97,8 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     isLoading: journalEntriesDataLoading,
     isError: journalEntriesDataError,
   } = useQuery({
-    queryKey: ["studentJournal"],
-    queryFn: () => journalService.getAllUserJournalEntries(),
+    queryKey: ["studentData"],
+    queryFn: () => studentService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 

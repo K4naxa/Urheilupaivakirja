@@ -9,16 +9,16 @@ const frontendUrl = config.FRONTEND_URL;
 const bcrypt = require("bcryptjs");
 const saltRounds = config.BCRYPTSALT;
 const crypto = require("crypto");
+const { getUserFullName } = require("../../utils/library");
 
 const sendEmail = require("../../utils/email/sendEmail");
 const {
-  getRole,
-  createToken,
-  getUserFullName,
+  isAuthenticated,
+  isTeacher
 } = require("../../utils/authMiddleware");
 
 // Get all spectators
-router.get("/", async (req, res) => {
+router.get("/", isAuthenticated, isTeacher, async (req, res) => {
   try {
     // Check if user is admin
     if (getRole(req) !== 1) {
@@ -46,10 +46,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 // Admin invites a spectator
-router.post("/invite", async (req, res) => {
-  const role = getRole(req);
+router.post("/invite", isAuthenticated, isTeacher, async (req, res) => {
   const { email } = req.body;
   // check if user is admin
   if (role !== 1) {
@@ -88,7 +86,7 @@ router.post("/invite", async (req, res) => {
 
     var sendersName;
     try {
-      sendersName = await getUserFullName(req);
+      sendersName = await getUserFullName(req.user.user_id);
     } catch (error) {
       console.error("Failed to get full name:", error);
     }
@@ -209,7 +207,6 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-
 
 router.get("/invited", async (req, res) => {
   try {

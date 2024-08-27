@@ -10,6 +10,8 @@ const bcrypt = require('bcryptjs');
 
 
 const { createAccessToken, createRefreshToken, createTokens } = require('../../utils/token');
+const { isAuthenticated } = require('../../utils/authMiddleware');
+
 
 // user login
 router.post("/login", async (req, res, next) => {
@@ -85,13 +87,47 @@ router.post("/login", async (req, res, next) => {
     }
   });
 
-router.post('/logout', async (req, res) => {
+  router.post('/logout', isAuthenticated, (req, res) => {
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict'
+    });
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict'
+    });
+    res.status(200).json({ message: "Successfully logged out" });
+});
 
-})
+router.post('/logout/all', isAuthenticated, async (req, res) => {
+  try {
+      const user_id = req.user.user_id;
 
-router.post('/logout/all', async (req, res) => {
+      // invalidate existing refresh tokens by incrementing the token version
+      await knex('users')
+          .where('id', '=', user_id)
+          .increment('token_version', 1);
 
-})
+      res.clearCookie('refreshToken', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Strict'
+      });
+      res.clearCookie('accessToken', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Strict'
+      });
+
+      res.status(200).json({ message: "Successfully logged out from all devices" });
+  } catch (error) {
+      console.error("Error logging out from all devices:", error);
+      res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+});
+
 
 router.post('/refresh-access-token', async (req, res) => {
   const { refreshToken } = req.cookies;

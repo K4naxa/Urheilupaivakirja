@@ -11,10 +11,17 @@ const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const { getUserId } = require("../../utils/authMiddleware");
 
+const {
+  isAuthenticated,
+  isStudent,
+  isTeacher,
+  isTeacherOrSpectator,
+} = require("../../utils/authMiddleware");
+
 // "/" --------------------------------------------
 
 // Get all the dropdown options for journal entry modal (add/edit)
-router.get("/options", async (req, res, next) => {
+router.get("/options", isAuthenticated, async (req, res, next) => {
   try {
     const data = await Promise.all([
       knex("journal_entry_types").select("*"),
@@ -49,10 +56,11 @@ router.get("/options", async (req, res, next) => {
 
 // "/user" --------------------------------------------
 
+// TODO: REMOVE IF NOT USED
 // get all users own journal entries
-router.get("/user", async (req, res, next) => {
+router.get("/user", isAuthenticated, async (req, res, next) => {
   try {
-    const user_id = getUserId(req);
+    const user_id = req.user.user_id;
     const rows = await knex("journal_entries")
       .select(
         "journal_entries.*",
@@ -97,7 +105,8 @@ router.get("/user", async (req, res, next) => {
 });
 
 //get all user journals by id for Teacher
-router.get("/user/:id", async (req, res, next) => {
+// TODO: Remove if not used
+router.get("/user/:id", isAuthenticated, isTeacher, async (req, res, next) => {
   const user_id = req.params.id;
   try {
     // Get all journal entries along with related information
@@ -181,6 +190,7 @@ router.get("/user/:id", async (req, res, next) => {
 });
 
 //get all users own journal entries by date
+// TODO: Remove if not used. Else add middleware
 router.get("/user/:date", async (req, res, next) => {
   const date = req.params.date;
   const user_id = getUserId(req);
@@ -199,10 +209,10 @@ router.get("/user/:date", async (req, res, next) => {
 // "/entry/" --------------------------------------------
 
 // Post a new journal entry
-router.post("/entry/", async (req, res, next) => {
+router.post("/entry/", isAuthenticated, isStudent, async (req, res, next) => {
   const entry = req.body;
 
-  entry.user_id = getUserId(req);
+  entry.user_id = req.user.user_id;
 
   entry.created_at = new Date();
 
@@ -274,7 +284,8 @@ router.post("/entry/", async (req, res, next) => {
 });
 
 // Get a single journal entry by journal_entry.id
-router.get("/:id", async (req, res, next) => {
+// TODO: Remove if not used
+router.get("/:id", isAuthenticated, async (req, res, next) => {
   const id = req.params.id;
   try {
     const data = await knex("journal_entries")
@@ -305,7 +316,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.put("/entry/:id", async (req, res, next) => {
+router.put("/entry/:id", isAuthenticated, isStudent, async (req, res, next) => {
   const id = req.params.id;
   const entry = req.body;
 
@@ -324,11 +335,18 @@ router.put("/entry/:id", async (req, res, next) => {
         return res.status(404).json({ error: "Entry not found." });
       }
 
+      // Ensure only the user who created the entry can edit it
+      if (existingEntry.user_id !== req.user.user_id) {
+        return res
+          .status(403)
+          .json({ error: "Unauthorized to edit this entry." });
+      }
+
       // Check for conflicts (entries on the same day) except for the entry being updated
       const conflicts = await trx("journal_entries")
         .where({
-          user_id: entry.user_id || existingEntry.user_id,
-          date: entry.date || existingEntry.date,
+          user_id: existingEntry.user_id,
+          date: entry.date,
         })
         .andWhereNot("id", id);
 
@@ -342,8 +360,8 @@ router.put("/entry/:id", async (req, res, next) => {
             // If not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
             await trx("journal_entries")
               .where({
-                user_id: entry.user_id || existingEntry.user_id,
-                date: entry.date || existingEntry.date,
+                user_id: existingEntry.user_id,
+                date: entry.date,
               })
               .andWhereNot("id", id)
               .del();
@@ -352,8 +370,8 @@ router.put("/entry/:id", async (req, res, next) => {
           // For rest or sick days, delete all existing conflicting entries
           await trx("journal_entries")
             .where({
-              user_id: entry.user_id || existingEntry.user_id,
-              date: entry.date || existingEntry.date,
+              user_id: existingEntry.user_id,
+              date: entry.date,
             })
             .andWhereNot("id", id)
             .del();
@@ -372,32 +390,47 @@ router.put("/entry/:id", async (req, res, next) => {
 
     res.json({ message: "Entry updated successfully" });
   } catch (err) {
-    console.error("PUT /:id failed", err);
+    console.error("PUT /entry/:id failed", err);
     res.status(500).json({
-      error: "An error occurred while updating a journal entry.",
+      error: "An error occurred while updating the journal entry.",
     });
   }
 });
 
 // Delete a journal entry
-router.delete("/entry/:id", async (req, res, next) => {
+router.delete("/entry/:id", isAuthenticated, isStudent, async (req, res) => {
   const id = req.params.id;
-  //TODO: Check if the user is authorized to delete the entry
+  const userId = req.user.user_id;
   try {
-    const rows = await knex("journal_entries").where("id", id).del();
+    await knex.transaction(async trx => {
+      // Check if the entry exists and belongs to the user
+      const entry = await trx("journal_entries")
+        .where({ id: id, user_id: userId })
+        .first();
 
-    // decrement total_entry_count for the user
-    await knex("students")
-      .where({ user_id: getUserId(req) })
-      .decrement("total_entry_count", 1);
+      if (!entry) {
+        return res.status(404).json({ message: "Entry not found or you do not have permission to delete this entry." });
+      }
+
+      // Delete the entry
+      await trx("journal_entries")
+        .where({ id: id })
+        .del();
+
+      // Decrement total_entry_count for the user
+      await trx("students")
+        .where({ user_id: userId })
+        .decrement("total_entry_count", 1);
+    });
 
     res.json({ message: "Entry deleted successfully" });
   } catch (err) {
-    console.log("DELETE /journal_entry/:id failed", err);
+    console.log("DELETE /entry/:id failed", err);
     res.status(500).json({
-      error: "An error occurred while deleting a journal entry.",
+      error: "An error occurred while deleting the journal entry.",
     });
   }
 });
+
 
 module.exports = router;

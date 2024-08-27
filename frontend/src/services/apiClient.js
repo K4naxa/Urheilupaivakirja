@@ -22,7 +22,7 @@ apiClient.interceptors.response.use(
   
         // If the error message specifically indicates an expired token
         if (
-          errorMessage === "Access token not found" ||
+          errorMessage === "Access token missing" ||
           errorMessage === "Invalid or expired access token"
         ) {
             console.log(errorMessage);

@@ -7,6 +7,7 @@ const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
 const saltRounds = config.BCRYPTSALT;
 const { createToken } = require("../../utils/authMiddleware");
+const { isAuthenticated } = require("../../utils/authMiddleware");
 
 // Register a new student
 router.post("/", async (req, res, next) => {
@@ -72,11 +73,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.post("/new-email-verification", async (req, res) => {
-  const user_id = getUserId(req);
-  if (!user_id) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+router.post("/new-email-verification", isAuthenticated, async (req, res) => {
 
   try {
     // does user exist?
@@ -170,13 +167,8 @@ router.post("/new-email-verification", async (req, res) => {
   }
 });
 
-router.post("/verify-email", async (req, res) => {
-  let userId;
-  try {
-    userId = getUserId(req);
-  } catch (error) {
-    return res.status(401).json({ message: error.message });
-  }
+router.post("/verify-email", isAuthenticated, async (req, res) => {
+  const userId = req.user.user_id;
   const { otp } = req.body;
 
   try {
@@ -220,26 +212,6 @@ router.post("/verify-email", async (req, res) => {
   } catch (error) {
     console.error("Error verifying email:", error);
     res.status(500).json({ message: "Error verifying email" });
-  }
-});
-
-
-
-router.delete("/:id", async (req, res, next) => {
-  //TODO: IMPLEMENT ADMIN AUTHENTICATION, NOW JUST FOR TESTING PURPOSES
-  try {
-    await knex.transaction(async (trx) => {
-      await trx("students").where("user_id", req.params.id).del();
-
-      await trx("users").where("id", req.params.id).del();
-
-      res.status(200).json({ success: "Student user deleted successfully" });
-    });
-  } catch (err) {
-    console.error("DELETE /user/register/:id transaction error:", err);
-    res
-      .status(500)
-      .json({ error: "An error occurred while deleting a student user" });
   }
 });
 

@@ -9,10 +9,6 @@ const getUserJournalEntriesByUserId = async (user_id) => {
   return response.data;
 };
 
-const getAllUserJournalEntries = async () => {
-  const response = await apiClient.get("/journal/user");
-  return response.data;
-};
 
 const getUserJournalEntriesByDate = async (date) => {
   const response = await apiClient.get(
@@ -131,7 +127,6 @@ const deleteJournalEntry = async (id) => {
 
 export default {
   getUserJournalEntriesByUserId,
-  getAllUserJournalEntries,
   getUserJournalEntriesByDate,
   getJournalEntry,
   getJournalEntryForForm,

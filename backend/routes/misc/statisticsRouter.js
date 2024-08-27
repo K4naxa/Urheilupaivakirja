@@ -4,81 +4,61 @@ var router = express.Router();
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 
-router.get("/entries", async (req, res) => {
+router.get("/entries", isAuthenticated, isTeacher, async (req, res) => {
   try {
-    const role = getRole(req);
-
-    if (role !== 1 && role !== 2) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
     const { date1, date2 } = req.query;
 
-    const allEntries = await knex("journal_entries")
+    // Query to fetch all necessary data and compute aggregates
+    const results = await knex("journal_entries")
       .select(
-        "journal_entries.*",
-        "journal_entry_types.name as entry_type_name",
-        "workout_types.name as workout_type_name",
-        "workout_categories.name as workout_category_name",
-        "time_of_day.name as time_of_day_name",
-        "workout_intensities.name as workout_intensity_name"
+        knex.raw('COUNT(DISTINCT journal_entries.student_id) AS studentCount'),
+        knex.raw('COUNT(*) AS entryCount'),
+        knex.raw('SUM(CASE WHEN journal_entries.entry_type_id = 1 THEN journal_entries.length_in_minutes ELSE 0 END) AS exerciseTimeMinutes')
       )
-      .whereBetween("journal_entries.date", [date1, date2])
-      .leftJoin(
-        "journal_entry_types",
-        "journal_entries.entry_type_id",
-        "journal_entry_types.id"
-      )
-      .leftJoin(
-        "workout_types",
-        "journal_entries.workout_type_id",
-        "workout_types.id"
-      )
-      .leftJoin(
-        "workout_categories",
-        "journal_entries.workout_category_id",
-        "workout_categories.id"
-      )
-      .leftJoin(
-        "time_of_day",
-        "journal_entries.time_of_day_id",
-        "time_of_day.id"
-      )
-      .leftJoin(
-        "workout_intensities",
-        "journal_entries.workout_intensity_id",
-        "workout_intensities.id"
-      );
-    console.log(allEntries);
-    res.json(allEntries);
+      .whereBetween("journal_entries.date", [date1, date2]);
+
+    // Processing to format exercise time in hours and minutes
+    const { studentCount, entryCount, exerciseTimeMinutes } = results[0];
+    const hours = Math.floor(exerciseTimeMinutes / 60);
+    const minutes = exerciseTimeMinutes % 60;
+    const exerciseTimeFormatted = `${hours}h ${minutes}min`;
+
+    // Send the processed data as response
+    res.json({ studentCount, entryCount, exerciseTimeFormatted });
   } catch (error) {
     console.error("Error fetching journal entries:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.get("/new-students", async (req, res) => {
+
+router.get("/new-students", isAuthenticated, isTeacher, async (req, res) => {
   try {
-    const role = getRole(req);
-
-    if (role !== 1 && role !== 2) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
     const { date1, date2 } = req.query;
 
-    const newStudents = await knex("students")
-      .select("students.created_at")
-      .whereBetween("students.created_at", [date1, date2])
-      .where("students.verified", true)
-      .leftJoin("users", "students.user_id", "users.id");
+    if (!date1 || !date2) {
+      return res.status(400).json({ error: "Both date1 and date2 are required" });
+    }
 
-    res.json(newStudents);
+    const countResult = await knex("students")
+      .count('students.id as studentCount')  
+      .whereBetween("students.created_at", [date1, date2])  // Filter by created_at between date1 and date2
+      .andWhere("students.verified", true);
+
+    if (countResult.length > 0) {
+      const totalNewStudents = countResult[0].studentCount;
+      res.json({ totalNewStudents });
+    } else {
+      // If no data found, return zero as count
+      res.json({ totalNewStudents: 0 });
+    }
   } catch (error) {
     console.error("Error fetching new student count:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 module.exports = router;

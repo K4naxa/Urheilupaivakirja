@@ -4,9 +4,10 @@ var router = express.Router();
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 
 // get all groups
-router.get("/", async (req, res, next) => {
+router.get("/", isAuthenticated, isTeacher, async (req, res, next) => {
   knex("student_groups")
     .select("student_groups.*")
     .where("is_verified", 1)
@@ -77,13 +78,7 @@ router.post("/", (req, res) => {
 });
 
 // edit a single group by group.id
-router.put("/:id", (req, res) => {
-  // for admin only (role 1)
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to edit a group");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
+router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
   if (!req.body.name) {
     return res.status(400).json({ error: "Name is required" });
   }
@@ -110,11 +105,8 @@ router.put("/:id", (req, res) => {
     });
 });
 
-// check if the user is an admin (1) and then delete the group
-router.delete("/:id", async (req, res, next) => {
-  if (getRole(req) !== 1)
-    return res.status(401).json({ error: "Unauthorized" });
-
+// check if the user is an teacher/admin (1) and then delete the group
+router.delete("/:id", isAuthenticated, isTeacher, async (req, res, next) => {
   const { id } = req.params;
 
   knex("student_groups")
@@ -138,30 +130,25 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 // Teacher verifies/activates student_group by its ID
-router.put("/verify/:id", (req, res) => {
-    const role = getRole(req);
-    if (role !== 1) {
-      return res.status(401).json({ error: "Unauthorized" });
-    } else {
-      const studentGroupId = req.params.id;
-  
-      knex("student_groups")
-        .where("id", studentGroupId)
-        .update({ is_verified: 1 }) // update is_verified to 1
-        .then((count) => {
-          if (count > 0) {
-            res.status(200).json({ message: "Student group verified" });
-          } else {
-            res.status(404).json({ error: "Student group not found" });
-          }
-        })
-        .catch((err) => {
-          console.error("Error verifying student group:", err);
-          res
-            .status(500)
-            .json({ error: "Failed to verify student group", details: err });
-        });
-    }
-  });
+router.put("/verify/:id", isAuthenticated, isTeacher, (req, res) => {
+  const studentGroupId = req.params.id;
+
+  knex("student_groups")
+    .where("id", studentGroupId)
+    .update({ is_verified: 1 }) // update is_verified to 1
+    .then((count) => {
+      if (count > 0) {
+        res.status(200).json({ message: "Student group verified" });
+      } else {
+        res.status(404).json({ error: "Student group not found" });
+      }
+    })
+    .catch((err) => {
+      console.error("Error verifying student group:", err);
+      res
+        .status(500)
+        .json({ error: "Failed to verify student group", details: err });
+    });
+});
 
 module.exports = router;

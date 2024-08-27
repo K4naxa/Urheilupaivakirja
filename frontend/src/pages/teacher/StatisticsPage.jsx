@@ -68,34 +68,6 @@ function StatisticsPage() {
     }
   }, [newStudentsData, NewStudentsLoading, selectedTime, chartShowDate]);
 
-  // Get values for the statistics boxes
-  const getStudentCount = () => {
-    if (!EntriesData) return 0;
-    const count = EntriesData.reduce((acc, entry) => {
-      if (!acc.includes(entry.student_id)) {
-        acc.push(entry.student_id);
-      }
-      return acc;
-    }, []);
-    return count.length;
-  };
-  const getEntryCount = () => {
-    if (!EntriesData) return 0;
-    return EntriesData.length;
-  };
-  const getExcerciseTime = () => {
-    if (!EntriesData) return "0h 0min";
-    const time = EntriesData.reduce((acc, entry) => {
-      if (entry.entry_type_id === 1) {
-        acc += entry.length_in_minutes;
-      }
-      return acc;
-    }, 0);
-    let hours = Math.floor(time / 60);
-    let minutes = time % 60;
-    return `${hours}h ${minutes}min`;
-  };
-
   // -----------------------------------------------------------------------------------------
 
   // invalidate queries when changing the selected time or view
@@ -261,15 +233,15 @@ function StatisticsPage() {
       <div className="flex gap-8 justify-center flex-wrap">
         <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
           <p className=""> Opiskelijoiden määrä:</p>{" "}
-          <p className="text-xl text-primaryColor">{getStudentCount()}</p>
+          <p className="text-xl text-primaryColor">{EntriesData.studentCount}</p>
         </div>
         <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
           <p> Merkintöjen määrä:</p>{" "}
-          <p className="text-xl text-primaryColor">{getEntryCount()}</p>
+          <p className="text-xl text-primaryColor">{EntriesData.entryCount}</p>
         </div>
         <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
           <p> Urheiltu aika:</p>{" "}
-          <p className="text-xl text-primaryColor">{getExcerciseTime()}</p>
+          <p className="text-xl text-primaryColor">{EntriesData.exerciseTimeFormatted}</p>
         </div>
       </div>
     </div>

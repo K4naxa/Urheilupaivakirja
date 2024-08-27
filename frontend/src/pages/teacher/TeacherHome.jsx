@@ -72,7 +72,7 @@ function TeacherHome() {
     viewableJournals: [],
   });
 
-  // all Students and their journals
+  // get all students
   const { data: StudentsList, isLoading: StudentsListLoading } = useQuery({
     queryKey: ["StudentsList"],
     queryFn: () => userService.getStudents(),

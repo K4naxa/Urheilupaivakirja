@@ -9,7 +9,13 @@ const crypto = require("crypto");
 const saltRounds = config.BCRYPTSALT;
 const sendEmail = require("../../utils/email/sendEmail");
 const otpGenerator = require("otp-generator");
-const { getRole, getUserId, createToken } = require("../../utils/authMiddleware");
+const {
+  getRole,
+  getUserId,
+  createToken,
+  isTeacherOrSpectator,
+} = require("../../utils/authMiddleware");
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 
 // For user themselves -------------------------------------------------------------------
 
@@ -198,7 +204,7 @@ router.post("/reset-password", async (req, res) => {
 });
 
 // ---- User self change password ----
-router.put("/change-password", async (req, res) => {
+router.put("/change-password", isAuthenticated, async (req, res) => {
   const userId = getUserId(req);
   const { oldPassword, newPassword } = req.body;
 
@@ -227,32 +233,31 @@ router.put("/change-password", async (req, res) => {
 // ---- User self deletion ----
 
 //delete self with password confirmation -- POST instead of DELETE for password verification (delete has no body)
-router.post("/delete/self", async (req, res) => {
-  const user_id = getUserId(req);
+router.post("/delete/self", isAuthenticated, async (req, res) => {
+  const user_id = res.user.user_id;
   const password = req.body.password;
   const user = await knex("users").where({ id: user_id }).first();
-  console.log("User data:", user);
 
-  if (user && (user.role_id === 2 || user.role_id === 3)) {
-    try {
-      const match = await bcrypt.compare(password, user.password);
-      if (match) {
-        await knex("users").where("id", "=", user_id).delete();
-        return res.status(200).json({ message: "User deleted" });
-      } else {
-        return res.status(401).json({ error: "Incorrect password" });
-      }
-    } catch (error) {
-      console.error("Error during authentication or deletion:", error);
-      return res.status(500).json({ error: "Internal server error" });
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  try {
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+      await knex("users").where("id", "=", user_id).delete();
+      return res.status(200).json({ message: "User deleted" });
+    } else {
+      return res.status(401).json({ error: "Incorrect password" });
     }
-  } else {
-    return res.status(401).json({ error: "Unauthorized" });
+  } catch (error) {
+    console.error("Error during authentication or deletion:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // verify user password (used to check if user can delete their account)
-router.post("/verify-password", async (req, res) => {
+router.post("/verify-password", isAuthenticated, async (req, res) => {
   const userId = getUserId(req);
   const { password } = req.body;
 
@@ -279,59 +284,71 @@ router.post("/verify-password", async (req, res) => {
 
 // FOR TEACHERS (ADMINS) -------------------------------------------------------------------
 
-//delete student or spectator user
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", isAuthenticated, isTeacher, async (req, res) => {
   const userIdToDelete = Number(req.params.id);
 
-  if (getRole(req) === 1) {
-    try {
-      await knex("users").where("id", "=", userIdToDelete).delete();
-      return res.status(200).json({ message: "User deleted" });
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      return res.status(500).json({ error: "Internal server error" });
+  if (!userIdToDelete) {
+    return res.status(400).json({ error: "Invalid user ID provided." });
+  }
+
+  try {
+    const user = await knex("users").where("id", "=", userIdToDelete).first();
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
     }
-  } else {
-    return res.status(401).json({ error: "Unauthorized" });
+
+    // Check if the user to be deleted is either a student or a spectator
+    if (user.role_id !== 2 && user.role_id !== 3) {
+      return res.status(403).json({ error: "Unauthorized to delete this user type." });
+    }
+
+    await knex("users").where("id", "=", userIdToDelete).delete();
+    return res.status(200).json({ message: "User deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
 
 // delete teacher user
-router.delete("/delete/teacher/:id", async (req, res) => {
+router.delete("/delete/teacher/:id", isAuthenticated, isTeacher, async (req, res) => {
   const userIdToDelete = Number(req.params.id);
-  if (getRole(req) === 1) {
-    try {
-      const targetUser = await knex("users")
-        .where("id", "=", userIdToDelete)
-        .first();
-      if (targetUser.role_id === 1) {
-        const isAdmin = await knex("teachers")
-          .where("user_id", "=", userIdToDelete)
-          .andWhere("is_admin", true)
-          .first();
-        if (isAdmin) {
-          return res.status(403).json({ error: "Cannot delete the admin" });
-        }
-      }
-      await knex("users").where("id", "=", userIdToDelete).delete();
-      return res.status(200).json({ message: "User deleted" });
-    } catch (error) {
-      console.error("Error attempting to delete user:", error);
-      return res.status(500).json({ error: "Internal server error" });
+
+  try {
+    const targetUser = await knex("users")
+      .where("id", "=", userIdToDelete)
+      .first();
+    
+    if (!targetUser) {
+      return res.status(404).json({ error: "User not found" });
     }
-  } else {
-    return res.status(401).json({ error: "Unauthorized" });
+
+    if (targetUser.role_id !== 1) {
+      return res.status(403).json({ error: "Can only delete teacher users" });
+    }
+
+    const isAdmin = await knex("teachers")
+      .where("user_id", "=", userIdToDelete)
+      .andWhere("is_admin", true)
+      .first();
+
+    if (isAdmin) {
+      return res.status(403).json({ error: "Cannot delete an admin" });
+    }
+
+    await knex("users").where("id", "=", userIdToDelete).delete();
+    return res.status(200).json({ message: "User deleted" });
+  } catch (error) {
+    console.error("Error attempting to delete user:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.get("/profiledata", async (req, res) => {
+
+router.get("/profile", isAuthenticated, isTeacherOrSpectator, async (req, res) => {
   try {
-    if (getRole(req) !== 1 && getRole(req) !== 2) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    const role = getRole(req);
-    const userId = getUserId(req);
+    const userId = req.user.user_id
 
     const userData = await knex("users")
       .select("id", "email", "created_at")

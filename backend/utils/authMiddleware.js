@@ -10,31 +10,6 @@ const getTokenFrom = (request) => {
     : null;
 };
 
-// checks if user has any authentication token
-const isAuthenticated = (req, res, next) => {
-  const token = getTokenFrom(req);
-
-  if (!token || token === "" || token === null) {
-    console.error("Authentication token missing");
-    return res.status(401).json({ error: "Authentication token missing" });
-  }
-
-  try {
-    const decodedToken = jwt.verify(token, config.SECRET);
-
-    if (!decodedToken || !decodedToken.user_id) {
-      console.error("Invalid token: ", decodedToken);
-      return res.status(401).json({ error: "Invalid token" });
-    }
-
-    res.locals.auth = { user_id: decodedToken.user_id };
-    next();
-  } catch (error) {
-    console.error("JWT verification error: ", error.message);
-    return 0;
-  }
-};
-
 const verifyToken = (token) => {
   if (!token) throw new Error("No token provided");
   /*
@@ -61,46 +36,6 @@ const getUserId = (req) => {
   if (!token) throw new Error("No token provided");
   const decodedToken = verifyToken(token);
   return decodedToken.user_id;
-};
-
-const getUserFullName = async (req) => {
-  try {
-    const token = getTokenFrom(req);
-    if (!token) throw new Error("No token provided");
-
-    const userId = getUserId(req);
-
-    const role = getRole(req);
-
-    switch (role) {
-      case 1: // Teacher
-        const teacher = await knex("teachers")
-          .where({ user_id: userId })
-          .first();
-        return teacher
-          ? `${teacher.first_name} ${teacher.last_name}`
-          : "No name found";
-      case 2: // Spectator
-        const spectator = await knex("spectators")
-          .where({ user_id: userId })
-          .first();
-        return spectator
-          ? `${spectator.first_name} ${spectator.last_name}`
-          : "No name found";
-      case 3: // Student
-        const student = await knex("students")
-          .where({ user_id: userId })
-          .first();
-        return student
-          ? `${student.first_name} ${student.last_name}`
-          : "No name found";
-      default:
-        throw new Error("Invalid user role");
-    }
-  } catch (error) {
-    console.error("Error retrieving user name:", error);
-    throw error;
-  }
 };
 
 const getEmailVerified = (req) => {
@@ -162,34 +97,47 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-const extractUserInfo = (req, res, next) => {
-  const token = req.cookies.accessToken; // get token from cookies
+// Check if user is authenticated and extract user information from token
+const isAuthenticated = (req, res, next) => {
+  // get tokens from cookies
+  const accessToken = req.cookies.accessToken; 
+  const refreshToken = req.cookies.refreshToken;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access token not found' });
+  if (!accessToken && !refreshToken) {
+    return res.status(401).json({ message: 'No tokens provided' });
   }
-  // verify token
-  jwt.verify(token, config.SECRET, (err, decodedToken) => {
-    if (err) {
-      return res.status(401).json({ message: 'Invalid or expired access token' });
-    }
 
-    req.user = decodedToken; // req.user contains the user information from the token
-    console.log('User info extracted from token:', req.user);
-    next();
-  });
+  if (accessToken) {
+    // Verify access token
+    jwt.verify(accessToken, config.SECRET, (err, decodedToken) => {
+      if (err) {
+        // On error, check if refresh token is available
+        if (refreshToken) {
+          return res.status(401).json({ message: 'Invalid or expired access token' });
+        } else {
+          return res.status(401).json({ message: 'No refresh token' });
+        }
+      }
+
+      req.user = decodedToken; // req.user contains user information from the token
+      console.log("User authenticated: ", req.user);
+      next();
+    });
+  } else if (refreshToken) {
+    // Only refresh token is available, user should refresh the access token
+    return res.status(401).json({ message: 'Access token missing' });
+  }
 };
 
+
 module.exports = {
-  isAuthenticated,
   getRole,
   getUserId,
   createToken,
   getEmailVerified,
-  getUserFullName,
   isStudent,
   isTeacher,
   isTeacherOrSpectator,
   authenticateToken,
-  extractUserInfo
+  isAuthenticated
 };
