@@ -14,7 +14,7 @@ import { useBigModal } from "../hooks/useBigModal";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-import ThemeSwitcher from "../components/themeSwitcher";
+import ThemeSwitcher from "../components/ThemeSwitcher";
 
 import siteLogo from "/pwa-192x192.png";
 import cc from "../utils/cc";

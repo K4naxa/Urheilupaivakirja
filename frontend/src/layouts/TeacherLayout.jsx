@@ -1,4 +1,4 @@
-import ThemeSwitcher from "../components/themeSwitcher";
+import ThemeSwitcher from "../components/ThemeSwitcher";
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";

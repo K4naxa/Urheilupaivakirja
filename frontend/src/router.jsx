@@ -27,13 +27,13 @@ import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
 import SpectatorsPage from "./pages/teacher/manage/SpectatorsPage";
 import TeachersPage from "./pages/teacher/manage/TeachersPage";
-import GroupsPage from "./pages/teacher/manage/groupsPage";
-import CampusPage from "./pages/teacher/manage/campusPage";
+import GroupsPage from "./pages/teacher/manage/GroupsPage";
+import CampusPage from "./pages/teacher/manage/CampusPage";
 
 import TeacherNewsPage from "./pages/teacher/news/TeacherNewsPage";
 
 
-import ManageStudentsLayout from "./layouts/manage-layout/manageStudentsLayout";
+import ManageStudentsLayout from "./layouts/manage-layout/ManageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
 import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";

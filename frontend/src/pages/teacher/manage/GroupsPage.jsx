@@ -351,4 +351,4 @@ const GroupsPage = () => {
 };
 
 export default GroupsPage;
-// Path: frontEnd/src/pages/teacher/manage/student-groups/groupsPage.css'
+// Path: frontEnd/src/pages/teacher/manage/student-groups/GroupsPage.css'

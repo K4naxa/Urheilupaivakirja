@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
+import ConfirmModal from "../../../components/confirm-modal/ConfirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { format } from "date-fns";

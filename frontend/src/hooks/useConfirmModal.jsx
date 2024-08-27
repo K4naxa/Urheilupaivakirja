@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
-import ConfirmModal from '../components/confirm-modal/confirmModal';
-import AccountDeleteConfirmModal from '../components/confirm-modal/accountDeleteConfirmModal'; // Assume this is another modal component
+import ConfirmModal from '../components/confirm-modal/ConfirmModal';
+import AccountDeleteConfirmModal from '../components/confirm-modal/AccountDeleteConfirmModal'; // Assume this is another modal component
 
 const ConfirmModalContext = createContext();
 
