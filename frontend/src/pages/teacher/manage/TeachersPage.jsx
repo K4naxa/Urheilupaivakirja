@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import userService from "../../../services/userService";
+import teacherService from "../../../services/teacherService";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";
@@ -14,22 +14,22 @@ const TeachersPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
 
-  const handleDelete = (spectator) => {
+  const handleDelete = (teacher) => {
 
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(spectator.user_id).then(() => {
+      await teacherService.deleteUser(teacher.user_id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });
       });
-      queryClient.invalidateQueries({ spectators });
+      queryClient.invalidateQueries({ teachers });
     };
 
     const modalText = (
       <span>
         Haluatko varmasti poistaa opettajan
         <br/>
-        <strong>{spectator.first_name} {spectator.last_name}?</strong>
+        <strong>{teacher.first_name} {teacher.last_name}?</strong>
         <br />
         Tämä poistaa kaikki opettajan tiedot pysyvästi.`
       </span>
@@ -45,17 +45,17 @@ const TeachersPage = () => {
     });
   };
 
-  const { data: spectators, isLoading: spectatorsLoading } = useQuery({
-    queryKey: ["spectators"],
-    queryFn: () => userService.getSpectators(),
+  const { data: teachers, isLoading: teachersLoading } = useQuery({
+    queryKey: ["teachers"],
+    queryFn: () => teacherService.getTeachers(),
     config: {
       enabled: false,
     },
   });
 
   useEffect(() => {
-    if (!spectatorsLoading) console.log(spectators);
-  }, [spectators, spectatorsLoading]);
+    if (!teachersLoading) console.log(teachers);
+  }, [teachers, teachersLoading]);
 
   return (
     <div className="w-full items-center bg-bgSecondary rounded-md">
@@ -82,11 +82,11 @@ const TeachersPage = () => {
         <div className="flex flex-col w-full p-4 ">
           <div className="flex gap-4 justify-center w-full items-end">
             <div className="flex flex-col w-3/4">
-              <label htmlFor="newSpectatorInput">Kutsu uusi vierailija</label>
+              <label htmlFor="newTeacherInput">Kutsu uusi vierailija</label>
               <input
                 type="text"
-                name="newSpectatorInput"
-                id="newSpectatorInput"
+                name="newTeacherInput"
+                id="newTeacherInput"
                 placeholder="Vierailijan sähköposti"
                 className="text-textPrimary bg-bgGray p-1 
                   border border-borderPrimary rounded-md
@@ -101,14 +101,14 @@ const TeachersPage = () => {
         <div className="flex-col w-full ">
           <h2 className="text-xl">Henkilökunta</h2>
           <div className="flex flex-col gap-4">
-            {spectatorsLoading ? (
+            {teachersLoading ? (
               <div>{LoadingScreen()}</div>
             ) : (
-              spectators.map((spectator) => (
-                <CreateSpectatorCard
-                  spectator={spectator}
+              teachers.map((teacher) => (
+                <CreateTeacherCard
+                  teacher={teacher}
                   handleDelete={handleDelete}
-                  key={spectator.id}
+                  key={teacher.id}
                 />
               ))
             )}
@@ -119,7 +119,7 @@ const TeachersPage = () => {
   );
 };
 
-const CreateSpectatorCard = ({ spectator, handleDelete }) => {
+const CreateTeacherCard = ({ teacher, handleDelete }) => {
   const calcTimeFromLogin = (loginTime) => {
     const loginDate = new Date(loginTime);
     const now = new Date();
@@ -134,9 +134,9 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
     }
   };
 
-  const created_at = formatDate(new Date(spectator.created_at), "d.m.Y");
-  const last_login_at = spectator.last_login_at
-    ? calcTimeFromLogin(spectator.last_login_at)
+  const created_at = formatDate(new Date(teacher.created_at), "d.m.Y");
+  const last_login_at = teacher.last_login_at
+    ? calcTimeFromLogin(teacher.last_login_at)
     : null;
 
   return (
@@ -145,9 +145,9 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
         {/* name and email row */}
         <div className="flex flex-wrap gap-4 items-end">
           <span className="text-lg">
-            {spectator.first_name} {spectator.last_name}
+            {teacher.first_name} {teacher.last_name}
           </span>
-          <span className="text-textSecondary">{spectator.email}</span>
+          <span className="text-textSecondary">{teacher.email}</span>
         </div>
 
         {/* additional info row */}
@@ -163,7 +163,7 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
       <div className="flex justify-center p-4">
         <button
           className="IconButton text-iconRed"
-          onClick={() => handleDelete(spectator)}
+          onClick={() => handleDelete(teacher)}
         >
           <FiTrash2 size={20} />
         </button>

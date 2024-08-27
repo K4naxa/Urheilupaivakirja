@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import publicService from "../../../services/publicService";
+import campusService from "../../../services/campusService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
@@ -45,7 +45,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
       student_count: campus.student_count,
       name: newName,
     };
-    publicService.editCampus(newCampus).then(() => {
+    campusService.editCampus(newCampus).then(() => {
       setCampuses((prevCampuses) =>
         prevCampuses.map((prevCampus) =>
           prevCampus.id === campus.id ? newCampus : prevCampus
@@ -56,7 +56,7 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
   };
 
   const handleDelete = () => {
-    publicService
+    campusService
       .deleteCampus(campus.id)
       .then(() => {
         setCampuses((prevCampuses) =>
@@ -166,7 +166,7 @@ const CampusPage = () => {
   });
 
   useEffect(() => {
-    publicService.getCampuses().then((data) => {
+    campusService.getCampuses().then((data) => {
       setCampuses(data);
       setSortedCampuses(data);
     });
@@ -174,8 +174,8 @@ const CampusPage = () => {
 
   const handleNewCampus = () => {
     if (!handleInputError(newCampus, setErrorMessage, campuses)) return;
-    publicService.addCampus(newCampus).then(() => {
-      publicService.getCampuses().then((data) => {
+    campusService.addCampus(newCampus).then(() => {
+      campusService.getCampuses().then((data) => {
         setCampuses(data);
         setNewCampus("");
       });

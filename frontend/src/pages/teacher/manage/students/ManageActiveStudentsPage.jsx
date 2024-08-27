@@ -84,7 +84,7 @@ const ManageActiveStudentsPage = () => {
   });
 
   useEffect(() => {
-    userService.getStudents().then((data) => {
+    studentService.getStudents().then((data) => {
       setState({
         ...state,
         students: data,
@@ -193,7 +193,7 @@ const ManageActiveStudentsPage = () => {
 
   const handleArchive = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.toggleStudentArchive(student.user_id).then(() => {
+      await studentService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });
@@ -228,7 +228,7 @@ const ManageActiveStudentsPage = () => {
   // handle Delete funtion for students
   const handleDelete = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(student.user_id).then(() => {
+      await studentService.deleteStudent(student.user_id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });

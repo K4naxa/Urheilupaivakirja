@@ -1,16 +1,15 @@
 var express = require("express");
 var router = express.Router();
 
-const config = require("../utils/config");
+const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
-const { getUserId } = require("../middleware/auth");
-const { getRole } = require("../middleware/auth");
+const { getRole } = require("../../utils/authMiddleware");
 
 // get course info
-router.get("/courseSegments", async (req, res) => {
+router.get("/segment", async (req, res) => {
   console.log(" trying to get course segments");
-  const user_id = req.params.id;
+
   try {
     const segments = await knex("course_segments").select("*");
     segments.sort((a, b) => a.order_number - b.order_number);
@@ -23,7 +22,7 @@ router.get("/courseSegments", async (req, res) => {
 });
 
 // add a new course segment
-router.post("/courseSegments", async (req, res) => {
+router.post("/segment", async (req, res) => {
   const user_id = req.params.id;
 
   //   return user if not admin (role 1)
@@ -52,7 +51,7 @@ router.post("/courseSegments", async (req, res) => {
 });
 
 // update course segments
-router.put("/courseSegments", async (req, res) => {
+router.put("/segment", async (req, res) => {
   const user_id = req.params.id;
 
   //   return user if not admin (role 1)
@@ -90,7 +89,7 @@ router.put("/courseSegments", async (req, res) => {
     }
 });
 
-router.delete("/courseSegments/:id", async (req, res) => {
+router.delete("/segment/:id", async (req, res) => {
   console.log("trying to delete course segment");
   const user_id = req.params.id;
 

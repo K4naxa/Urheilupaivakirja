@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import OTPInput from "../components/OTPInput";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useEffect } from "react";
-import userService from "../services/userService";
+import registerService from "../services/registerService";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { FiArrowLeft } from "react-icons/fi";
@@ -17,7 +17,7 @@ const EmailVerificationPage = () => {
     isError,
     error,
   } = useMutation({
-    mutationFn: () => userService.createEmailVerificationOTP(), // Ensure the mutation function takes necessary parameters, like user email
+    mutationFn: () => registerService.createEmailVerificationOTP(), // Ensure the mutation function takes necessary parameters, like user email
     onError: (error) => {
       console.error("Error sending OTP:", error);
       addToast(
@@ -35,7 +35,7 @@ const EmailVerificationPage = () => {
     isError: verifyIsError,
     error: verifyError,
   } = useMutation({
-    mutationFn: (otp) => userService.sendEmailVerificationOTP(otp),
+    mutationFn: (otp) => registerService.sendEmailVerificationOTP(otp),
     onError: (error) => {
       console.error("Error verifying OTP:", error);
       addToast(

@@ -42,6 +42,7 @@ import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
 //misc
 import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
+import LogoutPage from "./pages/LogoutPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
@@ -97,6 +98,14 @@ export const router = createBrowserRouter([
               <RedirectIfAuthenticated>
                 <LoginPage />
               </RedirectIfAuthenticated>
+            ),
+          },
+          {
+            path: "/kirjaudu-ulos",
+            element: (
+              <RedirectIfNotAuthenticated>
+                <LogoutPage />
+              </RedirectIfNotAuthenticated>
             ),
           },
           {

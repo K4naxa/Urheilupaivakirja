@@ -16,7 +16,7 @@ const motivationQuotes = [
   "Unelmat eivät toimi, ellei sinä tee.",
   "Jokainen harjoitus vie sinut lähemmäs tavoitettasi.",
   "Kipu, jonka tunnet tänään, on voima, jonka tunnet huomenna.",
-  "Urheilu on 10% fyysistä ja 90% henkistä.",
+  "Urheilu on yhtä paljon fyysistä kuin henkistä.",
   "Esteet ovat vain niitä asioita, jotka näet, kun otat katseesi pois tavoitteesta.",
   "Pysy keskittyneenä ja usko itseesi. Voit saavuttaa kaiken.",
   "Suuret mestarit ovat valmiita tekemään sitä, mitä muut eivät ole.",

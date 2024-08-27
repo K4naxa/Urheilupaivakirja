@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import userService from "../services/userService";
+import spectatorService from "../services/spectatorService";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useAuth } from "../hooks/useAuth";
 import cc from "../utils/cc";
@@ -29,7 +29,7 @@ const SpectatorRegistrationPage = () => {
 
   const registerSpectator = useMutation({
     mutationFn: (newRegistrationData) =>
-      userService.registerSpectator(newRegistrationData),
+      spectatorService.registerSpectator(newRegistrationData),
     onError: (error) => {
       console.error("Error registering spectator:", error);
       addToast("Virhe rekisteröitäessä käyttäjää", { style: "error" });

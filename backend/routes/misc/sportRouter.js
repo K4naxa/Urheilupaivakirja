@@ -1,14 +1,11 @@
 var express = require("express");
-const jwt = require("jsonwebtoken");
 var router = express.Router();
 
-const config = require("../utils/config");
+const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
-const { getRole } = require("../middleware/auth");
-
-// ................................................................................
+const { getRole } = require("../../utils/authMiddleware");
 
 // Get all sports
 router.get("/", (req, res, next) => {
@@ -162,6 +159,31 @@ router.delete("/:id", (req, res, next) => {
       console.log("Error deleting sport:", err);
       res.status(500).json({ error: "Internal server error" });
     });
+});
+
+// Teacher verifies/activates sport by its ID
+router.put("/verify/:id", (req, res) => {
+  const role = getRole(req);
+  if (role !== 1) {
+    return res.status(401).json({ error: "Unauthorized" });
+  } else {
+    const sportId = req.params.id;
+
+    knex("sports")
+      .where("id", sportId)
+      .update({ is_verified: 1 }) // update is_verified to 1
+      .then((count) => {
+        if (count > 0) {
+          res.status(200).json({ message: "Sport verified" });
+        } else {
+          res.status(404).json({ error: "Sport not found" });
+        }
+      })
+      .catch((err) => {
+        console.error("Error verifying sport:", err); // Log the error
+        res.status(500).json({ error: "Failed to verify sport", details: err });
+      });
+  }
 });
 
 module.exports = router;

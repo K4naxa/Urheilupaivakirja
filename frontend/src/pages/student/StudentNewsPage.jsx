@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import publicService from "../../services/publicService";
+import newsService from "../../services/newsService";
 import { useQuery } from "@tanstack/react-query";
 import cc from "../../utils/cc";
 import LoadingScreen from "../../components/LoadingScreen";
@@ -62,7 +62,7 @@ const RenderSingleNews = ({ news }) => {
 const StudentNewsPage = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["news"],
-    queryFn: () => publicService.getNews(),
+    queryFn: () => newsService.getNews(),
   });
 
   if (isLoading) {

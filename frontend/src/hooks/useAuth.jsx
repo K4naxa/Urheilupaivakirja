@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
 const AuthContext = createContext();
@@ -29,13 +29,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
   // call this function to sign out logged in user
-  const logout = () => {
+  const logout = useCallback(() => {
+    console.log("Logging out");
     setUser(null);
     queryClient.invalidateQueries();
-    window.localStorage.removeItem("user");
-    window.sessionStorage.removeItem("user");
-    navigate("/kirjaudu", { replace: true });
-  };
+    clearUserData();
+    navigate("/kirjaudu", { replace: true }), [queryClient, navigate];
+  });
 
   const value = useMemo(
     () => ({
@@ -46,6 +46,18 @@ export const AuthProvider = ({ children }) => {
     [user]
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+const clearUserData = () => {
+  // Clear access and refresh tokens stored in cookies
+  document.cookie =
+    "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie =
+    "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+  // Clear any user-related data in local storage
+  window.localStorage.removeItem("user");
+  window.sessionStorage.removeItem("user");
 };
 
 export const useAuth = () => {

@@ -85,7 +85,7 @@ const ManageArchivedStudentsPage = () => {
   });
 
   useEffect(() => {
-    userService.getArchivedStudents().then((data) => {
+    studentService.getArchivedStudents().then((data) => {
       setState({
         students: data,
         filteredStudents: data.sort((a, b) =>
@@ -98,7 +98,7 @@ const ManageArchivedStudentsPage = () => {
 
   const handleActivation = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.toggleStudentArchive(student.user_id).then(() => {
+      await studentService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });
@@ -131,7 +131,7 @@ const ManageArchivedStudentsPage = () => {
   // handle Delete funtion for students
   const handleDelete = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(student.user_id);
+      await studentService.deleteStudent(student.user_id);
       const newStudents = state.students.filter(
         (s) => s.user_id !== student.user_id
       );

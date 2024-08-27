@@ -1,4 +1,4 @@
-import publicService from "../../../services/publicService";
+import groupService from "../../../services/groupService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
@@ -40,7 +40,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
       student_count: group.student_count,
       name: editedGroup,
     };
-    publicService
+    groupService
       .editGroup(newGroup)
       .then(() => {
         setGroups((prevGroups) =>
@@ -57,7 +57,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
 
   // deletes the group from the server and updates the state
   const handleDelete = () => {
-    publicService
+    groupService
       .deleteGroup(group.id)
       .then(() => {
         setGroups((prevGroups) =>
@@ -160,7 +160,7 @@ const GroupsPage = () => {
   const [sorting, setSorting] = useState({ name: 0, group: 0 });
 
   useEffect(() => {
-    publicService.getGroups().then((data) => {
+    groupService.getGroups().then((data) => {
       setGroups(data);
       setSortedGroups(data);
     });
@@ -231,8 +231,8 @@ const GroupsPage = () => {
       return;
     }
 
-    publicService.addGroup(newGroup).then(() => {
-      publicService.getGroups().then((data) => {
+    groupService.addGroup(newGroup).then(() => {
+      groupService.getGroups().then((data) => {
         setGroups(data);
         setSortedGroups(data);
       });

@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from './apiClient';
 
 // get token from localStorage
 const getToken = () => {
@@ -17,96 +17,96 @@ const makeHeader = () => {
 };
 
 // ................................................................................
-
+/*
 const getOptions = async () => {
-  const response = await axios.get("/public/options");
+  const response = await apiClient.get("/public/options");
   return response.data;
 };
+*/
 
 // User Group Management -----------------------------------------------------------------
 
+/*
 const getGroups = async () => {
-  const response = await axios.get("/public/groups");
+  const response = await apiClient.get("/public/groups");
   return response.data;
 };
 
 const addGroup = async (newGroup) => {
   const group = { name: newGroup };
-  const response = await axios.post("/public/groups", group, makeHeader());
+  const response = await apiClient.post("/public/groups", group);
   return response.data;
 };
 
 const editGroup = async (group) => {
-  const response = await axios.put(
+  const response = await apiClient.put(
     `/public/groups/${group.id}`,
-    group,
-    makeHeader()
+    group
   );
   return response.data;
 };
 
 const deleteGroup = async (id) => {
-  const response = await axios.delete(`/public/groups/${id}`, makeHeader());
+  const response = await apiClient.delete(`/public/groups/${id}`);
   return response.data;
 };
 
+*/
 // Campus Management -----------------------------------------------------------------
-
+/*
 // get all campuses
 const getCampuses = async () => {
-  const response = await axios.get("/public/campuses");
+  const response = await apiClient.get("/public/campuses");
   return response.data;
 };
 // add a new campus
 const addCampus = async (newCampus) => {
   const campus = { name: newCampus };
-  const response = await axios.post("/public/campuses", campus, makeHeader());
+  const response = await apiClient.post("/public/campuses", campus);
   return response.data;
 };
 
 // edit a campus
 const editCampus = async (campus) => {
-  const response = await axios.put(
+  const response = await apiClient.put(
     `/public/campuses/${campus.id}`,
-    campus,
-    makeHeader()
+    campus
   );
   return response.data;
 };
 
 // delete a campus
 const deleteCampus = async (id) => {
-  const response = await axios.delete(`/public/campuses/${id}`, makeHeader());
+  const response = await apiClient.delete(`/public/campuses/${id}`);
   return response.data;
 };
 
+*/
 // ................................................................................
 
 // get all news
-
+/*
 const getNews = async () => {
-  const response = await axios.get("/public/news");
+  const response = await apiClient.get("/public/news");
   return response.data;
 };
 
 // get unread news count
 
 const checkUnreadNews = async () => {
-  const response = await axios.get("/public/news/unread", makeHeader());
+  const response = await apiClient.get("/public/news/unread");
   return response.data;
 };
+*/
 
 //TODO: SIIRRÄ OIKEAAN SERVICEEN JA ROUTERIIN
 
 // update student.news_last_viewed_at
 
-const updateNewsLastViewedAt = async () => {
-  const response = await axios.put("/students/news", {}, makeHeader());
-  return response.data;
-};
+
 
 // ................................................................................
-
+/*
 export default {
   getOptions,
   getGroups,
@@ -121,3 +121,4 @@ export default {
   checkUnreadNews,
   updateNewsLastViewedAt,
 };
+*/

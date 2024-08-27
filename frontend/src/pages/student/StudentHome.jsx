@@ -29,8 +29,8 @@ import {
 import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
-import userService from "../../services/userService";
-import trainingService from "../../services/trainingService";
+import studentService from "../../services/studentService";
+import courseService from "../../services/courseService";
 import cc from "../../utils/cc";
 
 function StudentHome() {
@@ -44,17 +44,21 @@ function StudentHome() {
     error: studentDataError,
   } = useQuery({
     queryKey: ["studentData"],
-    queryFn: () => userService.getStudentData(),
+    queryFn: () => studentService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseSegments } = useQuery({
+  const {
+    data: courseSegments,
+    isLoading: courseSegmentsLoading,
+    error: courseSegmentsError,
+  } = useQuery({
     queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
-  if (studentDataLoading || !courseSegments) {
+  if (studentDataLoading || courseSegmentsLoading) {
     return (
       <div className="flex items-center justify-center">
         <LoadingScreen />
@@ -161,7 +165,7 @@ function StudentHome() {
     );
   };
 
-  if (studentDataError) {
+  if (studentDataError || courseSegmentsError) {
     return (
       <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>

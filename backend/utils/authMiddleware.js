@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("../utils/config");
+const config = require("./config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
@@ -36,12 +36,16 @@ const isAuthenticated = (req, res, next) => {
 };
 
 const verifyToken = (token) => {
+  if (!token) throw new Error("No token provided");
+  /*
   try {
     return jwt.verify(token, config.SECRET);
   } catch (error) {
     console.error("Verification error in auth:", error.message);
     throw new Error("Token verification failed");
   }
+  */
+ return token
 };
 
 // Get the role from token
@@ -116,6 +120,66 @@ const createToken = (user) => {
   return jwt.sign(userForToken, config.SECRET);
 };
 
+//NEW MIDDLEWARE
+
+const isStudent = (req, res, next) => {
+  if (req.user && req.user.role == '3') {
+  
+      return next(); // User is a student and can access the route
+  }
+  return res.status(403).json({ message: 'Access forbidden: students only' });
+};
+
+const isTeacher = (req, res, next) => {
+  if (req.user && req.user.role === '1') {
+      return next(); // User is a teacher and has permission to access the route
+  }
+  return res.status(403).json({ message: 'Access forbidden: teachers only' });
+};
+
+const isTeacherOrSpectator = (req, res, next) => {
+  if (req.user && (req.user.role === '1' || req.user.role === '2')) {
+      return next(); // User is a teacher or spectator and has permission to access the route
+  }
+  return res.status(403).json({ message: 'Access forbidden: teachers and spectators only' });
+};
+
+
+const authenticateToken = (req, res, next) => {
+  const token = req.cookies.accessToken;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access token not found' });
+  }
+
+  jwt.verify(token, config.SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid or expired access token' });
+    }
+
+    req.user = user; // Attach user data to req.user
+    next();
+  });
+};
+
+const extractUserInfo = (req, res, next) => {
+  const token = req.cookies.accessToken; // get token from cookies
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access token not found' });
+  }
+  // verify token
+  jwt.verify(token, config.SECRET, (err, decodedToken) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid or expired access token' });
+    }
+
+    req.user = decodedToken; // req.user contains the user information from the token
+    console.log('User info extracted from token:', req.user);
+    next();
+  });
+};
+
 module.exports = {
   isAuthenticated,
   getRole,
@@ -123,4 +187,9 @@ module.exports = {
   createToken,
   getEmailVerified,
   getUserFullName,
+  isStudent,
+  isTeacher,
+  isTeacherOrSpectator,
+  authenticateToken,
+  extractUserInfo
 };

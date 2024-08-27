@@ -1,19 +1,12 @@
 var express = require("express");
-const jwt = require("jsonwebtoken");
 var router = express.Router();
 
-const { getRole } = require("../../middleware/auth");
+const { getRole } = require("../../utils/authMiddleware");
 
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  return authorization && authorization.toLowerCase().startsWith("bearer ")
-    ? authorization.substring(7)
-    : null;
-};
 
 router.get("/", async (req, res) => {
   const role = getRole(req);
@@ -75,7 +68,6 @@ router.get("/", async (req, res) => {
       getUnverifiedStudentGroups(),
     ]);
 
-    res.setHeader("Content-Type", "application/json");
     res.status(200).json({
       students,
       sports,

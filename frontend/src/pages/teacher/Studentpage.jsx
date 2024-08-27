@@ -30,8 +30,8 @@ import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import JournalActivityBar from "../../components/charts/JournalActivityBar";
 import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import userService from "../../services/userService";
+import courseService from "../../services/courseService";
 import { useParams } from "react-router-dom";
-import trainingService from "../../services/trainingService";
 import cc from "../../utils/cc";
 import { useState } from "react";
 
@@ -52,7 +52,7 @@ function StudentHome() {
 
   const { data: courseSegments } = useQuery({
     queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import trainingService from "../../../services/trainingService";
+import sportService from "../../../services/sportService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
@@ -42,7 +42,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
       student_count: sport.student_count,
       name: editedSport,
     };
-    trainingService
+    sportService
       .editSport(newSport)
       .then(() => {
         setSports((prevSports) =>
@@ -61,7 +61,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
 
   // deletes the sport from the server and updates the state
   const handleDelete = () => {
-    trainingService
+    sportService
       .deleteSport(sport.id)
       .then(() => {
         queryclient.invalidateQueries("sports");
@@ -183,7 +183,7 @@ const SportsPage = () => {
     isLoading: sportsLoading,
   } = useQuery({
     queryKey: ["sports"],
-    queryFn: trainingService.getSports,
+    queryFn: sportService.getSports,
   });
 
   useEffect(() => {
@@ -206,7 +206,7 @@ const SportsPage = () => {
       return;
     }
 
-    trainingService
+    sportService
       .addSport({ name: newSport })
       .then(() => {
         queryclient.invalidateQueries("sports");

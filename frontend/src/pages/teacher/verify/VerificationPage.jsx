@@ -1,9 +1,10 @@
-import userService from "../../../services/userService";
+import groupService from "../../../services/groupService";
+import sportService from "../../../services/sportService";
+import miscService from "../../../services/miscService";
 import { FiTrash2, FiCheck } from "react-icons/fi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingScreen from "../../../components/LoadingScreen";
-import trainingService from "../../../services/trainingService";
-import publicService from "../../../services/publicService";
+
 
 const VerificationPage = () => {
   const {
@@ -11,8 +12,8 @@ const VerificationPage = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["unverifiedData"],
-    queryFn: userService.getAllUnverified,
+    queryKey: ["unverifiedStudentsSportsCampuses"],
+    queryFn: miscService.getUnverifiedStudentsSportsCampuses,
   });
 
   const {
@@ -127,7 +128,7 @@ function CreateStudentContainer({ student }) {
   const queryClient = useQueryClient();
 
   const verifyStudentMutation = useMutation({
-    mutationFn: () => userService.verifyStudent(student.user_id),
+    mutationFn: () => studentService.verifyStudent(student.user_id),
     onSuccess: () => {
       queryClient.invalidateQueries(["unverifiedStudents"]);
       queryClient.invalidateQueries(["studentsAndJournals"]);
@@ -135,7 +136,7 @@ function CreateStudentContainer({ student }) {
   });
 
   const deleteStudentMutation = useMutation({
-    mutationFn: () => userService.deleteUser(student.user_id),
+    mutationFn: () => studentService.deleteStudent(student.user_id),
     onSuccess: () => {
       queryClient.invalidateQueries(["unverifiedStudents"]);
     },
@@ -190,14 +191,14 @@ const CreateStudentGroupContainer = ({ student_group }) => {
   const queryClient = useQueryClient();
 
   const verifyStudentGroupMutation = useMutation({
-    mutationFn: () => userService.verifyStudentGroup(student_group.id),
+    mutationFn: () => groupService.verifyStudentGroup(student_group.id),
     onSuccess: () => {
       queryClient.invalidateQueries(["unverifiedData"]);
     },
   });
 
   const deleteStudentGroupMutation = useMutation({
-    mutationFn: () => publicService.deleteGroup(student_group.id),
+    mutationFn: () => groupService.deleteGroup(student_group.id),
     onSuccess: () => {
       queryClient.invalidateQueries(["unverifiedData"]);
     },
@@ -236,14 +237,14 @@ const CreateSportContainer = ({ sport }) => {
   const queryClient = useQueryClient();
 
   const verifySportMutation = useMutation({
-    mutationFn: () => userService.verifySport(sport.id),
+    mutationFn: () => sportService.verifySport(sport.id),
     onSuccess: () => {
       queryClient.invalidateQueries(["unverifiedData"]);
     },
   });
 
   const deleteSportMutation = useMutation({
-    mutationFn: () => trainingService.deleteSport(sport.id),
+    mutationFn: () => sportService.deleteSport(sport.id),
     onSuccess: () => {
       queryClient.invalidateQueries(["unverifiedData"]);
     },

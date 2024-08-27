@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useMemo } from "react";
-import trainingService from "../../../services/trainingService.js";
+import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
@@ -51,7 +51,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     isLoading: journalEntryIsLoading,
   } = useQuery({
     queryKey: ["journalEntry", EntryIdForQuery],
-    queryFn: () => trainingService.getJournalEntryForForm(EntryIdForQuery),
+    queryFn: () => journalService.getJournalEntryForForm(EntryIdForQuery),
   });
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   }, [journalEntryIsLoading, journalEntry]);
 
   const editJournalEntry = useMutation({
-    mutationFn: () => trainingService.editJournalEntry(journalEntryData),
+    mutationFn: () => journalService.editJournalEntry(journalEntryData),
     // If the mutation fails, roll back to the previous value
     onError: (error) => {
       console.error("Error adding journal entry:", error);
@@ -79,7 +79,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   });
 
   const deleteEntry = useMutation({
-    mutationFn: () => trainingService.deleteJournalEntry(journalEntryData.entry_id),
+    mutationFn: () => journalService.deleteJournalEntry(journalEntryData.entry_id),
     onError: (error) => {
       console.error("Error deleting journal entry:", error);
       addToast("Virhe poistettaessa merkintää", { style: "error" });
@@ -98,7 +98,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     isError: journalEntriesDataError,
   } = useQuery({
     queryKey: ["studentJournal"],
-    queryFn: () => trainingService.getAllUserJournalEntries(),
+    queryFn: () => journalService.getAllUserJournalEntries(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -110,7 +110,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     error,
   } = useQuery({
     queryKey: ["options"],
-    queryFn: () => trainingService.getJournalEntryOptions(),
+    queryFn: () => journalService.getJournalEntryOptions(),
   });
 
   function formatDateString(isoDateString) {

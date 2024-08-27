@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from "react";
-import publicService from "../../services/publicService.js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year.jsx";
@@ -32,11 +31,15 @@ import {
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
 import userService from "../../services/userService.js";
+import studentService from "../../services/studentService.js";
+import courseService from "../../services/courseService.js";
+import miscService from "../../services/miscService.js";
+
 import { TeacherHeatmapTooltip } from "../../components/heatmap-tooltip/TeacherHeatmapTooltip.jsx";
 import CampusMultiSelect from "../../components/multiSelect-search/CampusMultiSelect.jsx";
 import GroupMultiSelect from "../../components/multiSelect-search/GroupMultiSelect.jsx";
 import cc from "../../utils/cc.js";
-import trainingService from "../../services/trainingService.js";
+
 import { useToast } from "../../hooks/toast-messages/useToast.jsx";
 
 function TeacherHome() {
@@ -79,21 +82,21 @@ function TeacherHome() {
   // Course completion requirement for passing the course
   const { data: courseSegments } = useQuery({
     queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
   // Only pinned students where the user id == pinner_user_id
   const { data: pinnedStudentsData } = useQuery({
     queryKey: ["pinnedStudents"],
-    queryFn: () => userService.getPinnedStudents(),
+    queryFn: () => studentService.getPinnedStudents(),
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
   // all  sports / campuses / student groups for filtering
   const { data: optionsData, isLoading: optionsDataLoading } = useQuery({
     queryKey: ["options"],
-    queryFn: () => publicService.getOptions(),
+    queryFn: () => miscService.getGroupsSportsCampusesOptions(),
   });
 
   const options = useMemo(() => {
@@ -187,7 +190,7 @@ function TeacherHome() {
         }));
 
         try {
-          const response = await userService.getPaginatedStudentsData(
+          const response = await studentService.getPaginatedStudentsData(
             requestedStudents,
             newStates.showDate
           );

@@ -6,7 +6,7 @@ const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
 const saltRounds = config.BCRYPTSALT;
-const { createToken } = require("../../middleware/auth");
+const { createToken } = require("../../utils/authMiddleware");
 
 // Register a new student
 router.post("/", async (req, res, next) => {
@@ -72,8 +72,158 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.post("/new-email-verification", async (req, res) => {
+  const user_id = getUserId(req);
+  if (!user_id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
-module.exports = router;
+  try {
+    // does user exist?
+    const user = await knex("users").where({ id: user_id }).first();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    let firstName = "";
+
+    switch (user.role_id) {
+      case 1: // Teacher
+        const teacher = await knex("teachers")
+          .where({ user_id: user.id })
+          .first();
+        firstName = teacher ? teacher.first_name : null;
+        break;
+      case 2: // Spectator
+        const spectator = await knex("spectators")
+          .where({ user_id: user.id })
+          .first();
+        firstName = spectator ? spectator.first_name : null;
+        break;
+      case 3: // Student
+        const student = await knex("students")
+          .where({ user_id: user.id })
+          .first();
+        firstName = student ? student.first_name : null;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid user role" });
+    }
+
+    if (!firstName) {
+      return res.status(404).json({ message: "First name not found for user" });
+    }
+
+    const existingToken = await knex("verification_otp")
+      .where({ user_id: user.id })
+      .orderBy("created_at", "desc")
+      .first();
+
+    if (existingToken) {
+      const now = Date.now();
+      const tokenCreationTime = new Date(existingToken.created_at).getTime();
+      const timeSinceLastToken = now - tokenCreationTime;
+      const cooldownPeriod = 5 * 60 * 1000; // 5min
+
+      if (timeSinceLastToken < cooldownPeriod) {
+        const waitTime = Math.ceil(
+          (cooldownPeriod - timeSinceLastToken) / 1000 / 60
+        ); // remaining wait time in minutes
+        return res.status(429).json({
+          message: `A reset email has already been sent recently. Please check your email or try again in ${waitTime} minutes.`,
+        });
+      }
+    }
+
+    // if no recent token, delete any old tokens
+    await knex("verification_otp").where({ user_id: user.id }).del();
+
+    const resetOTP = otpGenerator.generate(8, {
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const OTP_hash = await bcrypt.hash(resetOTP, Number(saltRounds));
+
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hours
+
+    // Store the new token in the database
+    await knex("verification_otp").insert({
+      user_id: user.id,
+      otp_hash: OTP_hash,
+      expires_at: expiresAt,
+      created_at: new Date(),
+    });
+
+    // Send the email
+    sendEmail(
+      user.email,
+      "Urheilupäiväkirja - Vahvista sähköpostiosoitteesi",
+      { name: firstName, otp: resetOTP },
+      "./template/verifyEmail.handlebars"
+    );
+
+    res.json({
+      message: "Reset token generated and sent to your email address.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generating reset token" });
+  }
+});
+
+router.post("/verify-email", async (req, res) => {
+  let userId;
+  try {
+    userId = getUserId(req);
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+  const { otp } = req.body;
+
+  try {
+    // check database for token
+    const tokenEntry = await knex("verification_otp")
+      .where({ user_id: userId })
+      .first();
+
+    if (!tokenEntry) {
+      return res.status(404).json({ message: "No OTP found" });
+    }
+
+    // Validate OTP and check if it's expired
+    const isTokenValid = await bcrypt.compare(otp, tokenEntry.otp_hash);
+    const isTokenExpired = new Date() > new Date(tokenEntry.expires_at);
+
+    if (!isTokenValid || isTokenExpired) {
+      return res.status(401).json({ message: "Invalid or expired OTP" });
+    }
+
+    // update user's email verified status
+    await knex("users").where({ id: userId }).update({ email_verified: true });
+
+    await knex("verification_otp").where({ user_id: userId }).del();
+
+    const user = await knex("users").where({ id: userId }).first();
+
+    const newToken = createToken({
+      email: user.email,
+      id: user.id,
+      role_id: user.role_id,
+      email_verified: user.email_verified,
+    });
+
+    res.json({
+      token: newToken,
+      email_verified: user.email_verified,
+      email: user.email,
+      role: user.role_id,
+    });
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    res.status(500).json({ message: "Error verifying email" });
+  }
+});
+
+
 
 router.delete("/:id", async (req, res, next) => {
   //TODO: IMPLEMENT ADMIN AUTHENTICATION, NOW JUST FOR TESTING PURPOSES

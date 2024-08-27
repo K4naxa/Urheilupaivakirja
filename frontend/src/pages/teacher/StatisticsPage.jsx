@@ -16,7 +16,7 @@ import {
   subYears,
 } from "date-fns";
 import formatDate from "../../utils/formatDate";
-import userService from "../../services/userService";
+import statisticsService from "../../services/statisticsService";
 import { useQueryClient } from "@tanstack/react-query";
 
 function StatisticsPage() {
@@ -30,12 +30,12 @@ function StatisticsPage() {
     queryKey: ["EntriesData", selectedTime, selectedView],
     queryFn: () => {
       if (selectedTime === "Month") {
-        return userService.getAllJournalEntryDataBetweenDates(
+        return statisticsService.getAllJournalEntryDataBetweenDates(
           startOfMonth(chartShowDate),
           endOfMonth(chartShowDate)
         );
       } else if (selectedTime === "Year") {
-        return userService.getAllJournalEntryDataBetweenDates(
+        return statisticsService.getAllJournalEntryDataBetweenDates(
           startOfYear(chartShowDate),
           endOfYear(chartShowDate)
         );
@@ -48,12 +48,12 @@ function StatisticsPage() {
     queryKey: ["newStudentsData", selectedTime],
     queryFn: () => {
       if (selectedTime === "Month") {
-        return userService.getNewStudentsBetweenDates(
+        return statisticsService.getNewStudentsBetweenDates(
           startOfMonth(chartShowDate),
           endOfMonth(chartShowDate)
         );
       } else if (selectedTime === "Year") {
-        return userService.getNewStudentsBetweenDates(
+        return statisticsService.getNewStudentsBetweenDates(
           startOfYear(chartShowDate),
           endOfYear(chartShowDate)
         );

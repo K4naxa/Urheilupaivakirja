@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect, useMemo } from "react";
-import trainingService from "../../../services/trainingService.js";
+import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
@@ -40,7 +40,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => trainingService.postJournalEntry(newJournalEntryData),
+    mutationFn: () => journalService.postJournalEntry(newJournalEntryData),
     // If the mutation fails, roll back to the previous value
     onError: (error) => {
       console.error("Error adding journal entry:", error);
@@ -73,7 +73,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     error,
   } = useQuery({
     queryKey: ["sportCategoryOptions"],
-    queryFn: () => trainingService.getJournalEntryOptions(),
+    queryFn: () => journalService.getJournalEntryOptions(),
   });
 
   // get all journal entries for the selected date from cache

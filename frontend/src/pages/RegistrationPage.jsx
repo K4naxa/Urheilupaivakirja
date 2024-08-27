@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import userService from "../services/userService";
+
+import registerService from "../services/registerService";
+import miscService from "../services/miscService";
 import { useNavigate } from "react-router-dom";
-import publicService from "../services/publicService";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
@@ -35,7 +36,7 @@ const RegistrationPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const optionsData = await publicService.getOptions();
+        const optionsData = await miscService.getGroupsSportsCampusesOptions();
         setOptions(optionsData);
       } catch (error) {
         console.error("Failed to fetch options:", error);
@@ -128,6 +129,7 @@ const RegistrationPage = () => {
     return isValid;
   };
 
+  //TODO: KORJAA
   const registerHandler = async (e) => {
     e.preventDefault();
 
@@ -135,7 +137,7 @@ const RegistrationPage = () => {
       return;
     }
     try {
-      let user = await userService.register(
+      let user = await registerService.register(
         registrationData.email,
         registrationData.password,
         registrationData.firstName,

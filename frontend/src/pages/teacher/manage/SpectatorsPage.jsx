@@ -19,7 +19,7 @@ const SpectatorsPage = () => {
   const handleDelete = (spectator) => {
     console.log("Deleting spectator:", spectator);
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(spectator.id).then(() => {
+      await spectatorService.deleteUser(spectator.id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });
@@ -51,7 +51,7 @@ const SpectatorsPage = () => {
 
   const inviteSpectator = useMutation({
     mutationFn: () =>
-      userService.inviteSpectator(newSpectatorEmail),
+      spectatorService.inviteSpectator(newSpectatorEmail),
     onError: (error) => {
       console.error("Error inviting spectator:", error);
       addToast("Virhe kutsuttaessa vierailijaa", { style: "error" });
@@ -74,7 +74,7 @@ const SpectatorsPage = () => {
 
   const { data: spectators, isLoading: spectatorsLoading } = useQuery({
     queryKey: ["spectators"],
-    queryFn: () => userService.getSpectators(),
+    queryFn: () => spectatorService.getSpectators(),
     config: {
       enabled: false,
     },
@@ -82,7 +82,7 @@ const SpectatorsPage = () => {
 
   const { data: invitedSpectators } = useQuery({
     queryKey: ["invitedSpectators"],
-    queryFn: () => userService.getInvitedSpectators(),
+    queryFn: () => spectatorService.getInvitedSpectators(),
     config: {
       enabled: false,
     },

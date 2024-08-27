@@ -10,7 +10,7 @@ import { FiCheck, FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
 import cc from "../../utils/cc";
-import trainingService from "../../services/trainingService";
+import courseService from "../../services/courseService";
 import { useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -62,15 +62,15 @@ function TeacherProfilePage() {
 
   const queryclient = useQueryClient();
 
-  const { data: visitorData, isLoading: visitorDataLoading } = useQuery({
-    queryKey: ["visitorData"],
+  const { data: spectatorData, isLoading: spectatorDataLoading } = useQuery({
+    queryKey: ["spectatorData"],
     queryFn: () => userService.getProfileData(),
     staleTime: 15 * 60 * 1000,
   });
 
   const { data: courseSegments } = useQuery({
     queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -81,7 +81,7 @@ function TeacherProfilePage() {
       setEmailError("Sähköpostiosoite ei voi olla tyhjä");
       return false;
     }
-    if (email === visitorData.email) {
+    if (email === spectatorData.email) {
       setEmailError("Sähköpostiosoite on jo käytössä");
       return false;
     }
@@ -152,7 +152,7 @@ function TeacherProfilePage() {
         let updatedPositions = updatedCourseSegments.map((segment, index) => {
           return { ...segment, order_number: index + 1 };
         });
-        trainingService.updateCourseSegments(updatedPositions);
+        courseService.updateCourseSegments(updatedPositions);
       } catch (error) {
         addToast("Virhe päivitettäessä merkintöjen määrä vaatimusta", {
           style: "error",
@@ -169,7 +169,7 @@ function TeacherProfilePage() {
     setShowConfirmModal(true);
     setAgreeStyle("red");
     setModalMessage(
-      `Haluatko varmasti poistaa käyttäjän ${visitorData.first_name} ${visitorData.last_name}? 
+      `Haluatko varmasti poistaa käyttäjän ${spectatorData.first_name} ${spectatorData.last_name}? 
   
       Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
     );
@@ -177,7 +177,7 @@ function TeacherProfilePage() {
 
     const handleUserConfirmation = async () => {
       try {
-        await userService.deleteUser(visitorData.id);
+        await userService.deleteUser(spectatorData.id);
         await logout();
         addToast("Käyttäjä poistettu", { style: "success" });
       } catch (error) {
@@ -190,10 +190,10 @@ function TeacherProfilePage() {
   };
 
   useEffect(() => {
-    if (visitorData) {
-      setUpdatedEmail(visitorData.email);
+    if (spectatorData) {
+      setUpdatedEmail(spectatorData.email);
     }
-  }, [visitorData]);
+  }, [spectatorData]);
   useEffect(() => {
     if (courseSegments) {
       setUpdatedCourseSegments([...courseSegments]);
@@ -202,7 +202,7 @@ function TeacherProfilePage() {
 
   const handleSegmentCreation = async () => {
     try {
-      await trainingService.createCourseSegment({
+      await courseService.createCourseSegment({
         name: newSegmentName,
         value: newSegmentValue,
       });
@@ -227,7 +227,7 @@ function TeacherProfilePage() {
 
     const handleUserConfirmation = async () => {
       try {
-        await trainingService.deleteCourseSegment(segment.id);
+        await courseService.deleteCourseSegment(segment.id);
         addToast("Segmentti poistettu", { style: "success" });
         queryclient.invalidateQueries("courseSegments");
       } catch (error) {
@@ -400,7 +400,7 @@ function TeacherProfilePage() {
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (visitorDataLoading || !courseSegments) {
+  if (spectatorDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -542,7 +542,7 @@ function TeacherProfilePage() {
                 type="text"
                 name="name"
                 disabled
-                value={visitorData.first_name + " " + visitorData.last_name}
+                value={spectatorData.first_name + " " + spectatorData.last_name}
                 className={cc(
                   inputClass,
                   "cursor-not-allowed",
