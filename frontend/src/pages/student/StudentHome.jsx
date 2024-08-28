@@ -239,7 +239,7 @@ function StudentHome() {
       {/* second row */}
       <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
         <div>
-          <WeekDayActivity journal={studentData.journal_entries} />
+          {/*<WeekDayActivity journal={studentData.journal_entries} />  */}
         </div>
 
         <div className="flex flex-col w-full h-full gap-4 p-4 border rounded-md bg-bgSecondary border-borderPrimary">

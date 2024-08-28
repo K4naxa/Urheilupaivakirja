@@ -29,8 +29,8 @@ const StudentLayout = () => {
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
-      <div className="border border-b-2 bg-bgSecondary border-borderPrimary fixed-header">
-        <header className="z-10 hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between">
+      <div className="z-10 border border-b-2 bg-bgSecondary border-borderPrimary fixed-header">
+        <header className="hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between">
           <Link to={"/"} className="flex items-center gap-2 text-xl">
             <img src={siteLogo} alt="site logo" className="w-8 h-8" />
             Urheilupäiväkirja

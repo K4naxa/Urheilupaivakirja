@@ -71,8 +71,14 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
+      console.log("Invalidating studentData query");
+
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      console.log("adding toast");
+
       addToast("Merkintä päivitetty", { style: "success" });
+      console.log("closing modal");
+
       onClose();
     },
   });
@@ -98,8 +104,6 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     isError: journalEntriesDataError,
   } = useQuery({
     queryKey: ["studentData"],
-    queryFn: () => studentService.getStudentData(),
-    staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
