@@ -299,7 +299,9 @@ router.delete("/delete/:id", isAuthenticated, isTeacher, async (req, res) => {
 
     // Check if the user to be deleted is either a student or a spectator
     if (user.role_id !== 2 && user.role_id !== 3) {
-      return res.status(403).json({ error: "Unauthorized to delete this user type." });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to delete this user type." });
     }
 
     await knex("users").where("id", "=", userIdToDelete).delete();
@@ -310,66 +312,85 @@ router.delete("/delete/:id", isAuthenticated, isTeacher, async (req, res) => {
   }
 });
 
-
 // delete teacher user
-router.delete("/delete/teacher/:id", isAuthenticated, isTeacher, async (req, res) => {
-  const userIdToDelete = Number(req.params.id);
+router.delete(
+  "/delete/teacher/:id",
+  isAuthenticated,
+  isTeacher,
+  async (req, res) => {
+    const userIdToDelete = Number(req.params.id);
 
-  try {
-    const targetUser = await knex("users")
-      .where("id", "=", userIdToDelete)
-      .first();
-    
-    if (!targetUser) {
-      return res.status(404).json({ error: "User not found" });
+    try {
+      const targetUser = await knex("users")
+        .where("id", "=", userIdToDelete)
+        .first();
+
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (targetUser.role_id !== 1) {
+        return res.status(403).json({ error: "Can only delete teacher users" });
+      }
+
+      const isAdmin = await knex("teachers")
+        .where("user_id", "=", userIdToDelete)
+        .andWhere("is_admin", true)
+        .first();
+
+      if (isAdmin) {
+        return res.status(403).json({ error: "Cannot delete an admin" });
+      }
+
+      await knex("users").where("id", "=", userIdToDelete).delete();
+      return res.status(200).json({ message: "User deleted" });
+    } catch (error) {
+      console.error("Error attempting to delete user:", error);
+      return res.status(500).json({ error: "Internal server error" });
     }
-
-    if (targetUser.role_id !== 1) {
-      return res.status(403).json({ error: "Can only delete teacher users" });
-    }
-
-    const isAdmin = await knex("teachers")
-      .where("user_id", "=", userIdToDelete)
-      .andWhere("is_admin", true)
-      .first();
-
-    if (isAdmin) {
-      return res.status(403).json({ error: "Cannot delete an admin" });
-    }
-
-    await knex("users").where("id", "=", userIdToDelete).delete();
-    return res.status(200).json({ message: "User deleted" });
-  } catch (error) {
-    console.error("Error attempting to delete user:", error);
-    return res.status(500).json({ error: "Internal server error" });
   }
-});
+);
+
+router.get(
+  "/profile",
+  isAuthenticated,
+  isTeacherOrSpectator,
+  async (req, res) => {
+    try {
+      const userId = req.user.user_id;
+      const role = req.user.role; 
 
 
-router.get("/profile", isAuthenticated, isTeacherOrSpectator, async (req, res) => {
-  try {
-    const userId = req.user.user_id
+      const userData = await knex("users")
+        .select("id", "email", "created_at")
+        .where("id", userId)
+        .first();
 
-    const userData = await knex("users")
-      .select("id", "email", "created_at")
-      .where("id", userId);
+      let userNames;
 
-    const userNames =
-      role === 2
-        ? await knex("spectators")
-            .select("first_name", "last_name")
-            .where("user_id", userId)
-        : await knex("teachers")
+      switch (role) {
+        case 1: // Teacher
+          userNames = await knex("teachers")
             .select("first_name", "last_name")
             .where("user_id", userId);
-    const combined = userData.map((user) => {
-      const spectator = userNames.find((s) => s.id === user.user_id);
-      return { ...user, ...spectator };
-    });
-    res.json(combined[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+          break;
+        case 2: // Spectator
+          userNames = await knex("spectators")
+            .select("first_name", "last_name")
+            .where("user_id", userId);
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid user role" });
+      }
+
+      const userProfile = { ...userData, ...userNames[0] };
+
+      res.json(userProfile);
+    } catch (err) {
+      console.error("Failed to fetch user profile:", err);
+      res.status(500).json({ message: err.message });
+    }
   }
-});
+);
 
 module.exports = router;

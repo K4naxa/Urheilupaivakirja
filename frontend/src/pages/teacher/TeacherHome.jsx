@@ -30,7 +30,6 @@ import {
 } from "date-fns";
 import formatDate from "../../utils/formatDate.ts";
 import { Link } from "react-router-dom";
-import userService from "../../services/userService.js";
 import studentService from "../../services/studentService.js";
 import courseService from "../../services/courseService.js";
 import miscService from "../../services/miscService.js";
@@ -73,10 +72,9 @@ function TeacherHome() {
   });
 
   // get all students
-  const { data: StudentsList, isLoading: StudentsListLoading } = useQuery({
+  const { data: StudentsList, isPending: StudentsListLoading } = useQuery({
     queryKey: ["StudentsList"],
-    queryFn: () => userService.getStudents(),
-    staleTime: 30 * 60 * 1000, //30 minutes
+    queryFn: () => studentService.getStudents(),
   });
 
   // Course completion requirement for passing the course
@@ -87,14 +85,18 @@ function TeacherHome() {
   });
 
   // Only pinned students where the user id == pinner_user_id
-  const { data: pinnedStudentsData } = useQuery({
+  const {
+    data: pinnedStudentsData,
+    isPending: pinnedStudentsLoading,
+    isError: pinnedStudentsError,
+  } = useQuery({
     queryKey: ["pinnedStudents"],
     queryFn: () => studentService.getPinnedStudents(),
     staleTime: 30 * 60 * 1000, //30 minutes
   });
 
   // all  sports / campuses / student groups for filtering
-  const { data: optionsData, isLoading: optionsDataLoading } = useQuery({
+  const { data: optionsData, isPending: optionsDataLoading } = useQuery({
     queryKey: ["options"],
     queryFn: () => miscService.getGroupsSportsCampusesOptions(),
   });
@@ -762,7 +764,12 @@ function TeacherHome() {
       );
   };
 
-  if ((optionsDataLoading, StudentsListLoading)) {
+  if (
+    optionsDataLoading ||
+    StudentsListLoading ||
+    pinnedStudentsLoading ||
+    pinnedStudentsError
+  ) {
     return <LoadingScreen />;
   } else
     return (

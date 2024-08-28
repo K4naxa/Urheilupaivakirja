@@ -60,12 +60,12 @@ const RenderSingleNews = ({ news }) => {
 };
 
 const StudentNewsPage = () => {
-  const { data, isLoading, error } = useQuery({
+  const { data: newsData, isPending, error } = useQuery({
     queryKey: ["news"],
     queryFn: () => newsService.getNews(),
   });
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="w-full h-full flex justify-center items-center">
         <LoadingScreen />
@@ -88,7 +88,7 @@ const StudentNewsPage = () => {
         </header>
 
         <div className="grid justify-center md:grid-cols-2 m-4 auto-rows-max gap-8">
-          {data.map((news) => (
+          {newsData.map((news) => (
             <RenderSingleNews key={news.id} news={news} />
           ))}
         </div>

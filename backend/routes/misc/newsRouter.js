@@ -5,7 +5,6 @@ const {
   isAuthenticated,
   isStudent,
   isTeacher,
-  isTeacherOrSpectator,
 } = require("../../utils/authMiddleware");
 
 const config = require("../../utils/config");
@@ -17,7 +16,7 @@ router.get("/", isAuthenticated, async (req, res, next) => {
   try {
     const newsRows = await knex("news")
       .select(
-        "news.id", // Explicitly selecting each column except 'teacher_id'
+        "news.id",
         "news.title",
         "news.content",
         "news.created_at",
@@ -167,9 +166,7 @@ router.get("/unread", isAuthenticated, async (req, res, next) => {
 // Update student.news_last_viewed_at to current time is found at userRouter.js
 router.put("/update-student-news-last-viewed-at", isAuthenticated, isStudent, async (req, res) => {
   console.log("update news last viewed at");
-  if (!user_id) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  const user_id = req.user.user_id;
 
   try {
     await knex("students")

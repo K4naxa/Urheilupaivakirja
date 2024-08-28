@@ -7,7 +7,8 @@ const getUnverifiedStudentsSportsCampuses = async () => {
 };
 
 const getGroupsSportsCampusesOptions = async () => {
-  const response = await apiClient.get("/register/options");
+  const response = await apiClient.get("/public/options");
+  console.log("options: ", response.data);
   return response.data;
 };
 

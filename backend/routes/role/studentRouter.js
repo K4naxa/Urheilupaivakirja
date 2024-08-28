@@ -14,6 +14,7 @@ const {
 
 // Get all students and the names of their sport, group and campus
 router.get("/", isAuthenticated, isTeacherOrSpectator, async (req, res) => {
+  console.log("trying to get all students");
   try {
     // Get all students
     const allStudents = await knex

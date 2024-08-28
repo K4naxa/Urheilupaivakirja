@@ -11,7 +11,7 @@ const getPaginatedStudentsData = async (students, showDate) => {
 
 // Student Management -------------------------------------------------------------------
 const getStudents = async () => {
-  const response = await apiClient.get("/student");
+  const response = await apiClient.get("/student/");
   return response.data;
 };
 

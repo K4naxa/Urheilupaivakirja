@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 
 // get all news
 const getNews = async () => {
-  const response = await apiClient.get("/news");
+  const response = await apiClient.get("/news/");
   return response.data;
 };
 

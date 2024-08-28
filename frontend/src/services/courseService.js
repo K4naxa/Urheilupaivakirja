@@ -1,12 +1,12 @@
 import apiClient from "./apiClient";
 
 const getCourseSegments = async () => {
-    const response = await apiClient.get("/course/segments");
+    const response = await apiClient.get("/course/segment");
     return response.data;
   };
   const updateCourseSegments = async (segments) => {
     const response = await apiClient.put(
-      "/course/segments",
+      "/course/segment",
       { segments }
     );
     return response.data;
@@ -14,7 +14,7 @@ const getCourseSegments = async () => {
   
   const createCourseSegment = async (segment) => {
     const response = await apiClient.post(
-      "/course/segments",
+      "/course/segment",
       segment
     );
     return response.data;
@@ -22,7 +22,7 @@ const getCourseSegments = async () => {
   
   const deleteCourseSegment = async (id) => {
     const response = await apiClient.delete(
-      `/course/segments/${id}`
+      `/course/segment/${id}`
     );
     return response.data;
   };

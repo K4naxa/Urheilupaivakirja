@@ -66,17 +66,21 @@ const isStudent = (req, res, next) => {
 };
 
 const isTeacher = (req, res, next) => {
-  if (req.user && req.user.role === '1') {
-      return next(); // User is a teacher and has permission to access the route
+  if (req.user && req.user.role === 1) { // Assuming role is stored as a number
+    //console.log("User is a teacher: ", req.user);
+    next();
+  } else {
+    return res.status(403).json({ message: 'Access forbidden: teachers only' });
   }
-  return res.status(403).json({ message: 'Access forbidden: teachers only' });
 };
 
 const isTeacherOrSpectator = (req, res, next) => {
-  if (req.user && (req.user.role === '1' || req.user.role === '2')) {
-      return next(); // User is a teacher or spectator and has permission to access the route
+  if (req.user && (req.user.role === 1 || req.user.role === 2)) { // Assuming role is stored as a number
+    //console.log("User is a teacher or spectator: ", req.user);
+    next();
+  } else {
+    return res.status(403).json({ message: 'Access forbidden: teachers only' });
   }
-  return res.status(403).json({ message: 'Access forbidden: teachers and spectators only' });
 };
 
 
@@ -120,7 +124,7 @@ const isAuthenticated = (req, res, next) => {
       }
 
       req.user = decodedToken; // req.user contains user information from the token
-      console.log("User authenticated: ", req.user);
+      //console.log("User authenticated: ", req.user);
       next();
     });
   } else if (refreshToken) {

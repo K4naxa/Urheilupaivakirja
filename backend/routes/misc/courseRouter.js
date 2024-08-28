@@ -4,7 +4,6 @@ var router = express.Router();
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
-const { getRole } = require("../../utils/authMiddleware");
 const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 
 // get course info
@@ -78,7 +77,7 @@ router.put("/segment", isAuthenticated, isTeacher, async (req, res) => {
   }
 });
 
-router.delete("/segment/:id", async (req, res) => {
+router.delete("/segment/:id", isAuthenticated, isTeacher, async (req, res) => {
   try {
     const id = req.params.id;
     try {
