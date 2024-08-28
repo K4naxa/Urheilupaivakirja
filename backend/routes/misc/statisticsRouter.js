@@ -13,7 +13,7 @@ router.get("/entries", isAuthenticated, isTeacher, async (req, res) => {
     // Query to fetch all necessary data and compute aggregates
     const results = await knex("journal_entries")
       .select(
-        knex.raw('COUNT(DISTINCT journal_entries.student_id) AS studentCount'),
+        knex.raw('COUNT(DISTINCT journal_entries.user_id) AS studentCount'),
         knex.raw('COUNT(*) AS entryCount'),
         knex.raw('SUM(CASE WHEN journal_entries.entry_type_id = 1 THEN journal_entries.length_in_minutes ELSE 0 END) AS exerciseTimeMinutes')
       )

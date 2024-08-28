@@ -104,6 +104,21 @@ router.get("/user", isAuthenticated, async (req, res, next) => {
   }
 });
 
+//get all user journal entries for checking conflicts
+router.get("/user/conflicts", isAuthenticated, async (req, res, next) => {
+  const user_id = req.user.user_id;
+
+  try {
+    const rows = await knex("journal_entries")
+      .select("id", "entry_type_id")
+      .where({user_id});
+    res.json(rows);
+  } catch (err) {
+    console.log("SELECT * FROM `journal_entries` failed", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+})
+
 //get all user journals by id for Teacher
 // TODO: Remove if not used
 router.get("/user/:id", isAuthenticated, isTeacher, async (req, res, next) => {
@@ -285,8 +300,10 @@ router.post("/entry/", isAuthenticated, isStudent, async (req, res, next) => {
 
 // Get a single journal entry by journal_entry.id
 // TODO: Remove if not used
-router.get("/:id", isAuthenticated, async (req, res, next) => {
+router.get("/entry/:id", isAuthenticated, async (req, res, next) => {
   const id = req.params.id;
+  const userId = req.user.user_id;
+
   try {
     const data = await knex("journal_entries")
       .select([
@@ -301,12 +318,13 @@ router.get("/:id", isAuthenticated, async (req, res, next) => {
         "details",
       ])
       .where("id", id)
+      .andWhere("user_id", userId)
       .first();
 
     if (data) {
       res.json(data);
     } else {
-      res.status(404).json({ message: "Entry not found" });
+      res.status(404).json({ message: "Entry not found or access denied" });
     }
   } catch (err) {
     console.log("GET /journal_entry/:id failed", err);
@@ -315,6 +333,7 @@ router.get("/:id", isAuthenticated, async (req, res, next) => {
       .json({ error: "An error occurred while fetching a journal entry." });
   }
 });
+
 
 router.put("/entry/:id", isAuthenticated, isStudent, async (req, res, next) => {
   const id = req.params.id;

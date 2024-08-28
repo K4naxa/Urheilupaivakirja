@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import userService from "../../../../services/userService";
+import studentService from "../../../../services/studentService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 
 import { Link } from "react-router-dom";

@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 
 // Teacher  Management -------------------------------------------------------------------
 const getTeachers = async () => {
-    const response = await apiClient.get("/teacher");
+    const response = await apiClient.get("/teacher/");
     return response.data;
   };
   

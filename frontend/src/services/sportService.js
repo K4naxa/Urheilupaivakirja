@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 
 //get all sports
 const getSports = async () => {
-    const response = await apiClient.get("/sport");
+    const response = await apiClient.get("/sport/");
     return response.data;
   };
   

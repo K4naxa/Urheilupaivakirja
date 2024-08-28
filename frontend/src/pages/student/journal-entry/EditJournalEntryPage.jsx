@@ -1,13 +1,12 @@
 import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "../../../components/confirm-modal/ConfirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
-import { format } from "date-fns";
 import { useParams } from "react-router-dom";
 import { FiTrash2 } from "react-icons/fi";
 import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
+import studentService from "../../../services/studentService.js";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -48,7 +47,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   const {
     data: journalEntry,
     error: journalEntryError,
-    isLoading: journalEntryIsLoading,
+    isFetching: journalEntryisFetching,
   } = useQuery({
     queryKey: ["journalEntry", EntryIdForQuery],
     queryFn: () => journalService.getJournalEntryForForm(EntryIdForQuery),
@@ -61,7 +60,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
       }
       setJournalEntryData(journalEntry);
     }
-  }, [journalEntryIsLoading, journalEntry]);
+  }, [journalEntryisFetching, journalEntry]);
 
   const editJournalEntry = useMutation({
     mutationFn: () => journalService.editJournalEntry(journalEntryData),
@@ -79,7 +78,8 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   });
 
   const deleteEntry = useMutation({
-    mutationFn: () => journalService.deleteJournalEntry(journalEntryData.entry_id),
+    mutationFn: () =>
+      journalService.deleteJournalEntry(journalEntryData.entry_id),
     onError: (error) => {
       console.error("Error deleting journal entry:", error);
       addToast("Virhe poistettaessa merkintää", { style: "error" });
@@ -94,24 +94,26 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   // Journal data for matching
   const {
     data: journalEntriesData,
-    isLoading: journalEntriesDataLoading,
+    isFetching: journalEntriesDataLoading,
     isError: journalEntriesDataError,
   } = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => studentService.getStudentData(),
+    queryKey: ["journalEntriesForConflictCheck"],
+    queryFn: () => journalService.getJournalEntriesForConflictCheck(),
     staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
   const {
     data: optionsData,
-    isLoading: optionsLoading,
+    isFetching: optionsLoading,
     isError: optionsError,
     error,
   } = useQuery({
     queryKey: ["options"],
     queryFn: () => journalService.getJournalEntryOptions(),
   });
+
+
 
   function formatDateString(isoDateString) {
     // Assuming the input date string is in UTC and in ISO format
@@ -180,26 +182,25 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
 
   const deleteJournalEntryHandler = async (e) => {
     e.preventDefault();
-  
+
     const onConfirmDelete = async () => {
       try {
         await deleteEntry.mutate({ journalEntryData });
-        console.log('Journal entry deleted successfully');
+        console.log("Journal entry deleted successfully");
       } catch (error) {
         console.error("Error deleting journal entry:", error);
       }
     };
-  
+
     openConfirmModal({
       text: "Merkintä poistetaan pysyvästi",
       agreeButtonText: "Jatka",
-      agreeStyle: "red", 
+      agreeStyle: "red",
       declineButtonText: "Peruuta",
-      onAgree: onConfirmDelete, 
+      onAgree: onConfirmDelete,
       closeOnOutsideClick: false,
     });
   };
-  
 
   const handleUserConfirmation = async () => {
     try {
@@ -309,10 +310,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
         journalEntryData.time_of_day,
         "time_of_day"
       );
-      hasMissingInputs |= checkIfEmpty(
-        journalEntryData.intensity,
-        "intensity"
-      );
+      hasMissingInputs |= checkIfEmpty(journalEntryData.intensity, "intensity");
     }
 
     if (hasMissingInputs) {
@@ -466,223 +464,228 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 
-  if (optionsLoading || journalEntriesDataLoading) {
+    if (optionsLoading || journalEntriesDataLoading || journalEntryisFetching) {
     console.log("is loading");
     return <p>Loading...</p>;
-  } else {
-    return (
-      <>
-        <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
-          <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
-            <p className="sm:min-w-[400px] cursor-default	">Muokkaa merkintää</p>
-            <button
-              onClick={onClose}
-              className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
-            >
-              <FiArrowLeft />
-            </button>
-          </div>
-          <form
-            className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
-            onSubmit={editJournalEntryHandler}
+  }
+
+  if (journalEntryError || optionsError || journalEntriesDataError) {
+    console.error("Error fetching journal entry:", journalEntryError);
+    return <p>Error: {journalEntryError.message || "Unknown error"}</p>;
+  }
+
+  return (
+    <>
+      <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
+        <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
+          <p className="sm:min-w-[400px] cursor-default	">Muokkaa merkintää</p>
+          <button
+            onClick={onClose}
+            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
           >
-            <div className="flex flex-col items-center w-full p-1">
-              <div className="flex flex-row gap-12 justify-between">
-                <button
-                  type="button"
-                  onClick={() => entryTypeChangeHandler("2")}
-                  className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
+            <FiArrowLeft />
+          </button>
+        </div>
+        <form
+          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
+          onSubmit={editJournalEntryHandler}
+        >
+          <div className="flex flex-col items-center w-full p-1">
+            <div className="flex flex-row gap-12 justify-between">
+              <button
+                type="button"
+                onClick={() => entryTypeChangeHandler("2")}
+                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
               border-2 ${journalEntryData.entry_type === "2" ? "border-bgRest bg-bgRest" : "border-bgRest bg-bgSecondary hover:bg-bgRest hover:bg-opacity-40"}
               `}
-                >
-                  Lepopäivä
-                </button>
+              >
+                Lepopäivä
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => entryTypeChangeHandler("3")}
-                  className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
+              <button
+                type="button"
+                onClick={() => entryTypeChangeHandler("3")}
+                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
               border-2 ${journalEntryData.entry_type === "3" ? "border-bgSick bg-bgSick" : "border-bgSick bg-bgSecondary hover:bg-bgSick hover:bg-opacity-40"}
               `}
+              >
+                Sairauspäivä
+              </button>
+            </div>
+          </div>
+
+          <div className={`${inputContainer} px-2.5`}>
+            <label className={inputLabel} htmlFor="date-picker">
+              Päivämäärä
+            </label>
+            <input
+              className={`text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b p-1 ${errors.date ? "border-red-500" : "border-borderPrimary"} text-center`}
+              type="date"
+              name="date"
+              value={journalEntryData.date}
+              onChange={changeHandler}
+              id="date-picker"
+            />
+          </div>
+
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.length_in_minutes ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel} htmlFor="length_in_minutes">
+                Kesto: {convertTime(journalEntryData.length_in_minutes)}
+              </label>
+              <div className="w-full p-1">
+                <input
+                  className="bg-bgPrimary w-full"
+                  type="range"
+                  min="30"
+                  max="180"
+                  value={journalEntryData.length_in_minutes}
+                  step="15"
+                  id="length_in_minutes"
+                  onChange={changeHandler}
+                  name="length_in_minutes"
+                />
+              </div>
+            </div>
+          )}
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.time_of_day ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel}>Ajankohta</label>
+              <div className={optionContainer}>
+                {optionsData.time_of_day.map((time) =>
+                  renderRadioButton(
+                    "time_of_day",
+                    time.id.toString(),
+                    time.name,
+                    changeHandler
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel}>Harjoitustyyppi</label>
+              <div className={optionContainer}>
+                {optionsData.workout_types.map((type) =>
+                  renderRadioButton(
+                    "workout_type",
+                    type.id.toString(),
+                    type.name,
+                    workoutTypeChangeHandler
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
+          {journalEntryData.entry_type === "1" &&
+            journalEntryData.workout_type === "3" && (
+              <div
+                className={`${inputContainer} px-2.5 ${errors.workout_category ? "shadow-error" : ""}`}
+              >
+                <label className={inputLabel} htmlFor="workout-category">
+                  Harjoituskategoria
+                </label>
+                <select
+                  className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
+                  id="workoutCategory"
+                  name="workout_category"
+                  value={journalEntryData.workout_category}
+                  onChange={changeHandler}
+                  disabled={journalEntryData.workout_type != "3"}
                 >
-                  Sairauspäivä
+                  {optionsData.workout_categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.intensity ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel}>Rankkuus</label>
+              <div className={optionContainer}>
+                {console.log(optionsData.workout_intensities[0].id)}
+                {optionsData.workout_intensities.map((intensity) =>
+                  renderRadioButton(
+                    "intensity",
+                    intensity.id.toString(),
+                    intensity.name,
+                    changeHandler
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className={inputContainer}>
+            <label
+              className={`${inputLabel} cursor-pointer flex items-center gap-1 hover:text-primaryColor hover:cursor-pointer`}
+              htmlFor="details-textarea"
+              onClick={() => setShowDetails((prevState) => !prevState)}
+            >
+              Lisätiedot{" "}
+              {(showDetails && <FiChevronUp className="text-lg" />) || (
+                <FiChevronDown className="text-lg" />
+              )}
+            </label>
+            {showDetails && (
+              <textarea
+                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
+                onChange={changeHandler}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.stopPropagation();
+                  }
+                }}
+                type="text"
+                name="details"
+                id="details-textarea"
+                value={journalEntryData.details}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
+            {conflict.messageShort && <p>{conflict.messageShort}</p>}
+            <div className="flex w-full">
+              <div className="flex-1"></div>
+              <div>
+                <button
+                  className={`min-w-[160px] text-white mx-6 px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
+      ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
+                  type="submit"
+                  disabled={submitButtonIsDisabled}
+                >
+                  {getSubmitButtonText(journalEntryData.entry_type)}
+                </button>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <button
+                  className="hover:cursor-pointer hover:bg-bgGray rounded m-1.5 p-2"
+                  onClick={deleteJournalEntryHandler}
+                >
+                  <FiTrash2 className="text-2xl" />
                 </button>
               </div>
             </div>
-
-            <div className={`${inputContainer} px-2.5`}>
-              <label className={inputLabel} htmlFor="date-picker">
-                Päivämäärä
-              </label>
-              <input
-                className={`text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b p-1 ${errors.date ? "border-red-500" : "border-borderPrimary"} text-center`}
-                type="date"
-                name="date"
-                value={journalEntryData.date}
-                onChange={changeHandler}
-                id="date-picker"
-              />
-            </div>
-
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.length_in_minutes ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel} htmlFor="length_in_minutes">
-                  Kesto: {convertTime(journalEntryData.length_in_minutes)}
-                </label>
-                <div className="w-full p-1">
-                  <input
-                    className="bg-bgPrimary w-full"
-                    type="range"
-                    min="30"
-                    max="180"
-                    value={journalEntryData.length_in_minutes}
-                    step="15"
-                    id="length_in_minutes"
-                    onChange={changeHandler}
-                    name="length_in_minutes"
-                  />
-                </div>
-              </div>
-            )}
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.time_of_day ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel}>Ajankohta</label>
-                <div className={optionContainer}>
-                  {optionsData.time_of_day.map((time) =>
-                    renderRadioButton(
-                      "time_of_day",
-                      time.id.toString(),
-                      time.name,
-                      changeHandler
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel}>Harjoitustyyppi</label>
-                <div className={optionContainer}>
-                  {optionsData.workout_types.map((type) =>
-                    renderRadioButton(
-                      "workout_type",
-                      type.id.toString(),
-                      type.name,
-                      workoutTypeChangeHandler
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            {journalEntryData.entry_type === "1" &&
-              journalEntryData.workout_type === "3" && (
-                <div
-                  className={`${inputContainer} px-2.5 ${errors.workout_category ? "shadow-error" : ""}`}
-                >
-                  <label className={inputLabel} htmlFor="workout-category">
-                    Harjoituskategoria
-                  </label>
-                  <select
-                    className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
-                    id="workoutCategory"
-                    name="workout_category"
-                    value={journalEntryData.workout_category}
-                    onChange={changeHandler}
-                    disabled={journalEntryData.workout_type != "3"}
-                  >
-                    {optionsData.workout_categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.intensity ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel}>Rankkuus</label>
-                <div className={optionContainer}>
-                  {console.log(optionsData.workout_intensities[0].id)}
-                  {optionsData.workout_intensities.map((intensity) =>
-                    renderRadioButton(
-                      "intensity",
-                      intensity.id.toString(),
-                      intensity.name,
-                      changeHandler
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className={inputContainer}>
-              <label
-                className={`${inputLabel} cursor-pointer flex items-center gap-1 hover:text-primaryColor hover:cursor-pointer`}
-                htmlFor="details-textarea"
-                onClick={() => setShowDetails((prevState) => !prevState)}
-              >
-                Lisätiedot{" "}
-                {(showDetails && <FiChevronUp className="text-lg" />) || (
-                  <FiChevronDown className="text-lg" />
-                )}
-              </label>
-              {showDetails && (
-                <textarea
-                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
-                  onChange={changeHandler}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.stopPropagation();
-                    }
-                  }}
-                  type="text"
-                  name="details"
-                  id="details-textarea"
-                  value={journalEntryData.details}
-                />
-              )}
-            </div>
-
-            <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
-              {conflict.messageShort && <p>{conflict.messageShort}</p>}
-              <div className="flex w-full">
-                <div className="flex-1"></div>
-                <div>
-                  <button
-                    className={`min-w-[160px] text-white mx-6 px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
-      ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
-                    type="submit"
-                    disabled={submitButtonIsDisabled}
-                  >
-                    {getSubmitButtonText(journalEntryData.entry_type)}
-                  </button>
-                </div>
-                <div className="flex-1 flex justify-center">
-
-                  <button className="hover:cursor-pointer hover:bg-bgGray rounded m-1.5 p-2" onClick={deleteJournalEntryHandler}>
-                    <FiTrash2 className="text-2xl"/>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-      </>
-    );
-  }
+          </div>
+        </form>
+      </div>
+    </>
+  );
 };
-
-
 
 export default EditJournalEntryPage;

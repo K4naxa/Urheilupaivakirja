@@ -2,13 +2,13 @@ import apiClient from './apiClient';
 
 // get all campuses
 const getCampuses = async () => {
-    const response = await apiClient.get("/campus");
+    const response = await apiClient.get("/campus/");
     return response.data;
   };
   // add a new campus
   const addCampus = async (newCampus) => {
     const campus = { name: newCampus };
-    const response = await apiClient.post("/campus", campus);
+    const response = await apiClient.post("/campus/", campus);
     return response.data;
   };
   

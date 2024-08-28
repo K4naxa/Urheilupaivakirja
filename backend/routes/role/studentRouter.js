@@ -312,7 +312,7 @@ router.get(
         .select("pinned_user_id")
         .where("pinner_user_id", pinner_id);
 
-      res.json({ pinnedStudents });
+      res.json( pinnedStudents );
     } catch (error) {
       console.error("Error fetching pinned students:", error);
       res
@@ -321,6 +321,8 @@ router.get(
     }
   }
 );
+
+
 
 // pin a student
 router.post(

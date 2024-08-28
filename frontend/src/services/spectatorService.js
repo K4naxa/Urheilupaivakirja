@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 
 // Spectator  Management -------------------------------------------------------------------
 const getSpectators = async () => {
-    const response = await apiClient.get("/spectator");
+    const response = await apiClient.get("/spectator/");
     return response.data;
   };
   

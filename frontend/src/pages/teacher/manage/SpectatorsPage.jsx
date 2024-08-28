@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import userService from "../../../services/userService";
+import spectatorService from "../../../services/spectatorService";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";

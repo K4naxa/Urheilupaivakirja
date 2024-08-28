@@ -20,11 +20,6 @@ const {
 // Get all spectators
 router.get("/", isAuthenticated, isTeacher, async (req, res) => {
   try {
-    // Check if user is admin
-    if (getRole(req) !== 1) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
     // get spectators with their user info
     const spectators = await knex("users")
       .join("spectators", "users.id", "=", "spectators.user_id")
@@ -38,7 +33,6 @@ router.get("/", isAuthenticated, isTeacher, async (req, res) => {
         "spectators.last_name"
       )
       .where("users.role_id", 2);
-
     res.json(spectators);
   } catch (err) {
     console.error("Error fetching spectators:", err);
@@ -208,12 +202,8 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.get("/invited", async (req, res) => {
+router.get("/invited", isAuthenticated, isTeacher, async (req, res) => {
   try {
-    // Check if user is admin
-    if (getRole(req) !== 1) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
 
     const invitedSpectators = await knex("invited_spectators").select(
       "email",

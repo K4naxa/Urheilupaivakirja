@@ -1,13 +1,13 @@
 import apiClient from "./apiClient";
 
 const getGroups = async () => {
-  const response = await apiClient.get("/group");
+  const response = await apiClient.get("/group/");
   return response.data;
 };
 
 const addGroup = async (newGroup) => {
   const group = { name: newGroup };
-  const response = await apiClient.post("/group", group);
+  const response = await apiClient.post("/group/", group);
   return response.data;
 };
 

@@ -70,7 +70,7 @@ function TeacherHome() {
     viewableStudents: [],
     viewableJournals: [],
   });
-
+   
   // get all students
   const { data: StudentsList, isPending: StudentsListLoading } = useQuery({
     queryKey: ["StudentsList"],
@@ -85,11 +85,7 @@ function TeacherHome() {
   });
 
   // Only pinned students where the user id == pinner_user_id
-  const {
-    data: pinnedStudentsData,
-    isPending: pinnedStudentsLoading,
-    isError: pinnedStudentsError,
-  } = useQuery({
+  const { data: pinnedStudentsData, isPending: pinnedStudentsLoading  } = useQuery({
     queryKey: ["pinnedStudents"],
     queryFn: () => studentService.getPinnedStudents(),
     staleTime: 30 * 60 * 1000, //30 minutes
@@ -764,12 +760,7 @@ function TeacherHome() {
       );
   };
 
-  if (
-    optionsDataLoading ||
-    StudentsListLoading ||
-    pinnedStudentsLoading ||
-    pinnedStudentsError
-  ) {
+  if (optionsDataLoading || StudentsListLoading || pinnedStudentsLoading) {
     return <LoadingScreen />;
   } else
     return (

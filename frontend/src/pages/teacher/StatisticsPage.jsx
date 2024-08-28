@@ -18,6 +18,7 @@ import {
 import formatDate from "../../utils/formatDate";
 import statisticsService from "../../services/statisticsService";
 import { useQueryClient } from "@tanstack/react-query";
+import LoadingScreen from "../../components/LoadingScreen";
 
 function StatisticsPage() {
   const queryclient = useQueryClient();
@@ -26,7 +27,7 @@ function StatisticsPage() {
   const [selectedView, setSelectedView] = useState("Day");
 
   // Get data for the  journal info graphs (new entries, avg excercise time, avg sickdays)
-  const { data: EntriesData, isLoading: EntriesLoading } = useQuery({
+  const { data: EntriesData, isPending: EntriesLoading } = useQuery({
     queryKey: ["EntriesData", selectedTime, selectedView],
     queryFn: () => {
       if (selectedTime === "Month") {
@@ -44,7 +45,7 @@ function StatisticsPage() {
   });
 
   // Get data for the new students graph
-  const { data: newStudentsData, isLoading: NewStudentsLoading } = useQuery({
+  const { data: newStudentsData, isPending: NewStudentsLoading } = useQuery({
     queryKey: ["newStudentsData", selectedTime],
     queryFn: () => {
       if (selectedTime === "Month") {
@@ -70,11 +71,16 @@ function StatisticsPage() {
 
   // -----------------------------------------------------------------------------------------
 
+
   // invalidate queries when changing the selected time or view
   useEffect(() => {
     queryclient.invalidateQueries("EntriesData");
     queryclient.invalidateQueries("newStudentsData");
   }, [selectedTime, chartShowDate, selectedView]);
+
+  if (EntriesLoading || NewStudentsLoading) {
+    return <LoadingScreen />;
+  }
 
   const graphContainerClass =
     "flex flex-col gap-4 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2";

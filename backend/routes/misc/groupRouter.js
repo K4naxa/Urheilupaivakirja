@@ -26,14 +26,7 @@ router.get("/", isAuthenticated, isTeacher, async (req, res, next) => {
 });
 
 // Add a new group
-router.post("/", (req, res) => {
-  // Check for admin role
-  if (getRole(req) !== 1) {
-    console.log("Unauthorized user trying to add group");
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
-  }
+router.post("/", isAuthenticated, isTeacher, (req, res) => {
 
   let { name } = req.body;
 

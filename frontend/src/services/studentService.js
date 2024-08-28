@@ -3,7 +3,7 @@ import apiClient from "./apiClient";
 // Get all students and their journal entries for a given year
 const getPaginatedStudentsData = async (students, showDate) => {
   const response = await apiClient.post(
-    `/student/paginated/`,
+    `/student/paginated`,
     { students, showDate }
   );
   return response.data;
@@ -46,12 +46,12 @@ const getPinnedStudents = async () => {
 };
 
 const pinStudent = async (id) => {
-  const response = await apiClient.put(`/student/pin/${id}`, {});
+  const response = await apiClient.post(`/student/pin/${id}`, {});
   return response.data;
 };
 
 const unpinStudent = async (id) => {
-  const response = await apiClient.put(
+  const response = await apiClient.delete(
     `/student/unpin/${id}`,
     {}
   );

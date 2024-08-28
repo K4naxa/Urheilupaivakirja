@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-
+import dayjs from "dayjs";
 // multiple journal entries or whole journal -------------------------------------------------------------------
 
 const getUserJournalEntriesByUserId = async (user_id) => {
@@ -8,6 +8,13 @@ const getUserJournalEntriesByUserId = async (user_id) => {
   );
   return response.data;
 };
+
+const getJournalEntriesForConflictCheck = async () => {
+  const response = await apiClient.get(
+    `/journal/user`
+  );
+  return response.data;
+}
 
 
 const getUserJournalEntriesByDate = async (date) => {
@@ -125,6 +132,11 @@ const deleteJournalEntry = async (id) => {
   return response.data;
 };
 
+const getJournalEntryOptions = async () => {
+  const response = await apiClient.get("/journal/options");
+  return response.data;
+};
+
 export default {
   getUserJournalEntriesByUserId,
   getUserJournalEntriesByDate,
@@ -133,4 +145,6 @@ export default {
   postJournalEntry,
   editJournalEntry,
   deleteJournalEntry,
+  getJournalEntryOptions,
+  getJournalEntriesForConflictCheck
 };

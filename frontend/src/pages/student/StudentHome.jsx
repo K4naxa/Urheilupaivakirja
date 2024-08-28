@@ -40,7 +40,7 @@ function StudentHome() {
 
   const {
     data: studentData,
-    isLoading: studentDataLoading,
+    isPending: studentDataLoading,
     error: studentDataError,
   } = useQuery({
     queryKey: ["studentData"],
@@ -50,7 +50,7 @@ function StudentHome() {
 
   const {
     data: courseSegments,
-    isLoading: courseSegmentsLoading,
+    isPending: courseSegmentsLoading,
     error: courseSegmentsError,
   } = useQuery({
     queryKey: ["courseSegments"],
