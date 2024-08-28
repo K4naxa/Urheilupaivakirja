@@ -120,7 +120,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
 
     try {
-      await addJournalEntry.mutate({ newJournalEntryData });
+       addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }

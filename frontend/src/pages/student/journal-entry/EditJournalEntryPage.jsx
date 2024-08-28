@@ -172,7 +172,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     }
 
     try {
-      await editJournalEntry.mutate({ journalEntryData });
+       editJournalEntry.mutate({ journalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -183,7 +183,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
 
     const onConfirmDelete = async () => {
       try {
-        await deleteEntry.mutate({ journalEntryData });
+        deleteEntry.mutate({ journalEntryData });
         console.log("Journal entry deleted successfully");
       } catch (error) {
         console.error("Error deleting journal entry:", error);
@@ -192,7 +192,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
 
     openConfirmModal({
       text: "Merkintä poistetaan pysyvästi",
-      agreeButtonText: "Jatka",
+      agreeButtonText: "Poista",
       agreeStyle: "red",
       declineButtonText: "Peruuta",
       onAgree: onConfirmDelete,

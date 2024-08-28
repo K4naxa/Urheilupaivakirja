@@ -73,7 +73,7 @@ router.post("/login", async (req, res, next) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Set to true in production
         sameSite: 'Strict',
-        maxAge: 60 * 60 * 1000, // 15 minutes
+        maxAge: 1 * 60 * 1000, // 1 minute
       });
 
       res.status(200).send({
