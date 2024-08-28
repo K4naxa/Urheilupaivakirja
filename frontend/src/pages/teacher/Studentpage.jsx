@@ -27,8 +27,6 @@ import {
 import { Tooltip } from "react-tooltip";
 
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import JournalActivityBar from "../../components/charts/JournalActivityBar";
-import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import userService from "../../services/userService";
 import courseService from "../../services/courseService";
 import { useParams } from "react-router-dom";
@@ -306,7 +304,10 @@ function StudentHome() {
             <p className="text-lg">Vuoden merkinnät</p>
           </div>
         </div>
-        <HeatMap_Year journal={studentData.journal_entries} />
+        <HeatMap_Year
+          journal={studentData.journal_entries}
+          showDate={showDate}
+        />
       </div>
       <Tooltip
         id="segment-tooltip"
