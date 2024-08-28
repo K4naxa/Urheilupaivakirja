@@ -24,7 +24,7 @@ const SpectatorsPage = () => {
           queryKey: ["studentsAndJournals"],
         });
       });
-      queryClient.invalidateQueries({ spectators });
+      queryClient.invalidateQueries({queryKey:  ["spectators"] });
     };
 
     const modalText = (
@@ -58,7 +58,7 @@ const SpectatorsPage = () => {
     },
     onSuccess: (user) => {
       addToast("Vierailijakutsu lähetetty", { style: "success" });
-      queryClient.invalidateQueries({invitedSpectators});
+      queryClient.invalidateQueries({queryKey: ["invitedSpectators"]});
     },
   });
 

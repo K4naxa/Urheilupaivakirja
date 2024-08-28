@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import dayjs from "dayjs";
-import userService from "../../../services/userService.js";
+import studentService from "../../../services/userService.js";
 import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
@@ -48,7 +48,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      queryClient.invalidateQueries(["studentJournal"]);
+      queryClient.invalidateQueries({queryKey: ["studentData"]});
       addToast("Merkintä lisätty", { style: "success" });
       onClose();
     },
@@ -57,22 +57,22 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   // Journal data for matching
   const {
     data: journalEntriesData,
-    isLoading: journalEntriesDataLoading,
+    isFetching: journalEntriesDataLoading,
     isError: journalEntriesDataError,
   } = useQuery({
     queryKey: ["studentData"],
-    queryFn: () => userService.getStudentData(),
+    queryFn: () => studentService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
   const {
     data: optionsData,
-    isLoading: optionsLoading,
+    isFetching: optionsLoading,
     isError: optionsError,
     error,
   } = useQuery({
-    queryKey: ["sportCategoryOptions"],
+    queryKey: ["options"],
     queryFn: () => journalService.getJournalEntryOptions(),
   });
 

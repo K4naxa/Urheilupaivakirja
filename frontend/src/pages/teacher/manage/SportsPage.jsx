@@ -50,7 +50,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
             prevSport.id === sport.id ? newSport : prevSport
           )
         );
-        queryclient.invalidateQueries("sports");
+        queryclient.invalidateQueries({queryKey: ["sports"]});
         setIsEditing(false);
       })
       .catch((error) => {
@@ -64,7 +64,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
     sportService
       .deleteSport(sport.id)
       .then(() => {
-        queryclient.invalidateQueries("sports");
+        queryclient.invalidateQueries({queryKey: ["sports"]});
       })
       .catch((error) => {
         setCellError(error.response.data.error);
@@ -209,7 +209,7 @@ const SportsPage = () => {
     sportService
       .addSport({ name: newSport })
       .then(() => {
-        queryclient.invalidateQueries("sports");
+        queryclient.invalidateQueries({queryKey: ["sports"]});
 
         setNewSport("");
         setErrorMessage("");

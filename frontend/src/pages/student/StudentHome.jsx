@@ -40,7 +40,7 @@ function StudentHome() {
 
   const {
     data: studentData,
-    isPending: studentDataLoading,
+    isLoading: studentDataLoading,
     error: studentDataError,
   } = useQuery({
     queryKey: ["studentData"],
@@ -50,7 +50,6 @@ function StudentHome() {
 
   const {
     data: courseSegments,
-    isPending: courseSegmentsLoading,
     error: courseSegmentsError,
   } = useQuery({
     queryKey: ["courseSegments"],
@@ -58,7 +57,7 @@ function StudentHome() {
     staleTime: 15 * 60 * 1000,
   });
 
-  if (studentDataLoading || courseSegmentsLoading) {
+  if (studentDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center">
         <LoadingScreen />

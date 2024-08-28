@@ -58,6 +58,7 @@ const createToken = (user) => {
 //NEW MIDDLEWARE
 
 const isStudent = (req, res, next) => {
+  //console.log("Checking if user is student");
   if (req.user && req.user.role == '3') {
   
       return next(); // User is a student and can access the route

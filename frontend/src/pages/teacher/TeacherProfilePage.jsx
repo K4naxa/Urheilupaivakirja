@@ -159,7 +159,7 @@ function TeacherProfilePage() {
         });
       }
       addToast("Merkintöjen määrä vaatimus päivitetty", { style: "success" });
-      queryclient.invalidateQueries("courseSegments");
+      queryclient.invalidateQueries({queryKey: ["courseSegments"]});
       setShowConfirmModal(false);
     };
     setHandleUserConfirmation(() => handleUpdate);
@@ -209,7 +209,7 @@ function TeacherProfilePage() {
       addToast("Segmentti luotu", { style: "success" });
       setNewSegmentName("");
       setNewSegmentValue("");
-      queryclient.invalidateQueries("courseSegments");
+      queryclient.invalidateQueries({queryKey: ["courseSegments"]});
     } catch (error) {
       addToast("Virhe luotaessa segmenttiä", { style: "error" });
     }
@@ -229,7 +229,7 @@ function TeacherProfilePage() {
       try {
         await courseService.deleteCourseSegment(segment.id);
         addToast("Segmentti poistettu", { style: "success" });
-        queryclient.invalidateQueries("courseSegments");
+        queryclient.invalidateQueries({queryKey: ["courseSegments"]});
       } catch (error) {
         addToast("Virhe poistettaessa segmenttiä", { style: "error" });
       }

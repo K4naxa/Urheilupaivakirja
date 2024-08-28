@@ -130,15 +130,15 @@ function CreateStudentContainer({ student }) {
   const verifyStudentMutation = useMutation({
     mutationFn: () => studentService.verifyStudent(student.user_id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedStudents"]);
-      queryClient.invalidateQueries(["studentsAndJournals"]);
+      queryClient.invalidateQueries({queryKey: ["unverifiedStudents"]});
+      queryClient.invalidateQueries({queryKey: ["studentsAndJournals"]});
     },
   });
 
   const deleteStudentMutation = useMutation({
     mutationFn: () => studentService.deleteStudent(student.user_id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedStudents"]);
+      queryClient.invalidateQueries({queryKey: ["unverifiedStudents"]});
     },
   });
 
@@ -193,14 +193,14 @@ const CreateStudentGroupContainer = ({ student_group }) => {
   const verifyStudentGroupMutation = useMutation({
     mutationFn: () => groupService.verifyStudentGroup(student_group.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      queryClient.invalidateQueries({queryKey: ["unverifiedData"]});
     },
   });
 
   const deleteStudentGroupMutation = useMutation({
     mutationFn: () => groupService.deleteGroup(student_group.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      queryClient.invalidateQueries({queryKey: ["unverifiedData"]});
     },
   });
 
@@ -239,14 +239,14 @@ const CreateSportContainer = ({ sport }) => {
   const verifySportMutation = useMutation({
     mutationFn: () => sportService.verifySport(sport.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      queryClient.invalidateQueries({queryKey: ["unverifiedData"]});
     },
   });
 
   const deleteSportMutation = useMutation({
     mutationFn: () => sportService.deleteSport(sport.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      queryClient.invalidateQueries({queryKey: ["unverifiedData"]});
     },
   });
 

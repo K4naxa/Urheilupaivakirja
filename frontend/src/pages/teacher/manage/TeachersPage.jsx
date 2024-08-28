@@ -13,27 +13,27 @@ const TeachersPage = () => {
 
   const [errorMessage, setErrorMessage] = useState("");
 
-
   const handleDelete = (teacher) => {
-
     const handleUserConfirmation = async () => {
       await teacherService.deleteUser(teacher.user_id).then(() => {
         queryClient.invalidateQueries({
           queryKey: ["studentsAndJournals"],
         });
       });
-      queryClient.invalidateQueries({ teachers });
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
     };
 
     const modalText = (
       <span>
         Haluatko varmasti poistaa opettajan
-        <br/>
-        <strong>{teacher.first_name} {teacher.last_name}?</strong>
+        <br />
+        <strong>
+          {teacher.first_name} {teacher.last_name}?
+        </strong>
         <br />
         Tämä poistaa kaikki opettajan tiedot pysyvästi.`
       </span>
-    );    
+    );
 
     openConfirmModal({
       onAgree: handleUserConfirmation,

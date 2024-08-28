@@ -8,7 +8,7 @@ const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 
 // get course info
 router.get("/segment", isAuthenticated, async (req, res) => {
-  console.log(" trying to get course segments");
+  //console.log(" trying to get course segments");
 
   try {
     const segments = await knex("course_segments").select("*");

@@ -71,7 +71,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      queryClient.invalidateQueries(["studentJournal"]);
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
       addToast("Merkintä päivitetty", { style: "success" });
       onClose();
     },
@@ -85,7 +85,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
       addToast("Virhe poistettaessa merkintää", { style: "error" });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["studentJournal"]);
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
       addToast("Merkintä poistettu", { style: "success" });
       onClose();
     },
@@ -97,8 +97,8 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     isFetching: journalEntriesDataLoading,
     isError: journalEntriesDataError,
   } = useQuery({
-    queryKey: ["journalEntriesForConflictCheck"],
-    queryFn: () => journalService.getJournalEntriesForConflictCheck(),
+    queryKey: ["studentData"],
+    queryFn: () => studentService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -112,8 +112,6 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     queryKey: ["options"],
     queryFn: () => journalService.getJournalEntryOptions(),
   });
-
-
 
   function formatDateString(isoDateString) {
     // Assuming the input date string is in UTC and in ISO format
@@ -131,7 +129,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData
+      journalEntriesData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
@@ -464,7 +462,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 
-    if (optionsLoading || journalEntriesDataLoading || journalEntryisFetching) {
+  if (optionsLoading || journalEntriesDataLoading || journalEntryisFetching) {
     console.log("is loading");
     return <p>Loading...</p>;
   }

@@ -22,7 +22,7 @@ const RenderFavouriteMark = ({ journal, pinnedStudentsData, queryClient }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      queryClient.invalidateQueries("pinnedStudents");
+      queryClient.invalidateQueries({queryKey: ["pinnedStudents"]})
     }
   };
 

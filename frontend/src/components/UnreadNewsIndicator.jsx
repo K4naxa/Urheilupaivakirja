@@ -37,7 +37,7 @@ const UnreadNewsIndicator = ({ type }) => {
       console.log("update news last viewed at");
       updateNewsLastViewedAtMutation.mutate();
       setHasUnreadNews(false);
-      queryClient.invalidateQueries(["checkUnreadNews"]);
+      queryClient.invalidateQueries({queryKey: ["checkUnreadNews"]});
     }
   }, [location]);
 

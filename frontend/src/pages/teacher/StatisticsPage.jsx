@@ -74,8 +74,8 @@ function StatisticsPage() {
 
   // invalidate queries when changing the selected time or view
   useEffect(() => {
-    queryclient.invalidateQueries("EntriesData");
-    queryclient.invalidateQueries("newStudentsData");
+    queryclient.invalidateQueries({queryKey: ["EntriesData"]});
+    queryclient.invalidateQueries({queryKey: ["newStudentsData"]});
   }, [selectedTime, chartShowDate, selectedView]);
 
   if (EntriesLoading || NewStudentsLoading) {
