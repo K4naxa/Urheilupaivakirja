@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
 const AuthContext = createContext();
 import { useQueryClient } from "@tanstack/react-query";
+import userService from "../services/userService";
+import { useToast } from "./toast-messages/useToast";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useLocalStorage("user", null);
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const queryClient = useQueryClient();
   // call this function to sign in user
@@ -29,19 +32,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
   // call this function to sign out logged in user
-  const logout = useCallback(() => {
-    console.log("Logging out");
-    setUser(null);
-    queryClient.invalidateQueries();
-    clearUserData();
-    navigate("/kirjaudu", { replace: true }), [queryClient, navigate];
-  });
+  const logout = async () => {
+    try {
+      setUser(null);
+      await userService.logout();
+      queryClient.invalidateQueries();
+      clearUserData();
+      addToast("Olet kirjautunut ulos", { style: "success" });
+      navigate("/kirjaudu", { replace: true }), [queryClient, navigate];
+    } catch (error) {
+      // Handle any errors during the logout process
+      addToast("Error logging out. Please try again.", { style: "error" });
+      console.error("Logout error:", error);
+    }
+  };
+
+  const logoutAll = async () => {
+    try {
+      setUser(null);
+      await userService.logoutAll();
+      queryClient.invalidateQueries();
+      clearUserData();
+      addToast("Olet kirjautunut ulos kaikista laitteista", {
+        style: "success",
+      });
+      navigate("/kirjaudu", { replace: true }), [queryClient, navigate];
+    } catch (error) {
+      // Handle any errors during the logout process
+      addToast("Error logging out. Please try again.", { style: "error" });
+      console.error("Logout error:", error);
+    }
+  };
 
   const value = useMemo(
     () => ({
       user,
       login,
       logout,
+      logoutAll,
     }),
     [user]
   );
@@ -49,13 +77,6 @@ export const AuthProvider = ({ children }) => {
 };
 
 const clearUserData = () => {
-  // Clear access and refresh tokens stored in cookies
-  document.cookie =
-    "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie =
-    "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-  // Clear any user-related data in local storage
   window.localStorage.removeItem("user");
   window.sessionStorage.removeItem("user");
 };

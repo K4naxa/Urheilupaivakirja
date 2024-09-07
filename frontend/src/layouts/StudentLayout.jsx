@@ -122,7 +122,7 @@ const StudentLayout = () => {
         h-16 py-8 w-full items-center text-xl md:hidden z-10`}
         id="mobile-header"
       >
-        <nav id="top-nav" className="grid w-full gap-4 grid-cols-mHeader">
+        <nav id="top-nav" className="grid w-full gap-1 grid-cols-mHeader">
           {/* left of navigation bar */}
           <div className="grid grid-cols-2">
             <NavLink
@@ -164,6 +164,7 @@ const StudentLayout = () => {
 
           {/* right of navigation bar */}
           <div className="grid grid-cols-2 ">
+            <div></div>
             <NavLink
               to="/profiili"
               className={cc(
@@ -188,7 +189,7 @@ const StudentLayout = () => {
           {showUserMenu && (
             <div
               className=" bg-bgPrimary rounded-t-md w-full shadow-upper-shadow absolute
- grid grid-cols-mHeader gap-4 bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary"
+ grid grid-cols-mHeader gap-1 bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary pr-2"
             >
               <div className="grid grid-cols-2 place-items-center">
                 <NavLink
@@ -200,7 +201,8 @@ const StudentLayout = () => {
                   <p className={linkTextClass}>Profiili</p>
                 </NavLink>
               </div>
-              <div></div>
+              <div className="flex justify-center">
+</div>
               <div className="grid grid-cols-2 place-items-center">
                 <button
                   className={linkClass}

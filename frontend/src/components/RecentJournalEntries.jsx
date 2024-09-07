@@ -20,76 +20,100 @@ const convertTime = (totalMinutes) => {
   return `${hours}h ${minutes}min`;
 };
 
-const RecentJournalEntry = ({ entry }) => {
+const RecentJournalEntry = ({ entry, user }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
   const { openBigModal } = useBigModal();
 
+  console.log(user);
   return (
-    <div
-      className={`grid items-center p-2 grid-cols-4 md:grid-cols-5 gap-1 md:gap-4 md:gap-y-0 hover:bg-hoverDefault ${
-        isOpen ? "row-span-2" : ""
-      }`}
-      onClick={() => setIsOpen(!isOpen)}
-    >
-      {/* Date */}
-      <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
-      <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
-
-      <p className="">{entry.workout_category_name}</p>
-
-      {/* Workout Length */}
-      <p>{entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}</p>
-
-      {/* Intensity */}
-      <p className="hidden md:flex">{entry.workout_intensity_name}</p>
-
-      {/* Type of entry (sick, rest, ..) */}
-      <div className="flex justify-between">
-        <p
-          className={cc(
-            "flex w-24 h-8 justify-center items-center rounded-md mr-1",
-            entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
-            entry.entry_type_id === 2 && "bg-bgRest text-textRest",
-            entry.entry_type_id === 3 && "bg-bgSick text-textSick"
-          )}
-        >
-          {entry.entry_type_name}
+    <div className="hover:bg-hoverDefault bg-bgSecondary text-sm sm:text-base flex">
+      <div
+        className={`grid  w-[calc(100%-32px)] sm:w-[calc(100%-32px)] items-center px-1 py-2 sm:p-2 grid-cols-4 md:grid-cols-5 gap-0.5 md:gap-4 md:gap-y-0 ${
+          isOpen ? "row-span-2" : ""
+        }`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {/* Date */}
+        <p className="hidden md:flex">
+          {dayjs(entry.date).format("DD.MM.YYYY")}
+        </p>
+        <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
+      
+        <p className="">
+          {entry.workout_category_id === 1
+            ? user?.sport
+            : entry.workout_category_name}
         </p>
 
-        {/* Edit button only for student*/}
+        {/* Workout Length */}
+        <p>
+          {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
+        </p>
 
-        {user.role !== 1 && (
-          <div className="flex justify-end md:justify-center m-auto">
-            <button
-              onClick={(event) => {
-                event.stopPropagation();
-                openBigModal("editJournalEntry", { entryId: entry.id });
-              }}
-              className="text-iconGray hover:text-primaryColor"
+        {/* Intensity */}
+        <p className="hidden md:flex">{entry.workout_intensity_name}</p>
+
+        {/* Type of entry (sick, rest, ..) */}
+        <div className="flex justify-between relative">
+          <p
+            className={cc(
+              "flex min-w-20 h-8 justify-center items-center rounded-md px-1",
+              entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+              entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+              entry.entry_type_id === 3 && "bg-bgSick text-textSick"
+            )}
+          >
+            {entry.entry_type_name}
+          </p>
+
+          {user.role !== 1 && (
+            <div
+              className="flex-shrink-0 w-1 sm:ml-auto relative"
+              // On smaller screens (`ml-2` keeps it close to the <p> element)
+              // On larger screens (`ml-auto` pushes it as far to the right as possible)
             >
-              <FiEdit3 size={20} />
-            </button>
+              <button
+                onClick={(event) => {
+                  event.stopPropagation();
+                  openBigModal("editJournalEntry", { entryId: entry.id });
+                }}
+                className="absolute sm:right-[-28px] top-[6px] text-iconGray hover:text-primaryColor"
+              >
+                <FiEdit3 size={20} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {isOpen && (
+          <div className="flex justify-around w-full col-span-4 md:col-span-5 text-sm ">
+            {entry.entry_type_id === 1 && (
+              <>
+                <p className="flex flex-col w-full pr-0.5 sm:pr-1 md:w-1/4">
+                  <span className="text-textSecondary">Ajankohta:</span>
+                  {entry.time_of_day_name
+                    ? entry.time_of_day_name
+                    : "Ei ajankohtaa"}
+                </p>
+                <p className="flex flex-col w-full pr-0.5 sm:pr-1 md:w-1/4">
+                  <span className="text-textSecondary">Harjoitus tyyppi:</span>
+                  {entry.workout_type_name
+                    ? entry.workout_type_name
+                    : "Ei tyyppiä"}
+                </p>
+              </>
+            )}
+            <p
+              className={`flex flex-col w-full ${entry.entry_type_id === 1 ? "md:w-1/2" : "md:w-full"}`}
+            >
+              <span className="text-textSecondary">Lisätiedot:</span>
+              <span className="whitespace-normal break-words">
+                {entry.details ? entry.details : "Ei lisätietoja"}
+              </span>
+            </p>
           </div>
         )}
       </div>
-
-      {isOpen && (
-        <div className="flex justify-around w-full col-span-4 gap-4 md:col-span-5">
-          <p className="flex flex-col">
-            <span className="text-textSecondary">Ajankohta:</span>
-            {entry.time_of_day_name ? entry.time_of_day_name : "Ei ajankohtaa"}
-          </p>
-          <p className="flex flex-col">
-            <span className="text-textSecondary">Harjoitus tyyppi:</span>
-            {entry.workout_type_name ? entry.workout_type_name : "Ei tyyppiä"}
-          </p>
-          <p className="flex flex-col">
-            <span className="text-textSecondary">Lisätiedot:</span>
-            {entry.details ? entry.details : "Ei lisätietoja"}
-          </p>
-        </div>
-      )}
     </div>
   );
 };
@@ -102,6 +126,7 @@ const RecentJournalEntries = ({ journal }) => {
   const [selectedTime, setSelectedTime] = useState("Month");
   const [scrollbarWidth, setScrollbarWidth] = useState(0);
   const scrollContainerRef = useRef(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const element = scrollContainerRef.current;
@@ -185,30 +210,34 @@ const RecentJournalEntries = ({ journal }) => {
       </div>
       <div className="flex h-full overflow-y-auto">
         <div className="relative w-full h-full rounded-md ">
-          <div
-            style={{ paddingRight: `${8 + scrollbarWidth}px` }}
-            className="grid grid-cols-4 gap-4 p-2 border-b md:grid-cols-5 bg-bgGray text-textSecondary border-borderPrimary"
-          >
-            <span className="hidden md:flex">Päivämäärä</span>
-            <span className="flex md:hidden">Pvm</span>
-            <span>Laji</span>
-            <span>Kesto</span>
-            <span className="hidden md:flex">Rankkuus</span>
-            <span>Tyyppi</span>
-            <span></span>
-          </div>
-          <div
-            ref={scrollContainerRef}
-            className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px] overflow-auto"
-          >
-            {filteredJournal.length === 0 && (
-              <p className="m-4 text-center text-textSecondary">
-                Ei merkintöjä
-              </p>
-            )}
-            {filteredJournal?.map((entry) => (
-              <RecentJournalEntry key={entry.id} entry={entry} />
-            ))}
+          <div className="bg-bgGray text-textSecondary">
+            <div
+              style={{ paddingRight: `${8 + scrollbarWidth}px` }}
+              className="grid grid-cols-4 px-1 py-2 w-[calc(100%-32px)] gap-1 md:gap-x-4 sm:pb-2 sm:pt-3 sm:px-2 border-b md:grid-cols-5 bg-bgGray text-textSecondary border-borderPrimary"
+            >
+              <span className="hidden md:flex">Päivämäärä</span>
+              <span className="flex md:hidden">Pvm</span>
+              <span>Laji</span>
+              <span>Kesto</span>
+              <span className="hidden md:flex">Rankkuus</span>
+              <span>Tyyppi</span>
+              <span></span>
+            </div>
+            <div
+              ref={scrollContainerRef}
+              className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px]  overflow-y-auto overflow-x-hidden"
+            >
+              {filteredJournal.length === 0 && (
+                <div className="w-full h-full bg-bgSecondary">
+                  <p className="m-4 text-center text-textSecondary">
+                    Ei merkintöjä
+                  </p>
+                </div>
+              )}
+              {filteredJournal?.map((entry) => (
+                <RecentJournalEntry key={entry.id} user={user} entry={entry} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

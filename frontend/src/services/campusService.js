@@ -7,7 +7,7 @@ const getCampuses = async () => {
   };
   // add a new campus
   const addCampus = async (newCampus) => {
-    const campus = { name: newCampus };
+    const campus = { campus_name: newCampus };
     const response = await apiClient.post("/campus/", campus);
     return response.data;
   };
@@ -16,7 +16,7 @@ const getCampuses = async () => {
   const editCampus = async (campus) => {
     const response = await apiClient.put(
       `/campus/${campus.id}`,
-      campus
+      {campus_name: campus.name}
     );
     return response.data;
   };

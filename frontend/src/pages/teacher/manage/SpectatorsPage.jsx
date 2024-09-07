@@ -16,17 +16,28 @@ const SpectatorsPage = () => {
 
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleDelete = (spectator) => {
-    console.log("Deleting spectator:", spectator);
-    const handleUserConfirmation = async () => {
-      await spectatorService.deleteUser(spectator.id).then(() => {
-        queryClient.invalidateQueries({
-          queryKey: ["studentsAndJournals"],
-        });
-      });
-      queryClient.invalidateQueries({queryKey:  ["spectators"] });
-    };
+  const deleteSpectator = useMutation({
+    mutationFn: (spectatorId) => spectatorService.deleteSpectator(spectatorId),
+    onError: (error) => {
+      console.error("Error deleting spectator:", error);
+      addToast("Virhe poistettaessa vierailijaa", { style: "error" });
+    },
+    onSuccess: () => {
+      addToast("Vierailija poistettu", { style: "success" });
+      queryClient.invalidateQueries({ queryKey: ["StudentsList"] });
+      queryClient.invalidateQueries({ queryKey: ["spectators"] });
+    },
+  });
 
+  const handleDelete = (spectator) => {
+    const spectatorId = spectator.id;
+    console.log("Saved id", spectatorId);
+  
+    const handleUserConfirmation = (id) => {
+      console.log("Deleting spectator", id);
+      deleteSpectator.mutate(id);
+    };
+  
     const modalText = (
       <span>
         Haluatko varmasti poistaa vierailijan
@@ -35,12 +46,12 @@ const SpectatorsPage = () => {
           {spectator.first_name} {spectator.last_name}?
         </strong>
         <br />
-        Tämä poistaa kaikki vierailijan tiedot pysyvästi.`
+        Tämä poistaa kaikki vierailijan tiedot pysyvästi.
       </span>
     );
-
+  
     openConfirmModal({
-      onAgree: handleUserConfirmation,
+      onAgree: () => handleUserConfirmation(spectatorId),
       text: modalText,
       agreeButtonText: "Poista",
       agreeStyle: "red",
@@ -48,17 +59,18 @@ const SpectatorsPage = () => {
       useTimer: true,
     });
   };
+  
+  
 
   const inviteSpectator = useMutation({
-    mutationFn: () =>
-      spectatorService.inviteSpectator(newSpectatorEmail),
+    mutationFn: () => spectatorService.inviteSpectator(newSpectatorEmail),
     onError: (error) => {
       console.error("Error inviting spectator:", error);
       addToast("Virhe kutsuttaessa vierailijaa", { style: "error" });
     },
     onSuccess: (user) => {
       addToast("Vierailijakutsu lähetetty", { style: "success" });
-      queryClient.invalidateQueries({queryKey: ["invitedSpectators"]});
+      queryClient.invalidateQueries({ queryKey: ["invitedSpectators"] });
     },
   });
 
@@ -70,7 +82,7 @@ const SpectatorsPage = () => {
     }
     await inviteSpectator.mutate();
     setNewSpectatorEmail("");
-   }
+  };
 
   const { data: spectators, isLoading: spectatorsLoading } = useQuery({
     queryKey: ["spectators"],
@@ -108,48 +120,48 @@ const SpectatorsPage = () => {
           </div>
         )}
       </div>
-        <div className="flex flex-col w-full px-4 ">
-          <div className="flex gap-4 justify-center w-full items-end">
-            <form onSubmit={handleSendInvitation}className="flex flex-col w-3/4">
-              <label htmlFor="newSpectatorInput" className="my-0.5">
-                Kutsu uusi vierailija
-              </label>
-              <div className="flex">
-                <input
-                  className="flex-grow text-textPrimary bg-bgGray p-1 
+      <div className="flex flex-col w-full px-4 ">
+        <div className="flex gap-4 justify-center w-full items-end">
+          <form onSubmit={handleSendInvitation} className="flex flex-col w-3/4">
+            <label htmlFor="newSpectatorInput" className="my-0.5">
+              Kutsu uusi vierailija
+            </label>
+            <div className="flex">
+              <input
+                className="flex-grow text-textPrimary bg-bgGray p-1 
                 border border-borderPrimary rounded-l-md
                 focus-visible:outline-none"
-                  type="text"
-                  placeholder="Vierailijan sähköpostiosoite"
-                  value={newSpectatorEmail}
-                  onChange={(e) => setNewSpectatorEmail(e.target.value)}
-                  id="newSpectatorInput"
-                />
+                type="text"
+                placeholder="Vierailijan sähköpostiosoite"
+                value={newSpectatorEmail}
+                onChange={(e) => setNewSpectatorEmail(e.target.value)}
+                id="newSpectatorInput"
+              />
 
-                <button className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor whitespace-nowrap align-bottom">
-                  Lähetä
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div className="flex-col w-full ">
-          <h2 className="text-xl m-2">Vierailijat</h2>
-          <div className="flex flex-col gap-4">
-            {spectatorsLoading ? (
-              <div>{LoadingScreen()}</div>
-            ) : (
-              spectators.map((spectator) => (
-                <CreateSpectatorCard
-                  spectator={spectator}
-                  handleDelete={handleDelete}
-                  key={spectator.id}
-                />
-              ))
-            )}
-          </div>
+              <button className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor whitespace-nowrap align-bottom">
+                Lähetä
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+      <div className="flex-col w-full ">
+        <h2 className="text-xl m-2">Vierailijat</h2>
+        <div className="flex flex-col gap-4">
+          {spectatorsLoading ? (
+            <div>{LoadingScreen()}</div>
+          ) : (
+            spectators.map((spectator) => (
+              <CreateSpectatorCard
+                spectator={spectator}
+                handleDelete={handleDelete}
+                key={spectator.id}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -197,7 +209,9 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
       <div className="flex justify-center p-4">
         <button
           className="IconButton text-iconRed"
-          onClick={() => handleDelete(spectator)}
+          onClick={() => {
+            handleDelete(spectator);
+          }}
         >
           <FiTrash2 size={20} />
         </button>

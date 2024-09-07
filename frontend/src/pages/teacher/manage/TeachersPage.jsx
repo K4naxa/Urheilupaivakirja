@@ -17,7 +17,7 @@ const TeachersPage = () => {
     const handleUserConfirmation = async () => {
       await teacherService.deleteUser(teacher.user_id).then(() => {
         queryClient.invalidateQueries({
-          queryKey: ["studentsAndJournals"],
+          queryKey: ["StudentsList"],
         });
       });
       queryClient.invalidateQueries({ queryKey: ["teachers"] });

@@ -21,7 +21,9 @@ const getStudentData = async () => {
 };
 
 const getStudentDataWithId = async (userId) => {
+  console.log("Trying to get student data with id: ", userId);  
   const response = await apiClient.get(`/student/data/${userId}`);
+  console.log("Response: ", response);
   return response.data;
 };
 
@@ -70,7 +72,7 @@ const verifyStudent = async (userid) => {
 
 // Delete a student by id
 const deleteStudent = async (userId) => {
-  const response = await apiClient.delete(`/user/${userId}`);
+  const response = await apiClient.delete(`/user/delete/${userId}`);
   return response.data;
 };
 

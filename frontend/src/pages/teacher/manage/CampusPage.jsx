@@ -3,19 +3,25 @@ import campusService from "../../../services/campusService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
+import { useToast } from "../../../hooks/toast-messages/useToast";
 
 // renders a container for a campus while checking if it is being edited
 const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(campus.name);
   const [error, setError] = useState("");
+  const { openConfirmModal } = useConfirmModal();
+  const { addToast } = useToast();
 
+
+  
   // sets a timeout for the error message
   useEffect(() => {
     if (error) {
       setTimeout(() => {
         setError("");
-      }, 5000);
+      }, 7500);
     }
   }, [error]);
 
@@ -51,22 +57,50 @@ const CreateCampusContainer = ({ campus, setCampuses, campuses }) => {
           prevCampus.id === campus.id ? newCampus : prevCampus
         )
       );
+      addToast("Toimipaikan nimi vaihdettu", { style: "success" }); 
       setIsEditing(false);
     });
   };
 
+  // NEW
   const handleDelete = () => {
-    campusService
+    const handleUserConfirmation = () => {
+      campusService
       .deleteCampus(campus.id)
       .then(() => {
         setCampuses((prevCampuses) =>
           prevCampuses.filter((prevCampus) => prevCampus.id !== campus.id)
         );
+        addToast("Toimipaikka poistettu", { style: "success" }); 
       })
       .catch((error) => {
+        addToast("Virhe poistettaessa toimipaikkaa", { style: "error" }); 
         setError(error.response.data.error);
       });
+    };
+  
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa toimipaikan
+        <br />
+        <strong>
+          {campus.name}?
+        </strong>
+        <br />
+      </span>
+    );
+  
+    openConfirmModal({
+      onAgree: () => handleUserConfirmation(),
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
+
+
 
   if (isEditing) {
     return (
@@ -164,6 +198,7 @@ const CampusPage = () => {
     name: 0,
     student: 0,
   });
+  const { addToast } = useToast();
 
   useEffect(() => {
     campusService.getCampuses().then((data) => {
@@ -176,7 +211,9 @@ const CampusPage = () => {
     if (!handleInputError(newCampus, setErrorMessage, campuses)) return;
     campusService.addCampus(newCampus).then(() => {
       campusService.getCampuses().then((data) => {
+        addToast("Uusi toimipaikka lisätty", { style: "success" }); 
         setCampuses(data);
+        setSortedCampuses(data);
         setNewCampus("");
       });
     });

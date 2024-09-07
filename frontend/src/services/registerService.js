@@ -10,7 +10,7 @@ const register = async (
   groupId,
   campusId
 ) => {
-  const response = await apiClient.post("user/register", {
+  const response = await apiClient.post("/register/", {
     email: email,
     password: password,
     first_name: firstName,
@@ -42,8 +42,14 @@ const sendEmailVerificationOTP = async (otp) => {
   return response.data;
 };
 
+const checkIfOTPExists = async () => {
+  const response = await apiClient.get("/register/check-for-otp");
+  return response.data.value;
+};
+
 export default {
   register,
   createEmailVerificationOTP,
   sendEmailVerificationOTP,
+  checkIfOTPExists
 };

@@ -93,7 +93,7 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
     if (!journal) return;
 
     if (minutes > 1 && minutes <= 60)
-      return "bg-heatmapExercise1 border-heatmapExercise1 text-textExercise";
+      return "bg-heatmapExercise1 border-heatmapExercise1 text-black";
     if (minutes > 60 && minutes <= 120)
       return "bg-heatmapExercise2 border-heatmapExercise2 text-textExercise";
     if (minutes > 120)

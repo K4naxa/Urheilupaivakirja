@@ -6,9 +6,7 @@ import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { useParams } from "react-router-dom";
 import { FiTrash2 } from "react-icons/fi";
 import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
-import studentService from "../../../services/studentService.js";
 
-//const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
   "flex flex-col items-center gap-0.5 sm:gap-1 w-full max-w-[370px] p-1";
 const inputLabel = "text-textPrimary font-medium";
@@ -606,7 +604,9 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
                 >
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {category.name}
+                      {category.id === 1
+                        ? journalEntriesData.sport_name
+                        : category.name}
                     </option>
                   ))}
                 </select>

@@ -44,6 +44,10 @@ const SportSelect = ({
       backgroundColor: "rgb(var(--color-bg-secondary))",
       color: "rgb(var(--color-text-primary))",
     }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: "rgb(var(--color-text-primary))", // Ensure the displayed value text color is color-text-primary
+    }),
   };
   
 

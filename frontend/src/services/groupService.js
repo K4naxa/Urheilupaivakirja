@@ -6,7 +6,7 @@ const getGroups = async () => {
 };
 
 const addGroup = async (newGroup) => {
-  const group = { name: newGroup };
+  const group = { group_name: newGroup };
   const response = await apiClient.post("/group/", group);
   return response.data;
 };
@@ -14,7 +14,7 @@ const addGroup = async (newGroup) => {
 const editGroup = async (group) => {
   const response = await apiClient.put(
     `/group/${group.id}`,
-    group
+    {group_name: group.name}
   );
   return response.data;
 };

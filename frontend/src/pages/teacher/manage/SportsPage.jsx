@@ -5,10 +5,14 @@ import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../../../hooks/toast-messages/useToast";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";  
 
 // renders a container for a sport while checking if it is being edited
 function CreateSportContainer({ sport, sports, setSports }) {
   const queryclient = useQueryClient();
+  const { openConfirmModal } = useConfirmModal();
+  const { addToast } = useToast();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedSport, setEditedSport] = useState(sport.name);
@@ -51,6 +55,7 @@ function CreateSportContainer({ sport, sports, setSports }) {
           )
         );
         queryclient.invalidateQueries({queryKey: ["sports"]});
+        addToast("Lajin nimi vaihdettu", { style: "success" }); 
         setIsEditing(false);
       })
       .catch((error) => {
@@ -61,17 +66,41 @@ function CreateSportContainer({ sport, sports, setSports }) {
 
   // deletes the sport from the server and updates the state
   const handleDelete = () => {
-    sportService
+    const handleUserConfirmation = () => {
+      sportService
       .deleteSport(sport.id)
       .then(() => {
+        addToast("Laji poistettu", { style: "success" }); 
         queryclient.invalidateQueries({queryKey: ["sports"]});
       })
       .catch((error) => {
+        addToast("Virhe poistettaessa lajia", { style: "error" }); 
         setCellError(error.response.data.error);
       });
+    };
+  
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa ryhmän
+        <br />
+        <strong>
+          {sport.name}?
+        </strong>
+        <br />
+      </span>
+    );
+  
+    openConfirmModal({
+      onAgree: () => handleUserConfirmation(),
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
 
-  // sets the sport's "isEditing" property to "true"
+  
   const handleEdit = () => {
     if (isEditing) {
       setEditedSport(sport.name);
@@ -210,7 +239,7 @@ const SportsPage = () => {
       .addSport({ name: newSport })
       .then(() => {
         queryclient.invalidateQueries({queryKey: ["sports"]});
-
+        addToast("Uusi laji lisätty", { style: "success" }); 
         setNewSport("");
         setErrorMessage("");
       })

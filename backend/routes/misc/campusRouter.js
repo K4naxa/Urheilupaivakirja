@@ -6,6 +6,8 @@ const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
+const { campus_name } = require("../../utils/validation");
+const { validationResult } = require("express-validator");
 
 // get all campuses with student count
 router.get("/", isAuthenticated, isTeacher, async (req, res) => {
@@ -26,20 +28,25 @@ router.get("/", isAuthenticated, isTeacher, async (req, res) => {
 });
 
 // Add a new campus
-router.post("/", isAuthenticated, isTeacher, (req, res) => {
-  let { name } = req.body;
+router.post("/", isAuthenticated, isTeacher, campus_name, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let { campus_name } = req.body;
 
   // Validate input
-  if (!name) {
+  if (!campus_name) {
     return res.status(400).json({ error: "Campus name is required" });
   }
 
-  // Trim the name
-  name = name.trim();
+  // Trim the campus_name
+  campus_name = campus_name.trim();
 
   // Check if campus already exists
   knex("campuses")
-    .where("name", "=", name)
+    .where("name", "=", campus_name)
     .first() // Using first() as we expect 0 or 1 row
     .then((existingCampus) => {
       if (existingCampus) {
@@ -48,7 +55,7 @@ router.post("/", isAuthenticated, isTeacher, (req, res) => {
 
       // Add campus
       knex("campuses")
-        .insert({ name: name })
+        .insert({ name: campus_name })
         .then((insertedIds) => {
           // fetch the campus after inserting
           return knex("campuses").where("id", "=", insertedIds[0]).first();
@@ -69,15 +76,18 @@ router.post("/", isAuthenticated, isTeacher, (req, res) => {
 
 // edit a single campus by campus.id
 router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-  if (!req.body.name) {
+  if (!req.body.campus_name) {
     return res.status(400).json({ error: "Name is required" });
   }
 
   const { id } = req.params;
   const updatedCampus = {
-    name: req.body.name,
-    is_verified: 1,
+    name: req.body.campus_name,
   };
 
   knex("campuses")
@@ -98,28 +108,33 @@ router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
 });
 
 // check if the user is an admin and then delete the campus
-router.delete("/:id", isAuthenticated, isTeacher, (req, res, next) => {
-
+router.delete("/:id", isAuthenticated, isTeacher, async (req, res, next) => {
   const { id } = req.params;
 
-  knex("campuses")
-    .where({ id })
-    .del()
-    .then(() => {
-      res.status(200).json({ id });
-    })
-    .catch((err) => {
-      console.log("Error deleting campus", err);
+  try {
+    const result = await knex("campuses").where({ id }).del();
 
-      if (err.code === "ER_ROW_IS_REFERENCED_2") {
-        return res.status(400).json({
-          error: "Poisto epäonnistui, koska toimipaikalla on opiskelijoita",
-        });
-      }
-      res
-        .status(500)
-        .json({ error: "An error occurred while deleting the campus" });
-    });
+    if (result === 0) {
+      // No rows were deleted, meaning the campus might not exist
+      return res.status(404).json({
+        error: "Campus not found or could not be deleted",
+      });
+    }
+
+    res.status(200).json({ id });
+  } catch (err) {
+    console.error("Error deleting campus");
+
+    if (err.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(409).json({
+        error: "Poisto epäonnistui, koska toimipaikalla on opiskelijoita",
+      });
+    }
+
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the campus" });
+  }
 });
 
 module.exports = router;

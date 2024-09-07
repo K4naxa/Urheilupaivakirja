@@ -93,7 +93,7 @@ const AccountDeleteConfirmModal = ({
             Peruuta
           </button>
           <button
-            className="w-20 py-1.5 border rounded-md border-borderPrimary hover:bg-red-800 text-white"
+            className="w-20 py-1.5 border rounded-md  text-white bg-btnRed border-btnRed hover:bg-red-800 "
             onClick={handleAgree}
           >
             Poista

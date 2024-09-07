@@ -10,22 +10,25 @@ const saltRounds = config.BCRYPTSALT;
 const sendEmail = require("../../utils/email/sendEmail");
 const otpGenerator = require("otp-generator");
 const {
-  getRole,
   getUserId,
-  createToken,
   isTeacherOrSpectator,
 } = require("../../utils/authMiddleware");
 const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
+const { email, password, newPassword } = require("../../utils/validation");
+const { validationResult } = require("express-validator");
+const { createAccessToken, createRefreshToken } = require("../../utils/token"); 
 
 // For user themselves -------------------------------------------------------------------
 
 // ---- Forgotten password ----
 // Step #1: Request password reset
-router.post("/request-password-reset", async (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
+router.post("/request-password-reset", email, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
+
+  const { email } = req.body;
 
   try {
     // does user exist?
@@ -119,7 +122,12 @@ router.post("/request-password-reset", async (req, res) => {
 });
 
 // Step #2: Verify with OTP from email
-router.post("/verify-password-reset", async (req, res) => {
+router.post("/verify-password-reset", email, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { email, otp } = req.body;
 
   try {
@@ -162,8 +170,17 @@ router.post("/verify-password-reset", async (req, res) => {
 });
 
 // Step #3: Replace password with new password
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", [email, newPassword], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { email, resetToken, newPassword } = req.body;
+
+  if (!resetToken) {
+    return res.status(400).json({ message: "Reset token is required" });
+  }
 
   try {
     const user = await knex("users").where({ email }).first();
@@ -191,10 +208,18 @@ router.post("/reset-password", async (req, res) => {
       return res.status(401).json({ message: "Invalid token" });
     }
 
+    // Hash the new password and update it in the database
     const hash = await bcrypt.hash(newPassword, Number(saltRounds));
+    await knex("users")
+      .where({ id: user.id })
+      .increment("token_version", 1)
+      .update({ password: hash, email_verified: true });
 
-    await knex("users").where({ id: user.id }).update({ password: hash });
+    // Remove the used reset token
     await knex("password_reset_token").where({ user_id: user.id }).del();
+
+    // Increment the token version to invalidate all existing tokens
+    await knex("users").where("id", "=", user_id);
 
     res.json({ message: "Your password has been successfully reset." });
   } catch (error) {
@@ -204,43 +229,112 @@ router.post("/reset-password", async (req, res) => {
 });
 
 // ---- User self change password ----
-router.put("/change-password", isAuthenticated, async (req, res) => {
-  const userId = getUserId(req);
-  const { oldPassword, newPassword } = req.body;
+router.put(
+  "/change-password",
+  isAuthenticated,
+  newPassword,
+  async (req, res) => {
+    console.log("oldPassword: ", req.body.oldPassword);
+    console.log("password: ", req.body.password);
 
-  try {
-    const user = await knex("users").where({ id: userId }).first();
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
-    if (!isOldPasswordValid) {
-      return res.status(401).json({ message: "Invalid old password" });
+    const userId = req.user.user_id;
+    const oldPassword = req.body.oldPassword.trim();
+    const newPassword = req.body.password.trim();
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Old and new passwords are required" });
     }
 
-    const hash = await bcrypt.hash(newPassword, Number(saltRounds));
+    try {
+      const user = await knex("users").where({ id: userId }).first();
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-    await knex("users").where({ id: userId }).update({ password: hash });
+      const isOldPasswordValid = await bcrypt.compare(
+        oldPassword,
+        user.password
+      );
+      if (!isOldPasswordValid) {
+        return res.status(401).json({ message: "Invalid old password" });
+      }
 
-    res.json({ message: "Password updated successfully" });
-  } catch (error) {
-    console.error("Error updating password:", error);
-    res.status(500).json({ message: "Error updating password" });
+      // Check if the new password is the same as the old password
+      const isNewPasswordSameAsOld = await bcrypt.compare(
+        newPassword,
+        user.password
+      );
+      if (isNewPasswordSameAsOld) {
+        return res
+          .status(400)
+          .json({ message: "New password cannot be the same as the old password" });
+      }
+
+      const hash = await bcrypt.hash(newPassword, Number(saltRounds));
+
+      const tempUser = await knex("users")
+        .where({ id: userId })
+        .increment("token_version", 1)
+        .update({ password: hash, email_verified: true });
+
+      // Generate new tokens
+      const updatedUser = await knex("users").where({ id: userId }).first();
+
+      const accessToken = createAccessToken(updatedUser);
+      const refreshToken = createRefreshToken(updatedUser);
+
+      // Send the new tokens to the client
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days
+      });
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 5 * 60 * 1000, // 5 minutes
+      });
+
+      // Send success response
+      res.status(200).send({
+        user_id: tempUser.id,
+        email_verified: tempUser.email_verified,
+        email: tempUser.email,
+        role: tempUser.role_id,
+        message: "Password updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Error updating password" });
+    }
   }
-});
+);
+
+
 
 // ---- User self deletion ----
 
 //delete self with password confirmation -- POST instead of DELETE for password verification (delete has no body)
-router.post("/delete/self", isAuthenticated, async (req, res) => {
-  const user_id = res.user.user_id;
-  const password = req.body.password;
-  const user = await knex("users").where({ id: user_id }).first();
-
-  if (!user) {
-    return res.status(404).json({ error: "User not found" });
+router.post("/delete/self", isAuthenticated, password, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
+
+  const password = req.body.password.trim();
+  const user_id = req.user.user_id;
+
+  const user = await knex("users").where({ id: user_id }).first();
 
   try {
     const match = await bcrypt.compare(password, user.password);
@@ -258,12 +352,10 @@ router.post("/delete/self", isAuthenticated, async (req, res) => {
 
 // verify user password (used to check if user can delete their account)
 router.post("/verify-password", isAuthenticated, async (req, res) => {
-  const userId = getUserId(req);
-  const { password } = req.body;
+  const userId = req.user.user_id;
 
-  if (!password) {
-    return res.status(400).json({ message: "Password is required" });
-  }
+  //get password and trim it
+  const password = req.body.password.trim();
 
   try {
     const user = await knex("users").where({ id: userId }).first();
@@ -283,7 +375,7 @@ router.post("/verify-password", isAuthenticated, async (req, res) => {
 });
 
 // FOR TEACHERS (ADMINS) -------------------------------------------------------------------
-
+// TODO: CHECK EVERYTHING BELOW
 router.delete("/delete/:id", isAuthenticated, isTeacher, async (req, res) => {
   const userIdToDelete = Number(req.params.id);
 
@@ -358,8 +450,7 @@ router.get(
   async (req, res) => {
     try {
       const userId = req.user.user_id;
-      const role = req.user.role; 
-
+      const role = req.user.role;
 
       const userData = await knex("users")
         .select("id", "email", "created_at")

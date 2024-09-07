@@ -100,7 +100,7 @@ const ManageArchivedStudentsPage = () => {
     const handleUserConfirmation = async () => {
       await studentService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
-          queryKey: ["studentsAndJournals"],
+          queryKey: ["StudentsList"],
         });
       });
       const newStudents = state.students.filter(

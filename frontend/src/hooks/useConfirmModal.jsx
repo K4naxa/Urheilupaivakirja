@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState } from 'react';
 import ConfirmModal from '../components/confirm-modal/ConfirmModal';
-import AccountDeleteConfirmModal from '../components/confirm-modal/AccountDeleteConfirmModal'; // Assume this is another modal component
+import AccountDeleteConfirmModal from '../components/confirm-modal/AccountDeleteConfirmModal';
+// Import the new modal component
+import CompareConfirmModal from '../components/confirm-modal/CompareConfirmModal'; // Assume this is the modal for oldValue type
 
 const ConfirmModalContext = createContext();
 
@@ -10,7 +12,7 @@ export const ConfirmModalProvider = ({ children }) => {
   const [modals, setModals] = useState([]);
 
   const openConfirmModal = (modalProps) => {
-    const { type = 'default' } = modalProps; // Default type can be set here
+    const { type = 'default' } = modalProps; // set default here
     setModals([...modals, { ...modalProps, isOpen: true, id: Math.random(), type }]);
   };
 
@@ -22,8 +24,18 @@ export const ConfirmModalProvider = ({ children }) => {
     <ConfirmModalContext.Provider value={{ openConfirmModal, closeConfirmModal }}>
       {children}
       {modals.map(modal => {
-        // render modal based on type
-        const ModalComponent = modal.type === 'accountDelete' ? AccountDeleteConfirmModal : ConfirmModal;
+        // Render the modal based on the type property
+        let ModalComponent;
+        switch (modal.type) {
+          case 'accountDelete':
+            ModalComponent = AccountDeleteConfirmModal;
+            break;
+          case 'compare':
+            ModalComponent = CompareConfirmModal;
+            break;
+          default:
+            ModalComponent = ConfirmModal;
+        }
         return (
           <ModalComponent
             key={modal.id}

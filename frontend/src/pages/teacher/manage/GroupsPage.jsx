@@ -1,21 +1,24 @@
 import groupService from "../../../services/groupService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
-
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
 import { useState, useEffect } from "react";
 import cc from "../../../utils/cc";
+import { useToast } from "../../../hooks/toast-messages/useToast";
 
 // renders a container for a group while checking if it is being edited
 function CreateGroupContainer({ group, setGroups, groups }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedGroup, setEditedGroup] = useState(group.name);
   const [cellError, setCellError] = useState(false);
-
+  const { openConfirmModal } = useConfirmModal(); 
+  const { addToast } = useToast();
+  
   useEffect(() => {
     if (cellError) {
       setTimeout(() => {
         setCellError("");
-      }, 5000);
+      }, 7500);
     }
   }, [cellError]);
 
@@ -48,6 +51,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
             prevGroup.id === group.id ? newGroup : prevGroup
           )
         );
+        addToast("Ryhmän nimi vaihdettu", { style: "success" }); 
         setIsEditing(false);
       })
       .catch((error) => {
@@ -56,17 +60,41 @@ function CreateGroupContainer({ group, setGroups, groups }) {
   };
 
   // deletes the group from the server and updates the state
+  // NEW
   const handleDelete = () => {
-    groupService
+    const handleUserConfirmation = () => {
+      groupService
       .deleteGroup(group.id)
       .then(() => {
         setGroups((prevGroups) =>
-          prevGroups.filter((prevGroup) => prevGroup.id !== group.id)
+        prevGroups.filter((prevGroup) => prevGroup.id !== group.id)
         );
       })
       .catch((error) => {
+        addToast("Virhe poistettaessa ryhmää", { style: "error" }); 
         setCellError(error.response.data.error);
       });
+    };
+  
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa ryhmän
+        <br />
+        <strong>
+          {group.name}?
+        </strong>
+        <br />
+      </span>
+    );
+  
+    openConfirmModal({
+      onAgree: () => handleUserConfirmation(),
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
 
   // sets the sport's "isEditing" property to "true"
@@ -235,6 +263,7 @@ const GroupsPage = () => {
       groupService.getGroups().then((data) => {
         setGroups(data);
         setSortedGroups(data);
+        addToast("Uusi ryhmä lisätty", { style: "success" }); 
       });
       setNewGroup("");
       setErrorMessage("");

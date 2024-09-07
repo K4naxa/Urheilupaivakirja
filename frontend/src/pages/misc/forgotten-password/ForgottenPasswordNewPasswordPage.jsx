@@ -74,42 +74,55 @@ const ForgottenPasswordNewPasswordPage = () => {
   const errorCheckPassword = (newPassword, newPasswordConfirm) => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-
+  
+      // Regular expressions for validation
+      const lengthCheck = /.{8,}/; // At least 8 characters
+      const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+      const numberCheck = /[0-9]/; // At least one number
+  
+      // Check if the password meets the required conditions
       if (newPassword.length < 1) {
         newErrors.password = {
           value: "error",
-          message: "Salasana ei voi olla tyhjä",
+          message: "Salasana ei voi olla tyhjä", 
         };
-      } else if (newPassword.length < 8) {
+      } else if (
+        !lengthCheck.test(newPassword) ||
+        !capitalLetterCheck.test(newPassword) ||
+        !numberCheck.test(newPassword)
+      ) {
         newErrors.password = {
           value: "error",
-          message: "Salasana liian lyhyt",
+          message:
+            "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron", 
         };
       } else {
         newErrors.password = {
           value: "success",
         };
       }
-
+  
+      // Check if the passwords match
       if (newPasswordConfirm && newPassword !== newPasswordConfirm) {
         newErrors.passwordConfirm = {
           value: "error",
-          message: "Salasanat eivät täsmää",
+          message: "Salasanat eivät täsmää", 
         };
       } else if (newPasswordConfirm) {
         newErrors.passwordConfirm = {
           value: "success",
         };
       }
-
+  
       return newErrors;
     });
   };
+  
 
   const errorCheckPasswordConfirm = (newPasswordConfirm, newPassword) => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-
+  
       if (newPasswordConfirm.length < 1) {
         newErrors.passwordConfirm = {
           value: "error",
@@ -125,10 +138,11 @@ const ForgottenPasswordNewPasswordPage = () => {
           value: "success",
         };
       }
-
+  
       return newErrors;
     });
   };
+  
 
   const isFormValid = () => {
     return (

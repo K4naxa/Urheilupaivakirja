@@ -14,8 +14,9 @@ const getSports = async () => {
   };
   
   // add a new sport
-  const addSport = async (sport) => {
-    const response = await apiClient.post("/sport", sport);
+  const addSport = async (newSport) => {
+    const sport = { sport_name: newSport.name }
+    const response = await apiClient.post("/sport/", sport);
     return response.data;
   };
   
@@ -24,7 +25,7 @@ const getSports = async () => {
     const id = sport.id;
     const response = await apiClient.put(
       `/sport/${id}`,
-      { name: sport.name }
+      { sport_name: sport.name }
     );
     return response.data;
   };

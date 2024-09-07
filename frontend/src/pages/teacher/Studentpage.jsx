@@ -27,7 +27,6 @@ import {
 import { Tooltip } from "react-tooltip";
 
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import userService from "../../services/userService";
 import courseService from "../../services/courseService";
 import { useParams } from "react-router-dom";
 import cc from "../../utils/cc";
@@ -38,14 +37,16 @@ function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
   const [tooltipContent, setTooltipContent] = useState(null);
 
+  console.log(id);
   const {
     data: studentData,
     isLoading: studentDataLoading,
     error: studentDataError,
   } = useQuery({
-    queryKey: ["studentData", id],
-    queryFn: () => userService.getStudentData(id),
+    queryKey: ["singleStudentData", id],
+    queryFn: () => studentService.getStudentDataWithId(id),
     staleTime: 15 * 60 * 1000,
+    enabled: !!id,
   });
 
   const { data: courseSegments } = useQuery({

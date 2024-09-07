@@ -11,13 +11,42 @@ const GroupSelect = ({
 }) => {
   const customStyles = {
     control: (provided) => ({
-      ...provided,
-      borderColor:
-        errors.groupId && errors.groupId.value === 'error'
+        ...provided,
+        backgroundColor: "rgb(var(--color-bg-secondary))",
+        color: "rgb(var(--color-text-primary))",
+        borderColor: errors.groupId && errors.groupId.value === 'error'
           ? 'red'
           : errors.groupId && errors.groupId.value === 'success'
           ? 'green'
           : provided.borderColor,
+    }),
+    input: (provided) => ({
+      ...provided,
+      color: "rgb(var(--color-text-primary))",
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "rgb(var(--color-primary))"
+        : state.isFocused
+          ? "rgb(var(--color-hover-select))"
+          : "rgb(var(--color-bg-secondary))",
+      color: state.isDisabled
+        ? "rgb(var(--color-text-secondary))"
+        : "rgb(var(--color-text-primary))",
+      ":active": {
+        backgroundColor: "rgb(var(--color-bg-primary))",
+        color: "rgb(var(--color-text-primary))",
+      },
+    }),
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: "rgb(var(--color-bg-secondary))",
+      color: "rgb(var(--color-text-primary))",
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: "rgb(var(--color-text-primary))", // Ensure the displayed value text color is color-text-primary
     }),
   };
 

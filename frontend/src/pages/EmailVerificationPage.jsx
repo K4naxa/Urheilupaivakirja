@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import OTPInput from "../components/OTPInput";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useEffect } from "react";
@@ -12,21 +12,46 @@ const EmailVerificationPage = () => {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Query to check if OTP already exists
+  const { data: otpExists } = useQuery({
+    queryKey: ["checkIfOTPExists"],
+    queryFn: () => registerService.checkIfOTPExists(),
+    enabled: !!user, // Run this query only if the user exists
+  });
+
   const {
     mutate: requestOTP,
     isError,
     error,
   } = useMutation({
-    mutationFn: () => registerService.createEmailVerificationOTP(), // Ensure the mutation function takes necessary parameters, like user email
+    mutationFn: () => registerService.createEmailVerificationOTP(),
     onError: (error) => {
-      console.error("Error sending OTP:", error);
-      addToast(
-        "Virhe lähetettäessä vahvistuskoodia, ota yhteyttä ylläpitäjään",
-        { style: "error" }
-      );
+      if (error.response.status === 429) {
+        const waitTimeMs = error.response.data.wait_time;
+        const minutes = Math.floor(waitTimeMs / 1000 / 60);
+        const seconds = Math.floor((waitTimeMs / 1000) % 60);
+
+        const minuteString = `${minutes} minuutin`;
+        var secondString;
+        if (seconds === 0) {
+          secondString = "";
+        } else {
+          secondString = ` ja ${seconds} sekunnin`;
+        }
+        addToast(
+          `Voit lähettää uuden vahvistuskoodin ${minuteString}${secondString} kuluttua.`,
+          { style: "error" }
+        );
+        return;
+      } else {
+        addToast(
+          "Virhe lähetettäessä vahvistuskoodia, ota yhteyttä ylläpitäjään",
+          { style: "error" }
+        );
+      }
     },
     onSuccess: () => {
-      addToast("Vahvistuskoodi lähetetty sähköpostiisi.", { style: "success" });
+      addToast("Vahvistuskoodi on lähetetty sähköpostiisi.", { style: "success" });
     },
   });
 
@@ -36,10 +61,9 @@ const EmailVerificationPage = () => {
     error: verifyError,
   } = useMutation({
     mutationFn: (otp) => registerService.sendEmailVerificationOTP(otp),
-    onError: (error) => {
-      console.error("Error verifying OTP:", error);
+    onError: () => {
       addToast(
-        "Virhe vahvistaessa vahvistuskoodia, tarkista koodi tai yritä uudelleen",
+        "Virhe tarkistettaessa vahvistuskoodia, tarkista koodi tai yritä uudelleen",
         { style: "error" }
       );
     },
@@ -54,13 +78,13 @@ const EmailVerificationPage = () => {
   });
 
   useEffect(() => {
-    if (user && !user.emailVerified) {
+    if (user && !user.emailVerified && otpExists === false) {
       requestOTP();
     }
-  }, [user, requestOTP]);
+  }, [user, otpExists, requestOTP]);
 
   useEffect(() => {
-    if (user.email_verified) {
+    if (user?.email_verified) {
       switch (user.role) {
         case 1:
           navigate("/opettaja");

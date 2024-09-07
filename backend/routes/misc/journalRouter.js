@@ -18,6 +18,20 @@ const {
   isTeacherOrSpectator,
 } = require("../../utils/authMiddleware");
 
+const {
+  entry_type_id,
+  workout_type_id,
+  workout_category_id,
+  time_of_day_id,
+  workout_intensity_id,
+  details,
+  date,
+  length_in_minutes,
+} = require("../../utils/validation");
+
+const { validationResult } = require("express-validator");
+
+
 // "/" --------------------------------------------
 
 // Get all the dropdown options for journal entry modal (add/edit)
@@ -111,13 +125,13 @@ router.get("/user/conflicts", isAuthenticated, async (req, res, next) => {
   try {
     const rows = await knex("journal_entries")
       .select("id", "entry_type_id")
-      .where({user_id});
+      .where({ user_id });
     res.json(rows);
   } catch (err) {
     console.log("SELECT * FROM `journal_entries` failed", err);
     res.status(500).json({ error: "Internal server error" });
   }
-})
+});
 
 //get all user journals by id for Teacher
 // TODO: Remove if not used
@@ -224,36 +238,48 @@ router.get("/user/:date", async (req, res, next) => {
 // "/entry/" --------------------------------------------
 
 // Post a new journal entry
-router.post("/entry/", isAuthenticated, isStudent, async (req, res, next) => {
-  const entry = req.body;
+router.post(
+  "/entry/exercise",
+  isAuthenticated,
+  isStudent,
+  [
+    entry_type_id,
+    workout_type_id,
+    workout_category_id,
+    time_of_day_id,
+    length_in_minutes,
+    workout_intensity_id,
+    details,
+    date,
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  entry.user_id = req.user.user_id;
+    const entry = req.body;
 
-  entry.created_at = new Date();
+    entry.user_id = req.user.user_id;
+    entry.created_at = new Date();
+    entry.date = new Date(entry.date);
+    entry.date.setUTCHours(0, 0, 0, 0);
 
-  entry.date = new Date(entry.date);
-  entry.date.setUTCHours(0, 0, 0, 0);
+    try {
+      const result = await knex.transaction(async (trx) => {
+        const conflicts = await trx("journal_entries").where({
+          user_id: entry.user_id,
+          date: entry.date,
+        });
 
-  try {
-    const result = await knex.transaction(async (trx) => {
-      // get entries for the date, called conflicts
-      const conflicts = await trx("journal_entries").where({
-        user_id: entry.user_id,
-        date: entry.date,
-      });
+        let deletedEntriesCount = 0;
 
-      let deletedEntriesCount = 0;
-
-      // check if conflicts
-      if (conflicts.length > 0) {
-        if (entry.entry_type_id == 1) {
-          // check if all existing entries are exercises
+        if (conflicts.length > 0) {
           const allTypeOne = conflicts.every(
             (conflict) => conflict.entry_type_id == 1
           );
 
           if (!allTypeOne) {
-            // if not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
             deletedEntriesCount += await trx("journal_entries")
               .where({
                 user_id: entry.user_id,
@@ -261,8 +287,61 @@ router.post("/entry/", isAuthenticated, isStudent, async (req, res, next) => {
               })
               .del();
           }
-        } else {
-          // for rest or sick days, delete all existing entries
+        }
+
+        if (deletedEntriesCount > 0) {
+          await trx("students")
+            .where({ user_id: entry.user_id })
+            .decrement("total_entry_count", deletedEntriesCount);
+        }
+
+        const rows = await trx("journal_entries").insert(entry);
+
+        await trx("students")
+          .where({ user_id: entry.user_id })
+          .increment("total_entry_count", 1);
+
+        return rows;
+      });
+
+      res.json(result);
+    } catch (err) {
+      console.log("Transaction failed", err);
+      res.status(500).json({
+        error: "An error occurred while processing your journal entry.",
+      });
+    }
+  }
+);
+
+router.post(
+  "/entry/sick-or-rest",
+  isAuthenticated,
+  isStudent,
+  [entry_type_id, details, date],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const entry = req.body;
+
+    entry.user_id = req.user.user_id;
+    entry.created_at = new Date();
+    entry.date = new Date(entry.date);
+    entry.date.setUTCHours(0, 0, 0, 0);
+
+    try {
+      const result = await knex.transaction(async (trx) => {
+        const conflicts = await trx("journal_entries").where({
+          user_id: entry.user_id,
+          date: entry.date,
+        });
+
+        let deletedEntriesCount = 0;
+
+        if (conflicts.length > 0) {
           deletedEntriesCount += await trx("journal_entries")
             .where({
               user_id: entry.user_id,
@@ -270,33 +349,31 @@ router.post("/entry/", isAuthenticated, isStudent, async (req, res, next) => {
             })
             .del();
         }
-      }
 
-      if (deletedEntriesCount > 0) {
+        if (deletedEntriesCount > 0) {
+          await trx("students")
+            .where({ user_id: entry.user_id })
+            .decrement("total_entry_count", deletedEntriesCount);
+        }
+
+        const rows = await trx("journal_entries").insert(entry);
+
         await trx("students")
           .where({ user_id: entry.user_id })
-          .decrement("total_entry_count", deletedEntriesCount);
-      }
+          .increment("total_entry_count", 1);
 
-      // insert entry after handling possible conflicts
-      const rows = await trx("journal_entries").insert(entry);
+        return rows;
+      });
 
-      // increment total_entry_count for the user
-      await trx("students")
-        .where({ user_id: entry.user_id })
-        .increment("total_entry_count", 1);
-
-      return rows;
-    });
-
-    res.json(result);
-  } catch (err) {
-    console.log("Transaction failed", err);
-    res.status(500).json({
-      error: "An error occurred while processing your journal entry.",
-    });
+      res.json(result);
+    } catch (err) {
+      console.log("Transaction failed", err);
+      res.status(500).json({
+        error: "An error occurred while processing your journal entry.",
+      });
+    }
   }
-});
+);
 
 // Get a single journal entry by journal_entry.id
 // TODO: Remove if not used
@@ -334,107 +411,202 @@ router.get("/entry/:id", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// Update a journal entry for EXERCISE entries
+router.put(
+  "/entry/exercise/:id",
+  isAuthenticated,
+  isStudent,
+  [
+    entry_type_id,
+    workout_type_id,
+    workout_category_id,
+    time_of_day_id,
+    length_in_minutes,
+    workout_intensity_id,
+    details,
+    date,
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-router.put("/entry/:id", isAuthenticated, isStudent, async (req, res, next) => {
-  const id = req.params.id;
-  const entry = req.body;
+    const id = req.params.id;
+    const entry = req.body;
 
-  entry.date = new Date(entry.date);
-  entry.date.setUTCHours(0, 0, 0, 0);
-  entry.updated_at = new Date();
+    entry.date = new Date(entry.date);
+    entry.date.setUTCHours(0, 0, 0, 0);
+    entry.updated_at = new Date();
 
-  try {
-    await knex.transaction(async (trx) => {
-      // Check if the entry exists
-      const existingEntry = await trx("journal_entries")
-        .where("id", id)
-        .first();
+    try {
+      const result = await knex.transaction(async (trx) => {
+        // Check if the entry exists
+        const existingEntry = await trx("journal_entries")
+          .where("id", id)
+          .first();
 
-      if (!existingEntry) {
-        return res.status(404).json({ error: "Entry not found." });
-      }
+        if (!existingEntry) {
+          return res.status(404).json({ error: "Entry not found." });
+        }
 
-      // Ensure only the user who created the entry can edit it
-      if (existingEntry.user_id !== req.user.user_id) {
-        return res
-          .status(403)
-          .json({ error: "Unauthorized to edit this entry." });
-      }
+        // Ensure only the user who created the entry can edit it
+        if (existingEntry.user_id !== req.user.user_id) {
+          return res
+            .status(403)
+            .json({ error: "Unauthorized to edit this entry." });
+        }
 
-      // Check for conflicts (entries on the same day) except for the entry being updated
-      const conflicts = await trx("journal_entries")
-        .where({
-          user_id: existingEntry.user_id,
-          date: entry.date,
-        })
-        .andWhereNot("id", id);
+        // Check for conflicts (entries on the same day) except for the entry being updated
+        const conflicts = await trx("journal_entries")
+          .where({ user_id: existingEntry.user_id, date: entry.date })
+          .andWhereNot("id", id);
 
-      if (conflicts.length > 0) {
-        if (entry.entry_type_id == 1) {
+        let deletedEntriesCount = 0;
+
+        if (conflicts.length > 0) {
           const allTypeOne = conflicts.every(
             (conflict) => conflict.entry_type_id == 1
           );
 
           if (!allTypeOne) {
             // If not all are exercises, delete existing entries. Multiple exercises on the same day are allowed.
-            await trx("journal_entries")
-              .where({
-                user_id: existingEntry.user_id,
-                date: entry.date,
-              })
+            deletedEntriesCount += await trx("journal_entries")
+              .where({ user_id: existingEntry.user_id, date: entry.date })
               .andWhereNot("id", id)
               .del();
+
+            if (deletedEntriesCount > 0) {
+              await trx("students")
+                .where({ user_id: existingEntry.user_id })
+                .decrement("total_entry_count", deletedEntriesCount);
+            }
           }
-        } else {
+        }
+
+        // Update the entry
+        const rows = await trx("journal_entries").where("id", id).update(entry);
+
+        if (rows === 0) {
+          throw new Error("Failed to update entry.");
+        }
+
+        return rows;
+      });
+
+      res.json({ message: "Entry updated successfully" });
+    } catch (err) {
+      console.error("PUT /entry/exercise/:id failed", err);
+      res.status(500).json({
+        error: "An error occurred while updating the exercise entry.",
+      });
+    }
+  }
+);
+
+router.put(
+  "/entry/sick-or-rest/:id",
+  isAuthenticated,
+  isStudent,
+  [entry_type_id, details, date],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const id = req.params.id;
+    const entry = req.body;
+
+    entry.date = new Date(entry.date);
+    entry.date.setUTCHours(0, 0, 0, 0);
+    entry.updated_at = new Date();
+
+    entry.workout_type_id = null;
+    entry.workout_category_id = null;
+    entry.time_of_day_id = null;
+    entry.length_in_minutes = null;
+    entry.workout_intensity_id = null;
+
+    try {
+      const result = await knex.transaction(async (trx) => {
+        // Check if the entry exists
+        const existingEntry = await trx("journal_entries")
+          .where("id", id)
+          .first();
+
+        if (!existingEntry) {
+          return res.status(404).json({ error: "Entry not found." });
+        }
+
+        // Ensure only the user who created the entry can edit it
+        if (existingEntry.user_id !== req.user.user_id) {
+          return res
+            .status(403)
+            .json({ error: "Unauthorized to edit this entry." });
+        }
+
+        // Check for conflicts (entries on the same day) except for the entry being updated
+        const conflicts = await trx("journal_entries")
+          .where({ user_id: existingEntry.user_id, date: entry.date })
+          .andWhereNot("id", id);
+
+        let deletedEntriesCount = 0;
+
+        if (conflicts.length > 0) {
           // For rest or sick days, delete all existing conflicting entries
-          await trx("journal_entries")
-            .where({
-              user_id: existingEntry.user_id,
-              date: entry.date,
-            })
+          deletedEntriesCount += await trx("journal_entries")
+            .where({ user_id: existingEntry.user_id, date: entry.date })
             .andWhereNot("id", id)
             .del();
+
+          if (deletedEntriesCount > 0) {
+            await trx("students")
+              .where({ user_id: existingEntry.user_id })
+              .decrement("total_entry_count", deletedEntriesCount);
+          }
         }
-      }
 
-      // Update entry after handling possible conflicts
-      const rows = await trx("journal_entries").where("id", id).update(entry);
+        // Update the entry
+        const rows = await trx("journal_entries").where("id", id).update(entry);
 
-      if (rows === 0) {
-        throw new Error("Failed to update entry.");
-      }
+        if (rows === 0) {
+          throw new Error("Failed to update entry.");
+        }
 
-      return rows;
-    });
+        return rows;
+      });
 
-    res.json({ message: "Entry updated successfully" });
-  } catch (err) {
-    console.error("PUT /entry/:id failed", err);
-    res.status(500).json({
-      error: "An error occurred while updating the journal entry.",
-    });
+      res.json({ message: "Entry updated successfully" });
+    } catch (err) {
+      console.error("PUT /entry/sick-or-rest/:id failed", err);
+      res.status(500).json({
+        error: "An error occurred while updating the sick or rest entry.",
+      });
+    }
   }
-});
+);
 
 // Delete a journal entry
 router.delete("/entry/:id", isAuthenticated, isStudent, async (req, res) => {
   const id = req.params.id;
   const userId = req.user.user_id;
   try {
-    await knex.transaction(async trx => {
+    await knex.transaction(async (trx) => {
       // Check if the entry exists and belongs to the user
       const entry = await trx("journal_entries")
         .where({ id: id, user_id: userId })
         .first();
 
       if (!entry) {
-        return res.status(404).json({ message: "Entry not found or you do not have permission to delete this entry." });
+        return res.status(404).json({
+          message:
+            "Entry not found or you do not have permission to delete this entry.",
+        });
       }
 
       // Delete the entry
-      await trx("journal_entries")
-        .where({ id: id })
-        .del();
+      await trx("journal_entries").where({ id: id }).del();
 
       // Decrement total_entry_count for the user
       await trx("students")
@@ -450,6 +622,5 @@ router.delete("/entry/:id", isAuthenticated, isStudent, async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;

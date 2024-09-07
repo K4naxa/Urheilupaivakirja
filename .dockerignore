@@ -6,7 +6,7 @@
 */.gitignore
 .git
 .aws
-*/database
+/database/seeds/development/
 */docker-compose.yml
 Docker
 */readme.md

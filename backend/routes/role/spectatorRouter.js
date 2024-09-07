@@ -43,10 +43,6 @@ router.get("/", isAuthenticated, isTeacher, async (req, res) => {
 // Admin invites a spectator
 router.post("/invite", isAuthenticated, isTeacher, async (req, res) => {
   const { email } = req.body;
-  // check if user is admin
-  if (role !== 1) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
 
   // check if user with the same email already exists
   try {

@@ -5,6 +5,8 @@ const config = require("../../utils/config");
 const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
+const { group_name } = require("../../utils/validation");
+const { validationResult } = require("express-validator");
 
 // get all groups
 router.get("/", isAuthenticated, isTeacher, async (req, res, next) => {
@@ -26,21 +28,25 @@ router.get("/", isAuthenticated, isTeacher, async (req, res, next) => {
 });
 
 // Add a new group
-router.post("/", isAuthenticated, isTeacher, (req, res) => {
+router.post("/", isAuthenticated, isTeacher, group_name, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-  let { name } = req.body;
+  let { group_name } = req.body;
 
   // Validate input
-  if (!name) {
+  if (!group_name) {
     return res.status(400).json({ error: "Group name is required" });
   }
 
   // Trim the name
-  name = name.trim();
+  group_name = group_name.trim();
 
   // Check if group already exists
   knex("student_groups")
-    .where("name", "=", name)
+    .where("name", "=", group_name)
     .first() // Using first() as we expect 0 or 1 row
     .then((existingGroup) => {
       if (existingGroup) {
@@ -49,7 +55,7 @@ router.post("/", isAuthenticated, isTeacher, (req, res) => {
 
       // Add group
       knex("student_groups")
-        .insert({ name: name, is_verified: 1 })
+        .insert({ name: group_name, is_verified: 1 })
         .then((insertedIds) => {
           // Since MySQL doesn't support returning, fetch the group after inserting
           return knex("student_groups")
@@ -71,14 +77,19 @@ router.post("/", isAuthenticated, isTeacher, (req, res) => {
 });
 
 // edit a single group by group.id
-router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
-  if (!req.body.name) {
+router.put("/:id", isAuthenticated, isTeacher, group_name, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  if (!req.body.group_name) {
     return res.status(400).json({ error: "Name is required" });
   }
 
   const { id } = req.params;
   const updatedGroup = {
-    name: req.body.name,
+    name: req.body.group_name,
   };
 
   knex("student_groups")
@@ -102,24 +113,29 @@ router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
 router.delete("/:id", isAuthenticated, isTeacher, async (req, res, next) => {
   const { id } = req.params;
 
-  knex("student_groups")
-    .where({ id })
-    .del()
-    .then(() => {
-      res.status(200).json({ id });
-    })
-    .catch((err) => {
-      console.log("Error deleting campus", err);
+  try {
+    const result = await knex("student_groups").where({ id }).del();
 
-      if (err.code === "ER_ROW_IS_REFERENCED_2") {
-        return res.status(400).json({
-          error: "Poisto epäonnistui, koska ryhmässä on opiskelijoita.",
-        });
-      }
-      res
-        .status(500)
-        .json({ error: "An error occurred while deleting the campus." });
-    });
+    if (result === 0) {
+      return res.status(404).json({
+        error: "Student group not found or could not be deleted.",
+      });
+    }
+
+    res.status(200).json({ id });
+  } catch (err) {
+    console.error("Error deleting student group");
+
+    if (err.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(409).json({
+        error: "Poisto epäonnistui, koska ryhmässä on opiskelijoita.",
+      });
+    }
+
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the student group." });
+  }
 });
 
 // Teacher verifies/activates student_group by its ID

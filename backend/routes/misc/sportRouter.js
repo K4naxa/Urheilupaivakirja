@@ -6,6 +6,8 @@ const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 
 const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
+const { sport_name } = require("../../utils/validation");
+const { validationResult } = require("express-validator");
 
 // Get all sports
 router.get("/", isAuthenticated, isTeacher, async (req, res) => {
@@ -42,20 +44,17 @@ router.get("/:id", isAuthenticated, isTeacher, async (req, res) => {
 });
 
 // Add a new sport
-router.post("/", isAuthenticated, isTeacher, async (req, res) => {
-  let { name } = req.body;
-
-  // Validate input
-  if (!name) {
-    return res.status(400).json({ error: "Sport name is required" });
+router.post("/", isAuthenticated, isTeacher, sport_name, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
-  // Trim the name
-  name = name.trim();
+  let { sport_name } = req.body;
 
   try {
     // Check if sport already exists
-    const existingSport = await knex("sports").where("name", "=", name).first();
+    const existingSport = await knex("sports").where("name", "=", sport_name).first();
 
     if (existingSport) {
       return res.status(409).json({ error: "Sport already exists" }); // 409 Conflict for duplicates
@@ -63,7 +62,7 @@ router.post("/", isAuthenticated, isTeacher, async (req, res) => {
 
     // Add sport
     const insertedIds = await knex("sports").insert({
-      name: name,
+      name: sport_name,
       is_verified: 1,
     });
 
@@ -80,14 +79,19 @@ router.post("/", isAuthenticated, isTeacher, async (req, res) => {
 });
 
 // edit a single sport by sport.id
-router.put("/:id", isAuthenticated, isTeacher, async (req, res) => {
-  if (!req.body.name) {
+router.put("/:id", isAuthenticated, isTeacher, sport_name, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  if (!req.body.sport_name) {
     return res.status(400).json({ error: "Name is required" });
   }
 
   const { id } = req.params;
   const updatedSport = {
-    name: req.body.name.trim(),
+    name: req.body.sport_name
   };
 
   try {
@@ -107,24 +111,33 @@ router.put("/:id", isAuthenticated, isTeacher, async (req, res) => {
 });
 
 // delete a single sport by sport.id
-router.delete("/:id", isAuthenticated, isTeacher, (req, res, next) => {
-  const id = req.params.id;
-  knex("sports")
-    .where("id", "=", id)
-    .del()
-    .then(() => {
-      res.json({ message: `Sport with id ${id} deleted` });
-    })
-    .catch((err) => {
-      if (err.code === "ER_ROW_IS_REFERENCED_2") {
-        return res.status(400).json({
-          error: "Laji ei voitu poistaa, koska laji sisältää oppilaita",
-        });
-      }
-      console.log("Error deleting sport:", err);
-      res.status(500).json({ error: "Internal server error" });
-    });
+router.delete("/:id", isAuthenticated, isTeacher, async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const result = await knex("sports")
+      .where("id", "=", id)
+      .del();
+
+    if (result === 0) {
+      return res.status(404).json({
+        error: "Sport not found or could not be deleted.",
+      });
+    }
+
+    res.json({ message: `Sport with id ${id} deleted` });
+  } catch (err) {
+    if (err.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(409).json({
+        error: "Laji ei voitu poistaa, koska laji sisältää oppilaita",
+      });
+    }
+    
+    console.error("Error deleting sport:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
+
 
 // Teacher verifies/activates sport by its ID
 router.put("/verify/:id", isAuthenticated, isTeacher, async (req, res) => {

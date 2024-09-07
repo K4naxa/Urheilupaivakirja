@@ -39,7 +39,7 @@ const getSpectators = async () => {
   };
 
   const deleteSpectator = async (userId) => {
-    const response = await apiClient.delete(`/user/${userId}`);
+    const response = await apiClient.delete(`/user/delete/${userId}`);
     return response.data;
   };
 

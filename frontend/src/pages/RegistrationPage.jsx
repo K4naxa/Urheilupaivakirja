@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 import registerService from "../services/registerService";
 import miscService from "../services/miscService";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import { useToast } from "../hooks/toast-messages/useToast";
@@ -10,6 +9,7 @@ import { useAuth } from "../hooks/useAuth";
 import GroupSelect from "../components/registration/RegistrationGroupSelect";
 import CampusSelect from "../components/registration/RegistrationCampusSelect";
 import SportSelect from "../components/registration/RegistrationSportSelect";
+import userService from "../services/userService";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -136,8 +136,10 @@ const RegistrationPage = () => {
     if (!errorCheckRegistration()) {
       return;
     }
+
     try {
-      let user = await registerService.register(
+      // Attempt to register the user
+      await registerService.register(
         registrationData.email,
         registrationData.password,
         registrationData.firstName,
@@ -146,14 +148,30 @@ const RegistrationPage = () => {
         registrationData.groupId,
         registrationData.campusId
       );
-      addToast("Rekisteröityminen onnistui", { style: "success" });
-      login(user);
-    } catch (error) {
+
+      // If registration is successful, show a success message
+      addToast("Käyttäjätunnus luotu", { style: "success" });
+
+      // Attempt to log in the user
+      try {
+        const user = await userService.login(
+          registrationData.email,
+          registrationData.password
+        );
+        login(user);
+      } catch (loginError) {
+        addToast("Kirjautuminen epäonnistui", {
+          style: "error",
+          autoDismiss: false,
+        });
+        console.error("Error logging in:", loginError);
+      }
+    } catch (registrationError) {
       addToast("Rekisteröityminen epäonnistui", {
         style: "error",
         autoDismiss: false,
       });
-      console.error("Error registering:", error);
+      console.error("Error registering:", registrationError);
     }
   };
 
@@ -206,21 +224,32 @@ const RegistrationPage = () => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
 
-      if (registrationData.password.length < 1) {
+      const password = registrationData.password;
+
+      if (password.length < 1) {
         newErrors.password = {
           value: "error",
         };
         return newErrors;
       }
 
-      // Check if the password is too short
-      if (registrationData.password.length < 8) {
+      // Regular expressions for validation
+      const lengthCheck = /.{8,}/; // At least 8 characters
+      const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+      const numberCheck = /[0-9]/; // At least one number
+
+      // Check if the password meets the required conditions
+      if (
+        !lengthCheck.test(password) ||
+        !capitalLetterCheck.test(password) ||
+        !numberCheck.test(password)
+      ) {
         newErrors.password = {
           value: "error",
-          message: "Salasana liian lyhyt",
+          message:
+            "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron", // "The password must be at least 8 characters long and contain at least one uppercase letter and one number"
         };
       } else {
-        // Set password as valid if it's long enough
         newErrors.password = {
           value: "success",
         };
@@ -263,7 +292,7 @@ const RegistrationPage = () => {
       ) {
         newErrors.passwordAgain = {
           value: "error",
-          message: "Salasanat eivät täsmää", // "Passwords do not match"
+          message: "Salasanat eivät täsmää",
         };
       } else if (registrationData.passwordAgain) {
         // Set passwordAgain as valid if it matches
@@ -307,12 +336,11 @@ const RegistrationPage = () => {
       [name]: value,
     }));
 
-    errorCheckDropdown(value, name); 
-
+    errorCheckDropdown(value, name);
   };
 
   const containerClass = "flex flex-col gap-1 relative";
-  const dropdownContainerClass = "flex flex-col gap-1 mb-4 sm:mb-0 relative";
+  const dropdownContainerClass = "flex flex-col gap-1 mb-4 sm:mb-0 relative bg-bgSecondary ";
   const errorClass = "text-red-500 absolute top-full mt-1";
 
   const inputClass =
@@ -322,7 +350,7 @@ const RegistrationPage = () => {
     <div className="bg-bgPrimary text-textPrimary grid place-items-center border-none h-screen w-screen">
       <div
         className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[600px]
-       flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
+       flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto"
       >
         <div className=" relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           <p>Rekisteröityminen</p>
@@ -482,7 +510,6 @@ const RegistrationPage = () => {
               registrationData={registrationData}
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
-              
             />
             {/* registrationData.sportId === "new" && (
               <input
@@ -508,7 +535,6 @@ const RegistrationPage = () => {
               registrationData={registrationData}
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
-              
             />
             {errors.groupId && errors.groupId.message && (
               <p className={errorClass}>{errors.groupId.message}</p>
@@ -524,7 +550,6 @@ const RegistrationPage = () => {
               registrationData={registrationData}
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
-              
             />
             {errors.campusId && errors.campusId.message && (
               <p className={errorClass}>{errors.campusId.message}</p>

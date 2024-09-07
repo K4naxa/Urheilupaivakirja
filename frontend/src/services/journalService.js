@@ -64,8 +64,11 @@ const getJournalEntryForForm = async (id) => {
 
 // post new journal entry
 const postJournalEntry = async (journalEntry) => {
-  var entryToSend = {};
+  let entryToSend = {};
+  let endpoint;
+
   if (journalEntry.entry_type === "1") {
+    // Exercise entry
     entryToSend = {
       entry_type_id: journalEntry.entry_type,
       workout_type_id: journalEntry.workout_type,
@@ -76,27 +79,31 @@ const postJournalEntry = async (journalEntry) => {
       details: journalEntry.details,
       date: journalEntry.date,
     };
+    endpoint = "/journal/entry/exercise";
   } else {
+    // Sick or rest entry
     entryToSend = {
       entry_type_id: journalEntry.entry_type,
       details: journalEntry.details,
       date: journalEntry.date,
     };
+    endpoint = "/journal/entry/sick-or-rest";
   }
-  const response = await apiClient.post(
-    "/journal/entry",
-    entryToSend
-  );
+
+  const response = await apiClient.post(endpoint, entryToSend);
   return response.data;
 };
+
 
 // edit existing journal entry
 const editJournalEntry = async (journalEntry) => {
   let id = journalEntry.entry_id;
   let updatedJournalEntry = {};
+  let endpoint;
+
   if (journalEntry.entry_type === "1") {
+    // Exercise entry
     updatedJournalEntry = {
-      id: journalEntry.entry_id,
       entry_type_id: journalEntry.entry_type,
       workout_type_id: journalEntry.workout_type,
       workout_category_id: journalEntry.workout_category,
@@ -106,25 +113,21 @@ const editJournalEntry = async (journalEntry) => {
       details: journalEntry.details,
       date: journalEntry.date,
     };
+    endpoint = `/journal/entry/exercise/${id}`;
   } else {
+    // Sick or rest entry
     updatedJournalEntry = {
-      id: journalEntry.entry_id,
       entry_type_id: journalEntry.entry_type,
-      workout_type_id: null,
-      workout_category_id: null,
-      time_of_day_id: null,
-      length_in_minutes: null,
-      workout_intensity_id: null,
       details: journalEntry.details,
       date: journalEntry.date,
     };
+    endpoint = `/journal/entry/sick-or-rest/${id}`;
   }
-  const response = await apiClient.put(
-    `/journal/entry/${id}`,
-    updatedJournalEntry
-  );
+
+  const response = await apiClient.put(endpoint, updatedJournalEntry);
   return response.data;
 };
+
 
 // delete existing journal entry
 const deleteJournalEntry = async (id) => {
