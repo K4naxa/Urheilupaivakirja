@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import ConfirmModal from '../components/confirm-modal/ConfirmModal';
 import AccountDeleteConfirmModal from '../components/confirm-modal/AccountDeleteConfirmModal';
 // Import the new modal component
-import CompareConfirmModal from '../components/confirm-modal/CompareConfirmModal'; // Assume this is the modal for oldValue type
+import AdminAccountDeleteConfirmModal from '../components/confirm-modal/AdminAccountDeleteConfirmModal';
 
 const ConfirmModalContext = createContext();
 
@@ -30,6 +30,8 @@ export const ConfirmModalProvider = ({ children }) => {
           case 'accountDelete':
             ModalComponent = AccountDeleteConfirmModal;
             break;
+            case 'adminAccountDelete':
+            ModalComponent = AdminAccountDeleteConfirmModal;
           case 'compare':
             ModalComponent = CompareConfirmModal;
             break;

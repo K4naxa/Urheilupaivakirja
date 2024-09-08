@@ -33,7 +33,7 @@ const TeacherLayout = () => {
   let iconSize = 20;
   return (
     <div className="text-textPrimary">
-      <div className="z-10 border border-b-2 bg-bgSecondary border-borderPrimary fixed-header">
+      <div className="z-10 md:border-b-2 bg-bgSecondary border-borderPrimary fixed-header">
         <header className="hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between">
           <nav id="top-nav" className="flex justify-center gap-8">
             <div className="flex justify-center gap-4 text-textPrimary ">

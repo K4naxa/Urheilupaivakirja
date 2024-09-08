@@ -36,11 +36,6 @@ function SpectatorProfilePage() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: invitedSpectators, isLoading: invitedSpectatorsLoading } = useQuery({
-    queryKey: ["invitedSpectators"],
-    queryFn: () => userService.getInvitedSpectators(),
-    staleTime: 15 * 60 * 1000,
-  })
 
   const validateEmail = (email) => {
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;

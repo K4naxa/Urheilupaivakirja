@@ -29,6 +29,14 @@ const getSpectators = async () => {
     );
     return response.data;
   };
+
+  const revokeInvitationToken = async (id) => {
+    const response = await apiClient.delete(
+      `/spectator/revoke/${id}`,
+      {}
+    );
+    return response.data;
+  }
   
   const deactivateSpectator = async (id) => {
     const response = await apiClient.put(
@@ -49,5 +57,6 @@ export default {
     registerSpectator,
     inviteSpectator,
     deactivateSpectator,
-    deleteSpectator
+    deleteSpectator,
+    revokeInvitationToken,
 };

@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import userService from "../../services/userService";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen";
-import ConfirmModal from "../../components/confirm-modal/ConfirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import cc from "../../utils/cc";
 import { useConfirmModal } from "../../hooks/useConfirmModal";
 import { useToast } from "../../hooks/toast-messages/useToast";
@@ -65,12 +64,7 @@ function StudentProfilePage() {
   const validateNewPasswords = () => {
     let passwordError = "";
     let newPasswordError = "";
-  
-    console.log("Starting validation");
-    console.log("Current Password:", currentPassword);
-    console.log("New Password:", newPassword);
-    console.log("Confirm Password:", confirmPassword);
-  
+
     // Regular expressions for validation
     const lengthCheck = /.{8,}/; // At least 8 characters
     const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
@@ -134,7 +128,7 @@ function StudentProfilePage() {
     openConfirmModal({
       handleLogout: handleLogout,
       text: `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
-      type: "accountDelete",
+      type: "adminDelete",
       inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
       inputType: "password",
       agreeButtonText: "Poista",
@@ -169,7 +163,7 @@ function StudentProfilePage() {
             <div>
               <h1 className="text-xl">Merkinnät</h1>
               <small className="text-textSecondary">
-                Näe tilastoja tehdyistä merkinnöistä
+                Yhteenveto tehdyistä merkinnöistä
               </small>
             </div>
             <div className="flex flex-col gap-4">
@@ -284,7 +278,7 @@ function StudentProfilePage() {
               <h1 className="text-xl">Päivitä salasana</h1>
               <small className="text-textSecondary">
                 Muista käyttää pitkää ja turvallista salasanaa. Salasanan vaihto
-                kirjaa sinut ulos kaikilta laitteiltasi.
+                kirjaa sinut ulos kaikilta muilta laitteiltasi.
               </small>
             </div>
 

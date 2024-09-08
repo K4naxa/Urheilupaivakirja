@@ -269,7 +269,7 @@ const CampusPage = () => {
   return (
     <div className="items-center w-full rounded-md bg-bgSecondary">
       {/* header for mobile*/}
-      <div className="w-full py-4 text-2xl text-center shadow-md md:hidden bg-primaryColor rounded-b-md">
+      <div className="w-full py-4 text-2xl text-center shadow-md md:hidden bg-primaryColor">
         Toimipaikat
       </div>
       {/* Error Header */}

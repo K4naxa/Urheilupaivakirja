@@ -12,10 +12,9 @@ const crypto = require("crypto");
 const { getUserFullName } = require("../../utils/library");
 
 const sendEmail = require("../../utils/email/sendEmail");
-const {
-  isAuthenticated,
-  isTeacher
-} = require("../../utils/authMiddleware");
+const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
+const { email } = require("../../utils/validation");
+const { validationResult } = require("express-validator");
 
 // Get all spectators
 router.get("/", isAuthenticated, isTeacher, async (req, res) => {
@@ -41,7 +40,12 @@ router.get("/", isAuthenticated, isTeacher, async (req, res) => {
 });
 
 // Admin invites a spectator
-router.post("/invite", isAuthenticated, isTeacher, async (req, res) => {
+router.post("/invite", isAuthenticated, isTeacher, email, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { email } = req.body;
 
   // check if user with the same email already exists
@@ -200,8 +204,8 @@ router.post("/register", async (req, res) => {
 
 router.get("/invited", isAuthenticated, isTeacher, async (req, res) => {
   try {
-
     const invitedSpectators = await knex("invited_spectators").select(
+      "id",
       "email",
       "created_at",
       "expires_at"
@@ -214,4 +218,21 @@ router.get("/invited", isAuthenticated, isTeacher, async (req, res) => {
   }
 });
 
+router.delete(
+  "/revoke/:id",
+  isAuthenticated,
+  isTeacher,
+  async (req, res) => {
+    const id = req.params.id;
+
+    try {
+      await knex("invited_spectators").where({ id }).del();
+    } catch (err) {
+      console.error("Error revoking invitation token:", err);
+      res.status(500).json({ message: err.message });
+    } finally {
+      res.json({ message: "Invitation revoked" });
+    }
+  }
+);
 module.exports = router;

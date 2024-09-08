@@ -29,15 +29,27 @@ const SpectatorsPage = () => {
     },
   });
 
+  const revokeInvitationToken = useMutation({
+    mutationFn: (id) => spectatorService.revokeInvitationToken(id),
+    onError: (error) => {
+      console.error("Error revoking invitation:", error);
+      addToast("Virhe kutsun perumisessa", { style: "error" });
+    },
+    onSuccess: () => {
+      addToast("Kutsu peruttu", { style: "success" });
+      queryClient.invalidateQueries({ queryKey: ["invitedSpectators"] });
+    },
+  });
+
   const handleDelete = (spectator) => {
     const spectatorId = spectator.id;
     console.log("Saved id", spectatorId);
-  
+
     const handleUserConfirmation = (id) => {
       console.log("Deleting spectator", id);
       deleteSpectator.mutate(id);
     };
-  
+
     const modalText = (
       <span>
         Haluatko varmasti poistaa vierailijan
@@ -49,7 +61,7 @@ const SpectatorsPage = () => {
         Tämä poistaa kaikki vierailijan tiedot pysyvästi.
       </span>
     );
-  
+
     openConfirmModal({
       onAgree: () => handleUserConfirmation(spectatorId),
       text: modalText,
@@ -59,8 +71,31 @@ const SpectatorsPage = () => {
       useTimer: true,
     });
   };
-  
-  
+
+  const handleRevoke = (invitedSpectator) => {
+    const spectatorId = invitedSpectator.id;
+    const handleUserConfirmation = (id) => {
+      revokeInvitationToken.mutate(id);
+    };
+
+    const modalText = (
+      <span>
+        Haluatko varmasti perua kutsun vierailijalle
+        <br />
+        <strong>{invitedSpectator.email}?</strong>
+        <br />
+      </span>
+    );
+
+    openConfirmModal({
+      onAgree: () => handleUserConfirmation(spectatorId),
+      text: modalText,
+      agreeButtonText: "Peru",
+      agreeStyle: "red",
+      declineButtonText: "Takaisin",
+      useTimer: true,
+    });
+  };
 
   const inviteSpectator = useMutation({
     mutationFn: () => spectatorService.inviteSpectator(newSpectatorEmail),
@@ -92,13 +127,14 @@ const SpectatorsPage = () => {
     },
   });
 
-  const { data: invitedSpectators } = useQuery({
-    queryKey: ["invitedSpectators"],
-    queryFn: () => spectatorService.getInvitedSpectators(),
-    config: {
-      enabled: false,
-    },
-  });
+  const { data: invitedSpectators, isLoading: invitedSpectatorsLoading } =
+    useQuery({
+      queryKey: ["invitedSpectators"],
+      queryFn: () => spectatorService.getInvitedSpectators(),
+      config: {
+        enabled: false,
+      },
+    });
 
   return (
     <div className="w-full items-center bg-bgSecondary rounded-md p-2">
@@ -145,6 +181,27 @@ const SpectatorsPage = () => {
           </form>
         </div>
       </div>
+      <div className="flex-col w-full">
+        {invitedSpectatorsLoading ? (
+          <div>{LoadingScreen()}</div>
+        ) : (
+          invitedSpectators.length > 0 && (
+            <>
+              <h2 className="text-xl m-2">Kutsutut vierailijat</h2>
+              <div className="flex flex-col gap-4">
+                {invitedSpectators.map((spectator) => (
+                  <CreateInvitedSpectatorCard
+                    spectator={spectator}
+                    handleRevoke={handleRevoke}
+                    key={spectator.id}
+                  />
+                ))}
+              </div>
+            </>
+          )
+        )}
+      </div>
+
       <div className="flex-col w-full ">
         <h2 className="text-xl m-2">Vierailijat</h2>
         <div className="flex flex-col gap-4">
@@ -211,6 +268,42 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
           className="IconButton text-iconRed"
           onClick={() => {
             handleDelete(spectator);
+          }}
+        >
+          <FiTrash2 size={20} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const CreateInvitedSpectatorCard = ({ spectator, handleRevoke }) => {
+  const created_at = formatDate(new Date(spectator.created_at), "d.m.Y");
+  const expires_at = formatDate(new Date(spectator.expires_at), "d.m.Y");
+
+  return (
+    <div className="flex w-full border border-borderPrimary rounded-md p-2">
+      <div className="flex flex-col gap-2 p-2  w-full">
+        {/* name and email row */}
+        <div className="flex flex-wrap gap-4 items-end">
+          <span className="text-textSecondary">{spectator.email}</span>
+        </div>
+
+        {/* additional info row */}
+        <div className="flex gap-4 flex-wrap">
+          <span className="text-textSecondary">
+            Lähetetty: {created_at || "Ei rekisteröitynyt"}
+          </span>
+          <span className="text-textSecondary">
+            Vanhenee: {expires_at || "Ei kirjautunut"}
+          </span>
+        </div>
+      </div>
+      <div className="flex justify-center p-4">
+        <button
+          className="IconButton text-iconRed"
+          onClick={() => {
+            handleRevoke(spectator);
           }}
         >
           <FiTrash2 size={20} />

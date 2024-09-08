@@ -29,6 +29,7 @@ import { Tooltip } from "react-tooltip";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import courseService from "../../services/courseService";
 import { useParams } from "react-router-dom";
+import studentService from "../../services/studentService";
 import cc from "../../utils/cc";
 import { useState } from "react";
 
@@ -180,7 +181,7 @@ function StudentHome() {
                 </div>
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Ryhmä:</p>{" "}
-                  <p>{studentData.name}</p>
+                  <p>{studentData.group_name}</p>
                 </div>
                 <div className="flex gap-2">
                   <p className="text-textSecondary">Laji:</p>{" "}
