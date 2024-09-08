@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import userService from "../../../../services/userService";
+import studentService from "../../../../services/studentService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 import { FiUserPlus } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
-import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
+import StudentMultiSelect from "../../../../components/multiselect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 
 //TODO: Ryhmä not showing correctly in the UI
@@ -85,7 +85,7 @@ const ManageArchivedStudentsPage = () => {
   });
 
   useEffect(() => {
-    userService.getArchivedStudents().then((data) => {
+    studentService.getArchivedStudents().then((data) => {
       setState({
         students: data,
         filteredStudents: data.sort((a, b) =>
@@ -98,9 +98,9 @@ const ManageArchivedStudentsPage = () => {
 
   const handleActivation = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.toggleStudentArchive(student.user_id).then(() => {
+      await studentService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
-          queryKey: ["studentsAndJournals"],
+          queryKey: ["StudentsList"],
         });
       });
       const newStudents = state.students.filter(
@@ -131,7 +131,7 @@ const ManageArchivedStudentsPage = () => {
   // handle Delete funtion for students
   const handleDelete = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(student.user_id);
+      await studentService.deleteStudent(student.user_id);
       const newStudents = state.students.filter(
         (s) => s.user_id !== student.user_id
       );

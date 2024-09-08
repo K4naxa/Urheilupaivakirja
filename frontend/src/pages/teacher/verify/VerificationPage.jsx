@@ -1,9 +1,12 @@
-import userService from "../../../services/userService";
+import groupService from "../../../services/groupService";
+import sportService from "../../../services/sportService";
+import miscService from "../../../services/miscService";
+import studentService from "../../../services/studentService";
 import { FiTrash2, FiCheck } from "react-icons/fi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingScreen from "../../../components/LoadingScreen";
-import trainingService from "../../../services/trainingService";
-import publicService from "../../../services/publicService";
+import { useToast } from "../../../hooks/toast-messages/useToast";
+import { add } from "date-fns";
 
 const VerificationPage = () => {
   const {
@@ -11,8 +14,8 @@ const VerificationPage = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["unverifiedData"],
-    queryFn: userService.getAllUnverified,
+    queryKey: ["unverifiedStudentsSportsCampuses"],
+    queryFn: miscService.getUnverifiedStudentsSportsCampuses,
   });
 
   const {
@@ -125,19 +128,33 @@ const VerificationPage = () => {
 
 function CreateStudentContainer({ student }) {
   const queryClient = useQueryClient();
-
+  const { addToast } = useToast();
   const verifyStudentMutation = useMutation({
-    mutationFn: () => userService.verifyStudent(student.user_id),
+    mutationFn: () => studentService.verifyStudent(student.user_id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedStudents"]);
-      queryClient.invalidateQueries(["studentsAndJournals"]);
+      addToast("Oppilas hyväksytty", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["StudentsList"] });
+    },
+    onError: (error) => {
+      addToast("Virhe hyväksyttäessä oppilasta", { style: "error" });
+      console.error("Error verifying student:", error);
     },
   });
 
   const deleteStudentMutation = useMutation({
-    mutationFn: () => userService.deleteUser(student.user_id),
+    mutationFn: () => studentService.deleteStudent(student.user_id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedStudents"]);
+      addToast("Oppilas poistettu", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+    },
+    onError: (error) => {
+      addToast("Virhe poistettaessa oppilasta", { style: "error" });
+      console.error("Error deleting student:", error);
     },
   });
 
@@ -171,7 +188,10 @@ function CreateStudentContainer({ student }) {
         {" "}
         <button
           className="text-iconGreen hover:scale-110  p-1 rounded-md "
-          onClick={() => verifyStudentMutation.mutate()}
+          onClick={() => {
+            console.log();
+            verifyStudentMutation.mutate();
+          }}
         >
           <FiCheck size={20} />
         </button>
@@ -188,18 +208,31 @@ function CreateStudentContainer({ student }) {
 
 const CreateStudentGroupContainer = ({ student_group }) => {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
 
   const verifyStudentGroupMutation = useMutation({
-    mutationFn: () => userService.verifyStudentGroup(student_group.id),
+    mutationFn: () => groupService.verifyStudentGroup(student_group.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      addToast("Ryhmä hyväksytty", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+    },
+    onError: () => {
+      addToast("Virhe hyväksyttäessä ryhmää", { style: "error" });
     },
   });
 
   const deleteStudentGroupMutation = useMutation({
-    mutationFn: () => publicService.deleteGroup(student_group.id),
+    mutationFn: () => groupService.deleteGroup(student_group.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      addToast("Ryhmä poistettu", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+    },
+    onError: () => {
+      addToast("Virhe poistettaessa ryhmää", { style: "error" });
     },
   });
 
@@ -234,18 +267,31 @@ const CreateStudentGroupContainer = ({ student_group }) => {
 
 const CreateSportContainer = ({ sport }) => {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
 
   const verifySportMutation = useMutation({
-    mutationFn: () => userService.verifySport(sport.id),
+    mutationFn: () => sportService.verifySport(sport.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      addToast("Laji hyväksytty", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+    },
+    onError: () => {
+      addToast("Virhe hyväksyttäessä lajia", { style: "error" });
     },
   });
 
   const deleteSportMutation = useMutation({
-    mutationFn: () => trainingService.deleteSport(sport.id),
+    mutationFn: () => sportService.deleteSport(sport.id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["unverifiedData"]);
+      addToast("Laji poistettu", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+    },
+    onError: () => {
+      addToast("Virhe poistettaessa lajia", { style: "error" });
     },
   });
 

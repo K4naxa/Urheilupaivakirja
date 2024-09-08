@@ -1,10 +1,10 @@
 import { useState, useLayoutEffect, useMemo } from "react";
-import trainingService from "../../../services/trainingService.js";
+import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import dayjs from "dayjs";
-import userService from "../../../services/userService.js";
+import studentService from "../../../services/userService.js";
 import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
@@ -40,7 +40,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => trainingService.postJournalEntry(newJournalEntryData),
+    mutationFn: () => journalService.postJournalEntry(newJournalEntryData),
     // If the mutation fails, roll back to the previous value
     onError: (error) => {
       console.error("Error adding journal entry:", error);
@@ -48,8 +48,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      queryClient.invalidateQueries(["studentJournal"]);
+      console.log("Invalidating studentData query");
+      queryClient.invalidateQueries({queryKey: ["studentData"]});
+      console.log("adding toast");
       addToast("Merkintä lisätty", { style: "success" });
+      console.log("closing modal");
       onClose();
     },
   });
@@ -57,23 +60,21 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   // Journal data for matching
   const {
     data: journalEntriesData,
-    isLoading: journalEntriesDataLoading,
+    isFetching: journalEntriesDataLoading,
     isError: journalEntriesDataError,
   } = useQuery({
     queryKey: ["studentData"],
-    queryFn: () => userService.getStudentData(),
-    staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
   const {
     data: optionsData,
-    isLoading: optionsLoading,
+    isFetching: optionsLoading,
     isError: optionsError,
     error,
   } = useQuery({
-    queryKey: ["sportCategoryOptions"],
-    queryFn: () => trainingService.getJournalEntryOptions(),
+    queryKey: ["options"],
+    queryFn: () => journalService.getJournalEntryOptions(),
   });
 
   // get all journal entries for the selected date from cache
@@ -120,7 +121,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
 
     try {
-      await addJournalEntry.mutate({ newJournalEntryData });
+       addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -364,6 +365,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   };
 
   function convertTime(totalMinutes) {
+    if (totalMinutes == 195) {
+      return "yli 3h";
+    }
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     if (hours === 0) {
@@ -374,6 +378,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
     return `${hours}h ${minutes}min`;
   }
+  
 
   function getSubmitButtonText(entry_type) {
     switch (entry_type) {
@@ -477,7 +482,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   className="w-full bg-bgPrimary"
                   type="range"
                   min="30"
-                  max="180"
+                  max="195"
                   value={newJournalEntryData.length_in_minutes}
                   step="15"
                   id="length_in_minutes"

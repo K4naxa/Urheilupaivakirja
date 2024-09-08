@@ -20,25 +20,23 @@ import "./hooks/toast-messages/toast.css";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-
   <QueryClientProvider client={queryClient}>
     <MainContextProvider>
       <ToastProvider>
         <ConfirmModalProvider>
-        <BigModalProvider>
-          <HeatmapTooltipContextProvider>
-            <DateModalProvider>
-              <RouterProvider router={router}>
-                <AuthProvider>
-                  <App />
-                </AuthProvider>
-              </RouterProvider>
-            </DateModalProvider>
-          </HeatmapTooltipContextProvider>
-        </BigModalProvider>
+          <BigModalProvider>
+            <HeatmapTooltipContextProvider>
+              <DateModalProvider>
+                <RouterProvider router={router}>
+                  <AuthProvider>
+                    <App />
+                  </AuthProvider>
+                </RouterProvider>
+              </DateModalProvider>
+            </HeatmapTooltipContextProvider>
+          </BigModalProvider>
         </ConfirmModalProvider>
       </ToastProvider>
     </MainContextProvider>
   </QueryClientProvider>
-
 );

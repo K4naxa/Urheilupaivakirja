@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import userService from "../../../../services/userService";
+import studentService from "../../../../services/studentService";
 import LoadingScreen from "../../../../components/LoadingScreen.jsx";
 import { Link } from "react-router-dom";
 
@@ -7,7 +7,7 @@ import { FiArchive } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import { useConfirmModal } from "../../../../hooks/useConfirmModal";
 
-import StudentMultiSelect from "../../../../components/multiSelect-search/StudentMultiSelect.jsx";
+import StudentMultiSelect from "../../../../components/multiselect-search/StudentMultiSelect.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 
 const createStudentContainer = (student, handleArchive, handleDelete) => {
@@ -84,7 +84,7 @@ const ManageActiveStudentsPage = () => {
   });
 
   useEffect(() => {
-    userService.getStudents().then((data) => {
+    studentService.getStudents().then((data) => {
       setState({
         ...state,
         students: data,
@@ -193,9 +193,9 @@ const ManageActiveStudentsPage = () => {
 
   const handleArchive = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.toggleStudentArchive(student.user_id).then(() => {
+      await studentService.toggleStudentArchive(student.user_id).then(() => {
         queryClient.invalidateQueries({
-          queryKey: ["studentsAndJournals"],
+          queryKey: ["StudentsList"],
         });
       });
       const newStudents = state.students.filter(
@@ -228,9 +228,9 @@ const ManageActiveStudentsPage = () => {
   // handle Delete funtion for students
   const handleDelete = (student) => {
     const handleUserConfirmation = async () => {
-      await userService.deleteUser(student.user_id).then(() => {
+      await studentService.deleteStudent(student.user_id).then(() => {
         queryClient.invalidateQueries({
-          queryKey: ["studentsAndJournals"],
+          queryKey: ["StudentsList"],
         });
       });
       const newStudents = state.students.filter(

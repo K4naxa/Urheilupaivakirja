@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tooltip } from "react-tooltip";
 import { useState } from "react";
-import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
-import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
+import HeatMap_Month from "../../components/heatmaps/HeatMap_Month";
+import HeatMap_Year from "../../components/heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
@@ -29,8 +29,8 @@ import {
 import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
-import userService from "../../services/userService";
-import trainingService from "../../services/trainingService";
+import studentService from "../../services/studentService";
+import courseService from "../../services/courseService";
 import cc from "../../utils/cc";
 
 function StudentHome() {
@@ -44,13 +44,13 @@ function StudentHome() {
     error: studentDataError,
   } = useQuery({
     queryKey: ["studentData"],
-    queryFn: () => userService.getStudentData(),
+    queryFn: () => studentService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: courseSegments } = useQuery({
+  const { data: courseSegments, error: courseSegmentsError } = useQuery({
     queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -161,7 +161,7 @@ function StudentHome() {
     );
   };
 
-  if (studentDataError) {
+  if (studentDataError || courseSegmentsError) {
     return (
       <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>
@@ -257,7 +257,7 @@ function StudentHome() {
             {/* Kuukauden aktiivusus container */}
 
             <div className="p-2 py-4 border rounded-md border-borderPrimary">
-              <h3 className="mb-1">Kuukauden merkintä aktiivisuus:</h3>
+              <h3 className="mb-1">Kuukauden merkintäaktiivisuus:</h3>
               {/* progressbar */}
               <div className="relative w-full h-5 border rounded-xl border-borderPrimary bg-bgGray">
                 <div

@@ -16,8 +16,9 @@ import {
   subYears,
 } from "date-fns";
 import formatDate from "../../utils/formatDate";
-import userService from "../../services/userService";
+import statisticsService from "../../services/statisticsService";
 import { useQueryClient } from "@tanstack/react-query";
+import LoadingScreen from "../../components/LoadingScreen";
 
 function StatisticsPage() {
   const queryclient = useQueryClient();
@@ -26,16 +27,16 @@ function StatisticsPage() {
   const [selectedView, setSelectedView] = useState("Day");
 
   // Get data for the  journal info graphs (new entries, avg excercise time, avg sickdays)
-  const { data: EntriesData, isLoading: EntriesLoading } = useQuery({
+  const { data: EntriesData, isPending: EntriesLoading } = useQuery({
     queryKey: ["EntriesData", selectedTime, selectedView],
     queryFn: () => {
       if (selectedTime === "Month") {
-        return userService.getAllJournalEntryDataBetweenDates(
+        return statisticsService.getAllJournalEntryDataBetweenDates(
           startOfMonth(chartShowDate),
           endOfMonth(chartShowDate)
         );
       } else if (selectedTime === "Year") {
-        return userService.getAllJournalEntryDataBetweenDates(
+        return statisticsService.getAllJournalEntryDataBetweenDates(
           startOfYear(chartShowDate),
           endOfYear(chartShowDate)
         );
@@ -44,16 +45,16 @@ function StatisticsPage() {
   });
 
   // Get data for the new students graph
-  const { data: newStudentsData, isLoading: NewStudentsLoading } = useQuery({
+  const { data: newStudentsData, isPending: NewStudentsLoading } = useQuery({
     queryKey: ["newStudentsData", selectedTime],
     queryFn: () => {
       if (selectedTime === "Month") {
-        return userService.getNewStudentsBetweenDates(
+        return statisticsService.getNewStudentsBetweenDates(
           startOfMonth(chartShowDate),
           endOfMonth(chartShowDate)
         );
       } else if (selectedTime === "Year") {
-        return userService.getNewStudentsBetweenDates(
+        return statisticsService.getNewStudentsBetweenDates(
           startOfYear(chartShowDate),
           endOfYear(chartShowDate)
         );
@@ -68,41 +69,18 @@ function StatisticsPage() {
     }
   }, [newStudentsData, NewStudentsLoading, selectedTime, chartShowDate]);
 
-  // Get values for the statistics boxes
-  const getStudentCount = () => {
-    if (!EntriesData) return 0;
-    const count = EntriesData.reduce((acc, entry) => {
-      if (!acc.includes(entry.student_id)) {
-        acc.push(entry.student_id);
-      }
-      return acc;
-    }, []);
-    return count.length;
-  };
-  const getEntryCount = () => {
-    if (!EntriesData) return 0;
-    return EntriesData.length;
-  };
-  const getExcerciseTime = () => {
-    if (!EntriesData) return "0h 0min";
-    const time = EntriesData.reduce((acc, entry) => {
-      if (entry.entry_type_id === 1) {
-        acc += entry.length_in_minutes;
-      }
-      return acc;
-    }, 0);
-    let hours = Math.floor(time / 60);
-    let minutes = time % 60;
-    return `${hours}h ${minutes}min`;
-  };
-
   // -----------------------------------------------------------------------------------------
+
 
   // invalidate queries when changing the selected time or view
   useEffect(() => {
-    queryclient.invalidateQueries("EntriesData");
-    queryclient.invalidateQueries("newStudentsData");
+    queryclient.invalidateQueries({queryKey: ["EntriesData"]});
+    queryclient.invalidateQueries({queryKey: ["newStudentsData"]});
   }, [selectedTime, chartShowDate, selectedView]);
+
+  if (EntriesLoading || NewStudentsLoading) {
+    return <LoadingScreen />;
+  }
 
   const graphContainerClass =
     "flex flex-col gap-4 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2";
@@ -261,15 +239,15 @@ function StatisticsPage() {
       <div className="flex gap-8 justify-center flex-wrap">
         <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
           <p className=""> Opiskelijoiden määrä:</p>{" "}
-          <p className="text-xl text-primaryColor">{getStudentCount()}</p>
+          <p className="text-xl text-primaryColor">{EntriesData.studentCount}</p>
         </div>
         <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
           <p> Merkintöjen määrä:</p>{" "}
-          <p className="text-xl text-primaryColor">{getEntryCount()}</p>
+          <p className="text-xl text-primaryColor">{EntriesData.entryCount}</p>
         </div>
         <div className="flex flex-col gap-2 items-center justify-center bg-bgSecondary p-4 rounded-md border-borderPrimary border-2 w-48">
           <p> Urheiltu aika:</p>{" "}
-          <p className="text-xl text-primaryColor">{getExcerciseTime()}</p>
+          <p className="text-xl text-primaryColor">{EntriesData.exerciseTimeFormatted}</p>
         </div>
       </div>
     </div>

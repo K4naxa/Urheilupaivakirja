@@ -18,22 +18,24 @@ import StudentNewsPage from "./pages/student/StudentNewsPage";
 import SpectatorRegistrationPage from "./pages/SpectatorRegistrationPage";
 
 //teacher
+import TeacherRegistrationPage from "./pages/TeacherRegistrationPage";
+
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
 
-import StudentPage from "./pages/teacher/Studentpage";
+import StudentPage from "./pages/teacher/StudentPage";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
 import SpectatorsPage from "./pages/teacher/manage/SpectatorsPage";
 import TeachersPage from "./pages/teacher/manage/TeachersPage";
-import GroupsPage from "./pages/teacher/manage/groupsPage";
-import CampusPage from "./pages/teacher/manage/campusPage";
+import GroupsPage from "./pages/teacher/manage/GroupsPage";
+import CampusPage from "./pages/teacher/manage/CampusPage";
 
 import TeacherNewsPage from "./pages/teacher/news/TeacherNewsPage";
 
 
-import ManageStudentsLayout from "./layouts/manage-layout/manageStudentsLayout";
+import ManageStudentsLayout from "./layouts/manage-layout/ManageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
 import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
@@ -42,6 +44,7 @@ import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
 //misc
 import NoPage from "./pages/NoPage";
 import LoginPage from "./pages/LoginPage";
+import LogoutPage from "./pages/LogoutPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgottenPasswordConfirmPage from "./pages/misc/forgotten-password/ForgottenPasswordConfirmPage";
@@ -100,6 +103,14 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: "/kirjaudu-ulos",
+            element: (
+              <RedirectIfNotAuthenticated>
+                <LogoutPage />
+              </RedirectIfNotAuthenticated>
+            ),
+          },
+          {
             path: "/rekisteroidy",
             element: (
               <RedirectIfAuthenticated>
@@ -110,6 +121,10 @@ export const router = createBrowserRouter([
           {
             path: "/vierailijan-rekisterointi",
             element: <SpectatorRegistrationPage />,
+          },
+          {
+            path :"opettajan-rekisterointi",
+            element: <TeacherRegistrationPage />,
           },
           //{ path: "/opettajan-rekisterointi", element: <TeacherRegistrationPage /> },
           {

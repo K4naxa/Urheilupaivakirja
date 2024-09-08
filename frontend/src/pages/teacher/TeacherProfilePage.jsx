@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import userService from "../../services/userService";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen";
-import ConfirmModal from "../../components/confirm-modal/confirmModal";
-import { useQuery } from "@tanstack/react-query";
+import ConfirmModal from "../../components/confirm-modal/ConfirmModal";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "../../hooks/toast-messages/useToast";
 
 import { FiCheck, FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
 import cc from "../../utils/cc";
-import trainingService from "../../services/trainingService";
+import courseService from "../../services/courseService";
 import { useQueryClient } from "@tanstack/react-query";
+import { useConfirmModal } from "../../hooks/useConfirmModal";
 
 import {
   closestCorners,
@@ -31,17 +32,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 function TeacherProfilePage() {
-  const { logout } = useAuth();
+  const { logout, logoutAll } = useAuth();
   const { addToast } = useToast();
 
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
+  const { openConfirmModal } = useConfirmModal();
 
   const [updatedCourseSegments, setUpdatedCourseSegments] = useState([]);
 
@@ -62,15 +56,31 @@ function TeacherProfilePage() {
 
   const queryclient = useQueryClient();
 
-  const { data: visitorData, isLoading: visitorDataLoading } = useQuery({
-    queryKey: ["visitorData"],
+  const { data: profileData, isLoading: profileDataLoading } = useQuery({
+    queryKey: ["profileData"],
     queryFn: () => userService.getProfileData(),
     staleTime: 15 * 60 * 1000,
   });
 
+  const passwordUpdate = useMutation({
+    mutationFn: () => userService.changePassword(currentPassword, newPassword),
+    onError: (error) => {
+      console.error("Error updating password:", error);
+      addToast("Virhe päivitettäessä salasanaa", { style: "error" });
+    },
+    onSuccess: () => {
+      addToast("Salasana päivitetty", { style: "success" });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordError("");
+      setNewPasswordError("");
+    },
+  });
+
   const { data: courseSegments } = useQuery({
     queryKey: ["courseSegments"],
-    queryFn: () => trainingService.getCourseSegments(),
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
@@ -81,7 +91,7 @@ function TeacherProfilePage() {
       setEmailError("Sähköpostiosoite ei voi olla tyhjä");
       return false;
     }
-    if (email === visitorData.email) {
+    if (email === profileData.email) {
       setEmailError("Sähköpostiosoite on jo käytössä");
       return false;
     }
@@ -105,36 +115,56 @@ function TeacherProfilePage() {
   const validateNewPasswords = () => {
     let passwordError = "";
     let newPasswordError = "";
+
+    // Regular expressions for validation
+    const lengthCheck = /.{8,}/; // At least 8 characters
+    const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+    const numberCheck = /[0-9]/; // At least one number
+
+    // Check if current password is empty
     if (currentPassword.length === 0) {
       passwordError = "Nykyinen salasana ei voi olla tyhjä";
+      console.log("Password Error:", passwordError);
     } else {
       setPasswordError("");
     }
-    if (newPassword !== confirmPassword) {
-      newPasswordError = "Salasanat eivät täsmää";
-    } else {
-      setNewPasswordError("");
-    }
+
+    // Check if new passwords are empty
     if (newPassword.length === 0 || confirmPassword.length === 0) {
       newPasswordError = "Salasanat eivät voi olla tyhjiä";
+      console.log("New Password Error:", newPasswordError);
+    } else if (newPassword !== confirmPassword) {
+      // Check if new passwords match
+      newPasswordError = "Salasanat eivät täsmää";
+      console.log("New Password Error:", newPasswordError);
+    } else if (
+      !lengthCheck.test(newPassword) ||
+      !capitalLetterCheck.test(newPassword) ||
+      !numberCheck.test(newPassword)
+    ) {
+      // Check if the new password meets the criteria
+      newPasswordError =
+        "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron";
+      console.log("New Password Error:", newPasswordError);
     }
 
-    if (newPassword.length < 8 || confirmPassword.length < 8) {
-      newPasswordError = "Salasanan pituuden oltava vähintään 8 merkkiä";
-    }
-
+    // If there are any errors, set them and return false
     if (passwordError.length > 0 || newPasswordError.length > 0) {
       setPasswordError(passwordError);
       setNewPasswordError(newPasswordError);
+      console.log("Validation failed with errors:");
+      console.log("Password Error:", passwordError);
+      console.log("New Password Error:", newPasswordError);
       return false;
     }
+
+    console.log("Validation passed");
+    return true;
   };
 
   const handlePasswordUpdate = async () => {
     try {
-      // TODO: LISÄÄ TÄNNE SALASANAN VAIHTO KÄSITTELY
-
-      addToast("Salasana päivitetty", { style: "success" });
+      passwordUpdate.mutate(currentPassword, newPassword);
     } catch (error) {
       addToast("Virhe päivitettäessä salasanaa", { style: "error" });
     }
@@ -152,48 +182,40 @@ function TeacherProfilePage() {
         let updatedPositions = updatedCourseSegments.map((segment, index) => {
           return { ...segment, order_number: index + 1 };
         });
-        trainingService.updateCourseSegments(updatedPositions);
+        courseService.updateCourseSegments(updatedPositions);
       } catch (error) {
         addToast("Virhe päivitettäessä merkintöjen määrä vaatimusta", {
           style: "error",
         });
       }
       addToast("Merkintöjen määrä vaatimus päivitetty", { style: "success" });
-      queryclient.invalidateQueries("courseSegments");
+      queryclient.invalidateQueries({ queryKey: ["courseSegments"] });
       setShowConfirmModal(false);
     };
     setHandleUserConfirmation(() => handleUpdate);
   };
 
   const handleAccountDelete = () => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa käyttäjän ${visitorData.first_name} ${visitorData.last_name}? 
-  
-      Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
-    );
-    setContinueButton("Poista");
-
-    const handleUserConfirmation = async () => {
-      try {
-        await userService.deleteUser(visitorData.id);
-        await logout();
-        addToast("Käyttäjä poistettu", { style: "success" });
-      } catch (error) {
-        console.error("Error deleting user or logging out:", error);
-      } finally {
-        setShowConfirmModal(false);
-      }
+    const handleLogout = () => {
+      logout();
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+    openConfirmModal({
+      handleLogout: handleLogout,
+      text: `Haluatko varmasti poistaa käyttäjän ${profileData.first_name} ${profileData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
+      type: "adminAccountDelete",
+      inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
+      inputType: "password",
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+    });
   };
 
   useEffect(() => {
-    if (visitorData) {
-      setUpdatedEmail(visitorData.email);
+    if (profileData) {
+      setUpdatedEmail(profileData.email);
     }
-  }, [visitorData]);
+  }, [profileData]);
   useEffect(() => {
     if (courseSegments) {
       setUpdatedCourseSegments([...courseSegments]);
@@ -202,14 +224,14 @@ function TeacherProfilePage() {
 
   const handleSegmentCreation = async () => {
     try {
-      await trainingService.createCourseSegment({
+      await courseService.createCourseSegment({
         name: newSegmentName,
         value: newSegmentValue,
       });
       addToast("Segmentti luotu", { style: "success" });
       setNewSegmentName("");
       setNewSegmentValue("");
-      queryclient.invalidateQueries("courseSegments");
+      queryclient.invalidateQueries({ queryKey: ["courseSegments"] });
     } catch (error) {
       addToast("Virhe luotaessa segmenttiä", { style: "error" });
     }
@@ -227,9 +249,9 @@ function TeacherProfilePage() {
 
     const handleUserConfirmation = async () => {
       try {
-        await trainingService.deleteCourseSegment(segment.id);
+        await courseService.deleteCourseSegment(segment.id);
         addToast("Segmentti poistettu", { style: "success" });
-        queryclient.invalidateQueries("courseSegments");
+        queryclient.invalidateQueries({ queryKey: ["courseSegments"] });
       } catch (error) {
         addToast("Virhe poistettaessa segmenttiä", { style: "error" });
       }
@@ -375,7 +397,7 @@ function TeacherProfilePage() {
             </button>
           ) : (
             <button
-              className="border rounded-md IconBox bg-bgSecondary text-btnGray border-bgSecondary hover:border-borderPrimary hover:text-hoverGray"
+              className="border text-iconGray rounded-md IconBox bg-bgSecondary border-bgSecondary hover:border-borderPrimary"
               onClick={() => setIsEditing(true)}
             >
               <FiEdit3 />
@@ -400,7 +422,7 @@ function TeacherProfilePage() {
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (visitorDataLoading || !courseSegments) {
+  if (profileDataLoading || !courseSegments) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -474,7 +496,7 @@ function TeacherProfilePage() {
                             setNewSegmentValue("");
                           }}
                         >
-                          peruuta
+                          Peruuta
                         </button>
                         <button
                           onClick={(e) => {
@@ -511,7 +533,7 @@ function TeacherProfilePage() {
               </DndContext>
 
               <button
-                className="p-2 mt-4 text-white w-fit Button"
+                className="p-2 mt-4 text-white w-fit Button hover:bg-hoverPrimary"
                 onClick={(e) => {
                   e.preventDefault();
                   if (courseSegments) {
@@ -542,7 +564,7 @@ function TeacherProfilePage() {
                 type="text"
                 name="name"
                 disabled
-                value={visitorData.first_name + " " + visitorData.last_name}
+                value={profileData.first_name + " " + profileData.last_name}
                 className={cc(
                   inputClass,
                   "cursor-not-allowed",
@@ -564,7 +586,7 @@ function TeacherProfilePage() {
               />
               <small className="text-red-500">{emailError}</small>
               <button
-                className="p-2 mt-4 text-white w-fit Button"
+                className="p-2 mt-4 text-white w-fit Button hover:bg-hoverPrimary"
                 onClick={(e) => {
                   e.preventDefault();
                   if (validateEmail(updatedEmail)) {
@@ -583,7 +605,8 @@ function TeacherProfilePage() {
             <div>
               <h1 className="text-xl">Päivitä salasana</h1>
               <small className="text-textSecondary">
-                Muista käyttää pitkää ja turvallista salasanaa
+                Muista käyttää pitkää ja turvallista salasanaa. Salasanan vaihto
+                kirjaa sinut ulos kaikilta muilta laitteiltasi.{" "}
               </small>
             </div>
 
@@ -636,7 +659,7 @@ function TeacherProfilePage() {
                 <small className="text-red-500">{newPasswordError}</small>
               </div>
               <button
-                className="p-2 text-white w-fit Button"
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary"
                 onClick={(e) => {
                   e.preventDefault();
                   if (validateNewPasswords()) {
@@ -650,35 +673,54 @@ function TeacherProfilePage() {
             </form>
           </div>
 
+          <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
+            <div className="flex flex-col max-w-xl">
+              <h1 className="text-xl ">Kirjaudu ulos</h1>
+              <small className="text-textSecondary">
+                Voit myös kirjautua ulos kaikilla laitteilla. Toiminnossa on
+                muutaman minuutin viive.
+              </small>
+            </div>
+            <div className="flex max-w-[400px] justify-between flex-wrap">
+              <button
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+                onClick={() => {
+                  logout();
+                }}
+              >
+                Kirjaudu ulos
+              </button>
+
+              <button
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+                onClick={() => {
+                  logoutAll();
+                }}
+              >
+                Kirjaudu ulos kaikilla laitteilla
+              </button>
+            </div>
+          </div>
+
           {/* Käyttäjän postamisen container */}
           <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
             <div className="flex flex-col max-w-xl">
-              {" "}
-              <h1 className="text-xl ">Poista käyttäjä</h1>
+              <h1 className="text-xl">Poista käyttäjä</h1>
               <small className="text-textSecondary">
                 Kun käyttäjä on poistettu, kaikki käyttäjän tiedot poistetaan
-                pysyvästi. Tämä toiminto on peruuttamaton
+                pysyvästi. Tämä toiminto on peruuttamaton.
               </small>
             </div>
             <button
-              className="w-32 text-white Button bg-iconRed"
+              className="w-32 text-white Button p-2 hover:bg-red-800 bg-iconRed"
               onClick={() => {
                 handleAccountDelete();
               }}
             >
-              Poista Käyttäjä
+              Poista käyttäjä
             </button>
           </div>
         </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButton={continueButton}
-          declineButton={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
       </div>
     );
 }

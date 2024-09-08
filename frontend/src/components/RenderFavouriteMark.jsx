@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TbPin, TbPinFilled, TbPinnedOff } from "react-icons/tb";
-import userService from "../services/userService";
+import studentService from "../services/studentService";
 
 const RenderFavouriteMark = ({ journal, pinnedStudentsData, queryClient }) => {
   let isPinned = false;
@@ -15,14 +15,14 @@ const RenderFavouriteMark = ({ journal, pinnedStudentsData, queryClient }) => {
   const handlePinClick = async () => {
     try {
       if (isPinned) {
-        await userService.unpinStudent(journal.user_id).then(() => {});
+        await studentService.unpinStudent(journal.user_id).then(() => {});
       } else {
-        await userService.pinStudent(journal.user_id).then(() => {});
+        await studentService.pinStudent(journal.user_id).then(() => {});
       }
     } catch (error) {
       console.log(error);
     } finally {
-      queryClient.invalidateQueries("pinnedStudents");
+      queryClient.invalidateQueries({queryKey: ["pinnedStudents"]})
     }
   };
 

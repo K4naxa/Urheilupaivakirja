@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import userService from "../../services/userService";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen";
-import ConfirmModal from "../../components/confirm-modal/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import { add, format } from "date-fns";
+import { format } from "date-fns";
 import cc from "../../utils/cc";
 import { useConfirmModal } from "../../hooks/useConfirmModal";
 import { useToast } from "../../hooks/toast-messages/useToast";
 
 function StudentProfilePage() {
-  const { logout } = useAuth();
+  const { logout, logoutAll } = useAuth();
   const { addToast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -32,16 +31,19 @@ function StudentProfilePage() {
     staleTime: 15 * 60 * 1000,
   });
 
-  const deleteUser = useMutation({
-    mutationFn: (password) => userService.deleteUserSelf(password),
+  const passwordUpdate = useMutation({
+    mutationFn: () => userService.changePassword(currentPassword, newPassword),
     onError: (error) => {
-      console.error("Error deleting account:", error);
-      addToast("Virhe poistettaessa käyttäjätunnusta", { style: "error" });
+      console.error("Error updating password:", error);
+      addToast("Virhe päivitettäessä salasanaa", { style: "error" });
     },
-    // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      addToast("Käyttäjätunnuksesi on poistettu", { style: "success" });
-      logout();
+      addToast("Salasana päivitetty", { style: "success" });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordError("");
+      setNewPasswordError("");
     },
   });
 
@@ -58,53 +60,75 @@ function StudentProfilePage() {
       countTrainedTime(userData.total_minutes);
     }
   }, [userData]);
+  
   const validateNewPasswords = () => {
     let passwordError = "";
     let newPasswordError = "";
+
+    // Regular expressions for validation
+    const lengthCheck = /.{8,}/; // At least 8 characters
+    const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+    const numberCheck = /[0-9]/; // At least one number
+  
+    // Check if current password is empty
     if (currentPassword.length === 0) {
       passwordError = "Nykyinen salasana ei voi olla tyhjä";
+      console.log("Password Error:", passwordError);
     } else {
       setPasswordError("");
     }
-    if (newPassword !== confirmPassword) {
-      newPasswordError = "Salasanat eivät täsmää";
-    } else {
-      setNewPasswordError("");
-    }
+  
+    // Check if new passwords are empty
     if (newPassword.length === 0 || confirmPassword.length === 0) {
-      newPasswordError = "Salasanat eivät voi olla tyhjiä";
+      newPasswordError = "Salasanat eivät voi olla tyhjiä"; 
+      console.log("New Password Error:", newPasswordError);
+    } else if (newPassword !== confirmPassword) {
+      // Check if new passwords match
+      newPasswordError = "Salasanat eivät täsmää"; 
+      console.log("New Password Error:", newPasswordError);
+    } else if (
+      !lengthCheck.test(newPassword) ||
+      !capitalLetterCheck.test(newPassword) ||
+      !numberCheck.test(newPassword)
+    ) {
+      // Check if the new password meets the criteria
+      newPasswordError =
+        "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron";
+      console.log("New Password Error:", newPasswordError);
     }
-
-    if (newPassword.length < 8 || confirmPassword.length < 8) {
-      newPasswordError = "Salasanan pituuden oltava vähintään 8 merkkiä";
-    }
-
+  
+    // If there are any errors, set them and return false
     if (passwordError.length > 0 || newPasswordError.length > 0) {
       setPasswordError(passwordError);
       setNewPasswordError(newPasswordError);
+      console.log("Validation failed with errors:");
+      console.log("Password Error:", passwordError);
+      console.log("New Password Error:", newPasswordError);
       return false;
     }
+  
+    console.log("Validation passed");
+    return true;
   };
+  
+
 
   const handlePasswordUpdate = async () => {
     try {
-      // TODO: LISÄÄ TÄNNE SALASANAN VAIHTO KÄSITTELY
-
-      addToast("Salasana päivitetty", { style: "success" });
+      passwordUpdate.mutate(currentPassword, newPassword);
     } catch (error) {
       addToast("Virhe päivitettäessä salasanaa", { style: "error" });
     }
   };
 
   const handleAccountDelete = () => {
-
-  const logoutHandler = () => {
-    logout();
-  }
+    const handleLogout = () => {
+      logout();
+    };
     openConfirmModal({
-      handleLogout: logoutHandler,
+      handleLogout: handleLogout,
       text: `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
-      type: "accountDelete",
+      type: "adminDelete",
       inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
       inputType: "password",
       agreeButtonText: "Poista",
@@ -139,7 +163,7 @@ function StudentProfilePage() {
             <div>
               <h1 className="text-xl">Merkinnät</h1>
               <small className="text-textSecondary">
-                Näe tilastoja tehdyistä merkinnöistä
+                Yhteenveto tehdyistä merkinnöistä
               </small>
             </div>
             <div className="flex flex-col gap-4">
@@ -181,7 +205,7 @@ function StudentProfilePage() {
             </div>
 
             <div className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="name">
+              <label className="text-textPrimary" htmlFor="name">
                 Nimi
               </label>
               <input
@@ -189,61 +213,61 @@ function StudentProfilePage() {
                 name="name"
                 disabled
                 value={userData.first_name + " " + userData.last_name}
-                className={cc(inputClass, "disabled:text-opacity-70")}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
             </div>
 
             <div className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="email">
+              <label className="text-textPrimary" htmlFor="email">
                 Sähköposti
               </label>
               <input
                 value={userData.email}
                 disabled
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
             </div>
             <div className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="sport">
+              <label className="text-textPrimary" htmlFor="sport">
                 Toimipaikka
               </label>
               <input
                 value={userData.campus_name}
                 disabled
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
             </div>
 
             <div className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="sport">
+              <label className="text-textPrimary" htmlFor="sport">
                 Ryhmä
               </label>
               <input
-                value={userData.name}
+                value={userData.group_name}
                 disabled
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
             </div>
 
             <div className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="sport">
+              <label className="text-textPrimary" htmlFor="sport">
                 Laji
               </label>
               <input
                 value={userData.sport_name}
                 disabled
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
             </div>
 
             <div className="flex flex-col max-w-xl">
-              <label className="text-textSecondary" htmlFor="sport">
+              <label className="text-textPrimary" htmlFor="sport">
                 Käyttäjä luotu
               </label>
               <input
                 value={format(new Date(userData.created_at), "dd.MM.yyyy")}
                 disabled
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
             </div>
           </div>
@@ -253,7 +277,8 @@ function StudentProfilePage() {
             <div>
               <h1 className="text-xl">Päivitä salasana</h1>
               <small className="text-textSecondary">
-                Muista käyttää pitkää ja turvallista salasanaa
+                Muista käyttää pitkää ja turvallista salasanaa. Salasanan vaihto
+                kirjaa sinut ulos kaikilta muilta laitteiltasi.
               </small>
             </div>
 
@@ -291,7 +316,6 @@ function StudentProfilePage() {
               </div>
 
               <div className="flex flex-col max-w-xl">
-                {" "}
                 <label className="text-textSecondary" htmlFor="confirmPassword">
                   Vahvista salasana
                 </label>
@@ -306,7 +330,7 @@ function StudentProfilePage() {
                 <small className="text-red-500">{newPasswordError}</small>
               </div>
               <button
-                className="p-2 text-white w-fit Button"
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
                 onClick={(e) => {
                   e.preventDefault();
                   if (validateNewPasswords()) {
@@ -320,6 +344,35 @@ function StudentProfilePage() {
             </form>
           </div>
 
+          <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
+            <div className="flex flex-col max-w-xl">
+              <h1 className="text-xl ">Kirjaudu ulos</h1>
+              <small className="text-textSecondary">
+                Voit myös kirjautua ulos kaikilla laitteilla. Toiminnossa on
+                muutaman minuutin viive.
+              </small>
+            </div>
+            <div className="flex max-w-[400px] justify-between flex-wrap">
+              <button
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+                onClick={() => {
+                  logout();
+                }}
+              >
+                Kirjaudu ulos
+              </button>
+
+              <button
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+                onClick={() => {
+                  logoutAll();
+                }}
+              >
+                Kirjaudu ulos kaikilla laitteilla
+              </button>
+            </div>
+          </div>
+
           {/* Käyttäjän postamisen container */}
           <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
             <div className="flex flex-col max-w-xl">
@@ -330,7 +383,7 @@ function StudentProfilePage() {
               </small>
             </div>
             <button
-              className="w-32 text-white Button bg-iconRed"
+              className="p-2 text-white Button w-fit hover:bg-red-800 bg-iconRed "
               onClick={() => {
                 handleAccountDelete();
               }}

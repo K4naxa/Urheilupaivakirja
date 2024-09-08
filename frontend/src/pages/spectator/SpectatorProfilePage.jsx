@@ -1,25 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import userService from "../../services/userService";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen";
-import ConfirmModal from "../../components/confirm-modal/confirmModal";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "../../hooks/toast-messages/useToast";
 
 import cc from "../../utils/cc";
+import { useQueryClient } from "@tanstack/react-query";
+import { useConfirmModal } from "../../hooks/useConfirmModal";
 
-function SpectatorProfilePage() {
-  const { logout } = useAuth();
+function TeacherProfilePage() {
+  const { logout, logoutAll } = useAuth();
   const { addToast } = useToast();
 
-  // statet Modalia varten
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [continueButton, setContinueButton] = useState("");
-  const [agreeStyle, setAgreeStyle] = useState("");
-  const [handleUserConfirmation, setHandleUserConfirmation] = useState(
-    () => {}
-  );
+  const { openConfirmModal } = useConfirmModal();
 
   const [updatedEmail, setUpdatedEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -30,17 +24,29 @@ function SpectatorProfilePage() {
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
 
-  const { data: spectatorData, isLoading: spectatorDataLoading } = useQuery({
-    queryKey: ["spectatorData"],
+  const queryclient = useQueryClient();
+
+  const { data: profileData, isLoading: profileDataLoading } = useQuery({
+    queryKey: ["profileData"],
     queryFn: () => userService.getProfileData(),
     staleTime: 15 * 60 * 1000,
   });
 
-  const { data: invitedSpectators, isLoading: invitedSpectatorsLoading } = useQuery({
-    queryKey: ["invitedSpectators"],
-    queryFn: () => userService.getInvitedSpectators(),
-    staleTime: 15 * 60 * 1000,
-  })
+  const passwordUpdate = useMutation({
+    mutationFn: () => userService.changePassword(currentPassword, newPassword),
+    onError: (error) => {
+      console.error("Error updating password:", error);
+      addToast("Virhe päivitettäessä salasanaa", { style: "error" });
+    },
+    onSuccess: () => {
+      addToast("Salasana päivitetty", { style: "success" });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordError("");
+      setNewPasswordError("");
+    },
+  });
 
   const validateEmail = (email) => {
     const emailRegEx = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
@@ -49,7 +55,7 @@ function SpectatorProfilePage() {
       setEmailError("Sähköpostiosoite ei voi olla tyhjä");
       return false;
     }
-    if (email === spectatorData.email) {
+    if (email === profileData.email) {
       setEmailError("Sähköpostiosoite on jo käytössä");
       return false;
     }
@@ -60,88 +66,85 @@ function SpectatorProfilePage() {
     }
     return true;
   };
-  const handleEmailUpdate = async () => {
-    try {
-      //  TODO: LISÄÄ TÄNNE EMAIL MUUTOSEN KÄSITTELY
-
-      addToast("Sähköposti päivitetty", { style: "success" });
-    } catch (error) {
-      addToast("Virhe päivitettäessä sähköpostia", { style: "error" });
-    }
-  };
 
   const validateNewPasswords = () => {
     let passwordError = "";
     let newPasswordError = "";
+
+    // Regular expressions for validation
+    const lengthCheck = /.{8,}/; // At least 8 characters
+    const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+    const numberCheck = /[0-9]/; // At least one number
+
+    // Check if current password is empty
     if (currentPassword.length === 0) {
       passwordError = "Nykyinen salasana ei voi olla tyhjä";
+      console.log("Password Error:", passwordError);
     } else {
       setPasswordError("");
     }
-    if (newPassword !== confirmPassword) {
-      newPasswordError = "Salasanat eivät täsmää";
-    } else {
-      setNewPasswordError("");
-    }
+
+    // Check if new passwords are empty
     if (newPassword.length === 0 || confirmPassword.length === 0) {
       newPasswordError = "Salasanat eivät voi olla tyhjiä";
+      console.log("New Password Error:", newPasswordError);
+    } else if (newPassword !== confirmPassword) {
+      // Check if new passwords match
+      newPasswordError = "Salasanat eivät täsmää";
+      console.log("New Password Error:", newPasswordError);
+    } else if (
+      !lengthCheck.test(newPassword) ||
+      !capitalLetterCheck.test(newPassword) ||
+      !numberCheck.test(newPassword)
+    ) {
+      // Check if the new password meets the criteria
+      newPasswordError =
+        "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron";
+      console.log("New Password Error:", newPasswordError);
     }
 
-    if (newPassword.length < 8 || confirmPassword.length < 8) {
-      newPasswordError = "Salasanan pituuden oltava vähintään 8 merkkiä";
-    }
-
+    // If there are any errors, set them and return false
     if (passwordError.length > 0 || newPasswordError.length > 0) {
       setPasswordError(passwordError);
       setNewPasswordError(newPasswordError);
+      console.log("Validation failed with errors:");
+      console.log("Password Error:", passwordError);
+      console.log("New Password Error:", newPasswordError);
       return false;
     }
+
+    console.log("Validation passed");
+    return true;
   };
 
   const handlePasswordUpdate = async () => {
     try {
-      // TODO: LISÄÄ TÄNNE SALASANAN VAIHTO KÄSITTELY
-
-      addToast("Salasana päivitetty", { style: "success" });
+      passwordUpdate.mutate(currentPassword, newPassword);
     } catch (error) {
       addToast("Virhe päivitettäessä salasanaa", { style: "error" });
     }
   };
 
   const handleAccountDelete = () => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa käyttäjän ${spectatorData.first_name} ${spectatorData.last_name}? 
-  
-      Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`
-    );
-    setContinueButton("Poista");
-
-    const handleUserConfirmation = async () => {
-      try {
-        await userService.deleteUser(spectatorData.id);
-        await logout();
-        addToast("Käyttäjä poistettu", { style: "success" });
-      } catch (error) {
-        console.error("Error deleting user or logging out:", error);
-      } finally {
-        setShowConfirmModal(false);
-      }
+    const handleLogout = () => {
+      logout();
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
+    openConfirmModal({
+      handleLogout: handleLogout,
+      text: `Haluatko varmasti poistaa käyttäjän ${profileData.first_name} ${profileData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
+      type: "accountDelete",
+      inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
+      inputType: "password",
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+    });
   };
-
-  useEffect(() => {
-    if (spectatorData) {
-      setUpdatedEmail(spectatorData.email);
-    }
-  }, [spectatorData]);
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (spectatorDataLoading) {
+  if (profileDataLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -168,11 +171,11 @@ function SpectatorProfilePage() {
                 type="text"
                 name="name"
                 disabled
-                value={spectatorData.first_name + " " + spectatorData.last_name}
+                value={profileData.first_name + " " + profileData.last_name}
                 className={cc(
                   inputClass,
                   "cursor-not-allowed",
-                  "disabled:text-opacity-70"
+                  "disabled:text-opacity-60"
                 )}
               />
             </form>
@@ -184,23 +187,10 @@ function SpectatorProfilePage() {
               <input
                 type="email"
                 name="email"
-                value={updatedEmail}
-                onChange={(e) => setUpdatedEmail(e.target.value)}
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                disabled
+                value={profileData.email}
+                className={cc(inputClass, "disabled:text-opacity-60")}
               />
-              <small className="text-red-500">{emailError}</small>
-              <button
-                className="p-2 mt-4 text-white w-fit Button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (validateEmail(updatedEmail)) {
-                    setEmailError("");
-                    handleEmailUpdate();
-                  }
-                }}
-              >
-                Tallenna
-              </button>
             </form>
           </div>
 
@@ -209,7 +199,8 @@ function SpectatorProfilePage() {
             <div>
               <h1 className="text-xl">Päivitä salasana</h1>
               <small className="text-textSecondary">
-                Muista käyttää pitkää ja turvallista salasanaa
+                Muista käyttää pitkää ja turvallista salasanaa. Salasanan vaihto
+                kirjaa sinut ulos kaikilta muilta laitteiltasi.
               </small>
             </div>
 
@@ -262,7 +253,7 @@ function SpectatorProfilePage() {
                 <small className="text-red-500">{newPasswordError}</small>
               </div>
               <button
-                className="p-2 text-white w-fit Button"
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary"
                 onClick={(e) => {
                   e.preventDefault();
                   if (validateNewPasswords()) {
@@ -276,37 +267,56 @@ function SpectatorProfilePage() {
             </form>
           </div>
 
+          <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
+            <div className="flex flex-col max-w-xl">
+              <h1 className="text-xl ">Kirjaudu ulos</h1>
+              <small className="text-textSecondary">
+                Voit myös kirjautua ulos kaikilla laitteilla. Toiminnossa on
+                muutaman minuutin viive.
+              </small>
+            </div>
+            <div className="flex max-w-[400px] justify-between flex-wrap">
+              <button
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+                onClick={() => {
+                  logout();
+                }}
+              >
+                Kirjaudu ulos
+              </button>
+
+              <button
+                className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+                onClick={() => {
+                  logoutAll();
+                }}
+              >
+                Kirjaudu ulos kaikilla laitteilla
+              </button>
+            </div>
+          </div>
+
           {/* Käyttäjän postamisen container */}
           <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
             <div className="flex flex-col max-w-xl">
-              {" "}
-              <h1 className="text-xl ">Poista käyttäjä</h1>
+              <h1 className="text-xl">Poista käyttäjä</h1>
               <small className="text-textSecondary">
                 Kun käyttäjä on poistettu, kaikki käyttäjän tiedot poistetaan
-                pysyvästi. Tämä toiminto on peruuttamaton
+                pysyvästi. Tämä toiminto on peruuttamaton.
               </small>
             </div>
             <button
-              className="w-32 text-white Button bg-iconRed"
+              className="w-32 text-white Button p-2 hover:bg-red-800 bg-iconRed"
               onClick={() => {
                 handleAccountDelete();
               }}
             >
-              Poista Käyttäjä
+              Poista käyttäjä
             </button>
           </div>
         </div>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={modalMessage}
-          agreeButtonText={continueButton}
-          declineButtonText={"Peruuta"}
-          agreeStyle={agreeStyle}
-        />
       </div>
     );
 }
 
-export default SpectatorProfilePage;
+export default TeacherProfilePage;

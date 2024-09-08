@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import publicService from "../services/publicService";
+import newsService from "../services/newsService";
 
-// Assuming publicService is accessible and has the relevant methods
 const UnreadNewsIndicator = ({ type }) => {
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -16,7 +15,7 @@ const UnreadNewsIndicator = ({ type }) => {
     isLoading,
   } = useQuery({
     queryKey: ["checkUnreadNews"],
-    queryFn: publicService.checkUnreadNews,
+    queryFn: newsService.checkUnreadNews,
     refetchInterval: 1000 * 60 * 5,
   });
 
@@ -28,7 +27,7 @@ const UnreadNewsIndicator = ({ type }) => {
   }, [isSuccess]);
 
   const updateNewsLastViewedAtMutation = useMutation({
-    mutationFn: publicService.updateNewsLastViewedAt,
+    mutationFn: newsService.updateNewsLastViewedAt,
     onSuccess: () => {},
   });
 
@@ -38,7 +37,7 @@ const UnreadNewsIndicator = ({ type }) => {
       console.log("update news last viewed at");
       updateNewsLastViewedAtMutation.mutate();
       setHasUnreadNews(false);
-      queryClient.invalidateQueries(["checkUnreadNews"]);
+      queryClient.invalidateQueries({queryKey: ["checkUnreadNews"]});
     }
   }, [location]);
 

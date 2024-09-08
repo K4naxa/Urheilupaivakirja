@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS = {
   style: "info",
   autoDismiss: true,
   autoDismissTimeout: 5000,
-  position: "top-right",
+  position: "top-center",
 };
 
 export const ToastProvider = ({ children }) => {
