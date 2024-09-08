@@ -7,8 +7,10 @@ import { FiTrash2 } from "react-icons/fi";
 import formatDate from "../../../utils/formatDate";
 import { useConfirmModal } from "../../../hooks/useConfirmModal";
 import { useToast } from "../../../hooks/toast-messages/useToast";
+import { useAuth } from "../../../hooks/useAuth";
 
 const TeachersPage = () => {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { openConfirmModal } = useConfirmModal();
   const [newTeacherEmail, setNewTeacherEmail] = useState("");
@@ -68,6 +70,7 @@ const TeachersPage = () => {
       agreeStyle: "red",
       declineButtonText: "Peruuta",
       useTimer: true,
+      timerDuration: 10,
     });
   };
 
@@ -126,14 +129,15 @@ const TeachersPage = () => {
     },
   });
 
-  const { data: invitedTeachers, isLoading: invitedTeachersLoading } =
-    useQuery({
+  const { data: invitedTeachers, isLoading: invitedTeachersLoading } = useQuery(
+    {
       queryKey: ["invitedTeachers"],
       queryFn: () => teacherService.getInvitedTeachers(),
       config: {
         enabled: false,
       },
-    });
+    }
+  );
 
   return (
     <div className="w-full items-center bg-bgSecondary rounded-md p-2">
@@ -209,6 +213,7 @@ const TeachersPage = () => {
           ) : (
             teachers.map((teacher) => (
               <CreateTeacherCard
+                user={user}
                 teacher={teacher}
                 handleDelete={handleDelete}
                 key={teacher.id}
@@ -221,7 +226,7 @@ const TeachersPage = () => {
   );
 };
 
-const CreateTeacherCard = ({ teacher, handleDelete }) => {
+const CreateTeacherCard = ({ teacher, handleDelete, user }) => {
   const calcTimeFromLogin = (loginTime) => {
     const loginDate = new Date(loginTime);
     const now = new Date();
@@ -243,7 +248,7 @@ const CreateTeacherCard = ({ teacher, handleDelete }) => {
 
   return (
     <div className="flex w-full border border-borderPrimary rounded-md p-2">
-      <div className="flex flex-col gap-2 p-2  w-full">
+      <div className="flex flex-col gap-2 p-2 w-full">
         {/* name and email row */}
         <div className="flex flex-wrap gap-4 items-end">
           <span className="text-lg">
@@ -262,16 +267,20 @@ const CreateTeacherCard = ({ teacher, handleDelete }) => {
           </span>
         </div>
       </div>
-      <div className="flex justify-center p-4">
-        <button
-          className="IconButton text-iconRed"
-          onClick={() => {
-            handleDelete(teacher);
-          }}
-        >
-          <FiTrash2 size={20} />
-        </button>
-      </div>
+
+      {/* Dont render delete button for self */}
+      {user.user_id != teacher.id && (
+        <div className="flex justify-center p-4">
+          <button
+            className="IconButton text-iconRed"
+            onClick={() => {
+              handleDelete(teacher);
+            }}
+          >
+            <FiTrash2 size={20} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

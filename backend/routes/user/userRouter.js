@@ -413,35 +413,48 @@ router.delete(
     const userIdToDelete = Number(req.params.id);
 
     try {
+      const currentUser = req.user.user_id;
+
+      // Dont allow deleting own account using this route
+      if (userIdToDelete === currentUser) {
+        return res.status(403).json({ error: "You cannot delete your own account" });
+      }
+
+      // Fetch the user to be deleted
       const targetUser = await knex("users")
         .where("id", "=", userIdToDelete)
         .first();
 
+      // Check if the user exists
       if (!targetUser) {
         return res.status(404).json({ error: "User not found" });
       }
 
+      // Check if the target user is a teacher (admin)
       if (targetUser.role_id !== 1) {
         return res.status(403).json({ error: "Can only delete teacher users" });
       }
 
-      const isAdmin = await knex("teachers")
-        .where("user_id", "=", userIdToDelete)
-        .andWhere("is_admin", true)
-        .first();
+      // Ensure there are at least 2 teachers (admins) before deleting one
+      const teacherCount = await knex("users")
+        .where("role_id", "=", 1)
+        .count({ count: "*" });
 
-      if (isAdmin) {
-        return res.status(403).json({ error: "Cannot delete an admin" });
+      if (teacherCount[0].count <= 1) {
+        return res.status(403).json({ error: "Cannot delete the last remaining teacher" });
       }
 
+      // Delete the teacher
       await knex("users").where("id", "=", userIdToDelete).delete();
-      return res.status(200).json({ message: "User deleted" });
+      return res.status(200).json({ message: "Teacher deleted successfully" });
     } catch (error) {
-      console.error("Error attempting to delete user:", error);
+      console.error("Error attempting to delete teacher:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   }
 );
+
+
 
 router.get(
   "/profile",

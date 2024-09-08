@@ -22,8 +22,12 @@ const newPassword = body("password")
   .matches(/[0-9]/)
   .withMessage("Password must contain at least one number");
 
-const capitalizeFirstLetter = (str) => {
-  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+const capitalizeFirstLetter = (word) => {
+  if (!word) return "";
+  return (
+    word.charAt(0).toLocaleUpperCase("fi-FI") +
+    word.slice(1).toLocaleLowerCase("fi-FI")
+  );
 };
 
 const nameValidator = (field) =>
@@ -74,7 +78,7 @@ const group_id = body("group_id")
   .isInt()
   .withMessage("Group ID must be an integer");
 
-  const group_name = body("group_name")
+const group_name = body("group_name")
   .notEmpty()
   .withMessage("Group name is required")
   .isLength({ max: 15 })
@@ -83,7 +87,6 @@ const group_id = body("group_id")
   .withMessage("Group name must start with 4 digits")
   .toLowerCase()
   .escape();
-
 
 const verified = body("verified")
   .isBoolean()

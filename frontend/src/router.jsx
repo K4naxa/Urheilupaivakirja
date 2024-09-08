@@ -23,7 +23,7 @@ import TeacherRegistrationPage from "./pages/TeacherRegistrationPage";
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
 
-import StudentPage from "./pages/teacher/Studentpage";
+import StudentPage from "./pages/teacher/StudentPage";
 
 import ManageLayout from "./layouts/manage-layout/ManageLayout";
 import SportsPage from "./pages/teacher/manage/SportsPage";
