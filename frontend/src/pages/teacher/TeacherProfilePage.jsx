@@ -202,7 +202,7 @@ function TeacherProfilePage() {
     openConfirmModal({
       handleLogout: handleLogout,
       text: `Haluatko varmasti poistaa käyttäjän ${profileData.first_name} ${profileData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
-      type: "accountDelete",
+      type: "adminAccountDelete",
       inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
       inputType: "password",
       agreeButtonText: "Poista",
@@ -605,7 +605,8 @@ function TeacherProfilePage() {
             <div>
               <h1 className="text-xl">Päivitä salasana</h1>
               <small className="text-textSecondary">
-                Muista käyttää pitkää ja turvallista salasanaa
+                Muista käyttää pitkää ja turvallista salasanaa. Salasanan vaihto
+                kirjaa sinut ulos kaikilta muilta laitteiltasi.{" "}
               </small>
             </div>
 
@@ -704,7 +705,6 @@ function TeacherProfilePage() {
           {/* Käyttäjän postamisen container */}
           <div className="flex flex-col gap-4 p-6 border rounded-md shadow-sm bg-bgSecondary border-borderPrimary">
             <div className="flex flex-col max-w-xl">
-
               <h1 className="text-xl">Poista käyttäjä</h1>
               <small className="text-textSecondary">
                 Kun käyttäjä on poistettu, kaikki käyttäjän tiedot poistetaan
@@ -717,7 +717,7 @@ function TeacherProfilePage() {
                 handleAccountDelete();
               }}
             >
-              Poista Käyttäjä
+              Poista käyttäjä
             </button>
           </div>
         </div>

@@ -434,6 +434,9 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   };
 
   function convertTime(totalMinutes) {
+    if (totalMinutes == 195) {
+      return "yli 3h";
+    }
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     if (hours === 0) {
@@ -540,7 +543,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
                   className="bg-bgPrimary w-full"
                   type="range"
                   min="30"
-                  max="180"
+                  max="195"
                   value={journalEntryData.length_in_minutes}
                   step="15"
                   id="length_in_minutes"

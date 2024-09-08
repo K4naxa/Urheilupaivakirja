@@ -6,7 +6,7 @@ const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
 const saltRounds = config.BCRYPTSALT;
-const { createToken } = require("../../utils/authMiddleware");
+const { createAccessToken, createShortRefreshToken } = require("../../utils/token");
 const { isAuthenticated } = require("../../utils/authMiddleware");
 const otpGenerator = require("otp-generator");
 const sendEmail = require("../../utils/email/sendEmail");
@@ -134,12 +134,43 @@ router.post("/", [email, newPassword], async (req, res, next) => {
       // Insert the new student
       await trx("students").insert(newStudent);
 
-      const token = await createToken({ ...newUser, id: userId });
+      let sportName = null;
+      if (newUser.role_id === 3) {
+        const sportData = await knex("students")
+          .join("sports", "students.sport_id", "sports.id")
+          .select("sports.name as sport_name")
+          .where("students.user_id", "=", newUser.id)
+          .first();
+  
+        if (sportData) {
+          sportName = sportData.sport_name;
+        }
+      }
+
+
+      refreshToken = createShortRefreshToken(newUser);
+      accessToken = createAccessToken(newUser);
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", 
+        sameSite: "Strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      });
+  
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 5 * 60 * 1000,
+      });
+
       res.status(201).json({
-        token,
+        user_id: newUser.id,
         email_verified: newUser.email_verified,
         email: newUser.email,
         role: newUser.role_id,
+        sport: sportName,
       });
     });
   } catch (err) {
@@ -279,18 +310,42 @@ router.post("/verify-email", isAuthenticated, async (req, res) => {
 
     const user = await knex("users").where({ id: userId }).first();
 
-    const newToken = createToken({
-      email: user.email,
-      id: user.id,
-      role_id: user.role_id,
-      email_verified: user.email_verified,
+    refreshToken = createShortRefreshToken(tempUser);
+    accessToken = createAccessToken(tempUser);
+
+    let sportName = null;
+    if (user.role_id === 3) {
+      const sportData = await knex("students")
+        .join("sports", "students.sport_id", "sports.id")
+        .select("sports.name as sport_name")
+        .where("students.user_id", "=", user.id)
+        .first();
+
+      if (sportData) {
+        sportName = sportData.sport_name;
+      }
+    }
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: "Strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 5 * 60 * 1000,
     });
 
     res.json({
-      token: newToken,
+      user_id: user.id,
       email_verified: user.email_verified,
       email: user.email,
       role: user.role_id,
+      sport: sportName,
     });
   } catch (error) {
     console.error("Error verifying email:", error);

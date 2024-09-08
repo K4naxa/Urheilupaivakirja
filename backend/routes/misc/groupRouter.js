@@ -76,6 +76,49 @@ router.post("/", isAuthenticated, isTeacher, group_name, (req, res) => {
     });
 });
 
+router.put("/merge/", isAuthenticated, isTeacher, async (req, res) => {
+  const { mergeFrom, mergeTo } = req.body;
+  console.log("mergeFrom", mergeFrom);
+  console.log("mergeTo", mergeTo);
+  try {
+    if (typeof mergeFrom !== "number" || typeof mergeTo !== "number") {
+      return res.status(400).json({ error: "Invalid group IDs" });
+    }
+
+    if (mergeFrom === mergeTo) {
+      return res
+        .status(400)
+        .json({ error: "Cannot merge a group with itself" });
+    }
+
+    const fromGroup = await knex("student_groups").where("id", mergeFrom).first();
+    const toGroup = await knex("student_groups").where("id", mergeTo).first();
+
+    if (!fromGroup || !toGroup) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    const result = await knex.transaction(async (trx) => {
+      //Move students from one group to another
+      const count = await trx("students")
+        .where("group_id", mergeFrom)
+        .update({ group_id: mergeTo });
+
+      return count;
+    });
+
+    res.json({
+      message: `Merged ${result} students from ${fromGroup.name} to ${toGroup.name}`,
+      count: result,
+      mergeFrom: fromGroup.name,
+      mergeTo: toGroup.name,
+    });
+  } catch (err) {
+    console.error("Error merging groups:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // edit a single group by group.id
 router.put("/:id", isAuthenticated, isTeacher, group_name, (req, res) => {
   const errors = validationResult(req);

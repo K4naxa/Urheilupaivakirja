@@ -461,7 +461,7 @@ function TeacherHome() {
           name="sorting"
           id="sortingSelect"
           value={state.selectedSorting}
-          className="p-1 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
+          className="p-1 border m-auto rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer "
           onChange={(e) => {
             handleViewUpdate({ ...state, selectedSorting: e.target.value });
           }}

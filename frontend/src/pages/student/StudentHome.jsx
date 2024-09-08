@@ -257,7 +257,7 @@ function StudentHome() {
             {/* Kuukauden aktiivusus container */}
 
             <div className="p-2 py-4 border rounded-md border-borderPrimary">
-              <h3 className="mb-1">Kuukauden merkintä aktiivisuus:</h3>
+              <h3 className="mb-1">Kuukauden merkintäaktiivisuus:</h3>
               {/* progressbar */}
               <div className="relative w-full h-5 border rounded-xl border-borderPrimary bg-bgGray">
                 <div

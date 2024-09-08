@@ -74,15 +74,16 @@ const group_id = body("group_id")
   .isInt()
   .withMessage("Group ID must be an integer");
 
-const group_name = body("group_name")
+  const group_name = body("group_name")
   .notEmpty()
   .withMessage("Group name is required")
   .isLength({ max: 15 })
   .withMessage("Group name must be no more than 15 characters")
-  .matches(/^\d{4}[a-zA-Z]+$/)
-  .withMessage("Group name must start with 4 digits followed by letters")
+  .matches(/^\d{4}/)
+  .withMessage("Group name must start with 4 digits")
   .toLowerCase()
   .escape();
+
 
 const verified = body("verified")
   .isBoolean()

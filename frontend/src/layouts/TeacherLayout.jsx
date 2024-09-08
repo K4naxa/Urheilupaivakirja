@@ -217,7 +217,7 @@ const TeacherLayout = () => {
             )}
           >
             <FiUserCheck size={iconSize} />
-            <p className={linkTextClass}>Verifoi</p>
+            <p className={linkTextClass}>Hyväksy</p>
           </NavLink>
 
           <button

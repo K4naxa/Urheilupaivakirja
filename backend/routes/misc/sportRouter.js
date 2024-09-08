@@ -54,7 +54,9 @@ router.post("/", isAuthenticated, isTeacher, sport_name, async (req, res) => {
 
   try {
     // Check if sport already exists
-    const existingSport = await knex("sports").where("name", "=", sport_name).first();
+    const existingSport = await knex("sports")
+      .where("name", "=", sport_name)
+      .first();
 
     if (existingSport) {
       return res.status(409).json({ error: "Sport already exists" }); // 409 Conflict for duplicates
@@ -78,6 +80,50 @@ router.post("/", isAuthenticated, isTeacher, sport_name, async (req, res) => {
   }
 });
 
+// teacher merges two sports together, moving all students from one sport to another
+router.put("/merge/", isAuthenticated, isTeacher, async (req, res) => {
+  const { mergeFrom, mergeTo } = req.body;
+  console.log("mergeFrom", mergeFrom);
+  console.log("mergeTo", mergeTo);
+  try {
+    if (typeof mergeFrom !== "number" || typeof mergeTo !== "number") {
+      return res.status(400).json({ error: "Invalid sport IDs" });
+    }
+
+    if (mergeFrom === mergeTo) {
+      return res
+        .status(400)
+        .json({ error: "Cannot merge a sport with itself" });
+    }
+
+    const fromSport = await knex("sports").where("id", mergeFrom).first();
+    const toSport = await knex("sports").where("id", mergeTo).first();
+
+    if (!fromSport || !toSport) {
+      return res.status(404).json({ error: "Sport not found" });
+    }
+
+    const result = await knex.transaction(async (trx) => {
+      //Move students from one sport to another
+      const count = await trx("students")
+        .where("sport_id", mergeFrom)
+        .update({ sport_id: mergeTo });
+
+      return count;
+    });
+
+    res.json({
+      message: `Merged ${result} students from ${fromSport.name} to ${toSport.name}`,
+      count: result,
+      mergeFrom: fromSport.name,
+      mergeTo: toSport.name,
+    });
+  } catch (err) {
+    console.error("Error merging sports:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // edit a single sport by sport.id
 router.put("/:id", isAuthenticated, isTeacher, sport_name, async (req, res) => {
   const errors = validationResult(req);
@@ -91,7 +137,7 @@ router.put("/:id", isAuthenticated, isTeacher, sport_name, async (req, res) => {
 
   const { id } = req.params;
   const updatedSport = {
-    name: req.body.sport_name
+    name: req.body.sport_name,
   };
 
   try {
@@ -115,9 +161,7 @@ router.delete("/:id", isAuthenticated, isTeacher, async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const result = await knex("sports")
-      .where("id", "=", id)
-      .del();
+    const result = await knex("sports").where("id", "=", id).del();
 
     if (result === 0) {
       return res.status(404).json({
@@ -132,12 +176,11 @@ router.delete("/:id", isAuthenticated, isTeacher, async (req, res, next) => {
         error: "Laji ei voitu poistaa, koska laji sisältää oppilaita",
       });
     }
-    
+
     console.error("Error deleting sport:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 // Teacher verifies/activates sport by its ID
 router.put("/verify/:id", isAuthenticated, isTeacher, async (req, res) => {

@@ -5,15 +5,17 @@ import { useConfirmModal } from "../../../hooks/useConfirmModal";
 import { useState, useEffect } from "react";
 import cc from "../../../utils/cc";
 import { useToast } from "../../../hooks/toast-messages/useToast";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { TbArrowMergeAltRight } from "react-icons/tb";
 
 // renders a container for a group while checking if it is being edited
-function CreateGroupContainer({ group, setGroups, groups }) {
+function CreateGroupContainer({ group, setGroups, groups, queryclient }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedGroup, setEditedGroup] = useState(group.name);
   const [cellError, setCellError] = useState(false);
-  const { openConfirmModal } = useConfirmModal(); 
+  const { openConfirmModal } = useConfirmModal();
   const { addToast } = useToast();
-  
+
   useEffect(() => {
     if (cellError) {
       setTimeout(() => {
@@ -30,8 +32,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     }
     if (
       groups.find(
-        (oGroup) =>
-          oGroup.name.toLowerCase() === editedGroup.toLowerCase()
+        (oGroup) => oGroup.name.toLowerCase() === editedGroup.toLowerCase()
       )
     ) {
       setCellError("Ryhmä on jo olemassa.");
@@ -46,12 +47,8 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     groupService
       .editGroup(newGroup)
       .then(() => {
-        setGroups((prevGroups) =>
-          prevGroups.map((prevGroup) =>
-            prevGroup.id === group.id ? newGroup : prevGroup
-          )
-        );
-        addToast("Ryhmän nimi vaihdettu", { style: "success" }); 
+        queryclient.invalidateQueries({ queryKey: ["groups"] });
+        addToast("Ryhmän nimi vaihdettu", { style: "success" });
         setIsEditing(false);
       })
       .catch((error) => {
@@ -59,34 +56,86 @@ function CreateGroupContainer({ group, setGroups, groups }) {
       });
   };
 
+  const mergeGroups = useMutation({
+    mutationFn: (mergeFromId, mergeToId) =>
+      groupService.mergeGroups(mergeFromId, mergeToId),
+    onError: (error) => {
+      addToast("Virhe yhdistettäessä lajeja", { style: "error" });
+    },
+    onSuccess: (res) => {
+      addToast(
+        `${res.count} oppilasta siirrettiin ryhmästä ${res.mergeFrom} ryhmään ${res.mergeTo}`,
+        { style: "success" }
+      );
+      queryclient.invalidateQueries({ queryKey: ["groups"] });
+    },
+  });
+
+  const handleMerge = () => {
+    const handleFinalMerge = (selectedOptionId) => {
+      selectedOptionId = Number(selectedOptionId);
+      group.id = Number(group.id);
+      mergeGroups.mutate({
+        mergeFromId: group.id,
+        mergeToId: selectedOptionId,
+      });
+    };
+
+    console.log("That merges: ", group);
+    console.log("Merged to options: ", groups);
+    const typeTextNominative = "ryhmä";
+    const typeTextGenitive = "ryhmän";
+    const typeTextIllative = "ryhmään";
+
+    const modalText = (
+      <span>
+        Valitse {typeTextNominative}, johon {typeTextGenitive}
+        <br />
+        <strong>{group.name}</strong>
+        <br />
+        opiskelijat siirretään.
+      </span>
+    );
+
+    openConfirmModal({
+      type: "merge",
+      text: modalText,
+      thatMerges: group,
+      typeTextNominative: typeTextNominative,
+      typeTextIllative: typeTextIllative,
+      onAgree: handleFinalMerge,
+      mergeToOptions: groups,
+      agreeButtonText: "Seuraava",
+      declineButtonText: "Peruuta",
+    });
+  };
+
   // deletes the group from the server and updates the state
   // NEW
   const handleDelete = () => {
     const handleUserConfirmation = () => {
       groupService
-      .deleteGroup(group.id)
-      .then(() => {
-        setGroups((prevGroups) =>
-        prevGroups.filter((prevGroup) => prevGroup.id !== group.id)
-        );
-      })
-      .catch((error) => {
-        addToast("Virhe poistettaessa ryhmää", { style: "error" }); 
-        setCellError(error.response.data.error);
-      });
+        .deleteGroup(group.id)
+        .then(() => {
+          queryclient.invalidateQueries({ queryKey: ["groups"] });
+          addToast("Ryhmä poistettu", { style: "success" });
+
+        })
+        .catch((error) => {
+          addToast("Virhe poistettaessa ryhmää", { style: "error" });
+          setCellError(error.response.data.error);
+        });
     };
-  
+
     const modalText = (
       <span>
         Haluatko varmasti poistaa ryhmän
         <br />
-        <strong>
-          {group.name}?
-        </strong>
+        <strong>{group.name}?</strong>
         <br />
       </span>
     );
-  
+
     openConfirmModal({
       onAgree: () => handleUserConfirmation(),
       text: modalText,
@@ -97,7 +146,7 @@ function CreateGroupContainer({ group, setGroups, groups }) {
     });
   };
 
-  // sets the sport's "isEditing" property to "true"
+  // sets the group's "isEditing" property to "true"
   const handleEdit = () => {
     setIsEditing(!isEditing);
     if (isEditing) {
@@ -154,16 +203,26 @@ function CreateGroupContainer({ group, setGroups, groups }) {
           <p className="">{group.name}</p>
           <p className="text-center">{group.student_count}</p>
           <div className="flex gap-4 ">
-            <button
-              className="IconButton text-iconGray"
-              data-testid="editBtn"
+          <button
+              id="editBtn"
+              title="Muokkaa"
+              className="IconButton text-iconGray hover:text-primaryColor"
               onClick={() => handleEdit()}
             >
               <FiEdit3 size={20} />
             </button>
             <button
-              className="IconButton text-iconRed "
-              data-testid="deleteBtn"
+              id="editBtn"
+              title="Yhdistä"
+              className="IconButton text-iconGray hover:text-primaryColor"
+              onClick={() => handleMerge()}
+            >
+              <TbArrowMergeAltRight size={20} className="rotate-90" />
+            </button>
+            <button
+              className="IconButton text-iconRed hover:text-red-700 "
+              id="deleteBtn"
+              title="Poista"
               onClick={() => handleDelete()}
             >
               <FiTrash2 size={20} />
@@ -181,44 +240,53 @@ function CreateGroupContainer({ group, setGroups, groups }) {
 }
 
 const GroupsPage = () => {
+  const queryclient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState("");
-  const [groups, setGroups] = useState([]);
   const [sortedGroups, setSortedGroups] = useState([]);
   const [newGroup, setNewGroup] = useState("");
   const [sorting, setSorting] = useState({ name: 0, group: 0 });
 
+  const {
+    data: groups,
+    error: groupsError,
+    isLoading: groupsLoading,
+  } = useQuery({
+    queryKey: ["groups"],
+    queryFn: groupService.getGroups,
+  });
+
   useEffect(() => {
-    groupService.getGroups().then((data) => {
-      setGroups(data);
-      setSortedGroups(data);
-    });
-  }, []);
+    if (groups) {
+      setSortedGroups(groups);
+    }
+    [groups, sortedGroups];
+  });
 
   useEffect(() => {
     if (sorting.name === 0 && sorting.student === 0)
       return setSortedGroups(groups);
     if (sorting.name) {
       if (sorting.name === 1) {
-        setSortedGroups((prevSports) =>
-          [...prevSports].sort((a, b) => (a.name > b.name ? 1 : -1))
+        setSortedGroups((prevGroups) =>
+          [...prevGroups].sort((a, b) => (a.name > b.name ? 1 : -1))
         );
       } else if (sorting.name === -1) {
-        setSortedGroups((prevSports) =>
-          [...prevSports].sort((a, b) => (a.name < b.name ? 1 : -1))
+        setSortedGroups((prevGroups) =>
+          [...prevGroups].sort((a, b) => (a.name < b.name ? 1 : -1))
         );
       }
     }
 
     if (sorting.student) {
       if (sorting.student === 1) {
-        setSortedGroups((prevSports) =>
-          [...prevSports].sort((a, b) =>
+        setSortedGroups((prevGroups) =>
+          [...prevGroups].sort((a, b) =>
             a.student_count > b.student_count ? 1 : -1
           )
         );
       } else if (sorting.student === -1) {
-        setSortedGroups((prevSports) =>
-          [...prevSports].sort((a, b) =>
+        setSortedGroups((prevGroups) =>
+          [...prevGroups].sort((a, b) =>
             a.student_count < b.student_count ? 1 : -1
           )
         );
@@ -247,8 +315,7 @@ const GroupsPage = () => {
 
     if (
       groups.some(
-        (group) =>
-          group.name.toLowerCase() === newGroup.toLocaleLowerCase()
+        (group) => group.name.toLowerCase() === newGroup.toLocaleLowerCase()
       )
     ) {
       setErrorMessage("Ryhmä on jo olemassa");
@@ -261,16 +328,15 @@ const GroupsPage = () => {
 
     groupService.addGroup(newGroup).then(() => {
       groupService.getGroups().then((data) => {
-        setGroups(data);
-        setSortedGroups(data);
-        addToast("Uusi ryhmä lisätty", { style: "success" }); 
+        queryclient.invalidateQueries({ queryKey: ["groups"] });
+        addToast("Uusi ryhmä lisätty", { style: "success" });
       });
       setNewGroup("");
       setErrorMessage("");
     });
   };
 
-  const handleInputError = (input, setError, campuses) => {
+  const handleInputError = (input, setError, groups) => {
     if (input === "") {
       setError("Ryhmän nimi puuttuu");
       return false;
@@ -279,7 +345,7 @@ const GroupsPage = () => {
       setError("Ryhmän nimi liian pitkä");
       return false;
     }
-    if (campuses.some((campus) => campus.name === input)) {
+    if (groups.some((group) => group.name === input)) {
       setError("Ryhmä on jo olemassa");
       return false;
     }
@@ -317,7 +383,7 @@ const GroupsPage = () => {
           <input
             className="p-1 border text-textPrimary bg-bgGray border-borderPrimary rounded-l-md focus-visible:outline-none"
             type="text"
-            data-testid="newSportInput"
+            data-testid="newGroupInput"
             placeholder="Uusi ryhmä"
             value={newGroup}
             onChange={(e) => setNewGroup(e.target.value)}
@@ -366,6 +432,7 @@ const GroupsPage = () => {
           >
             {sortedGroups.map((group) => (
               <CreateGroupContainer
+                queryclient={queryclient}
                 groups={sortedGroups}
                 setGroups={setSortedGroups}
                 group={group}

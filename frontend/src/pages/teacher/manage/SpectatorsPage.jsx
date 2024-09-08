@@ -24,7 +24,6 @@ const SpectatorsPage = () => {
     },
     onSuccess: () => {
       addToast("Vierailija poistettu", { style: "success" });
-      queryClient.invalidateQueries({ queryKey: ["StudentsList"] });
       queryClient.invalidateQueries({ queryKey: ["spectators"] });
     },
   });
@@ -144,7 +143,7 @@ const SpectatorsPage = () => {
           <div
             id="errorHeader"
             className="bg-btnRed w-full text-textPrimary text-center text-lg p-2
-          mb-4 animate-menu-appear-top shadow-md rounded-b-md relative"
+          mb-4 animate-menu-appear-top shadow-md relative"
           >
             <button
               onClick={() => setErrorMessage("")}

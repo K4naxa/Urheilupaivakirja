@@ -18,6 +18,8 @@ import StudentNewsPage from "./pages/student/StudentNewsPage";
 import SpectatorRegistrationPage from "./pages/SpectatorRegistrationPage";
 
 //teacher
+import TeacherRegistrationPage from "./pages/TeacherRegistrationPage";
+
 import TeacherLayout from "./layouts/TeacherLayout";
 import TeacherHome from "./pages/teacher/TeacherHome";
 
@@ -119,6 +121,10 @@ export const router = createBrowserRouter([
           {
             path: "/vierailijan-rekisterointi",
             element: <SpectatorRegistrationPage />,
+          },
+          {
+            path :"opettajan-rekisterointi",
+            element: <TeacherRegistrationPage />,
           },
           //{ path: "/opettajan-rekisterointi", element: <TeacherRegistrationPage /> },
           {

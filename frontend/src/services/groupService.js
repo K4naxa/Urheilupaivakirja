@@ -32,10 +32,19 @@ const verifyStudentGroup = async (studentGroupId) => {
   return response.data;
 };
 
+const mergeGroups = async ({mergeFromId, mergeToId}) => {
+  const response = await apiClient.put(`/group/merge/`, {
+    mergeFrom: mergeFromId,
+    mergeTo: mergeToId,
+  });
+  return response.data;
+}
+
 export default {
   getGroups,
   addGroup,
   editGroup,
   deleteGroup,
   verifyStudentGroup,
+  mergeGroups
 };

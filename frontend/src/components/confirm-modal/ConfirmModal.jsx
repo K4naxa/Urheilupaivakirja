@@ -11,8 +11,9 @@ const ConfirmModal = ({
   text,
   closeOnOutsideClick = true,
   useTimer = false,
+  timerDuration = 3,
 }) => {
-  const [timer, setTimer] = useState(useTimer ? 3 : 0);
+  const [timer, setTimer] = useState(useTimer ? timerDuration : 0);
   const [isDisabled, setIsDisabled] = useState(useTimer);
 
   useEffect(() => {
@@ -77,14 +78,14 @@ const ConfirmModal = ({
         <p className="text-center">{text}</p>
         <div className="flex justify-center gap-8">
           <button
-            className="w-20 py-1.5 border rounded-md border-borderPrimary hover:bg-hoverDefault"
+            className="min-w-20 py-1.5 border rounded-md border-borderPrimary hover:bg-hoverDefault"
             onClick={onDecline}
           >
             {declineButtonText}
           </button>
           <button
             className={cc(
-              "w-20 py-1.5 border rounded-md border-borderPrimary",
+              "min-w-20 py-1.5 px-1 border rounded-md border-borderPrimary",
               !agreeStyle && defaultStyle,
               agreeStyle === "red" && redStyleClass,
               agreeStyle === "gray" && grayStyleClass,

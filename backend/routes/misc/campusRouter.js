@@ -74,6 +74,49 @@ router.post("/", isAuthenticated, isTeacher, campus_name, (req, res) => {
     });
 });
 
+router.put("/merge/", isAuthenticated, isTeacher, async (req, res) => {
+  const { mergeFrom, mergeTo } = req.body;
+  console.log("mergeFrom", mergeFrom);
+  console.log("mergeTo", mergeTo);
+  try {
+    if (typeof mergeFrom !== "number" || typeof mergeTo !== "number") {
+      return res.status(400).json({ error: "Invalid campus IDs" });
+    }
+
+    if (mergeFrom === mergeTo) {
+      return res
+        .status(400)
+        .json({ error: "Cannot merge a campus with itself" });
+    }
+
+    const fromCampus = await knex("campuses").where("id", mergeFrom).first();
+    const toCampus = await knex("campuses").where("id", mergeTo).first();
+
+    if (!fromCampus || !toCampus) {
+      return res.status(404).json({ error: "Campus not found" });
+    }
+
+    const result = await knex.transaction(async (trx) => {
+      //Move students from one campus to another
+      const count = await trx("students")
+        .where("campus_id", mergeFrom)
+        .update({ campus_id: mergeTo });
+
+      return count;
+    });
+
+    res.json({
+      message: `Merged ${result} students from ${fromCampus.name} to ${toCampus.name}`,
+      count: result,
+      mergeFrom: fromCampus.name,
+      mergeTo: toCampus.name,
+    });
+  } catch (err) {
+    console.error("Error merging campuses:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // edit a single campus by campus.id
 router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
   const errors = validationResult(req);

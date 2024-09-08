@@ -38,7 +38,7 @@ const RecentJournalEntry = ({ entry, user }) => {
           {dayjs(entry.date).format("DD.MM.YYYY")}
         </p>
         <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
-      
+
         <p className="">
           {entry.workout_category_id === 1
             ? user?.sport
@@ -192,7 +192,9 @@ const RecentJournalEntries = ({ journal }) => {
           <p className="IconBox">
             <FiBarChart2 />
           </p>
-          <h2 className="text-lg font-medium">Omat merkinnät</h2>
+          <h2 className="text-lg">
+            {user.role === 3 ? "Omat merkinnät" : "Merkinnät"}
+          </h2>
         </div>
         <div>
           <select

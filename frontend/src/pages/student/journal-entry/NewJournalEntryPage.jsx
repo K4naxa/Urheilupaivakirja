@@ -365,6 +365,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   };
 
   function convertTime(totalMinutes) {
+    if (totalMinutes == 195) {
+      return "yli 3h";
+    }
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     if (hours === 0) {
@@ -375,6 +378,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
     return `${hours}h ${minutes}min`;
   }
+  
 
   function getSubmitButtonText(entry_type) {
     switch (entry_type) {
@@ -478,7 +482,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   className="w-full bg-bgPrimary"
                   type="range"
                   min="30"
-                  max="180"
+                  max="195"
                   value={newJournalEntryData.length_in_minutes}
                   step="15"
                   id="length_in_minutes"

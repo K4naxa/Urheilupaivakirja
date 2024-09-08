@@ -7,7 +7,7 @@ const getCampuses = async () => {
   };
   // add a new campus
   const addCampus = async (newCampus) => {
-    const campus = { campus_name: newCampus };
+    const campus = { campus_name: newCampus.name };
     const response = await apiClient.post("/campus/", campus);
     return response.data;
   };
@@ -26,11 +26,21 @@ const getCampuses = async () => {
     const response = await apiClient.delete(`/campus/${id}`);
     return response.data;
   };
+
+  // merge campuses
+  const mergeCampuses = async ({mergeFromId, mergeToId}) => {
+    const response = await apiClient.put(`/campus/merge/`, {
+      mergeFrom: mergeFromId,
+      mergeTo: mergeToId,
+    });
+    return response.data;
+  };
   
 
 export default {
     getCampuses,
     addCampus,
     editCampus,
-    deleteCampus
+    deleteCampus,
+    mergeCampuses
 }
