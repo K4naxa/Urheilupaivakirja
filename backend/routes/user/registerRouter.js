@@ -6,7 +6,10 @@ const options = config.DATABASE_OPTIONS;
 const knex = require("knex")(options);
 const bcrypt = require("bcryptjs");
 const saltRounds = config.BCRYPTSALT;
-const { createAccessToken, createShortRefreshToken } = require("../../utils/token");
+const {
+  createAccessToken,
+  createShortRefreshToken,
+} = require("../../utils/token");
 const { isAuthenticated } = require("../../utils/authMiddleware");
 const otpGenerator = require("otp-generator");
 const sendEmail = require("../../utils/email/sendEmail");
@@ -30,37 +33,20 @@ router.post("/", [email, newPassword], async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  function formatName(name) {
-    return name
-      .trim()
-      .replace(/\s+/g, " ") // Replace multiple spaces with a single space
-      .toLowerCase() 
-      .split("-") // Split by - 
-      .map((part) => {
-        return part.charAt(0).toUpperCase() + part.slice(1); // Capitalize the first letter of each part
-      })
-      .join("-"); // Join the parts back together with -
-  }
-
-  function formatNameWithCommas(name) {
-    return name
-      .trim()
-      .replace(/\s+/g, " ") // Replace multiple spaces with a single space
-      .toLowerCase()
-      .split(",")
-      .map((part) => {
-        return part
-          .trim() // Trim spaces around each part after splitting by ,
-          .split(" ") // Split by spaces to handle each word individually
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word
-          .join(" "); // Join words back with a single space between them
-      })
-      .join(", "); // Join the parts back together with , and space
-  }
-
-  console.log(req.body);
   try {
     await knex.transaction(async (trx) => {
+    // Check if the email already exists
+      const existingUser = await trx("users")
+      .where({ email: email })
+      .first();
+
+    if (existingUser) {
+      // If the email exists, respond with 409 Conflict
+      return res.status(409).json({
+        error: "An account with this email already exists",
+      });
+    }
+
       // Hash the password
       const passwordHash = await bcrypt.hash(password, Number(saltRounds));
 
@@ -72,9 +58,6 @@ router.post("/", [email, newPassword], async (req, res, next) => {
         email_verified: false,
         created_at: new Date(),
       };
-
-      const formated_first_name = formatName(first_name);
-      const formated_last_name = formatName(last_name);
 
       async function checkIfNew(tableName, id) {
         // Check if the ID already exists in the table
@@ -96,12 +79,12 @@ router.post("/", [email, newPassword], async (req, res, next) => {
           if (existingName) {
             return existingName.id;
           }
-          
+
           // "id" is in reality a name, so format it to handle commas
           trimmedName = formatNameWithCommas(id);
           const [newId] = await trx(tableName).insert({
             name: id, // Insert the "id" as the "name" in the table
-            created_by: formated_first_name + " " + formated_last_name,
+            created_by: first_name + " " + last_name,
           });
 
           return newId;
@@ -110,8 +93,6 @@ router.post("/", [email, newPassword], async (req, res, next) => {
         // If the ID exists, return the existing ID
         return id;
       }
-
-
 
       // Insert the new user and get the id of the inserted user
       const [userId] = await trx("users").insert(newUser);
@@ -123,8 +104,8 @@ router.post("/", [email, newPassword], async (req, res, next) => {
       // Prepare new student data
       const newStudent = {
         user_id: userId,
-        first_name: formated_first_name,
-        last_name: formated_last_name,
+        first_name: first_name,
+        last_name: last_name,
         sport_id: sportId,
         group_id: groupId,
         campus_id: campus_id,
@@ -136,28 +117,27 @@ router.post("/", [email, newPassword], async (req, res, next) => {
 
       let sportName = null;
       if (newUser.role_id === 3) {
-        const sportData = await knex("students")
+        const sportData = await trx("students")
           .join("sports", "students.sport_id", "sports.id")
           .select("sports.name as sport_name")
-          .where("students.user_id", "=", newUser.id)
+          .where("students.user_id", "=", userId) // Use userId instead of newUser.id
           .first();
-  
+
         if (sportData) {
           sportName = sportData.sport_name;
         }
       }
-
 
       refreshToken = createShortRefreshToken(newUser);
       accessToken = createAccessToken(newUser);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", 
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        maxAge: 12 * 60 * 60 * 1000, // 12 hours
       });
-  
+
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -310,8 +290,8 @@ router.post("/verify-email", isAuthenticated, async (req, res) => {
 
     const user = await knex("users").where({ id: userId }).first();
 
-    refreshToken = createShortRefreshToken(tempUser);
-    accessToken = createAccessToken(tempUser);
+    refreshToken = createShortRefreshToken(user);
+    accessToken = createAccessToken(user);
 
     let sportName = null;
     if (user.role_id === 3) {
@@ -328,16 +308,16 @@ router.post("/verify-email", isAuthenticated, async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
+      secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      maxAge: 12 * 60 * 60 * 1000, //12 hours
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 5 * 60 * 1000,
+      maxAge: 5 * 60 * 1000, // 5 minutes
     });
 
     res.json({

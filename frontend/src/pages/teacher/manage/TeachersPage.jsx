@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import teacherService from "../../../services/teacherService";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { FiTrash2 } from "react-icons/fi";
@@ -92,10 +92,10 @@ const TeachersPage = () => {
     openConfirmModal({
       onAgree: () => handleUserConfirmation(teacherId),
       text: modalText,
-      agreeButtonText: "Peru",
+      agreeButtonText: "Peru kutsu",
       agreeStyle: "red",
       declineButtonText: "Takaisin",
-      useTimer: true,
+
     });
   };
 
@@ -161,7 +161,7 @@ const TeachersPage = () => {
       </div>
       <div className="flex flex-col w-full px-4 ">
         <div className="flex gap-4 justify-center w-full items-end">
-          <form onSubmit={handleSendInvitation} className="flex flex-col w-3/4">
+          <form onSubmit={handleSendInvitation} className="flex flex-col w-3/4 pb-4">
             <label htmlFor="newTeacherInput" className="my-0.5">
               Kutsu uusi opettaja
             </label>
@@ -177,7 +177,7 @@ const TeachersPage = () => {
                 id="newTeacherInput"
               />
 
-              <button className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor whitespace-nowrap align-bottom">
+              <button title="Lähetä kutsu" className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor hover:bg-hoverPrimary whitespace-nowrap align-bottom">
                 Lähetä
               </button>
             </div>
@@ -272,6 +272,7 @@ const CreateTeacherCard = ({ teacher, handleDelete, user }) => {
       {user.user_id != teacher.id && (
         <div className="flex justify-center p-4">
           <button
+          title="Poista opettaja"
             className="IconButton text-iconRed"
             onClick={() => {
               handleDelete(teacher);
@@ -294,7 +295,7 @@ const CreateInvitedTeacherCard = ({ teacher, handleRevoke }) => {
       <div className="flex flex-col gap-2 p-2  w-full">
         {/* name and email row */}
         <div className="flex flex-wrap gap-4 items-end">
-          <span className="text-textSecondary">{teacher.email}</span>
+          <span className="text-textPrimary">{teacher.email}</span>
         </div>
 
         {/* additional info row */}
@@ -309,7 +310,8 @@ const CreateInvitedTeacherCard = ({ teacher, handleRevoke }) => {
       </div>
       <div className="flex justify-center p-4">
         <button
-          className="IconButton text-iconRed"
+        title="Peru kutsu"
+          className="IconButton text-iconRed hover:text-red-700"
           onClick={() => {
             handleRevoke(teacher);
           }}

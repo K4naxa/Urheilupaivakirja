@@ -31,15 +31,15 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="flex gap-2 text-sm">
-            <p className="text-textSecondary">laji:</p>
+            <p className="text-textSecondary">Laji:</p>
             {student.sport}
           </div>
           <div className="flex gap-2 text-sm">
-            <p className="text-textSecondary">ryhmä: </p>
+            <p className="text-textSecondary">Ryhmä: </p>
             {student.name}
           </div>
           <div className="flex gap-2 text-sm">
-            <p className="text-textSecondary">toimipaikka: </p>
+            <p className="text-textSecondary">Toimipaikka: </p>
             {student.campus}
           </div>
         </div>
@@ -47,7 +47,8 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
 
       <div className="flex flex-col items-center justify-center gap-2">
         <button
-          className="text-iconRed"
+        title="Poista opiskelija"
+          className="text-iconRed hover:text-red-700"
           onClick={() => {
             handleDelete(student);
           }}
@@ -55,7 +56,8 @@ const createStudentContainer = (student, handleActivation, handleDelete) => {
           <FiTrash2 />
         </button>
         <button
-          className="text-primaryColor"
+        title="Aktivoi opiskelija"
+          className="text-iconGray hover:text-primaryColor"
           onClick={() => {
             handleActivation(student);
           }}
@@ -302,7 +304,7 @@ const ManageArchivedStudentsPage = () => {
             createStudentContainer(student, handleActivation, handleDelete)
           )
         ) : (
-          <p className="my-2 text-center">Ei opiskelijoita</p>
+          <p className="my-2 text-center">Ei arkistoituja opiskelijoita</p>
         )}
       </div>
     </div>

@@ -7,7 +7,7 @@ const ManageStudentsLayout = () => {
         className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
         shadow-md"
       >
-        Opiskelija Hallinta
+        Opiskelijat
       </div>
       <div className="pt-3 flex flex-col w-full items-center">
         <nav

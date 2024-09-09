@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import dayjs from "dayjs";
-import studentService from "../../../services/userService.js";
 import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
@@ -14,6 +13,7 @@ const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
 const NewJournalEntryPage = ({ onClose, date }) => {
+  console.log("NewJournalEntryPage")
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
@@ -41,15 +41,31 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   const addJournalEntry = useMutation({
     mutationFn: () => journalService.postJournalEntry(newJournalEntryData),
-    // If the mutation fails, roll back to the previous value
     onError: (error) => {
-      console.error("Error adding journal entry:", error);
-      addToast("Virhe lisättäessä merkintää", { style: "error" });
+      console.error("Error posting new journal entry:", error);
+
+      let errorMessage = "Virhe tallentaessa uutta merkintää.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista tiedot ja yritä uudelleen.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      addToast(errorMessage, { style: "error" });
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
       console.log("Invalidating studentData query");
-      queryClient.invalidateQueries({queryKey: ["studentData"]});
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
       console.log("adding toast");
       addToast("Merkintä lisätty", { style: "success" });
       console.log("closing modal");
@@ -64,6 +80,8 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     isError: journalEntriesDataError,
   } = useQuery({
     queryKey: ["studentData"],
+    queryFn: () => studentService.getStudentData(),
+    staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
@@ -121,7 +139,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
 
     try {
-       addJournalEntry.mutate({ newJournalEntryData });
+      addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -179,11 +197,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         return restErrors;
       });
     }
-  };
-
-  const handleDetailsTextareaChange = (e) => {
-
-    changeHandler(e);
   };
 
   const errorCheckJournalEntry = () => {
@@ -378,7 +391,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
     return `${hours}h ${minutes}min`;
   }
-  
 
   function getSubmitButtonText(entry_type) {
     switch (entry_type) {
@@ -588,7 +600,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               <div className="relative w-full">
                 <textarea
                   className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
-                  onChange={handleDetailsTextareaChange}
+                  onChange={changeHandler}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       event.stopPropagation();
@@ -603,14 +615,16 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
                   required
                 ></textarea>
-  <p
-    className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? '100' : '40'} ${
-      newJournalEntryData.details.length === 200 ? 'text-red-500 bg-bgPrimary z-10' : 'text-textPrimary'
-    }`}
-    style={{ pointerEvents: 'none' }} // Make sure it doesn't interfere with textarea interactions
-  >
-    {newJournalEntryData.details.length}/200
-  </p>
+                <p
+                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? "100" : "40"} ${
+                    newJournalEntryData.details.length === 200
+                      ? "text-red-500 bg-bgPrimary z-10"
+                      : "text-textPrimary"
+                  }`}
+                  style={{ pointerEvents: "none" }} // Make sure it doesn't interfere with textarea interactions
+                >
+                  {newJournalEntryData.details.length}/200
+                </p>
               </div>
             )}
           </div>

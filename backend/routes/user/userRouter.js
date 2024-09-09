@@ -16,7 +16,7 @@ const {
 const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 const { email, password, newPassword } = require("../../utils/validation");
 const { validationResult } = require("express-validator");
-const { createAccessToken, createRefreshToken } = require("../../utils/token"); 
+const { createAccessToken, createRefreshToken } = require("../../utils/token");
 
 // For user themselves -------------------------------------------------------------------
 
@@ -74,14 +74,15 @@ router.post("/request-password-reset", email, async (req, res) => {
       const now = Date.now();
       const tokenCreationTime = new Date(existingToken.created_at).getTime();
       const timeSinceLastToken = now - tokenCreationTime;
-      const cooldownPeriod = 5 * 60 * 1000; // 5min
+      const cooldownPeriod = 5 * 60 * 1000; // 5 minutes in milliseconds
 
       if (timeSinceLastToken < cooldownPeriod) {
-        const waitTime = Math.ceil(
-          (cooldownPeriod - timeSinceLastToken) / 1000 / 60
-        ); // remaining wait time in minutes
+        const remainingTime = cooldownPeriod - timeSinceLastToken;
+        const waitTime = Math.ceil(remainingTime / 1000 / 60); // convert to minutes
+
         return res.status(429).json({
-          message: `A reset email has already been sent recently. Please check your email or try again in ${waitTime} minutes.`,
+          message: `A reset email has already been sent recently. Please check your email or try again in ${waitTime} minute(s).`,
+          wait_time: remainingTime, // in milliseconds
         });
       }
     }
@@ -95,7 +96,7 @@ router.post("/request-password-reset", email, async (req, res) => {
     });
     const OTP_hash = await bcrypt.hash(resetOTP, Number(saltRounds));
 
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hours
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000 * 1); // 1 hour
 
     // store the new token in the database
     await knex("password_reset_otp").insert({
@@ -161,7 +162,7 @@ router.post("/verify-password-reset", email, async (req, res) => {
       token_hash: hash,
       expires_at: new Date(Date.now() + 10 * 60000), //10min
     });
-
+    await knex("password_reset_otp").where({ user_id: user.id }).del();
     res.json({ message: "OTP verified successfully", resetToken });
   } catch (error) {
     console.error("Error verifying OTP:", error);
@@ -176,7 +177,7 @@ router.post("/reset-password", [email, newPassword], async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, resetToken, newPassword } = req.body;
+  const { email, resetToken, password } = req.body;
 
   if (!resetToken) {
     return res.status(400).json({ message: "Reset token is required" });
@@ -209,7 +210,7 @@ router.post("/reset-password", [email, newPassword], async (req, res) => {
     }
 
     // Hash the new password and update it in the database
-    const hash = await bcrypt.hash(newPassword, Number(saltRounds));
+    const hash = await bcrypt.hash(password, Number(saltRounds));
     await knex("users")
       .where({ id: user.id })
       .increment("token_version", 1)
@@ -219,7 +220,7 @@ router.post("/reset-password", [email, newPassword], async (req, res) => {
     await knex("password_reset_token").where({ user_id: user.id }).del();
 
     // Increment the token version to invalidate all existing tokens
-    await knex("users").where("id", "=", user_id);
+    await knex("users").where("id", "=", user.id);
 
     res.json({ message: "Your password has been successfully reset." });
   } catch (error) {
@@ -274,7 +275,9 @@ router.put(
       if (isNewPasswordSameAsOld) {
         return res
           .status(400)
-          .json({ message: "New password cannot be the same as the old password" });
+          .json({
+            message: "New password cannot be the same as the old password",
+          });
       }
 
       const hash = await bcrypt.hash(newPassword, Number(saltRounds));
@@ -319,8 +322,6 @@ router.put(
     }
   }
 );
-
-
 
 // ---- User self deletion ----
 
@@ -404,6 +405,46 @@ router.delete("/delete/:id", isAuthenticated, isTeacher, async (req, res) => {
   }
 });
 
+router.post(
+  "/delete/teacher/self",
+  isAuthenticated,
+  isTeacher,
+  password,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const password = req.body.password.trim();
+    const user_id = req.user.user_id;
+
+    const user = await knex("users").where({ id: user_id }).first();
+
+    try {
+      const teacherCount = await knex("users")
+        .where("role_id", "=", 1)
+        .count({ count: "*" });
+      if (teacherCount[0].count <= 1) {
+        return res
+          .status(403)
+          .json({ error: "Cannot delete the last remaining teacher" });
+      }
+
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        await knex("users").where("id", "=", user_id).delete();
+        return res.status(200).json({ message: "User deleted" });
+      } else {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
+    } catch (error) {
+      console.error("Error during authentication or deletion:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
 // delete teacher user
 router.delete(
   "/delete/teacher/:id",
@@ -417,7 +458,9 @@ router.delete(
 
       // Dont allow deleting own account using this route
       if (userIdToDelete === currentUser) {
-        return res.status(403).json({ error: "You cannot delete your own account" });
+        return res
+          .status(403)
+          .json({ error: "You cannot delete your own account" });
       }
 
       // Fetch the user to be deleted
@@ -441,7 +484,9 @@ router.delete(
         .count({ count: "*" });
 
       if (teacherCount[0].count <= 1) {
-        return res.status(403).json({ error: "Cannot delete the last remaining teacher" });
+        return res
+          .status(403)
+          .json({ error: "Cannot delete the last remaining teacher" });
       }
 
       // Delete the teacher
@@ -453,8 +498,6 @@ router.delete(
     }
   }
 );
-
-
 
 router.get(
   "/profile",

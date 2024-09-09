@@ -66,7 +66,41 @@ function TeacherProfilePage() {
     mutationFn: () => userService.changePassword(currentPassword, newPassword),
     onError: (error) => {
       console.error("Error updating password:", error);
-      addToast("Virhe päivitettäessä salasanaa", { style: "error" });
+
+      let errorMessage = "Virhe päivitettäessä salasanaa.";
+
+      if (error.response) {
+        // the code looks weird but it matches the backend.. 
+        switch (error.response.status) {
+          case 400:
+            if (
+              error.response.data.message ===
+              "New password cannot be the same as the old password"
+            ) {
+              errorMessage = "Uusi salasana ei voi olla sama kuin vanha.";
+            } else if (error.response.data.errors) {
+              errorMessage =
+                "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron";
+            } else {
+              errorMessage = "Virheellinen pyyntö. Tarkista syötetyt tiedot.";
+            }
+            break;
+          case 401:
+            errorMessage = "Vanha salasana on virheellinen.";
+            break;
+          case 404:
+            errorMessage = "Käyttäjää ei löytynyt.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      addToast(errorMessage, { style: "error" });
+      setNewPasswordError(errorMessage);
     },
     onSuccess: () => {
       addToast("Salasana päivitetty", { style: "success" });
@@ -420,6 +454,8 @@ function TeacherProfilePage() {
   );
 
   const inputClass =
+    "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgGray focus-visible:outline-none focus-visible:border-primaryColor";
+  const disabledInputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
   if (profileDataLoading || !courseSegments) {
@@ -622,7 +658,7 @@ function TeacherProfilePage() {
                   autoComplete="current-password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className={cc(inputClass, "disabled:text-opacity-80")}
+                  className={cc(inputClass, "px-2 bg-bgGray")}
                 />
                 <small className="text-red-500">{passwordError}</small>
               </div>

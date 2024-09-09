@@ -64,8 +64,32 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     mutationFn: () => journalService.editJournalEntry(journalEntryData),
     // If the mutation fails, roll back to the previous value
     onError: (error) => {
-      console.error("Error adding journal entry:", error);
-      addToast("Virhe tallennettaessa muutoksia", { style: "error" });
+      console.error("Error updating journal entry:", error);
+
+      let errorMessage = "Virhe päivitettäessä merkintää.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista syötetyt tiedot ja yritä uudelleen.";
+            break;
+          case 403:
+            errorMessage = "Sinulla ei ole oikeuksia muokata tätä merkintää.";
+            break;
+          case 404:
+            errorMessage = "Merkintää ei löytynyt.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+
+      addToast(errorMessage, { style: "error" });
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
@@ -102,6 +126,8 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     isError: journalEntriesDataError,
   } = useQuery({
     queryKey: ["studentData"],
+    queryFn: () => studentService.getStudentData(),
+    staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
@@ -174,7 +200,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     }
 
     try {
-       editJournalEntry.mutate({ journalEntryData });
+      editJournalEntry.mutate({ journalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -647,19 +673,35 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
               )}
             </label>
             {showDetails && (
-              <textarea
-                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
-                onChange={changeHandler}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.stopPropagation();
-                  }
-                }}
-                type="text"
-                name="details"
-                id="details-textarea"
-                value={journalEntryData.details}
-              />
+              <div className="relative w-full">
+                <textarea
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
+                  onChange={changeHandler}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.stopPropagation();
+                    }
+                  }}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={journalEntryData.details}
+                  rows={2}
+                  maxLength={200}
+                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  required
+                ></textarea>
+                <p
+                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${journalEntryData.details.length === 200 ? "100" : "40"} ${
+                    journalEntryData.details.length === 200
+                      ? "text-red-500 bg-bgPrimary z-10"
+                      : "text-textPrimary"
+                  }`}
+                  style={{ pointerEvents: "none" }} // Make sure it doesn't interfere with textarea interactions
+                >
+                  {journalEntryData.details.length}/200
+                </p>
+              </div>
             )}
           </div>
 

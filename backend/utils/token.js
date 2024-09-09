@@ -40,7 +40,7 @@ const createShortRefreshToken = (user) => {
   };
 
   return jwt.sign(userForToken, config.SECRET, {
-    expiresIn: '1h', // expires in 1 hour
+    expiresIn: '12h', // expires in 12 hours
   });
 };
 

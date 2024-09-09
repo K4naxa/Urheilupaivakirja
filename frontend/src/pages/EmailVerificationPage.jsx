@@ -31,12 +31,12 @@ const EmailVerificationPage = () => {
         const minutes = Math.floor(waitTimeMs / 1000 / 60);
         const seconds = Math.floor((waitTimeMs / 1000) % 60);
 
-        const minuteString = `${minutes} minuutin`;
+        const minuteString = `${minutes}m`;
         var secondString;
         if (seconds === 0) {
           secondString = "";
         } else {
-          secondString = ` ja ${seconds} sekunnin`;
+          secondString = `  ${seconds}s`;
         }
         addToast(
           `Voit lähettää uuden vahvistuskoodin ${minuteString}${secondString} kuluttua.`,
@@ -101,7 +101,7 @@ const EmailVerificationPage = () => {
 
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center h-screen w-screen">
-      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md ">
           Sähköpostin vahvistus
           <button

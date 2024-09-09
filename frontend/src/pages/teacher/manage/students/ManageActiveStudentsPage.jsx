@@ -29,15 +29,15 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="flex gap-2 text-sm">
-            <p className="text-textSecondary">laji:</p>
+            <p className="text-textSecondary">Laji:</p>
             {student.sport_name}
           </div>
           <div className="flex gap-2 text-sm">
-            <p className="text-textSecondary">ryhmä: </p>
+            <p className="text-textSecondary">Ryhmä: </p>
             {student.name}
           </div>
           <div className="flex gap-2 text-sm">
-            <p className="text-textSecondary">toimipaikka: </p>
+            <p className="text-textSecondary">Toimipaikka: </p>
             {student.campus_name}
           </div>
         </div>
@@ -45,7 +45,8 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
 
       <div className="flex flex-col items-center justify-center gap-2">
         <button
-          className="text-iconRed"
+        title="Poista opiskelija"
+          className="text-iconRed hover:text-red-700" 
           onClick={() => {
             handleDelete(student);
           }}
@@ -53,7 +54,8 @@ const createStudentContainer = (student, handleArchive, handleDelete) => {
           <FiTrash2 />
         </button>
         <button
-          className="text-iconGray"
+        title="Arkistoi opiskelija" 
+          className="text-iconGray hover:text-primaryColor"
           onClick={() => {
             handleArchive(student);
           }}
@@ -213,7 +215,7 @@ const ManageActiveStudentsPage = () => {
         </strong>
         ?
         <br />
-        Tämä piilottaa käyttäjän, mutta ei poista tietoja.
+        Tämä piilottaa käyttäjän, mutta ei poista tietoja eikä estä käyttäjää käyttämästä sovellusta.
       </span>
     );
     openConfirmModal({

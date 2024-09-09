@@ -60,7 +60,6 @@ const campus_name = body("campus_name")
   .notEmpty()
   .withMessage("Group name is required")
   .trim()
-  .customSanitizer((value) => capitalizeFirstLetter(value))
   .escape();
 
 const sport_id = body("sport_id")
@@ -187,3 +186,4 @@ module.exports = {
   course_segment_name,
   course_segment_order_number,
 };
+

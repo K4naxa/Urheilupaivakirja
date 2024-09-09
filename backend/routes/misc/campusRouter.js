@@ -118,7 +118,7 @@ router.put("/merge/", isAuthenticated, isTeacher, async (req, res) => {
 });
 
 // edit a single campus by campus.id
-router.put("/:id", isAuthenticated, isTeacher, (req, res) => {
+router.put("/:id", isAuthenticated, isTeacher, campus_name, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
