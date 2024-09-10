@@ -22,7 +22,7 @@ const ForgottenPasswordConfirmPage = () => {
     mutationFn: (otp) => userService.verifyPasswordResetOTP(email, otp),
     onError: (error) => {
       console.error("Error requesting password reset:", error);
-      addToast("Tapahtui virhe, ota yhteyttä ylläpitoon", { style: "error" });
+      addToast("Väärä tai vanhentunut koodi", { style: "error" });
     },
     onSuccess: (data) => {
       addToast("Vahvistuskoodi lähetetty sähköpostiisi.", { style: "success" });

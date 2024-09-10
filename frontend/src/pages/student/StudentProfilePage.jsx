@@ -9,8 +9,13 @@ import { format } from "date-fns";
 import cc from "../../utils/cc";
 import { useConfirmModal } from "../../hooks/useConfirmModal";
 import { useToast } from "../../hooks/toast-messages/useToast";
+import { useOutletContext } from "react-router-dom";
+
 
 function StudentProfilePage() {
+  const { studentData, studentDataLoading, studentDataError } =
+    useOutletContext();
+
   const { logout, logoutAll } = useAuth();
   const { addToast } = useToast();
 
@@ -22,12 +27,6 @@ function StudentProfilePage() {
 
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
-
-  const { data: userData, isLoading: userDataLoading, isError: userDataError, error} = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => studentService.getStudentData(),
-    staleTime: 15 * 60 * 1000, // Same stale time
-  });
 
   const passwordUpdate = useMutation({
     mutationFn: () => userService.changePassword(currentPassword, newPassword),
@@ -88,10 +87,10 @@ function StudentProfilePage() {
   };
 
   useEffect(() => {
-    if (userData) {
-      countTrainedTime(userData.total_minutes);
+    if (studentData) {
+      countTrainedTime(studentData.total_minutes);
     }
-  }, [userData]);
+  }, [studentData]);
 
   const validateNewPasswords = () => {
     let passwordError = "";
@@ -157,7 +156,7 @@ function StudentProfilePage() {
     };
     openConfirmModal({
       handleLogout: handleLogout,
-      text: `Haluatko varmasti poistaa käyttäjän ${userData.first_name} ${userData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
+      text: `Haluatko varmasti poistaa käyttäjän ${studentData.first_name} ${studentData.last_name}? Tämä toiminto on peruuttamaton ja poistaa kaikki käyttäjän tiedot pysyvästi.`,
       type: "accountDelete",
       inputPlaceholder: "Syötä salasanasi varmistaaksesi poiston",
       inputType: "password",
@@ -180,7 +179,7 @@ function StudentProfilePage() {
   const disabledInputClass =
     "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
-  if (userDataLoading) {
+  if (studentDataLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <LoadingScreen />
@@ -188,7 +187,7 @@ function StudentProfilePage() {
     );
   }
 
-  if (userDataError) {
+  if (studentDataError) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <p className="text-red-500">Error loading data: {error.message}</p>
@@ -196,7 +195,7 @@ function StudentProfilePage() {
     );
   }
 
-  if (!userData) {
+  if (!studentData) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <p>Data not available.</p>
@@ -219,19 +218,19 @@ function StudentProfilePage() {
             <div className="">
               <p>Merkintöjen määrä:</p>
               <p className={disabledInputClass}>
-                {userData.total_entries_count} <small>kpl</small>
+                {studentData.total_entries_count} <small>kpl</small>
               </p>
             </div>
             <div className="">
               <p>Aktiivisten päivien määrä:</p>
               <p className={disabledInputClass}>
-                {userData.unique_days_count} <small>kpl</small>
+                {studentData.unique_days_count} <small>kpl</small>
               </p>
             </div>
             <div className="">
               <p>Harjoitusten määrä:</p>
               <p className={disabledInputClass}>
-                {userData.entry_type_1_count} <small>kpl</small>
+                {studentData.entry_type_1_count} <small>kpl</small>
               </p>
             </div>
             <div>
@@ -261,7 +260,7 @@ function StudentProfilePage() {
               type="text"
               name="name"
               disabled
-              value={userData.first_name + " " + userData.last_name}
+              value={studentData.first_name + " " + studentData.last_name}
               className={cc(disabledInputClass, "disabled:text-opacity-60")}
             />
           </div>
@@ -271,7 +270,7 @@ function StudentProfilePage() {
               Sähköposti
             </label>
             <input
-              value={userData.email}
+              value={studentData.email}
               disabled
               className={cc(disabledInputClass, "disabled:text-opacity-60")}
             />
@@ -281,7 +280,7 @@ function StudentProfilePage() {
               Toimipaikka
             </label>
             <input
-              value={userData.campus_name}
+              value={studentData.campus_name}
               disabled
               className={cc(disabledInputClass, "disabled:text-opacity-60")}
             />
@@ -292,7 +291,7 @@ function StudentProfilePage() {
               Ryhmä
             </label>
             <input
-              value={userData.group_name}
+              value={studentData.group_name}
               disabled
               className={cc(disabledInputClass, "disabled:text-opacity-60")}
             />
@@ -303,7 +302,7 @@ function StudentProfilePage() {
               Laji
             </label>
             <input
-              value={userData.sport_name}
+              value={studentData.sport_name}
               disabled
               className={cc(disabledInputClass, "disabled:text-opacity-60")}
             />
@@ -314,7 +313,7 @@ function StudentProfilePage() {
               Käyttäjä luotu
             </label>
             <input
-              value={format(new Date(userData.created_at), "dd.MM.yyyy")}
+              value={format(new Date(studentData.created_at), "dd.MM.yyyy")}
               disabled
               className={cc(disabledInputClass, "disabled:text-opacity-60")}
             />
@@ -379,7 +378,7 @@ function StudentProfilePage() {
               <small className="text-red-500">{newPasswordError}</small>
             </div>
             <button
-              className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+              className="p-2 text-white w-fit Button border-2 hover:bg-hoverPrimary "
               onClick={(e) => {
                 e.preventDefault();
                 if (validateNewPasswords()) {
@@ -403,7 +402,7 @@ function StudentProfilePage() {
           </div>
           <div className="flex max-w-[400px] justify-between flex-wrap">
             <button
-              className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+              className="p-2 text-white w-fit Button border-2 hover:bg-hoverPrimary "
               onClick={() => {
                 logout();
               }}
@@ -412,7 +411,7 @@ function StudentProfilePage() {
             </button>
 
             <button
-              className="p-2 text-white w-fit Button hover:bg-hoverPrimary "
+              className="p-2 text-white w-fit Button border-2 hover:bg-hoverPrimary "
               onClick={() => {
                 logoutAll();
               }}
@@ -432,7 +431,7 @@ function StudentProfilePage() {
             </small>
           </div>
           <button
-            className="w-32 text-white Button p-2 hover:bg-red-800 bg-iconRed"
+            className="w-32 text-white Button border-2 p-2 hover:bg-red-800 bg-iconRed"
             onClick={() => {
               handleAccountDelete();
             }}

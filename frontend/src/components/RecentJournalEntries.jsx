@@ -20,17 +20,18 @@ const convertTime = (totalMinutes) => {
   return `${hours}h ${minutes}min`;
 };
 
-const RecentJournalEntry = ({ entry, user }) => {
+const RecentJournalEntry = ({ entry, user, studentData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { openBigModal } = useBigModal();
 
-  console.log(user);
   return (
     <div className="hover:bg-hoverDefault bg-bgSecondary text-sm sm:text-base flex">
       <div
-        className={`grid  w-[calc(100%-32px)] sm:w-[calc(100%-32px)] items-center px-1 py-2 sm:p-2 grid-cols-4 md:grid-cols-5 gap-0.5 md:gap-4 md:gap-y-0 ${
+        className={cc(
+          "grid items-center pr-1 pl-2 py-2 sm:p-2 grid-cols-4 md:grid-cols-5 gap-0.5 md:gap-4 md:gap-y-0",
+          user.role === 1 || user.role === 2 ? "w-full" : "w-[calc(100%-32px)]",
           isOpen ? "row-span-2" : ""
-        }`}
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* Date */}
@@ -54,10 +55,10 @@ const RecentJournalEntry = ({ entry, user }) => {
         <p className="hidden md:flex">{entry.workout_intensity_name}</p>
 
         {/* Type of entry (sick, rest, ..) */}
-        <div className="flex justify-between relative">
+        <div className="flex justify-between gap-1 relative">
           <p
             className={cc(
-              "flex min-w-20 h-8 justify-center items-center rounded-md px-1",
+              "flex min-w-20 h-8 justify-center items-center rounded-md pr-1 pl-2",
               entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
               entry.entry_type_id === 2 && "bg-bgRest text-textRest",
               entry.entry_type_id === 3 && "bg-bgSick text-textSick"
@@ -75,7 +76,10 @@ const RecentJournalEntry = ({ entry, user }) => {
               <button
                 onClick={(event) => {
                   event.stopPropagation();
-                  openBigModal("editJournalEntry", { entryId: entry.id });
+                  openBigModal("editJournalEntry", {
+                    entryId: entry.id,
+                    studentData,
+                  });
                 }}
                 className="absolute sm:right-[-28px] top-[6px] text-iconGray hover:text-primaryColor"
               >
@@ -120,7 +124,7 @@ const RecentJournalEntry = ({ entry, user }) => {
 
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
-const RecentJournalEntries = ({ journal }) => {
+const RecentJournalEntries = ({ studentData }) => {
   const { showDate } = useMainContext();
   const [filteredJournal, setFilteredJournal] = useState([]);
   const [selectedTime, setSelectedTime] = useState("Month");
@@ -159,7 +163,10 @@ const RecentJournalEntries = ({ journal }) => {
     };
   }, []);
 
-  if (journal.journal_entries) journal = journal.journal_entries;
+  console.log("user", user);
+
+  let journal;
+  if (studentData.journal_entries) journal = studentData.journal_entries;
 
   useEffect(() => {
     if (journal) {
@@ -184,6 +191,8 @@ const RecentJournalEntries = ({ journal }) => {
       setFilteredJournal(filteredJournal);
     }
   }, [journal, selectedTime, showDate]);
+
+  console.log(scrollbarWidth);
 
   return (
     <div className="p-4 border rounded-md border-borderPrimary">
@@ -214,8 +223,16 @@ const RecentJournalEntries = ({ journal }) => {
         <div className="relative w-full h-full rounded-md ">
           <div className="bg-bgGray text-textSecondary">
             <div
-              style={{ paddingRight: `${8 + scrollbarWidth}px` }}
-              className="grid grid-cols-4 px-1 py-2 w-[calc(100%-32px)] gap-1 md:gap-x-4 sm:pb-2 sm:pt-3 sm:px-2 border-b md:grid-cols-5 bg-bgGray text-textSecondary border-borderPrimary"
+              className={cc(
+                "grid grid-cols-4 pl-2 pr-1 py-2 gap-0.5 md:gap-x-4 sm:pb-2 sm:pt-3 sm:px-2 border-b md:grid-cols-5 bg-bgGray text-textSecondary border-borderPrimary",
+                user.role === 1 || user.role === 2 ? "w-full" : ""
+              )}
+              style={{
+                width:
+                  user.role !== 1 && user.role !== 2
+                    ? `calc(100% - (32px + ${scrollbarWidth}px))`
+                    : "100%",
+              }}
             >
               <span className="hidden md:flex">Päivämäärä</span>
               <span className="flex md:hidden">Pvm</span>
@@ -237,7 +254,12 @@ const RecentJournalEntries = ({ journal }) => {
                 </div>
               )}
               {filteredJournal?.map((entry) => (
-                <RecentJournalEntry key={entry.id} user={user} entry={entry} />
+                <RecentJournalEntry
+                  key={entry.id}
+                  user={user}
+                  studentData={studentData}
+                  entry={entry}
+                />
               ))}
             </div>
           </div>

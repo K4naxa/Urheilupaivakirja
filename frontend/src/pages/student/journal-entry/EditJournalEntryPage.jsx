@@ -12,7 +12,7 @@ const inputContainer =
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const EditJournalEntryPage = ({ onClose, entryId }) => {
+const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
   const { openConfirmModal } = useConfirmModal();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -96,6 +96,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
       console.log("Invalidating studentData query");
 
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      queryClient.refetchQueries(["studentData"], { exact: true });
       console.log("adding toast");
 
       addToast("Merkintä päivitetty", { style: "success" });
@@ -119,16 +120,6 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     },
   });
 
-  // Journal data for matching
-  const {
-    data: journalEntriesData,
-    isFetching: journalEntriesDataLoading,
-    isError: journalEntriesDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => studentService.getStudentData(),
-    staleTime: 15 * 60 * 1000,
-  });
 
   // Options data for dropdowns
   const {
@@ -157,14 +148,14 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData.journal_entries
+      studentData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === journalEntryData.date) || [];
     return filteredEntries;
-  }, [journalEntriesData, journalEntryData.date]);
+  }, [studentData, journalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
@@ -487,18 +478,18 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     }
   }
 
-  if (optionsError || journalEntriesDataError) {
+  if (optionsError) {
     console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 
-  if (optionsLoading || journalEntriesDataLoading || journalEntryisFetching) {
+  if (optionsLoading || journalEntryisFetching) {
     console.log("is loading");
     return <p>Loading...</p>;
   }
 
-  if (journalEntryError || optionsError || journalEntriesDataError) {
+  if (journalEntryError || optionsError) {
     console.error("Error fetching journal entry:", journalEntryError);
     return <p>Error: {journalEntryError.message || "Unknown error"}</p>;
   }
@@ -634,7 +625,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.id === 1
-                        ? journalEntriesData.sport_name
+                        ? studentData.sport_name
                         : category.name}
                     </option>
                   ))}

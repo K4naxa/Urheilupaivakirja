@@ -205,7 +205,7 @@ function StudentHome() {
           </div>
 
           <div className="bg-bgSecondary">
-            <RecentJournalEntries journal={studentData.journal_entries} />
+            <RecentJournalEntries studentData={studentData} />
           </div>
         </div>
         {/* left Side */}

@@ -14,7 +14,7 @@ const ThemeSwitcher = () => {
     >
       <div
         className={cc(
-          "flex bg-primaryColor rounded-full justify-center items-center w-[26px] h-[28px] absolute transition-transform duration-300 ease-in-out",
+          "flex bg-primaryColor rounded-full justify-center items-center w-[28px] h-[28px] absolute transition-transform duration-300 ease-in-out",
           theme === "light"
             ? "transform translate-y-0"
             : "transform translate-y-full bg-secondaryColor"

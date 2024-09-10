@@ -29,24 +29,16 @@ import {
 import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
-import studentService from "../../services/studentService";
+import { useOutletContext } from "react-router-dom";
 import courseService from "../../services/courseService";
 import cc from "../../utils/cc";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
+  const { studentData, studentDataLoading, studentDataError } = useOutletContext();
   const { openBigModal } = useBigModal();
   const [tooltipContent, setTooltipContent] = useState(null);
-
-  const {
-    data: studentData,
-    isLoading: studentDataLoading,
-    error: studentDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => studentService.getStudentData(),
-    staleTime: 15 * 60 * 1000,
-  });
+  console.log(studentData);
 
   const { data: courseSegments, error: courseSegmentsError } = useQuery({
     queryKey: ["courseSegments"],
@@ -171,7 +163,7 @@ function StudentHome() {
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 m-2 overflow-x-auto lg:m-8 lg:gap-8 bg-bgPrimary text-textPrimary">
-      <StudentHeatmapTooltip />
+      <StudentHeatmapTooltip studentData={studentData} />
       {/* first row */}
       <div className="grid w-full h-full grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-3 lg:gap-8">
         {/* left Side */}
@@ -220,8 +212,8 @@ function StudentHome() {
             </div>
             <div className="flex gap-4">
               <button
-                onClick={() => openBigModal("newJournalEntry")}
-                className="px-4 py-2 text-white border rounded-md border-borderPrimary bg-primaryColor hover:bg-hoverPrimary"
+                onClick={() => openBigModal("newJournalEntry", { studentData })}
+                className="px-4 py-2 text-white border-2 rounded-md border-borderPrimary bg-primaryColor hover:bg-hoverPrimary"
               >
                 {`+ Uusi harjoitus`}
               </button>
@@ -229,7 +221,7 @@ function StudentHome() {
           </div>
 
           <div className=" lg:mt-4">
-            <RecentJournalEntries journal={studentData.journal_entries} />
+            <RecentJournalEntries studentData={studentData} />
           </div>
         </div>
       </div>

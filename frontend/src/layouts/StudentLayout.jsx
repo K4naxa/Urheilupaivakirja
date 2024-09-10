@@ -15,6 +15,8 @@ import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
 import ThemeSwitcher from "../components/ThemeSwitcher";
+import { useQuery } from "@tanstack/react-query";
+import studentService from "../services/studentService";
 
 import siteLogo from "/pwa-192x192.png";
 import cc from "../utils/cc";
@@ -23,6 +25,16 @@ const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { openBigModal } = useBigModal();
+
+  const {
+    data: studentData,
+    isLoading: studentDataLoading,
+    error: studentDataError,
+  } = useQuery({
+    queryKey: ["studentData"],
+    queryFn: () => studentService.getStudentData(),
+    staleTime: 15 * 60 * 1000,
+  });
 
   const linkClass =
     "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl active:text-primaryColor";
@@ -37,7 +49,7 @@ const StudentLayout = () => {
           </Link>
 
           <div className="flex items-center gap-2">
-            <div>
+            <div className="mr-4">
               <ThemeSwitcher />
             </div>
 
@@ -154,7 +166,9 @@ const StudentLayout = () => {
               <div className="flex items-center justify-center text-white rounded-full bg-bgPrimary drop-shadow-t-md shadow-upper-shadow size-16 active:scale-110">
                 <button
                   className="flex items-center justify-center text-white duration-100 rounded-full bg-primaryColor size-14 active:scale-110"
-                  onClick={() => openBigModal("newJournalEntry")}
+                  onClick={() =>
+                    openBigModal("newJournalEntry", { studentData })
+                  }
                 >
                   <FiPlus size={24} />
                 </button>
@@ -188,22 +202,22 @@ const StudentLayout = () => {
         <div className="absolute bottom-0 flex justify-center w-full">
           {showUserMenu && (
             <div
-              className=" bg-bgPrimary rounded-t-md w-full shadow-upper-shadow absolute
- grid grid-cols-mHeader gap-1 bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary pr-2"
-            >
-              <div className="grid grid-cols-2 place-items-center">
-                <NavLink
-                  to="/profiili"
-                  className={linkClass}
-                  onClick={() => setShowUserMenu(false)}
-                >
-                  <FiUser />
-                  <p className={linkTextClass}>Profiili</p>
-                </NavLink>
+            className="bg-bgPrimary rounded-t-md w-full shadow-upper-shadow absolute grid grid-cols-[1fr_64px_1fr] bottom-[64px] right-0 animate-menu-appear-right border-b border-borderPrimary"
+          >
+            {/* Container 1 */}
+            <div className="grid grid-cols-2 w-full">
+              <div className={linkClass}>
+                <ThemeSwitcher />
               </div>
-              <div className="flex justify-center">
-</div>
-              <div className="grid grid-cols-2 place-items-center">
+              <div className="flex justify-center"></div>
+            </div>
+          
+            {/* Container 2 */}
+            <div className="w-[64px]"></div>
+          
+            {/* Container 3 */}
+            <div className="grid grid-cols-2 w-full place-items-center">
+              <div>
                 <button
                   className={linkClass}
                   onClick={() => {
@@ -213,18 +227,28 @@ const StudentLayout = () => {
                   <FiLogOut />
                   <p className={linkTextClass}>Kirjaudu ulos</p>
                 </button>
-
-                <div className={linkClass}>
-                  <ThemeSwitcher />
-                </div>
+              </div>
+              <div>
+                <NavLink
+                  to="/profiili"
+                  className={linkClass}
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <FiUser />
+                  <p className={linkTextClass}>Profiili</p>
+                </NavLink>
               </div>
             </div>
+          </div>
+          
           )}
         </div>
       </header>
       <div className="box-content flex w-full md:mt-24">
         <main className="flex w-full mx-auto max-w-[1480px] pb-16 md:pb-0">
-          <Outlet />
+          <Outlet
+            context={{ studentData, studentDataLoading, studentDataError }}
+          />{" "}
         </main>
       </div>
     </div>

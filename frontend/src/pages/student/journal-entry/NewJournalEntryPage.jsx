@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
@@ -12,8 +12,8 @@ const inputContainer =
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const NewJournalEntryPage = ({ onClose, date }) => {
-  console.log("NewJournalEntryPage")
+const NewJournalEntryPage = ({ onClose, studentData, date }) => {
+  console.log("Student Data:", studentData);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
@@ -30,6 +30,8 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     details: "",
   });
 
+  const studentDataLoading = false;
+
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
@@ -40,7 +42,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => journalService.postJournalEntry(newJournalEntryData),
+    mutationFn: () => {     console.time("addJournalEntry"); return journalService.postJournalEntry(newJournalEntryData)},
     onError: (error) => {
       console.error("Error posting new journal entry:", error);
 
@@ -64,24 +66,11 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      console.log("Invalidating studentData query");
-      queryClient.invalidateQueries({ queryKey: ["studentData"] });
-      console.log("adding toast");
+      console.timeEnd("addJournalEntry");
       addToast("Merkintä lisätty", { style: "success" });
-      console.log("closing modal");
+      queryClient.invalidateQueries(["studentData"]);
       onClose();
     },
-  });
-
-  // Journal data for matching
-  const {
-    data: journalEntriesData,
-    isFetching: journalEntriesDataLoading,
-    isError: journalEntriesDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => studentService.getStudentData(),
-    staleTime: 15 * 60 * 1000,
   });
 
   // Options data for dropdowns
@@ -98,27 +87,37 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData.journal_entries
+      studentData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === newJournalEntryData.date) || [];
     return filteredEntries;
-  }, [journalEntriesData, newJournalEntryData.date]);
+  }, [studentData, newJournalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
-    checkForConflicts(
-      newJournalEntryData.entry_type,
-      newJournalEntryData.date,
-      entriesForSelectedDate
-    );
+      checkForConflicts(
+        newJournalEntryData.entry_type,
+        newJournalEntryData.date,
+        entriesForSelectedDate
+      );
   }, [
     entriesForSelectedDate,
     newJournalEntryData.entry_type,
     newJournalEntryData.date,
   ]);
+
+  useEffect(() => {
+    console.log("entriesForSelectedDate changed:", entriesForSelectedDate);
+  }, [entriesForSelectedDate]);
+  
+  useEffect(() => {
+    console.log("newJournalEntryData changed:", newJournalEntryData);
+  }, [newJournalEntryData]);
+  
+  
 
   const newJournalEntryHandler = async (e) => {
     e.preventDefault();
@@ -405,12 +404,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
   }
 
-  if (optionsLoading || journalEntriesDataLoading) {
+  if (optionsLoading || studentDataLoading) {
     console.log("is loading");
     return <p>Loading...</p>;
   }
 
-  if (optionsError || journalEntriesDataError) {
+  if (optionsError) {
     console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
@@ -559,7 +558,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.id === 1
-                        ? journalEntriesData.sport_name
+                        ? studentData.sport_name
                         : category.name}
                     </option>
                   ))}

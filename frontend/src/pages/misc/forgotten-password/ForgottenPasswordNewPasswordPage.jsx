@@ -214,7 +214,7 @@ const ForgottenPasswordNewPasswordPage = () => {
             )}
           </div>
           <button
-            className="bg-primaryColor text-bgPrimary w-full h-10 rounded-md"
+            className="bg-primaryColor cursor-pointer text-bgPrimary w-full py-2 hover:bg-hoverPrimary border-2 border-borderPrimary rounded-md"
             type="submit"
             disabled={!isFormValid()}
           >

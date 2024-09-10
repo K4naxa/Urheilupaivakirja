@@ -80,7 +80,7 @@ const ForgottenPasswordPage = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <button className="bg-primaryColor text-bgPrimary w-full h-10 rounded-md duration-75 hover:bg-hoverPrimary active:scale-95">
+          <button className="bg-primaryColor text-white border-2 w-full py-2 rounded-md duration-75 hover:bg-hoverPrimary active:scale-95">
             Lähetä
           </button>
         </form>
