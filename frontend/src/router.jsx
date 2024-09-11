@@ -34,12 +34,10 @@ import CampusPage from "./pages/teacher/manage/CampusPage";
 
 import TeacherNewsPage from "./pages/teacher/news/TeacherNewsPage";
 
-
 import ManageStudentsLayout from "./layouts/manage-layout/ManageStudentsLayout";
 import ManageActiveStudentsPage from "./pages/teacher/manage/students/ManageActiveStudentsPage";
 import ManageArchivedStudentsPage from "./pages/teacher/manage/students/ManageArchivedStudentsPage";
 import ManageStaffLayout from "./layouts/manage-layout/ManageStaffLayout";
-
 
 //misc
 import NoPage from "./pages/NoPage";
@@ -123,7 +121,7 @@ export const router = createBrowserRouter([
             element: <SpectatorRegistrationPage />,
           },
           {
-            path :"opettajan-rekisterointi",
+            path: "opettajan-rekisterointi",
             element: <TeacherRegistrationPage />,
           },
           //{ path: "/opettajan-rekisterointi", element: <TeacherRegistrationPage /> },
@@ -172,7 +170,6 @@ export const router = createBrowserRouter([
               { path: "opiskelijat/:id", element: <StudentPage /> },
               { path: "profiili", element: <TeacherProfilePage /> },
               { path: "tiedotteet", element: <TeacherNewsPage /> },
-              { path: "tilastot", element: <StatisticsPage /> },
 
               {
                 path: "hallitse",
@@ -181,7 +178,7 @@ export const router = createBrowserRouter([
                   { element: <SportsPage />, index: true },
                   {
                     path: "henkilokunta/",
-                    element: <ManageStaffLayout/>,
+                    element: <ManageStaffLayout />,
                     children: [
                       {
                         index: true,
@@ -218,7 +215,6 @@ export const router = createBrowserRouter([
             element: <SpectatorLayout />,
             children: [
               { index: true, element: <TeacherHome /> },
-              { path: "tilastot", element: <StatisticsPage /> },
               { path: "opiskelijat/:id", element: <StudentPage /> },
               { path: "profiili", element: <SpectatorProfilePage /> },
             ],
