@@ -7,7 +7,7 @@ const ManageStaffLayout = () => {
         className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
         shadow-md"
       >
-        Henkilökunta Hallinta
+        Henkilökunta
       </div>
       <div className="pt-3 flex flex-col w-full items-center">
         <nav

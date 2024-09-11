@@ -10,6 +10,8 @@ import { useBigModal } from "../../../hooks/useBigModal";
 const RenderSingleNews = ({ news }) => {
   const [opened, setOpened] = useState(false);
   const toggleOpen = () => setOpened(!opened);
+  const { openBigModal } = useBigModal();
+  console.log(news);  
   return (
     <div
       className="bg-bgSecondary p-4 rounded-md md:max-w-96 border border-borderPrimary cursor-pointer hover:bg-bgPrimary"
@@ -18,7 +20,7 @@ const RenderSingleNews = ({ news }) => {
       <div className="w-full border-b border-borderPrimary px-1 relative">
 
       <button
-              onClick={(event) => {  event.stopPropagation(); openBigModal("editJournalEntry", { entryId: entry.id })}}
+              onClick={(event) => {  event.stopPropagation(); openBigModal("editNewsEntry", { entryId: news.id })}}
               className="text-iconGray absolute top-1 right-1 hover:text-primaryColor"
             >
               <FiEdit3 size={20} />

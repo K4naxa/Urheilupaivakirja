@@ -89,10 +89,9 @@ const SpectatorsPage = () => {
     openConfirmModal({
       onAgree: () => handleUserConfirmation(spectatorId),
       text: modalText,
-      agreeButtonText: "Peru",
+      agreeButtonText: "Peru kutsu",
       agreeStyle: "red",
       declineButtonText: "Takaisin",
-      useTimer: true,
     });
   };
 
@@ -157,7 +156,7 @@ const SpectatorsPage = () => {
       </div>
       <div className="flex flex-col w-full px-4 ">
         <div className="flex gap-4 justify-center w-full items-end">
-          <form onSubmit={handleSendInvitation} className="flex flex-col w-3/4">
+          <form onSubmit={handleSendInvitation} className="flex flex-col w-3/4 pb-4">
             <label htmlFor="newSpectatorInput" className="my-0.5">
               Kutsu uusi vierailija
             </label>
@@ -173,7 +172,7 @@ const SpectatorsPage = () => {
                 id="newSpectatorInput"
               />
 
-              <button className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor whitespace-nowrap align-bottom">
+              <button title="Lähetä kutsu" className="rounded-r w-max px-4 py-2 text-white bg-primaryColor border border-primaryColor hover:bg-hoverPrimary whitespace-nowrap align-bottom">
                 Lähetä
               </button>
             </div>
@@ -264,7 +263,8 @@ const CreateSpectatorCard = ({ spectator, handleDelete }) => {
       </div>
       <div className="flex justify-center p-4">
         <button
-          className="IconButton text-iconRed"
+          title="Poista vierailija"
+          className="IconButton text-iconRed hover:text-red-700"
           onClick={() => {
             handleDelete(spectator);
           }}
@@ -285,7 +285,7 @@ const CreateInvitedSpectatorCard = ({ spectator, handleRevoke }) => {
       <div className="flex flex-col gap-2 p-2  w-full">
         {/* name and email row */}
         <div className="flex flex-wrap gap-4 items-end">
-          <span className="text-textSecondary">{spectator.email}</span>
+          <span className="text-textPrimary">{spectator.email}</span>
         </div>
 
         {/* additional info row */}
@@ -300,7 +300,8 @@ const CreateInvitedSpectatorCard = ({ spectator, handleRevoke }) => {
       </div>
       <div className="flex justify-center p-4">
         <button
-          className="IconButton text-iconRed"
+          className="IconButton text-iconRed hover:text-red-700"
+          title="Peru kutsu"
           onClick={() => {
             handleRevoke(spectator);
           }}

@@ -1,10 +1,9 @@
-import { useState, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import dayjs from "dayjs";
-import studentService from "../../../services/userService.js";
 import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
@@ -13,7 +12,8 @@ const inputContainer =
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const NewJournalEntryPage = ({ onClose, date }) => {
+const NewJournalEntryPage = ({ onClose, studentData, date }) => {
+  console.log("Student Data:", studentData);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
@@ -30,6 +30,8 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     details: "",
   });
 
+  const studentDataLoading = false;
+
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
@@ -40,30 +42,34 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => journalService.postJournalEntry(newJournalEntryData),
-    // If the mutation fails, roll back to the previous value
+    mutationFn: () => {  journalService.postJournalEntry(newJournalEntryData)},
     onError: (error) => {
-      console.error("Error adding journal entry:", error);
-      addToast("Virhe lisättäessä merkintää", { style: "error" });
+      console.error("Error posting new journal entry:", error);
+
+      let errorMessage = "Virhe tallentaessa uutta merkintää.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista tiedot ja yritä uudelleen.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      addToast(errorMessage, { style: "error" });
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      console.log("Invalidating studentData query");
-      queryClient.invalidateQueries({queryKey: ["studentData"]});
-      console.log("adding toast");
       addToast("Merkintä lisätty", { style: "success" });
-      console.log("closing modal");
+      queryClient.invalidateQueries(["studentData"]);
       onClose();
     },
-  });
-
-  // Journal data for matching
-  const {
-    data: journalEntriesData,
-    isFetching: journalEntriesDataLoading,
-    isError: journalEntriesDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
   });
 
   // Options data for dropdowns
@@ -80,27 +86,37 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData.journal_entries
+      studentData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === newJournalEntryData.date) || [];
     return filteredEntries;
-  }, [journalEntriesData, newJournalEntryData.date]);
+  }, [studentData, newJournalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
-    checkForConflicts(
-      newJournalEntryData.entry_type,
-      newJournalEntryData.date,
-      entriesForSelectedDate
-    );
+      checkForConflicts(
+        newJournalEntryData.entry_type,
+        newJournalEntryData.date,
+        entriesForSelectedDate
+      );
   }, [
     entriesForSelectedDate,
     newJournalEntryData.entry_type,
     newJournalEntryData.date,
   ]);
+
+  useEffect(() => {
+    console.log("entriesForSelectedDate changed:", entriesForSelectedDate);
+  }, [entriesForSelectedDate]);
+  
+  useEffect(() => {
+    console.log("newJournalEntryData changed:", newJournalEntryData);
+  }, [newJournalEntryData]);
+  
+  
 
   const newJournalEntryHandler = async (e) => {
     e.preventDefault();
@@ -121,7 +137,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
 
     try {
-       addJournalEntry.mutate({ newJournalEntryData });
+      addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -179,11 +195,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
         return restErrors;
       });
     }
-  };
-
-  const handleDetailsTextareaChange = (e) => {
-
-    changeHandler(e);
   };
 
   const errorCheckJournalEntry = () => {
@@ -378,7 +389,6 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
     return `${hours}h ${minutes}min`;
   }
-  
 
   function getSubmitButtonText(entry_type) {
     switch (entry_type) {
@@ -393,12 +403,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
   }
 
-  if (optionsLoading || journalEntriesDataLoading) {
+  if (optionsLoading || studentDataLoading) {
     console.log("is loading");
     return <p>Loading...</p>;
   }
 
-  if (optionsError || journalEntriesDataError) {
+  if (optionsError) {
     console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
@@ -547,7 +557,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.id === 1
-                        ? journalEntriesData.sport_name
+                        ? studentData.sport_name
                         : category.name}
                     </option>
                   ))}
@@ -588,7 +598,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               <div className="relative w-full">
                 <textarea
                   className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
-                  onChange={handleDetailsTextareaChange}
+                  onChange={changeHandler}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       event.stopPropagation();
@@ -603,14 +613,16 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
                   required
                 ></textarea>
-  <p
-    className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? '100' : '40'} ${
-      newJournalEntryData.details.length === 200 ? 'text-red-500 bg-bgPrimary z-10' : 'text-textPrimary'
-    }`}
-    style={{ pointerEvents: 'none' }} // Make sure it doesn't interfere with textarea interactions
-  >
-    {newJournalEntryData.details.length}/200
-  </p>
+                <p
+                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? "100" : "40"} ${
+                    newJournalEntryData.details.length === 200
+                      ? "text-red-500 bg-bgPrimary z-10"
+                      : "text-textPrimary"
+                  }`}
+                  style={{ pointerEvents: "none" }} // Make sure it doesn't interfere with textarea interactions
+                >
+                  {newJournalEntryData.details.length}/200
+                </p>
               </div>
             )}
           </div>

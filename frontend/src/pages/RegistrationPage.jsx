@@ -223,39 +223,39 @@ const RegistrationPage = () => {
   const errorCheckPassword = () => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-
+  
       const password = registrationData.password;
-
+  
+      // Check if password is empty
       if (password.length < 1) {
         newErrors.password = {
           value: "error",
         };
-        return newErrors;
-      }
-
-      // Regular expressions for validation
-      const lengthCheck = /.{8,}/; // At least 8 characters
-      const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
-      const numberCheck = /[0-9]/; // At least one number
-
-      // Check if the password meets the required conditions
-      if (
-        !lengthCheck.test(password) ||
-        !capitalLetterCheck.test(password) ||
-        !numberCheck.test(password)
-      ) {
-        newErrors.password = {
-          value: "error",
-          message:
-            "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron", // "The password must be at least 8 characters long and contain at least one uppercase letter and one number"
-        };
       } else {
-        newErrors.password = {
-          value: "success",
-        };
+        // Regular expressions for validation
+        const lengthCheck = /.{8,}/; // At least 8 characters
+        const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+        const numberCheck = /[0-9]/; // At least one number
+  
+        // Check if the password meets the required conditions
+        if (
+          !lengthCheck.test(password) ||
+          !capitalLetterCheck.test(password) ||
+          !numberCheck.test(password)
+        ) {
+          newErrors.password = {
+            value: "error",
+            message:
+              "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron", 
+          };
+        } else {
+          newErrors.password = {
+            value: "success",
+          };
+        }
       }
-
-      // Additionally check if passwordAgain needs revalidation
+  
+      // Revalidate passwordAgain if present
       if (registrationData.passwordAgain) {
         if (registrationData.password !== registrationData.passwordAgain) {
           newErrors.passwordAgain = {
@@ -270,43 +270,47 @@ const RegistrationPage = () => {
       } else {
         delete newErrors.passwordAgain;
       }
-
+  
       return newErrors;
     });
   };
+  
 
   const errorCheckPasswordAgain = () => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-
-      if (registrationData.passwordAgain.length < 1) {
+  
+      const passwordAgain = registrationData.passwordAgain;
+  
+      if (passwordAgain.length < 1) {
         newErrors.passwordAgain = {
           value: "error",
         };
-        return newErrors;
-      }
-
-      if (
-        registrationData.passwordAgain &&
-        registrationData.password !== registrationData.passwordAgain
-      ) {
+      } else if (registrationData.password !== passwordAgain) {
         newErrors.passwordAgain = {
           value: "error",
           message: "Salasanat eivät täsmää",
         };
-      } else if (registrationData.passwordAgain) {
-        // Set passwordAgain as valid if it matches
+      } else {
         newErrors.passwordAgain = {
           value: "success",
         };
-      } else {
-        // Clear any existing error if no passwordAgain is provided yet
-        delete newErrors.passwordAgain;
       }
-
+  
+      // Ensure that password validation is in sync
+      if (!registrationData.password || registrationData.password.length < 1) {
+        newErrors.password = {
+          value: "error",
+        };
+      } else {
+        // Clear password error if already validated
+        delete newErrors.password;
+      }
+  
       return newErrors;
     });
   };
+  
 
   const errorCheckDropdown = (fieldValue, fieldName) => {
     setErrors((prevErrors) => {
@@ -341,7 +345,11 @@ const RegistrationPage = () => {
 
   const containerClass = "flex flex-col gap-1 relative";
   const dropdownContainerClass = "flex flex-col gap-1 mb-4 sm:mb-0 relative bg-bgSecondary ";
-  const errorClass = "text-red-500 absolute top-full mt-1";
+
+  //add absolute to errorClass to make it look better, but
+  //beware long error messages (minimum password length etc) will overlap
+  //with the input field below the it.
+  const errorClass = "text-red-500 mt-1"; 
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
@@ -511,19 +519,12 @@ const RegistrationPage = () => {
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
             />
-            {/* registrationData.sportId === "new" && (
-              <input
-                type="text"
-                name="newSport"
-                placeholder="Kirjoita uusi laji MUTTA ÄLÄ LÄHETÄ..."
-                value={registrationData.newSport}
-                className={inputClass}
-                onChange={handleDropdownChange}
-              />
-            )*/}
-            {errors.sportId && errors.sportId.message && (
+            
+            {/* example error messages for group, campus and sport. */}
+            {/* 
+            errors.sportId && errors.sportId.message && (
               <p className={errorClass}>{errors.sportId.message}</p>
-            )}
+            )*/}
           </div>
 
           {/* Group */}
@@ -536,9 +537,6 @@ const RegistrationPage = () => {
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
             />
-            {errors.groupId && errors.groupId.message && (
-              <p className={errorClass}>{errors.groupId.message}</p>
-            )}
           </div>
 
           {/* Campus */}
@@ -551,15 +549,12 @@ const RegistrationPage = () => {
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
             />
-            {errors.campusId && errors.campusId.message && (
-              <p className={errorClass}>{errors.campusId.message}</p>
-            )}
           </div>
 
           {/* TODO: Button to the center of the 2 cols when in sm:  */}
           <div className="flex sm:col-span-2 w-full justify-center my-8">
             <button
-              className=" text-textPrimary border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:bg-hoverPrimary active:scale-95"
+              className="text-white border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:bg-hoverPrimary active:scale-95"
               type="submit"
             >
               Rekisteröidy

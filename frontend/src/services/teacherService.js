@@ -37,13 +37,13 @@ const deleteTeacher = async (userId) => {
   return response.data;
 };
 
-const revokeInvitationToken = async (token) => {
+const revokeInvitationToken = async () => {
   const response = await apiClient.post("/teacher/revoke/:id");
   return response.data;
 };
 
 const deleteTeacherUserSelf = async (password) => {
-  const response = await apiClient.post("/user/delete/teacher/self", {
+  const response = await apiClient.post("/user/delete/teacher/self/", {
     password,
   });
   return response.data;
@@ -57,4 +57,5 @@ export default {
   deactivateTeacher,
   deleteTeacher,
   revokeInvitationToken,
+  deleteTeacherUserSelf
 };

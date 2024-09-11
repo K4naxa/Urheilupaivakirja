@@ -3,11 +3,12 @@ import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
+import newsService from "../../../services/newsService";
 
-const NewNewsEntryPage = ({ onClose, date }) => {
+const NewNewsEntryPage = ({ onClose }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const initialDate = dayjs(date || new Date()).format("YYYY-MM-DD");
+  const initialDate = dayjs(new Date()).format("YYYY-MM-DD");
 
   const [newNewsEntryData, setNewNewsEntryData] = useState({
     title: "",
@@ -23,6 +24,39 @@ const NewNewsEntryPage = ({ onClose, date }) => {
     messageLong: "",
   };
 
+  const addNews = useMutation({
+    mutationFn: () => {
+      newsService.postNews(newNewsEntryData);
+    },
+    onError: (error) => {
+      console.error("Error posting news entry:", error);
+
+      let errorMessage = "Virhe julkaistessa tiedotetta.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista tiedot ja yritä uudelleen.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      addToast(errorMessage, { style: "error" });
+    },
+    // Invalidate and refetch the query after the mutation
+    onSuccess: () => {
+      addToast("Uutinen lisätty", { style: "success" });
+      queryClient.invalidateQueries(["news"]);
+      onClose();
+    },
+  });
+
   const submitButtonIsDisabled = false;
 
   const handleInputChange = (e) => {
@@ -35,27 +69,21 @@ const NewNewsEntryPage = ({ onClose, date }) => {
 
   const newNewsEntryHandler = async (event) => {
     event.preventDefault();
-  
+
     // Check if the selected date is in the future
-    const today = dayjs().startOf('day');
+    const today = dayjs().startOf("day");
     const selectedDate = dayjs(newNewsEntryData.date);
-  
+
     if (selectedDate.isAfter(today)) {
       setNewNewsEntryData((prevData) => ({
         ...prevData,
-        date: today, 
+        date: today,
       }));
       addToast("Et voi julkaista tiedotetta tulevaisuuteen", "error");
       return;
     }
-    // const response = await newsService.addNewsEntry(newNewsEntryData);
-    // if (response.status === 201) {
-    //   queryClient.invalidateQueries("news");
-    //   onClose();
-    //   addToast("Tiedote lisätty", "success");
-    // } else {
-    //   addToast("Tiedotteen lisääminen epäonnistui", "error");
-    // }
+
+    addNews.mutate();
   };
 
   const handleTitleTextareaChange = (e) => {
@@ -65,7 +93,6 @@ const NewNewsEntryPage = ({ onClose, date }) => {
     textarea.style.height = `${textarea.scrollHeight}px`;
     handleInputChange(e);
   };
-  
 
   const handleContentTextareaChange = (e) => {
     const textarea = e.target;
@@ -112,7 +139,7 @@ const NewNewsEntryPage = ({ onClose, date }) => {
             value={newNewsEntryData.title}
             onChange={handleTitleTextareaChange} // Use the new handler
             maxLength={50} // Set the max length to 50 characters
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primaryColor focus:ring-primaryColor p-1 sm:text-sm"
+            className="mt-1 block w-full border-borderPrimary text-textPrimary bg-bgPrimary rounded-md shadow-sm focus:border-primaryColor focus:ring-primaryColor p-1 sm:text-sm"
             rows={1} // Start with 1 row
             style={{ resize: "none" }} // Prevent manual resizing
             required
@@ -130,30 +157,43 @@ const NewNewsEntryPage = ({ onClose, date }) => {
             name="content"
             value={newNewsEntryData.content}
             onChange={handleContentTextareaChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primaryColor focus:ring-primaryColor p-1 sm:text-sm"
+            className="mt-1 block w-full border-borderPrimary text-textPrimary bg-bgPrimary rounded-md shadow-sm focus:border-primaryColor focus:ring-primaryColor p-1 sm:text-sm"
             rows={5}
             maxLength={1000}
             style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
             required
           />
         </div>
-
         {/* Date Input */}
         <div className="w-full">
           <label className="block text-sm font-medium text-textPrimary">
-            Date
+            Päivämäärä
           </label>
           <input
             type="date"
             name="date"
             value={newNewsEntryData.date}
             onChange={handleInputChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primaryColor focus:ring-primaryColor sm:text-sm"
+            className="text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b py-1"
             required
           />
         </div>
 
-        {/* Public Toggle */}
+        {/* Pinned */}
+        <div className="w-full flex items-center justify-between">
+          <label className="block text-sm font-medium text-textPrimary">
+          Kiinnitetty
+          </label>
+          <input
+            type="checkbox"
+            name="pinned"
+            checked={newNewsEntryData.pinned}
+            onChange={handleInputChange}
+            className="h-4 w-4 text-primaryColor border-borderPrimary rounded focus:ring-primaryColor"
+          />
+        </div>
+        {/* 
+        {/* Public Toggle
         <div className="w-full flex items-center justify-between">
           <label className="block text-sm font-medium text-textPrimary">
             Public
@@ -163,39 +203,26 @@ const NewNewsEntryPage = ({ onClose, date }) => {
             name="public"
             checked={newNewsEntryData.public}
             onChange={handleInputChange}
-            className="h-4 w-4 text-primaryColor border-gray-300 rounded focus:ring-primaryColor"
+            className="h-4 w-4 text-primaryColor border-borderPrimary rounded focus:ring-primaryColor"
           />
         </div>
 
-        {/* Pinned Toggle */}
-        <div className="w-full flex items-center justify-between">
-          <label className="block text-sm font-medium text-textPrimary">
-            Pinned
-          </label>
-          <input
-            type="checkbox"
-            name="pinned"
-            checked={newNewsEntryData.pinned}
-            onChange={handleInputChange}
-            className="h-4 w-4 text-primaryColor border-gray-300 rounded focus:ring-primaryColor"
-          />
-        </div>
 
-        {/* Categories Input - Placeholder for your implementation */}
+
+        {/* Categories Input - Placeholder
         <div className="w-full">
           <label className="block text-sm font-medium text-textPrimary">
             Categories
           </label>
-          {/* You can implement your categories input field here */}
         </div>
-
+      */}
         {/* Conflict Message and Submit Button */}
         <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
           {conflict.messageShort && <p>{conflict.messageShort}</p>}
           <button
             className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary ${
               submitButtonIsDisabled
-                ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed"
+                ? "bg-gray-400 opacity-20 text-gray border-borderPrimary cursor-not-allowed"
                 : "cursor-pointer"
             }`}
             type="submit"

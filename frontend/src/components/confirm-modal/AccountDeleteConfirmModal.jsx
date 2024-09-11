@@ -18,8 +18,28 @@ const AccountDeleteConfirmModal = ({
     mutationFn: (password) => userService.deleteUserSelf(password),
     onError: (error) => {
       console.error("Error deleting account:", error);
-      addToast("Virhe poistettaessa käyttäjätunnusta", { style: "error" });
-      setError("Virhe poistettaessa käyttäjätunnusta");
+
+      let errorMessage = "Virhe poistettaessa käyttäjätunnusta";
+
+      if (error.response) {
+        // Check for specific error codes
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista tiedot ja yritä uudelleen.";
+            break;
+          case 401:
+            errorMessage = "Väärä salasana. Ole hyvä ja yritä uudelleen.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      setError(errorMessage);
     },
     onSuccess: () => {
       addToast("Käyttäjätunnuksesi on poistettu", { style: "success" });
@@ -43,14 +63,32 @@ const AccountDeleteConfirmModal = ({
   const handleAgree = async () => {
     try {
       const verified = await userService.verifyPassword(password);
+
       if (verified) {
         deleteUser.mutate(password);
       } else {
         setError("Väärä salasana. Yritä uudelleen.");
       }
     } catch (error) {
-      console.error("Error verifying password:", error);
-      setError("Virhe tarkistettaessa salasanaa. Yritä uudelleen.");
+      let errorMessage = "Virhe tarkistettaessa salasanaa. Yritä uudelleen.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            errorMessage = "Väärä salasana. Ole hyvä ja yritä uudelleen.";
+            break;
+          case 404:
+            errorMessage = "Käyttäjää ei löytynyt.";
+            break;
+          case 500:
+            errorMessage =
+            "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      setError(errorMessage);
     }
   };
 
@@ -81,7 +119,7 @@ const AccountDeleteConfirmModal = ({
         <input
           type="password"
           placeholder="Syötä salasanasi varmistaaksesi poiston"
-          className="w-full p-2 border rounded-md"
+          className="w-full p-2 border rounded-md bg-bgGray border-borderPrimary"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

@@ -152,86 +152,104 @@ const TeacherRegistrationPage = () => {
     });
   };
 
-  // reset password errors and check if password is valid
-  const errorCheckPassword = () => {
-    setErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
+// reset password errors and check if password is valid
+const errorCheckPassword = () => {
+  setErrors((prevErrors) => {
+    const newErrors = { ...prevErrors };
 
-      if (registrationData.password.length < 1) {
+    const password = registrationData.password;
+
+    // Check if password is empty
+    if (password.length < 1) {
+      newErrors.password = {
+        value: "error",
+      };
+    } else {
+      // Regular expressions for validation
+      const lengthCheck = /.{8,}/; // At least 8 characters
+      const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
+      const numberCheck = /[0-9]/; // At least one number
+
+      // Check if the password meets the required conditions
+      if (
+        !lengthCheck.test(password) ||
+        !capitalLetterCheck.test(password) ||
+        !numberCheck.test(password)
+      ) {
         newErrors.password = {
           value: "error",
-        };
-        return newErrors;
-      }
-
-      // Check if the password is too short
-      if (registrationData.password.length < 8) {
-        newErrors.password = {
-          value: "error",
-          message: "Salasana liian lyhyt",
+          message:
+            "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron", 
         };
       } else {
-        // Set password as valid if it's long enough
         newErrors.password = {
           value: "success",
         };
       }
+    }
 
-      // Additionally check if passwordAgain needs revalidation
-      if (registrationData.passwordAgain) {
-        if (registrationData.password !== registrationData.passwordAgain) {
-          newErrors.passwordAgain = {
-            value: "error",
-            message: "Salasanat eivät täsmää",
-          };
-        } else {
-          newErrors.passwordAgain = {
-            value: "success",
-          };
-        }
-      } else {
-        delete newErrors.passwordAgain;
-      }
-
-      return newErrors;
-    });
-  };
-
-  const errorCheckPasswordAgain = () => {
-    setErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-
-      if (registrationData.passwordAgain.length < 1) {
-        newErrors.passwordAgain = {
-          value: "error",
-        };
-        return newErrors;
-      }
-
-      if (
-        registrationData.passwordAgain &&
-        registrationData.password !== registrationData.passwordAgain
-      ) {
+    // Revalidate passwordAgain if present
+    if (registrationData.passwordAgain) {
+      if (registrationData.password !== registrationData.passwordAgain) {
         newErrors.passwordAgain = {
           value: "error",
           message: "Salasanat eivät täsmää",
         };
-      } else if (registrationData.passwordAgain) {
-        // Set passwordAgain as valid if it matches
+      } else {
         newErrors.passwordAgain = {
           value: "success",
         };
-      } else {
-        // Clear any existing error if no passwordAgain is provided yet
-        delete newErrors.passwordAgain;
       }
+    } else {
+      delete newErrors.passwordAgain;
+    }
 
-      return newErrors;
-    });
-  };
+    return newErrors;
+  });
+};
+
+
+const errorCheckPasswordAgain = () => {
+  setErrors((prevErrors) => {
+    const newErrors = { ...prevErrors };
+
+    const passwordAgain = registrationData.passwordAgain;
+
+    if (passwordAgain.length < 1) {
+      newErrors.passwordAgain = {
+        value: "error",
+      };
+    } else if (registrationData.password !== passwordAgain) {
+      newErrors.passwordAgain = {
+        value: "error",
+        message: "Salasanat eivät täsmää",
+      };
+    } else {
+      newErrors.passwordAgain = {
+        value: "success",
+      };
+    }
+
+    // Ensure that password validation is in sync
+    if (!registrationData.password || registrationData.password.length < 1) {
+      newErrors.password = {
+        value: "error",
+      };
+    } else {
+      // Clear password error if already validated
+      delete newErrors.password;
+    }
+
+    return newErrors;
+  });
+};
 
   const containerClass = "flex flex-col gap-1 relative";
-  const errorClass = "text-red-500 absolute top-full mt-1";
+  
+    //add absolute to errorClass to make it look better, but
+  //beware long error messages (minimum password length etc) will overlap
+  //with the input field below the it.
+  const errorClass = "text-red-500 mt-1"; 
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
@@ -391,7 +409,7 @@ const TeacherRegistrationPage = () => {
           {/* TODO: Button to the center of the 2 cols when in sm:  */}
           <div className="flex sm:col-span-2 w-full justify-center my-8">
             <button
-              className=" text-textPrimary border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:bg-hoverPrimary active:scale-95"
+              className=" text-white border-borderPrimary bg-primaryColor h-12 w-40 cursor-pointer rounded-md border-2 px-4 py-2 duration-75 hover:bg-hoverPrimary active:scale-95"
               type="submit"
             >
               Rekisteröidy

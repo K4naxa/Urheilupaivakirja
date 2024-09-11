@@ -86,7 +86,7 @@ router.post("/login", [email, password], async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", 
       sameSite: "Strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days
     });
 
     res.cookie("accessToken", accessToken, {
@@ -103,7 +103,7 @@ router.post("/login", [email, password], async (req, res, next) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", 
         sameSite: "Strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        maxAge: 12 * 60 * 60 * 1000, // 12 hours
       });
   
       res.cookie("accessToken", accessToken, {
@@ -118,21 +118,6 @@ router.post("/login", [email, password], async (req, res, next) => {
     await knex("users")
       .where("email", "=", tempUser.email)
       .update({ last_login_at: new Date() });
-
-    // Send the tokens to the client
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set to true in production
-      sameSite: "Strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
-
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set to true in production
-      sameSite: "Strict",
-      maxAge: 1 * 60 * 1000, // 1 minute
-    });
 
     res.status(200).send({
       user_id: tempUser.id,

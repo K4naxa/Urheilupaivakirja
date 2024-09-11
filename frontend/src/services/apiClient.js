@@ -35,22 +35,26 @@ apiClient.interceptors.response.use(
     ) {
       const errorMessage = error.response.data.message || "";
 
+      if (errorMessage === "No tokens provided") {
+        window.location.href = "/kirjaudu-ulos";
+        return Promise.reject(error);
+      }
+
       if (
         errorMessage === "Access token missing" ||
         errorMessage === "Invalid or expired access token"
       ) {
         if (isRefreshing) {
-          // If a refresh is already in progress, push the request to the queue
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           })
-          .then((token) => {
-            originalRequest.headers['Authorization'] = `Bearer ${token}`;
-            return apiClient(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
+            .then((token) => {
+              originalRequest.headers['Authorization'] = `Bearer ${token}`;
+              return apiClient(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
         }
 
         originalRequest._retry = true;
@@ -67,12 +71,13 @@ apiClient.interceptors.response.use(
 
           processQueue(null, data.accessToken);
 
-          // Retry the original request with the new token
           originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
           return apiClient(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
           console.log("Refresh token expired or invalid, redirecting to login");
+
+          // Clear localStorage and redirect to login
           window.location.href = "/kirjaudu-ulos";
           return Promise.reject(refreshError);
         } finally {

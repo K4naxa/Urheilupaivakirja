@@ -66,7 +66,41 @@ function TeacherProfilePage() {
     mutationFn: () => userService.changePassword(currentPassword, newPassword),
     onError: (error) => {
       console.error("Error updating password:", error);
-      addToast("Virhe päivitettäessä salasanaa", { style: "error" });
+
+      let errorMessage = "Virhe päivitettäessä salasanaa.";
+
+      if (error.response) {
+        // the code looks weird but it matches the backend..
+        switch (error.response.status) {
+          case 400:
+            if (
+              error.response.data.message ===
+              "New password cannot be the same as the old password"
+            ) {
+              errorMessage = "Uusi salasana ei voi olla sama kuin vanha.";
+            } else if (error.response.data.errors) {
+              errorMessage =
+                "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron";
+            } else {
+              errorMessage = "Virheellinen pyyntö. Tarkista syötetyt tiedot.";
+            }
+            break;
+          case 401:
+            errorMessage = "Vanha salasana on virheellinen.";
+            break;
+          case 404:
+            errorMessage = "Käyttäjää ei löytynyt.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      addToast(errorMessage, { style: "error" });
+      setNewPasswordError(errorMessage);
     },
     onSuccess: () => {
       addToast("Salasana päivitetty", { style: "success" });
@@ -170,14 +204,8 @@ function TeacherProfilePage() {
     }
   };
 
-  const handleCourseSegmentsUpdate = async () => {
-    setShowConfirmModal(true);
-    setAgreeStyle("");
-    setModalMessage(
-      `Haluatko varmasti tallentaa kurssin muutokset: ${updatedCourseSegments.map((segment) => " " + segment.name + " = " + segment.value)}?`
-    );
-    setContinueButton("Päivitä");
-    const handleUpdate = async () => {
+  const handleCourseSegmentsUpdate = () => {
+    const handleUserConfirmation = async () => {
       try {
         let updatedPositions = updatedCourseSegments.map((segment, index) => {
           return { ...segment, order_number: index + 1 };
@@ -188,11 +216,31 @@ function TeacherProfilePage() {
           style: "error",
         });
       }
-      addToast("Merkintöjen määrä vaatimus päivitetty", { style: "success" });
+      addToast("Muutokset tallennettu", { style: "success" });
       queryclient.invalidateQueries({ queryKey: ["courseSegments"] });
-      setShowConfirmModal(false);
     };
-    setHandleUserConfirmation(() => handleUpdate);
+    const modalText = (
+      <span>
+        Tarkista, että kurssien tiedot ovat
+        <br />
+        oikein ennen tallentamista:
+        <br />
+        <br />
+        {updatedCourseSegments.map((segment, index) => (
+          <span key={index}>
+            {segment.name}, {segment.value}
+            <br />
+          </span>
+        ))}
+      </span>
+    );
+
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: modalText,
+      agreeButtonText: "Tallenna",
+      declineButtonText: "Peruuta",
+    });
   };
 
   const handleAccountDelete = () => {
@@ -237,30 +285,36 @@ function TeacherProfilePage() {
     }
   };
 
-  const handleSegmentDelete = async (segment) => {
-    setShowConfirmModal(true);
-    setAgreeStyle("red");
-    setModalMessage(
-      `Haluatko varmasti poistaa segmentin <br>
-      nimi: ${segment.name} Vaaditut merkinnät: ${segment.value}? 
-`
-    );
-    setContinueButton("Poista");
-
+  const handleSegmentDelete = (segment) => {
     const handleUserConfirmation = async () => {
       try {
         await courseService.deleteCourseSegment(segment.id);
-        addToast("Segmentti poistettu", { style: "success" });
+        addToast("Kurssisegmentti poistettu", { style: "success" });
         queryclient.invalidateQueries({ queryKey: ["courseSegments"] });
       } catch (error) {
-        addToast("Virhe poistettaessa segmenttiä", { style: "error" });
+        addToast("Virhe poistettaessa kurssisegmenttiä", { style: "error" });
       }
-      setShowConfirmModal(false);
     };
-    setHandleUserConfirmation(() => handleUserConfirmation);
-  };
-  // Drag and drop segment sorting functions
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa kurssisegmentin
+        <br />
+        <strong>{segment.name}</strong>?
+        <br />
+        Poisto on peruuttamaton eikä vaadi erillistä tallennusta.
+      </span>
+    );
 
+    openConfirmModal({
+      onAgree: handleUserConfirmation,
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+    });
+  };
+
+  // Drag and drop segment sorting functions
   class MyPointerSensor extends PointerSensor {
     static activators = [
       {
@@ -397,14 +451,14 @@ function TeacherProfilePage() {
             </button>
           ) : (
             <button
-              className="border text-iconGray rounded-md IconBox bg-bgSecondary border-bgSecondary hover:border-borderPrimary"
+              className="border text-iconGray hover:text-primaryColor rounded-md IconBox bg-bgSecondary border-bgSecondary hover:border-borderPrimary"
               onClick={() => setIsEditing(true)}
             >
               <FiEdit3 />
             </button>
           )}
           <button
-            className="border rounded-md IconBox bg-bgSecondary text-btnRed border-bgSecondary hover:border-borderPrimary"
+            className="border rounded-md IconBox bg-bgSecondary hover:text-red-700 text-btnRed border-bgSecondary hover:border-borderPrimary"
             onClick={() => handleSegmentDelete(segment)}
           >
             <FiTrash2 />
@@ -420,7 +474,9 @@ function TeacherProfilePage() {
   );
 
   const inputClass =
-    "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
+    "text-lg text-textPrimary border-borderPrimary border rounded-md p-1 bg-bgGray focus-visible:outline-none focus-visible:border-primaryColor";
+  const disabledInputClass =
+    "text-lg text-textPrimary border-borderPrimary disabled:text-opacity-70 border rounded-md p-1 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
 
   if (profileDataLoading || !courseSegments) {
     return (
@@ -438,7 +494,7 @@ function TeacherProfilePage() {
               <h1 className="text-xl">Kurssin tiedot</h1>
               <small className="text-textSecondary">
                 Voit luoda uuden segmentin, muokata olemassa olevia segmenttejä
-                tai muuttaa näiden järjestystä vetämällä ja pudottamalla niitä
+                tai muuttaa näiden järjestystä vetämällä ja pudottamalla niitä. Poisto on peruuttamaton, mutta muut muutokset astuvat voimaan vasta tallennuksen jälkeen.
               </small>
             </div>
 
@@ -565,11 +621,7 @@ function TeacherProfilePage() {
                 name="name"
                 disabled
                 value={profileData.first_name + " " + profileData.last_name}
-                className={cc(
-                  inputClass,
-                  "cursor-not-allowed",
-                  "disabled:text-opacity-70"
-                )}
+                className={cc(disabledInputClass)}
               />
             </form>
 
@@ -581,8 +633,9 @@ function TeacherProfilePage() {
                 type="email"
                 name="email"
                 value={updatedEmail}
+                disabled
                 onChange={(e) => setUpdatedEmail(e.target.value)}
-                className={cc(inputClass, "disabled:text-opacity-80")}
+                className={disabledInputClass}
               />
               <small className="text-red-500">{emailError}</small>
               <button
@@ -622,7 +675,7 @@ function TeacherProfilePage() {
                   autoComplete="current-password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className={cc(inputClass, "disabled:text-opacity-80")}
+                  className={cc(inputClass, "px-2 bg-bgGray")}
                 />
                 <small className="text-red-500">{passwordError}</small>
               </div>

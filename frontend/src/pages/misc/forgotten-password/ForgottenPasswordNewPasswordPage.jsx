@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useState, useEffect } from "react";
 import userService from "../../../services/userService";
 import { useLocation } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const ForgottenPasswordNewPasswordPage = () => {
   const [password, setPassword] = useState("");
@@ -155,9 +157,16 @@ const ForgottenPasswordNewPasswordPage = () => {
 
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center  h-screen w-screen">
-      <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
-        <div className="bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
-          Salasanan palautus
+      <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+      <div className=" relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
+          <p>Salasanan palautus</p>
+
+          <Link
+            to="/LoginPage"
+            className="absolute bottom-1/2 translate-y-1/2 left-5 text-3xl"
+          >
+            <FiArrowLeft />
+          </Link>
         </div>
         <form
           onSubmit={handleSend}
@@ -205,7 +214,7 @@ const ForgottenPasswordNewPasswordPage = () => {
             )}
           </div>
           <button
-            className="bg-primaryColor text-bgPrimary w-full h-10 rounded-md"
+            className="bg-primaryColor cursor-pointer text-bgPrimary w-full py-2 hover:bg-hoverPrimary border-2 border-borderPrimary rounded-md"
             type="submit"
             disabled={!isFormValid()}
           >

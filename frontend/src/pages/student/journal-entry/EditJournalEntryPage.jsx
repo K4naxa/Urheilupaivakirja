@@ -12,7 +12,7 @@ const inputContainer =
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const EditJournalEntryPage = ({ onClose, entryId }) => {
+const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
   const { openConfirmModal } = useConfirmModal();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -64,14 +64,39 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     mutationFn: () => journalService.editJournalEntry(journalEntryData),
     // If the mutation fails, roll back to the previous value
     onError: (error) => {
-      console.error("Error adding journal entry:", error);
-      addToast("Virhe tallennettaessa muutoksia", { style: "error" });
+      console.error("Error updating journal entry:", error);
+
+      let errorMessage = "Virhe päivitettäessä merkintää.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista syötetyt tiedot ja yritä uudelleen.";
+            break;
+          case 403:
+            errorMessage = "Sinulla ei ole oikeuksia muokata tätä merkintää.";
+            break;
+          case 404:
+            errorMessage = "Merkintää ei löytynyt.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+
+      addToast(errorMessage, { style: "error" });
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
       console.log("Invalidating studentData query");
 
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      queryClient.refetchQueries(["studentData"], { exact: true });
       console.log("adding toast");
 
       addToast("Merkintä päivitetty", { style: "success" });
@@ -95,14 +120,6 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     },
   });
 
-  // Journal data for matching
-  const {
-    data: journalEntriesData,
-    isFetching: journalEntriesDataLoading,
-    isError: journalEntriesDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
-  });
 
   // Options data for dropdowns
   const {
@@ -131,14 +148,14 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData.journal_entries
+      studentData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === journalEntryData.date) || [];
     return filteredEntries;
-  }, [journalEntriesData, journalEntryData.date]);
+  }, [studentData, journalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
@@ -174,7 +191,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     }
 
     try {
-       editJournalEntry.mutate({ journalEntryData });
+      editJournalEntry.mutate({ journalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
@@ -461,18 +478,18 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
     }
   }
 
-  if (optionsError || journalEntriesDataError) {
+  if (optionsError) {
     console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 
-  if (optionsLoading || journalEntriesDataLoading || journalEntryisFetching) {
+  if (optionsLoading || journalEntryisFetching) {
     console.log("is loading");
     return <p>Loading...</p>;
   }
 
-  if (journalEntryError || optionsError || journalEntriesDataError) {
+  if (journalEntryError || optionsError) {
     console.error("Error fetching journal entry:", journalEntryError);
     return <p>Error: {journalEntryError.message || "Unknown error"}</p>;
   }
@@ -608,7 +625,7 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.id === 1
-                        ? journalEntriesData.sport_name
+                        ? studentData.sport_name
                         : category.name}
                     </option>
                   ))}
@@ -647,19 +664,35 @@ const EditJournalEntryPage = ({ onClose, entryId }) => {
               )}
             </label>
             {showDetails && (
-              <textarea
-                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
-                onChange={changeHandler}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.stopPropagation();
-                  }
-                }}
-                type="text"
-                name="details"
-                id="details-textarea"
-                value={journalEntryData.details}
-              />
+              <div className="relative w-full">
+                <textarea
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
+                  onChange={changeHandler}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.stopPropagation();
+                    }
+                  }}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={journalEntryData.details}
+                  rows={2}
+                  maxLength={200}
+                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  required
+                ></textarea>
+                <p
+                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${journalEntryData.details.length === 200 ? "100" : "40"} ${
+                    journalEntryData.details.length === 200
+                      ? "text-red-500 bg-bgPrimary z-10"
+                      : "text-textPrimary"
+                  }`}
+                  style={{ pointerEvents: "none" }} // Make sure it doesn't interfere with textarea interactions
+                >
+                  {journalEntryData.details.length}/200
+                </p>
+              </div>
             )}
           </div>
 
