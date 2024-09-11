@@ -12,3 +12,4 @@ Docker
 */readme.md
 */env_local-template
 backend/tests/
+.env
