@@ -765,7 +765,7 @@ function TeacherHome() {
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
-        <TeacherHeatmapTooltip />
+        <TeacherHeatmapTooltip/>
 
         {/* filtering controls */}
         <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
