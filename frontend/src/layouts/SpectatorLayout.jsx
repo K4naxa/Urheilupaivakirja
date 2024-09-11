@@ -32,15 +32,6 @@ const SpectatorLayout = () => {
               <img src={siteLogo} alt="site logo" className="w-8 h-8" />
               Urheilupäiväkirja
             </Link>
-
-            <NavLink
-              to="/vierailija/tilastot/"
-              id="statisticsLink"
-              className={linkClass}
-            >
-              <FiBarChart2 size={iconSize} />
-              Tilastot
-            </NavLink>
           </div>
         </nav>
         <div className="flex items-center gap-8">
@@ -115,21 +106,10 @@ const SpectatorLayout = () => {
         className={`bg-bgPrimary shadow-upper-shadow fixed left-0 bottom-0 flex h-16 py-8 w-full items-center text-xl md:hidden z-10`}
         id="mobile-header"
       >
-        <nav id="top-nav" className="grid w-full grid-cols-3 gap-4 ">
+        <nav id="top-nav" className="grid w-full grid-cols-2 gap-4 ">
           <NavLink to="/" end className={linkClass}>
             <FiHome size={iconSize} />
             <p className={linkTextClass}>Etusivu</p>
-          </NavLink>
-          <NavLink
-            to="/vierailija/tilastot"
-            className={linkClass}
-            onClick={() => {
-              setShowMenu(false);
-              setShowControlPanel(false);
-            }}
-          >
-            <FiBarChart2 size={iconSize} />
-            <p className={linkTextClass}>Tilastot</p>
           </NavLink>
 
           <button

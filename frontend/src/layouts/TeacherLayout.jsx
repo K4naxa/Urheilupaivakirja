@@ -71,15 +71,6 @@ const TeacherLayout = () => {
                 <FiGrid size={iconSize} />
                 Hallinta
               </NavLink>
-
-              <NavLink
-                to="/opettaja/tilastot/"
-                id="statisticsLink"
-                className={linkClass}
-              >
-                <FiBarChart2 size={iconSize} />
-                Tilastot
-              </NavLink>
             </div>
           </nav>
           <div className="flex items-center gap-8">
@@ -320,17 +311,6 @@ const TeacherLayout = () => {
               >
                 <FiUser size={iconSize} />
                 <p className={linkTextClass}>Profiili</p>
-              </NavLink>
-              <NavLink
-                to="/opettaja/tilastot"
-                className={linkClass}
-                onClick={() => {
-                  setShowMenu(false);
-                  setShowControlPanel(false);
-                }}
-              >
-                <FiBarChart2 size={iconSize} />
-                <p className={linkTextClass}>Tilastot</p>
               </NavLink>
               <button
                 className={linkClass}
