@@ -16,8 +16,8 @@ export const BigModalProvider = ({ children }) => {
   const [isBigModalOpen, setBigModalOpen] = useState(false);
   const [bigModalContent, setBigModalContent] = useState(null);
 
-  const openBigModal = (type, payload) => {
-    const { date = null, studentData = null } = payload;
+  const openBigModal = (type, payload = {}) => {
+    const { date = null, studentData = null, entryId = null } = payload;
     let content;
     switch (type) {
       case "newJournalEntry":
@@ -52,7 +52,7 @@ export const BigModalProvider = ({ children }) => {
           content = (
             <EditNewsEntryPage
               onClose={closeBigModal}
-              entryId={payload.entryId}
+              entryId={entryId}
             />
           );
           break;

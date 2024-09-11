@@ -222,7 +222,8 @@ function TeacherProfilePage() {
     const modalText = (
       <span>
         Tarkista, että kurssien tiedot ovat
-        <br />oikein ennen tallentamista:
+        <br />
+        oikein ennen tallentamista:
         <br />
         <br />
         {updatedCourseSegments.map((segment, index) => (

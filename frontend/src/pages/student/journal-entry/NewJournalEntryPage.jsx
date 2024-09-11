@@ -42,7 +42,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => {     console.time("addJournalEntry"); return journalService.postJournalEntry(newJournalEntryData)},
+    mutationFn: () => {  journalService.postJournalEntry(newJournalEntryData)},
     onError: (error) => {
       console.error("Error posting new journal entry:", error);
 
@@ -66,7 +66,6 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      console.timeEnd("addJournalEntry");
       addToast("Merkintä lisätty", { style: "success" });
       queryClient.invalidateQueries(["studentData"]);
       onClose();
