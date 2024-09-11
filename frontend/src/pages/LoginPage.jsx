@@ -2,6 +2,7 @@ import userService from "../services/userService";
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+
 function LoginPage() {
   const [errors, setErrors] = useState({
     errorMessage: "",
@@ -66,10 +67,9 @@ function LoginPage() {
       return;
     }
     try {
-      const user = await userService.login(email, password);
+      const user = await userService.login(email, password, stayLoggedIn);
       setEmail("");
       setPassword("");
-
       login(user);
     } catch (error) {
       console.log(error);
@@ -81,7 +81,7 @@ function LoginPage() {
 
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center  h-screen w-screen">
-      <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+      <div className="bg-bgSecondary border-borderPrimary flex h-full  w-full sm:max-w-[500px] flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md">
           Kirjautuminen
         </div>

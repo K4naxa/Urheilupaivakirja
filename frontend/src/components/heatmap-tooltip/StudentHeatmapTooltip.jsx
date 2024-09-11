@@ -1,30 +1,23 @@
 import {
-  FiBookOpen,
   FiPlusCircle,
   FiEdit3,
   FiSun,
   FiSunrise,
   FiSunset,
-  FiArrowLeft,
-  FiChevronUp,
-  FiChevronDown,
 } from "react-icons/fi";
 import dayjs from "dayjs";
 import { Tooltip } from "react-tooltip";
-import { isSameDay } from "date-fns";
-import React, { useState } from "react";
-import { useJournalModal } from "../../hooks/useJournalModal";
+import React, { useState, useMemo } from "react";
+import { useBigModal } from "../../hooks/useBigModal";
 import { useAuth } from "../../hooks/useAuth";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
-const StudentHeatmapTooltip = () => {
-  const { openBigModal } = useJournalModal();
+const StudentHeatmapTooltip = ({ studentData }) => {
+  const { openBigModal } = useBigModal();
   const { user } = useAuth();
-  const { tooltipContent } = useHeatmapContext();
-  const { tooltipUser } = useHeatmapContext();
-  const { tooltipDate } = useHeatmapContext();
-
-  const TooltipContent = ({ user, openBigModal }) => {
+  const { tooltipContent, tooltipUser, tooltipDate } = useHeatmapContext();
+  
+  const TooltipContent = React.memo(({ user, openBigModal }) => {
     const [expandedEntry, setExpandedEntry] = useState(null);
     const dayEntries = tooltipContent;
     const day = tooltipDate;
@@ -47,14 +40,26 @@ const StudentHeatmapTooltip = () => {
     const renderTimeOfDayIcon = (timeOfDay) => {
       switch (timeOfDay) {
         case "Aamu":
-          return <FiSunrise className="text-lg" title="Aamu" />;
+          return <FiSunrise className="text-xl" title="Aamu" />;
         case "Päivä":
-          return <FiSun className="text-lg" title="Päivä" />;
+          return <FiSun className="text-xl" title="Päivä" />;
         case "Ilta":
-          return <FiSunset className="text-lg" title="Ilta" />;
+          return <FiSunset className="text-xl" title="Ilta" />;
         default:
           return null;
       }
+    };
+
+    const convertTime = (totalMinutes) => {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      if (hours === 0) {
+        return `${minutes}min`;
+      }
+      if (minutes === 0) {
+        return `${hours}h`;
+      }
+      return `${hours}h ${minutes}min`;
     };
 
     const allEntriesAreExercises = dayEntries?.every(
@@ -69,66 +74,109 @@ const StudentHeatmapTooltip = () => {
       }
     };
 
-    dayEntries.sort((a, b) => a.time_of_day_id - b.time_of_day_id);
+    const sortedDayEntries = useMemo(() => {
+      return dayEntries
+        ?.slice()
+        .sort((a, b) => a.time_of_day_id - b.time_of_day_id);
+    }, [dayEntries]);
+
+    console.log("SortedEntries", sortedDayEntries);
+    console.log("TooltipContent", tooltipContent)
 
     return (
       <>
-        <div className="flex text-textPrimary flex-col gap-1">
-          <h2 className="text-sm  text-center font-semibold mt-1">
+        <div className="flex flex-col gap-1 text-textPrimary">
+          <h2 className="mt-1 text-sm font-semibold text-center">
             {dayjs(day).format("DD.MM.YYYY")}
           </h2>
 
-          {dayEntries?.length > 0 && (
+          {sortedDayEntries?.length > 0 && (
             <>
               {allEntriesAreExercises ? (
-                <table className="w-full text-right text-textPrimary">
-                  <tbody>
-                    {dayEntries.map((entry) => (
-                      <React.Fragment key={entry.id}>
-                        <tr
-                          className="hover:bg-bgGray cursor-pointer"
-                          onClick={() => toggleDetails(entry.id)}
-                        >
-                          <td className="flex justify-center px-2">
+                <div className="space-y-1 border-t border-borderPrimary">
+                  {sortedDayEntries.map((entry, index) => (
+                    <div key={entry.id}>
+                      <div
+                        className={`p-1 bg-bgSecondary hover:bg-bgPrimary  cursor-pointer ${
+                          index > 0 ? "border-t border-borderPrimary" : ""
+                        }`}
+                        onClick={() => toggleDetails(entry.id)}
+                      >
+                        {/* Header Row */}
+                        <div className="flex justify-between items-center">
+                          {/* Time of Day Icon (stick to the right) */}
+                          <div className="p-2 text-center">
                             {renderTimeOfDayIcon(entry.time_of_day_name)}
-                          </td>
-                          <td className="px-2 ">
-                            {entry.workout_category_name}
-                          </td>
-                          <td className="px-2">
-                            {entry.length_in_minutes} min
-                          </td>
+                          </div>
+                          {/* Main content (centered) */}
+                          <div className="flex flex-col justify-center items-center w-full px-1">
+                            <span className="text font-semibold text-textPrimary">
+                              {(() => {
+                                if (
+                                  entry.workout_type_id === 1 ||
+                                  entry.workout_type_id === 2
+                                ) {
+                                  return entry.workout_type_name;
+                                }
+                                if (entry.workout_category_id === 1) {
+                                  return user.sport;
+                                }
+                                if (entry.workout_type_id === 3) {
+                                  return entry.workout_category_name;
+                                }
+                                return null;
+                              })()}
+                            </span>
+
+                            {/* Updated row with length and intensity */}
+                            <div className="flex justify-center space-x-1">
+                              <span className="text-sm text-textPrimary">
+                                {convertTime(entry.length_in_minutes)},
+                              </span>
+
+                              {/* convert intensity to lower case */}
+                              <span className="text-sm text-textPrimary">
+                                {entry.workout_intensity_name.toLowerCase()}
+                              </span>
+                            </div>
+                          </div>
+
                           {user.role === 3 && (
-                            <td className="px-2">
-                              <button
-                                className="flex justify-center"
-                                onClick={(e) => {
-                                  e.stopPropagation(); // to prevent row toggle
-                                  openBigModal("edit", { entryId: entry.id });
-                                  simulateClickOutside();
-                                }}
-                              >
-                                <FiEdit3 className="text-textPrimary hover:text-primaryColor" />
-                              </button>
-                            </td>
+                            <button
+                              className="flex justify-center items-center p-2 hover:text-primaryColor"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent row toggle
+                                openBigModal("editJournalEntry", {
+                                  entryId: entry.id,
+                                  studentData,
+                                });
+                                simulateClickOutside();
+                              }}
+                            >
+                              <FiEdit3 className=" text-xl" />
+                            </button>
                           )}
-                        </tr>
+                        </div>
+
+                        {/* Expanded Details */}
                         {expandedEntry === entry.id && (
-                          <tr>
-                            <td colSpan={5}>
-                              <div>
-                                <p>...</p>
-                              </div>
-                            </td>
-                          </tr>
+                          <div className="space-y-3 pt-1 text-center">
+                            <div className="flex justify-center">
+                              <p className="text-textSecondary text-center">
+                                {entry.details
+                                  ? entry.details
+                                  : "Ei lisätietoja"}
+                              </p>
+                            </div>
+                          </div>
                         )}
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : (
-                dayEntries.map((entry) => (
-                  <div key={entry.id} className="text-center">
+                sortedDayEntries.map((entry) => (
+                  <div key={entry.id} className="text-center pt-2 border-t border-borderPrimary">
                     <p>
                       {entry.entry_type_id === 3
                         ? "Sairauspäivä"
@@ -144,15 +192,15 @@ const StudentHeatmapTooltip = () => {
 
           <div className="flex justify-center gap-2 py-1">
             {user.role === 3 &&
-              (dayEntries?.length > 0 ? (
+              (sortedDayEntries?.length > 0 ? (
                 allEntriesAreExercises ? (
                   <>
-                
                     <button
-                      className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center hover:bg-hoverPrimary"
+                      className="flex items-center p-2  text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
                       onClick={() => {
-                        openBigModal("new", {
+                        openBigModal("newJournalEntry", {
                           date: dayjs(day).format("YYYY-MM-DD"),
+                          studentData,
                         });
                         simulateClickOutside();
                       }}
@@ -163,9 +211,12 @@ const StudentHeatmapTooltip = () => {
                   </>
                 ) : (
                   <button
-                    className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center hover:bg-hoverPrimary"
+                    className="flex items-center p-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
                     onClick={() => {
-                      openBigModal("edit", { entryId: dayEntries[0].id });
+                      openBigModal("editJournalEntry", {
+                        entryId: sortedDayEntries[0].id,
+                        studentData,
+                      });
                       simulateClickOutside();
                     }}
                   >
@@ -175,10 +226,11 @@ const StudentHeatmapTooltip = () => {
                 )
               ) : (
                 <button
-                  className=" px-4 py-2 bg-primaryColor text-white rounded cursor-pointer flex items-center hover:bg-hoverPrimary"
+                  className="flex items-center p-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
                   onClick={() => {
-                    openBigModal("new", {
+                    openBigModal("newJournalEntry", {
                       date: dayjs(day).format("YYYY-MM-DD"),
+                      studentData,
                     });
                     simulateClickOutside();
                   }}
@@ -191,12 +243,11 @@ const StudentHeatmapTooltip = () => {
         </div>
       </>
     );
-  };
-
+  });
   return (
     <Tooltip
       anchorSelect=".clickableCalendarDay"
-      className="z-10 nice-shadow border border-borderPrimary"
+      className="z-10 border nice-shadow border-borderPrimary"
       place="bottom"
       openOnClick={true}
       clickable={true}

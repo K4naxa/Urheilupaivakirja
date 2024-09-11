@@ -7,10 +7,10 @@ import { MainContextProvider } from "./hooks/mainContext.jsx";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 //import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastProvider } from "./hooks/toast-messages/ToastProvider";
-import { JournalModalProvider } from "./hooks/useJournalModal.jsx";
+import { BigModalProvider } from "./hooks/useBigModal.jsx";
 import { DateModalProvider } from "./hooks/useDateModal.jsx";
 import { HeatmapTooltipContextProvider } from "./hooks/useHeatmapContext.jsx";
-
+import { ConfirmModalProvider } from "./hooks/useConfirmModal.jsx";
 import App from "./App.jsx";
 import "./index.css";
 
@@ -20,23 +20,23 @@ import "./hooks/toast-messages/toast.css";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-
   <QueryClientProvider client={queryClient}>
     <MainContextProvider>
       <ToastProvider>
-        <JournalModalProvider>
-          <HeatmapTooltipContextProvider>
-            <DateModalProvider>
-              <RouterProvider router={router}>
-                <AuthProvider>
-                  <App />
-                </AuthProvider>
-              </RouterProvider>
-            </DateModalProvider>
-          </HeatmapTooltipContextProvider>
-        </JournalModalProvider>
+        <ConfirmModalProvider>
+          <BigModalProvider>
+            <HeatmapTooltipContextProvider>
+              <DateModalProvider>
+                <RouterProvider router={router}>
+                  <AuthProvider>
+                    <App />
+                  </AuthProvider>
+                </RouterProvider>
+              </DateModalProvider>
+            </HeatmapTooltipContextProvider>
+          </BigModalProvider>
+        </ConfirmModalProvider>
       </ToastProvider>
     </MainContextProvider>
   </QueryClientProvider>
-
 );

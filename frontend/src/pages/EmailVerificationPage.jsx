@@ -1,8 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import OTPInput from "../components/OTPInput";
 import { useToast } from "../hooks/toast-messages/useToast";
 import { useEffect } from "react";
-import userService from "../services/userService";
+import registerService from "../services/registerService";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { FiArrowLeft } from "react-icons/fi";
@@ -12,21 +12,46 @@ const EmailVerificationPage = () => {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Query to check if OTP already exists
+  const { data: otpExists } = useQuery({
+    queryKey: ["checkIfOTPExists"],
+    queryFn: () => registerService.checkIfOTPExists(),
+    enabled: !!user, // Run this query only if the user exists
+  });
+
   const {
     mutate: requestOTP,
     isError,
     error,
   } = useMutation({
-    mutationFn: () => userService.createEmailVerificationOTP(), // Ensure the mutation function takes necessary parameters, like user email
+    mutationFn: () => registerService.createEmailVerificationOTP(),
     onError: (error) => {
-      console.error("Error sending OTP:", error);
-      addToast(
-        "Virhe lähetettäessä vahvistuskoodia, ota yhteyttä ylläpitäjään",
-        { style: "error" }
-      );
+      if (error.response.status === 429) {
+        const waitTimeMs = error.response.data.wait_time;
+        const minutes = Math.floor(waitTimeMs / 1000 / 60);
+        const seconds = Math.floor((waitTimeMs / 1000) % 60);
+
+        const minuteString = `${minutes}m`;
+        var secondString;
+        if (seconds === 0) {
+          secondString = "";
+        } else {
+          secondString = `  ${seconds}s`;
+        }
+        addToast(
+          `Voit lähettää uuden vahvistuskoodin ${minuteString}${secondString} kuluttua.`,
+          { style: "error" }
+        );
+        return;
+      } else {
+        addToast(
+          "Virhe lähetettäessä vahvistuskoodia, ota yhteyttä ylläpitäjään",
+          { style: "error" }
+        );
+      }
     },
     onSuccess: () => {
-      addToast("Vahvistuskoodi lähetetty sähköpostiisi.", { style: "success" });
+      addToast("Vahvistuskoodi on lähetetty sähköpostiisi.", { style: "success" });
     },
   });
 
@@ -35,11 +60,10 @@ const EmailVerificationPage = () => {
     isError: verifyIsError,
     error: verifyError,
   } = useMutation({
-    mutationFn: (otp) => userService.sendEmailVerificationOTP(otp),
-    onError: (error) => {
-      console.error("Error verifying OTP:", error);
+    mutationFn: (otp) => registerService.sendEmailVerificationOTP(otp),
+    onError: () => {
       addToast(
-        "Virhe vahvistaessa vahvistuskoodia, tarkista koodi tai yritä uudelleen",
+        "Virhe tarkistettaessa vahvistuskoodia, tarkista koodi tai yritä uudelleen",
         { style: "error" }
       );
     },
@@ -54,13 +78,13 @@ const EmailVerificationPage = () => {
   });
 
   useEffect(() => {
-    if (user && !user.emailVerified) {
+    if (user && !user.emailVerified && otpExists === false) {
       requestOTP();
     }
-  }, [user, requestOTP]);
+  }, [user, otpExists, requestOTP]);
 
   useEffect(() => {
-    if (user.email_verified) {
+    if (user?.email_verified) {
       switch (user.role) {
         case 1:
           navigate("/opettaja");
@@ -77,7 +101,7 @@ const EmailVerificationPage = () => {
 
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center h-screen w-screen">
-      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
+      <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
         <div className="relative bg-primaryColor text-white border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md ">
           Sähköpostin vahvistus
           <button

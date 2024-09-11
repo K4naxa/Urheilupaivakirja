@@ -41,7 +41,7 @@ const Text = ({ value, REQUIRED_COMPLETION }) => {
         Kurssi suoritus
       </text>
       <text
-        className="fill-textSecondary text-lg font-semibold"
+        className="text-lg font-semibold fill-textSecondary"
         x="50%"
         y="80%" // Adjust text position for half circle
         dominantBaseline="central"
@@ -53,18 +53,21 @@ const Text = ({ value, REQUIRED_COMPLETION }) => {
   );
 };
 
-const CourseCompletionBar = ({ value }) => {
-  const REQUIRED_COMPLETION = 300;
+const CourseComplitionBar = ({ student, courseSegments }) => {
   const [animatedPct, setAnimatedPct] = useState(0);
+  const value = student.total_entry_count;
+  const REQUIRED_COMPLETION = courseSegments
+    .map((segment) => segment.value)
+    .reduce((a, b) => a + b, 0);
 
   useEffect(() => {
     const percentage = (value / REQUIRED_COMPLETION) * 100;
     const pct = cleanPercentage(percentage);
     setTimeout(() => setAnimatedPct(pct), 100); // Slight delay for smoother animation
-  }, [value]);
+  }, [value, REQUIRED_COMPLETION]);
 
   return (
-    <div className="flex flex-col max-w-96 w-full rounded-md items-center justify-center p-4">
+    <div className="flex flex-col items-center justify-center w-full p-4 rounded-md max-w-96">
       <svg
         className="w-full h-full"
         viewBox="0 0 200 100" // Adjust viewBox for half circle
@@ -78,7 +81,7 @@ const CourseCompletionBar = ({ value }) => {
         </g>
         <Text value={value} REQUIRED_COMPLETION={REQUIRED_COMPLETION} />
       </svg>
-      <p className="p-2 text-textSecondary text-center">
+      <p className="p-2 text-center text-textSecondary">
         Olet suorittanut kurssistasi{" "}
         {((value / REQUIRED_COMPLETION) * 100).toFixed(0)}%
       </p>
@@ -86,4 +89,4 @@ const CourseCompletionBar = ({ value }) => {
   );
 };
 
-export default CourseCompletionBar;
+export default CourseComplitionBar;

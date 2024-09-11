@@ -7,7 +7,7 @@ exports.up = function (knex) {
     table.boolean("email_verified").notNullable().defaultTo(false);
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("last_login_at");
-
+    table.integer("token_version").defaultTo(0);
     table.foreign("role_id").references("roles.id").onDelete("CASCADE");
   });
 };

@@ -1,11 +1,11 @@
 import { FiBarChart2, FiEdit3 } from "react-icons/fi";
-import { useJournalModal } from "../hooks/useJournalModal";
+import { useBigModal } from "../hooks/useBigModal";
 import { useAuth } from "../hooks/useAuth";
 import dayjs from "dayjs";
 import cc from "../utils/cc";
 
 import { useMainContext } from "../hooks/mainContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { isSameMonth, isSameYear } from "date-fns";
 
 const convertTime = (totalMinutes) => {
@@ -20,15 +20,18 @@ const convertTime = (totalMinutes) => {
   return `${hours}h ${minutes}min`;
 };
 
-const RecentJournalEntry = ({ entry }) => {
+const RecentJournalEntry = ({ entry, user, studentData }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
-  const { openBigModal } = useJournalModal();
+  const { openBigModal } = useBigModal();
 
-  if (isOpen)
-    return (
+  return (
+    <div className="hover:bg-hoverDefault bg-bgSecondary text-sm sm:text-base flex">
       <div
-        className=" grid grid-cols-5 md:grid-cols-6 md:grid-rows-2 gap-x-1 md:gap-x-4 px-2 items-center hover:bg-hoverDefault"
+        className={cc(
+          "grid items-center pr-1 pl-2 py-2 sm:p-2 grid-cols-4 md:grid-cols-5 gap-0.5 md:gap-4 md:gap-y-0",
+          user.role === 1 || user.role === 2 ? "w-full" : "w-[calc(100%-32px)]",
+          isOpen ? "row-span-2" : ""
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* Date */}
@@ -37,106 +40,133 @@ const RecentJournalEntry = ({ entry }) => {
         </p>
         <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
 
-        <p className="">{entry.workout_category_name}</p>
+        <p className="">
+          {entry.workout_category_id === 1
+            ? user?.sport
+            : entry.workout_category_name}
+        </p>
 
-        {/* WorkoutLenght */}
+        {/* Workout Length */}
         <p>
-          {" "}
           {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
         </p>
+
         {/* Intensity */}
         <p className="hidden md:flex">{entry.workout_intensity_name}</p>
+
         {/* Type of entry (sick, rest, ..) */}
-        <p
-          className={cc(
-            "flex w-24 h-8 justify-center items-center rounded-md",
-            entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
-            entry.entry_type_id === 2 && "bg-bgRest text-textRest",
-            entry.entry_type_id === 3 && "bg-bgSick text-textSick"
-          )}
-        >
-          {entry.entry_type_name}
-        </p>
-
-        {/* Edit button only for student*/}
-        <div className="flex justify-end md:justify-center">
-          {user.role !== 1 && (
-            <button
-              onClick={() => openBigModal("edit", { entryId: entry.id })}
-              className="text-iconGray hover:text-primaryColor"
-            >
-              <FiEdit3 size={20} />
-            </button>
-          )}
-        </div>
-        <div className="col-span-6 flex justify-around w-full gap-4">
-          <p className="flex flex-col">
-            <span className="text-textSecondary">Ajankohta:</span>
-            {entry.time_of_day_name ? entry.time_of_day_name : "Ei ajankohtaa"}
-          </p>
-          <p className="flex flex-col">
-            <span className="text-textSecondary">Harjoitus tyyppi:</span>
-            {entry.workout_type_name ? entry.workout_type_name : "Ei tyyppiä"}
-          </p>
-          <p className="flex flex-col">
-            <span className="text-textSecondary">Lisätiedot:</span>
-            {entry.details ? entry.details : "Ei lisätietoja"}
-          </p>
-        </div>
-      </div>
-    );
-
-  return (
-    <div
-      className=" grid grid-cols-5 md:grid-cols-6 gap-1 md:gap-4 p-2 items-center hover:bg-hoverDefault"
-      onClick={() => setIsOpen(!isOpen)}
-    >
-      {/* Date */}
-      <p className="hidden md:flex">{dayjs(entry.date).format("DD.MM.YYYY")}</p>
-      <p className="flex md:hidden">{dayjs(entry.date).format("DD.MM")}</p>
-
-      <p className="">{entry.workout_category_name}</p>
-
-      {/* WorkoutLenght */}
-      <p>
-        {" "}
-        {entry.entry_type_id === 1 && convertTime(entry.length_in_minutes)}
-      </p>
-      {/* Intensity */}
-      <p className="hidden md:flex">{entry.workout_intensity_name}</p>
-      {/* Type of entry (sick, rest, ..) */}
-      <p
-        className={cc(
-          "flex w-24 h-8 justify-center items-center rounded-md",
-          entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
-          entry.entry_type_id === 2 && "bg-bgRest text-textRest",
-          entry.entry_type_id === 3 && "bg-bgSick text-textSick"
-        )}
-      >
-        {entry.entry_type_name}
-      </p>
-      {/* Edit button only for student*/}
-      <div className="flex justify-end md:justify-center">
-        {user.role !== 1 && (
-          <button
-            onClick={() => openBigModal("edit", { entryId: entry.id })}
-            className="text-iconGray hover:text-primaryColor"
+        <div className="flex justify-between gap-1 relative">
+          <p
+            className={cc(
+              "flex min-w-20 h-8 justify-center items-center rounded-md pr-1 pl-2",
+              entry.entry_type_id === 1 && "bg-bgExercise text-textExercise",
+              entry.entry_type_id === 2 && "bg-bgRest text-textRest",
+              entry.entry_type_id === 3 && "bg-bgSick text-textSick"
+            )}
           >
-            <FiEdit3 size={20} />
-          </button>
+            {entry.entry_type_name}
+          </p>
+
+          {user.role !== 1 && (
+            <div
+              className="flex-shrink-0 w-1 sm:ml-auto relative"
+              // On smaller screens (`ml-2` keeps it close to the <p> element)
+              // On larger screens (`ml-auto` pushes it as far to the right as possible)
+            >
+              <button
+                onClick={(event) => {
+                  event.stopPropagation();
+                  openBigModal("editJournalEntry", {
+                    entryId: entry.id,
+                    studentData,
+                  });
+                }}
+                className="absolute sm:right-[-28px] top-[6px] text-iconGray hover:text-primaryColor"
+              >
+                <FiEdit3 size={20} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {isOpen && (
+          <div className="flex justify-around w-full col-span-4 md:col-span-5 text-sm ">
+            {entry.entry_type_id === 1 && (
+              <>
+                <p className="flex flex-col w-full pr-0.5 sm:pr-1 md:w-1/4">
+                  <span className="text-textSecondary">Ajankohta:</span>
+                  {entry.time_of_day_name
+                    ? entry.time_of_day_name
+                    : "Ei ajankohtaa"}
+                </p>
+                <p className="flex flex-col w-full pr-0.5 sm:pr-1 md:w-1/4">
+                  <span className="text-textSecondary">Harjoitus tyyppi:</span>
+                  {entry.workout_type_name
+                    ? entry.workout_type_name
+                    : "Ei tyyppiä"}
+                </p>
+              </>
+            )}
+            <p
+              className={`flex flex-col w-full ${entry.entry_type_id === 1 ? "md:w-1/2" : "md:w-full"}`}
+            >
+              <span className="text-textSecondary">Lisätiedot:</span>
+              <span className="whitespace-normal break-words">
+                {entry.details ? entry.details : "Ei lisätietoja"}
+              </span>
+            </p>
+          </div>
         )}
       </div>
     </div>
   );
 };
+
 ////  const { data: journal } = useQuery({queryKey:['studentJournal']});
 
-const RecentJournalEntries = ({ journal }) => {
+const RecentJournalEntries = ({ studentData }) => {
   const { showDate } = useMainContext();
   const [filteredJournal, setFilteredJournal] = useState([]);
   const [selectedTime, setSelectedTime] = useState("Month");
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
+  const scrollContainerRef = useRef(null);
+  const { user } = useAuth();
 
-  if (journal.journal_entries) journal = journal.journal_entries;
+  useEffect(() => {
+    const element = scrollContainerRef.current;
+    if (!element) return;
+
+    const checkScrollbar = () => {
+      const hasVerticalScrollbar = element.offsetWidth > element.clientWidth;
+      const width = hasVerticalScrollbar
+        ? element.offsetWidth - element.clientWidth
+        : 0;
+      setScrollbarWidth(width);
+    };
+
+    // Initialize the observer
+    const observer = new MutationObserver(checkScrollbar);
+    observer.observe(element, {
+      childList: true, // observe direct children additions/removals
+      subtree: true, // observe all descendants
+      attributes: true, // observe attributes changes
+      characterData: true, // observe text changes within children
+    });
+
+    // Perform initial check and setup resize listener
+    checkScrollbar();
+    window.addEventListener("resize", checkScrollbar);
+
+    return () => {
+      window.removeEventListener("resize", checkScrollbar);
+      observer.disconnect(); // Clean up the observer when the component unmounts
+    };
+  }, []);
+
+  console.log("user", user);
+
+  let journal;
+  if (studentData.journal_entries) journal = studentData.journal_entries;
 
   useEffect(() => {
     if (journal) {
@@ -162,22 +192,24 @@ const RecentJournalEntries = ({ journal }) => {
     }
   }, [journal, selectedTime, showDate]);
 
+  console.log(scrollbarWidth);
+
   return (
-    <div className="p-4 rounded-md border border-borderPrimary">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-2 items-center">
+    <div className="p-4 border rounded-md border-borderPrimary">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
           <p className="IconBox">
             <FiBarChart2 />
           </p>
-          <h2 className="text-lg font-medium">Omat merkinnät</h2>
+          <h2 className="text-lg">
+            {user.role === 3 ? "Omat merkinnät" : "Merkinnät"}
+          </h2>
         </div>
         <div>
           <select
             name="timeFilter"
             id="selectTimeFilter"
-            className="bg-bgSecondary border border-borderPrimary
-               text-textSecondary p-2 rounded-md hover:cursor-pointer
-                focus-visible:outline-none focus:bg-bgPrimary hover:bg-bgPrimary"
+            className="p-2 border rounded-md bg-bgSecondary border-borderPrimary text-textSecondary hover:cursor-pointer focus-visible:outline-none focus:bg-bgPrimary hover:bg-bgPrimary"
             value={selectedTime}
             onChange={(e) => setSelectedTime(e.target.value)}
           >
@@ -188,25 +220,48 @@ const RecentJournalEntries = ({ journal }) => {
         </div>
       </div>
       <div className="flex h-full overflow-y-auto">
-        <div className="w-full h-full  rounded-md  relative ">
-          <div className="grid grid-cols-5 md:grid-cols-6 gap-4 p-2 bg-bgGray text-textSecondary border-b border-borderPrimary">
-            <span className="hidden md:flex">Päivämäärä</span>
-            <span className="flex md:hidden">Pvm</span>
-            <span>Laji</span>
-            <span>Kesto</span>
-            <span className="hidden md:flex">Rankkuus</span>
-            <span>Tyyppi</span>
-            <span></span>
-          </div>
-          <div className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px] overflow-auto">
-            {filteredJournal.length === 0 && (
-              <p className="text-textSecondary text-center m-4">
-                Ei merkintöjä
-              </p>
-            )}
-            {filteredJournal?.map((entry) => (
-              <RecentJournalEntry key={entry.id} entry={entry} />
-            ))}
+        <div className="relative w-full h-full rounded-md ">
+          <div className="bg-bgGray text-textSecondary">
+            <div
+              className={cc(
+                "grid grid-cols-4 pl-2 pr-1 py-2 gap-0.5 md:gap-x-4 sm:pb-2 sm:pt-3 sm:px-2 border-b md:grid-cols-5 bg-bgGray text-textSecondary border-borderPrimary",
+                user.role === 1 || user.role === 2 ? "w-full" : ""
+              )}
+              style={{
+                width:
+                  user.role !== 1 && user.role !== 2
+                    ? `calc(100% - (32px + ${scrollbarWidth}px))`
+                    : "100%",
+              }}
+            >
+              <span className="hidden md:flex">Päivämäärä</span>
+              <span className="flex md:hidden">Pvm</span>
+              <span>Laji</span>
+              <span>Kesto</span>
+              <span className="hidden md:flex">Rankkuus</span>
+              <span>Tyyppi</span>
+              <span></span>
+            </div>
+            <div
+              ref={scrollContainerRef}
+              className="divide-y divide-borderPrimary flex flex-col h-full max-h-[240px]  overflow-y-auto overflow-x-hidden"
+            >
+              {filteredJournal.length === 0 && (
+                <div className="w-full h-full bg-bgSecondary">
+                  <p className="m-4 text-center text-textSecondary">
+                    Ei merkintöjä
+                  </p>
+                </div>
+              )}
+              {filteredJournal?.map((entry) => (
+                <RecentJournalEntry
+                  key={entry.id}
+                  user={user}
+                  studentData={studentData}
+                  entry={entry}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

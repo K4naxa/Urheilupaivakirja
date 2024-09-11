@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import HeatMap_Month from "../../components/Heatmaps/HeatMap_Month";
-import HeatMap_Year from "../../components/Heatmaps/HeatMap_Year";
+import { Tooltip } from "react-tooltip";
+import { useState } from "react";
+import HeatMap_Month from "../../components/heatmaps/HeatMap_Month";
+import HeatMap_Year from "../../components/heatmaps/HeatMap_Year";
 import RecentJournalEntries from "../../components/RecentJournalEntries";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useMainContext } from "../../hooks/mainContext";
@@ -25,30 +26,29 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 
-import { useJournalModal } from "../../hooks/useJournalModal";
+import { useBigModal } from "../../hooks/useBigModal";
 import WeekDayActivity from "../../components/charts/WeekDayActivity";
-import JournalActivityBar from "../../components/charts/JournalActivityBar";
-import CourseComplitionBar from "../../components/charts/CourseComplitionBar";
 import getMotivationQuoteOfTheDay from "../../utils/motivationQuotes";
-import userService from "../../services/userService";
+import { useOutletContext } from "react-router-dom";
+import courseService from "../../services/courseService";
+import cc from "../../utils/cc";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
-  const { openBigModal } = useJournalModal();
+  const { studentData, studentDataLoading, studentDataError } = useOutletContext();
+  const { openBigModal } = useBigModal();
+  const [tooltipContent, setTooltipContent] = useState(null);
+  console.log(studentData);
 
-  const {
-    data: studentData,
-    isLoading: studentDataLoading,
-    error: studentDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => userService.getStudentData(),
+  const { data: courseSegments, error: courseSegmentsError } = useQuery({
+    queryKey: ["courseSegments"],
+    queryFn: () => courseService.getCourseSegments(),
     staleTime: 15 * 60 * 1000,
   });
 
-  if (studentDataLoading) {
+  if (studentDataLoading || !courseSegments) {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex items-center justify-center">
         <LoadingScreen />
       </div>
     );
@@ -80,32 +80,98 @@ function StudentHome() {
       }
     });
 
-    return (activeDaysInMonth.size / monthDays.length) * 100;
+    return Math.round((activeDaysInMonth.size / monthDays.length) * 100) || 0;
   };
 
-  const calcJournalEntriesCount = () => {
-    return studentData.journal_entries.length;
-  };
+  const renderProgressionBar = ({ student }) => {
+    if (!courseSegments) return null;
 
-  if (studentDataError) {
+    let unUsedEntires = student.total_entry_count || 0;
+
+    const total_requirement = courseSegments.reduce(
+      (acc, segment) => acc + segment.value,
+      0
+    );
+
     return (
-      <div className="flex justify-center items-center w-full">
+      <div className="flex w-full h-5 gap-1">
+        {courseSegments.map((segment, index) => {
+          const segmentLength = (segment.value / total_requirement) * 100;
+          let segmentProgression = Math.min(
+            (unUsedEntires / segment.value) * 100,
+            100
+          );
+
+          if (segmentProgression < 0) segmentProgression = 0;
+
+          const TooltipInfo = {
+            name: segment.name,
+            requirement: segment.value,
+            unUsedEntires: Math.min(Math.max(unUsedEntires, 0), segment.value),
+            progression: Math.min(Math.max(segmentProgression, 0), 100),
+          };
+
+          unUsedEntires -= segment.value;
+
+          return (
+            <div
+              key={index}
+              className={cc(
+                "h-full segment hover:cursor-pointer border border-borderPrimary rounded-xl clickableCourseSegment bg-bgGray"
+              )}
+              style={{ width: `${segmentLength}%` }}
+              onClick={() => setTooltipContent(TooltipInfo)}
+              onMouseLeave={() => setTooltipContent(null)}
+            >
+              <div
+                className={cc(
+                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md",
+                  segmentProgression === 100 && "bg-green-500"
+                )}
+                style={{ width: `${segmentProgression}%` }}
+              ></div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const getSegmentTooltipContent = () => {
+    console.log(tooltipContent);
+    return (
+      <>
+        <div className="flex flex-col gap-2 p-2 w-42">
+          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
+          <span>Suoritettu: {tooltipContent.progression}%</span>
+          <span className="">
+            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
+            {tooltipContent.requirement}
+          </span>
+        </div>
+      </>
+    );
+  };
+
+  if (studentDataError || courseSegmentsError) {
+    return (
+      <div className="flex items-center justify-center w-full">
         <h1>Something went wrong, try again later</h1>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 w-full m-2 lg:m-8 gap-4 lg:gap-8 overflow-x-auto bg-bgPrimary text-textPrimary">
-      <StudentHeatmapTooltip />
+    <div className="grid w-full grid-cols-1 gap-4 m-2 overflow-x-auto lg:m-8 lg:gap-8 bg-bgPrimary text-textPrimary">
+      <StudentHeatmapTooltip studentData={studentData} />
       {/* first row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  lg:gap-8 grid-rows-1 w-full h-full">
+      <div className="grid w-full h-full grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-3 lg:gap-8">
         {/* left Side */}
-        <div className="flex flex-col border border-borderPrimary p-4 bg-bgSecondary rounded-md text-center box-border">
+        <div className="box-border flex flex-col p-4 text-center border rounded-md border-borderPrimary bg-bgSecondary">
           <div className="text-textSecondary">{showDate.getFullYear()}</div>
-          <div className="w-full flex justify-center items-center mb-4">
+          <div className="flex items-center justify-center w-full mb-4">
             <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              className="select-none text-textPrimary hover:text-primaryColor hover:cursor-pointer"
               onClick={() => {
                 setShowDate(subMonths(showDate, 1));
               }}
@@ -116,7 +182,7 @@ function StudentHome() {
               {formatDate(showDate, { month: "long" })}
             </p>
             <p
-              className="text-textPrimary hover:text-primaryColor hover:cursor-pointer select-none"
+              className="select-none text-textPrimary hover:text-primaryColor hover:cursor-pointer"
               onClick={() => {
                 setShowDate(addMonths(showDate, 1));
               }}
@@ -124,17 +190,17 @@ function StudentHome() {
               <FiChevronRight />
             </p>
           </div>
-          <div className="w-full flex justify-center">
+          <div className="flex justify-center w-full">
             <HeatMap_Month journal={studentData.journal_entries} />
           </div>
         </div>
 
         {/* rightSide */}
-        <div className="lg:col-span-2 flex-col bg-bgSecondary lg:p-4 rounded-md lg:border border-borderPrimary">
+        <div className="flex-col rounded-md lg:col-span-2 bg-bgSecondary lg:p-4 lg:border border-borderPrimary">
           {/* right hello messaage */}
-          <div className="hidden lg:flex justify-between">
+          <div className="justify-between hidden lg:flex">
             <div className="">
-              <div className="text-2xl font-medium flex gap-2">
+              <div className="flex gap-2 text-2xl font-medium">
                 <p className="text-textSecondary">{formatHelloMessage()}</p>
                 <p className="text-textPrimary">
                   {studentData.first_name} {studentData.last_name[0]}.
@@ -146,9 +212,8 @@ function StudentHome() {
             </div>
             <div className="flex gap-4">
               <button
-                onClick={() => openBigModal("new")}
-                className="px-4 py-2 border border-borderPrimary rounded-md bg-primaryColor text-white
-              hover:bg-hoverPrimary"
+                onClick={() => openBigModal("newJournalEntry", { studentData })}
+                className="px-4 py-2 text-white border-2 rounded-md border-borderPrimary bg-primaryColor hover:bg-hoverPrimary"
               >
                 {`+ Uusi harjoitus`}
               </button>
@@ -156,62 +221,72 @@ function StudentHome() {
           </div>
 
           <div className=" lg:mt-4">
-            <RecentJournalEntries journal={studentData.journal_entries} />
+            <RecentJournalEntries studentData={studentData} />
           </div>
         </div>
       </div>
       {/* second row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
         <div>
           <WeekDayActivity journal={studentData.journal_entries} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 bg-bgSecondary bg-transparent gap-4">
-          <div className=" bg-bgSecondary border border-borderPrimary rounded-md p-4">
-            <div className="flex gap-2 items-center">
+        <div className="flex flex-col w-full h-full gap-4 p-4 border rounded-md bg-bgSecondary border-borderPrimary">
+          {/* Header */}
+          <div className="flex items-center gap-2">
+            {" "}
+            <p className="IconBox">
+              <FiTrendingUp />
+            </p>
+            <div className="flex flex-col ">
               {" "}
-              <p className="IconBox">
-                <FiTrendingUp />
-              </p>
-              <p className="text-lg">Seuranta</p>
-            </div>
-            <div className=" grid grid-cols-2 h-full w-full items-center co">
-              <div className="flex flex-col gap-4">
-                <p className="font-medium ">Merkintä aktiivisuus: </p>
-                <p className="text-textSecondary text-sm">
-                  Viimeisin merkintä:{" "}
-                  {studentData.journal_entries.length > 0
-                    ? format(studentData.journal_entries[0].date, "dd.MM.yyyy")
-                    : "Ei merkintöjä"}
-                </p>
-              </div>
-              <JournalActivityBar percentage={calcJournalActivity()} />
+              <p className="pb-0 mb-0 text-lg leading-none ">Seuranta</p>
+              <small>Seuraa aktiivisuuttasi, sekä kurssiesi edistymistä</small>
             </div>
           </div>
 
-          <div className="bg-bgSecondary border border-borderPrimary rounded-md p-4">
-            <div className="flex gap-2 items-center">
-              {" "}
-              <p className="IconBox">
-                <FiTrendingUp />
-              </p>
-              <p className="text-lg">Seuranta</p>
+          <div className="flex flex-col justify-around w-full h-full gap-4 ">
+            {/* Kuukauden aktiivusus container */}
+
+            <div className="p-2 py-4 border rounded-md border-borderPrimary">
+              <h3 className="mb-1">Kuukauden merkintäaktiivisuus:</h3>
+              {/* progressbar */}
+              <div className="relative w-full h-5 border rounded-xl border-borderPrimary bg-bgGray">
+                <div
+                  className="flex justify-center h-full align-middle bg-green-500 shadow-md rounded-xl"
+                  style={{ width: `${calcJournalActivity()}%` }}
+                >
+                  <small className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 text-textPrimary ">
+                    {calcJournalActivity()} %
+                  </small>
+                </div>
+              </div>
+              <small className="text-textSecondary">
+                Viimeisin merkintä:{" "}
+                {studentData.journal_entries.length > 0
+                  ? format(studentData.journal_entries[0].date, "dd.MM.yyyy")
+                  : "Ei merkintöjä"}
+              </small>
             </div>
-            <div className="flex flex-col justify-center items-center">
-              <CourseComplitionBar value={calcJournalEntriesCount()} />
+            <div className="p-2 py-4 border rounded-md border-borderPrimary">
+              <h3 className="mb-1">Kurssin suoritus:</h3>
+              {renderProgressionBar({ student: studentData })}
+              <small className="text-textSecondary">
+                Olet suorittanut kurssistasi: {studentData.total_entry_count} /{" "}
+                {courseSegments.reduce(
+                  (acc, segment) => acc + segment.value,
+                  0
+                )}
+              </small>
             </div>
           </div>
         </div>
       </div>
 
       {/* thrid Row */}
-      <div
-        className="flex flex-col bg-bgSecondary
-      p-4
-        rounded-md"
-      >
+      <div className="flex flex-col p-4 rounded-md bg-bgSecondary">
         <div className="flex justify-between">
-          <div className="flex gap-2  mb-4 items-center">
+          <div className="flex items-center gap-2 mb-4">
             {" "}
             <p className="IconBox">
               <FiZap />
@@ -219,8 +294,28 @@ function StudentHome() {
             <p className="text-lg">Vuoden merkinnät</p>
           </div>
         </div>
-        <HeatMap_Year journal={studentData.journal_entries} />
+        <HeatMap_Year
+          journal={studentData.journal_entries}
+          showDate={showDate}
+        />
       </div>
+
+      <Tooltip
+        id="segment-tooltip"
+        anchorSelect=".clickableCourseSegment"
+        className="z-10 border nice-shadow border-borderPrimary"
+        place="bottom"
+        openOnClick={true}
+        opacity={1}
+        offset="2"
+        style={{
+          backgroundColor: "rgb(var(--color-bg-secondary))",
+          color: "rgb(var(--color-text-primary))",
+          padding: "0.5rem",
+        }}
+      >
+        {tooltipContent && getSegmentTooltipContent()}
+      </Tooltip>
     </div>
   );
 }

@@ -9,7 +9,7 @@ export const TeacherRoute = ({ children }) => {
   }
 
   if (user.role !== 1) {
-    //user is not admin but student or visitor
+    //user is not admin but student or spectator
     if (user.role === 2) {
       return <Navigate to="/vierailija" />;
     } else if (user.role === 3) {

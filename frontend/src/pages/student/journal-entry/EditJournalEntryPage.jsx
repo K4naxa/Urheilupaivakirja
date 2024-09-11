@@ -1,19 +1,19 @@
 import { useState, useEffect, useLayoutEffect, useMemo } from "react";
-import trainingService from "../../../services/trainingService.js";
+import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
-import { format } from "date-fns";
 import { useParams } from "react-router-dom";
+import { FiTrash2 } from "react-icons/fi";
+import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
-//const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
   "flex flex-col items-center gap-0.5 sm:gap-1 w-full max-w-[370px] p-1";
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const NewJournalEntryPage = ({ onClose, entryId }) => {
+const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
+  const { openConfirmModal } = useConfirmModal();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -24,7 +24,7 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     workout_category: "1",
     length_in_minutes: "60",
     time_of_day: "",
-    workout_intensity: "",
+    intensity: "",
     date: "",
     details: "",
   });
@@ -33,7 +33,6 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
 
   const EntryIdForQuery = entryId || entry_id;
 
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
@@ -46,10 +45,10 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
   const {
     data: journalEntry,
     error: journalEntryError,
-    isLoading: journalEntryIsLoading,
+    isFetching: journalEntryisFetching,
   } = useQuery({
     queryKey: ["journalEntry", EntryIdForQuery],
-    queryFn: () => trainingService.getJournalEntryForForm(EntryIdForQuery),
+    queryFn: () => journalService.getJournalEntryForForm(EntryIdForQuery),
   });
 
   useEffect(() => {
@@ -59,43 +58,72 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
       }
       setJournalEntryData(journalEntry);
     }
-  }, [journalEntryIsLoading, journalEntry]);
+  }, [journalEntryisFetching, journalEntry]);
 
   const editJournalEntry = useMutation({
-    mutationFn: () => trainingService.editJournalEntry(journalEntryData),
-    // If the mutation fails, roll back to the previous value
+    mutationFn: () => journalService.editJournalEntry(journalEntryData),
     onError: (error) => {
-      console.error("Error adding journal entry:", error);
-      addToast("Virhe tallennettaessa muutoksia", { style: "error" });
+      console.error("Error updating journal entry:", error);
+
+      let errorMessage = "Virhe päivitettäessä merkintää.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista syötetyt tiedot ja yritä uudelleen.";
+            break;
+          case 403:
+            errorMessage = "Sinulla ei ole oikeuksia muokata tätä merkintää.";
+            break;
+          case 404:
+            errorMessage = "Merkintää ei löytynyt.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+
+      addToast(errorMessage, { style: "error" });
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      queryClient.invalidateQueries(["studentJournal"]);
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      queryClient.refetchQueries(["studentData"], { exact: true });
+
       addToast("Merkintä päivitetty", { style: "success" });
+
       onClose();
     },
   });
 
-  // Journal data for matching
-  const {
-    data: journalEntriesData,
-    isLoading: journalEntriesDataLoading,
-    isError: journalEntriesDataError,
-  } = useQuery({
-    queryKey: ["studentJournal"],
-    queryFn: () => trainingService.getAllUserJournalEntries(),
-    staleTime: 15 * 60 * 1000,
+  const deleteEntry = useMutation({
+    mutationFn: () =>
+      journalService.deleteJournalEntry(journalEntryData.entry_id),
+    onError: (error) => {
+      console.error("Error deleting journal entry:", error);
+      addToast("Virhe poistettaessa merkintää", { style: "error" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      addToast("Merkintä poistettu", { style: "success" });
+      onClose();
+    },
   });
 
   // Options data for dropdowns
   const {
     data: optionsData,
-    isLoading: optionsLoading,
+    isFetching: optionsLoading,
     isError: optionsError,
     error,
   } = useQuery({
     queryKey: ["options"],
-    queryFn: () => trainingService.getJournalEntryOptions(),
+    queryFn: () => journalService.getJournalEntryOptions(),
   });
 
   function formatDateString(isoDateString) {
@@ -114,14 +142,14 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData
+      studentData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === journalEntryData.date) || [];
     return filteredEntries;
-  }, [journalEntriesData, journalEntryData.date]);
+  }, [studentData, journalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
@@ -138,7 +166,7 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     journalEntryData.date,
   ]);
 
-  const newJournalEntryHandler = async (e) => {
+  const editJournalEntryHandler = async (e) => {
     e.preventDefault();
     setErrors("");
     if (!errorCheckJournalEntry()) {
@@ -146,19 +174,46 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     }
 
     if (conflict.value) {
-      setShowConfirmModal(true);
+      openConfirmModal({
+        text: conflict.message,
+        agreeButtonText: "Jatka",
+        declineButtonText: "Peruuta",
+        onAgree: handleUserConfirmation,
+        closeOnOutsideClick: false,
+      });
       return; // Open modal for conflicts and wait for user decision
     }
 
     try {
-      await editJournalEntry.mutate({ journalEntryData });
+      editJournalEntry.mutate({ journalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
   };
 
+  const deleteJournalEntryHandler = async (e) => {
+    e.preventDefault();
+
+    const onConfirmDelete = async () => {
+      try {
+        deleteEntry.mutate({ journalEntryData });
+        console.log("Journal entry deleted successfully");
+      } catch (error) {
+        console.error("Error deleting journal entry:", error);
+      }
+    };
+
+    openConfirmModal({
+      text: "Merkintä poistetaan pysyvästi",
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      onAgree: onConfirmDelete,
+      closeOnOutsideClick: false,
+    });
+  };
+
   const handleUserConfirmation = async () => {
-    setShowConfirmModal(false);
     try {
       await editJournalEntry.mutate({ journalEntryData });
     } catch (error) {
@@ -266,10 +321,7 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
         journalEntryData.time_of_day,
         "time_of_day"
       );
-      hasMissingInputs |= checkIfEmpty(
-        journalEntryData.workout_intensity,
-        "workout_intensity"
-      );
+      hasMissingInputs |= checkIfEmpty(journalEntryData.intensity, "intensity");
     }
 
     if (hasMissingInputs) {
@@ -393,6 +445,9 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
   };
 
   function convertTime(totalMinutes) {
+    if (totalMinutes == 195) {
+      return "yli 3h";
+    }
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     if (hours === 0) {
@@ -417,195 +472,195 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
     }
   }
 
-  if (optionsError || journalEntriesDataError) {
+  if (optionsError) {
     console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 
-  if (optionsLoading || journalEntriesDataLoading) {
+  if (optionsLoading || journalEntryisFetching) {
     console.log("is loading");
     return <p>Loading...</p>;
-  } else {
-    return (
-      <>
-        <ConfirmModal
-          isOpen={showConfirmModal}
-          onDecline={() => setShowConfirmModal(false)}
-          onAgree={handleUserConfirmation}
-          text={conflict.message}
-          agreeButton="Jatka"
-          declineButton="Peruuta"
-          closeOnOutsideClick={false}
-        />
-        <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
-          <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
-            <p className="sm:min-w-[400px] cursor-default	">Muokkaa merkintää</p>
-            <button
-              onClick={onClose}
-              className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
-            >
-              <FiArrowLeft />
-            </button>
-          </div>
-          <form
-            className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
-            onSubmit={newJournalEntryHandler}
+  }
+
+  if (journalEntryError || optionsError) {
+    console.error("Error fetching journal entry:", journalEntryError);
+    return <p>Error: {journalEntryError.message || "Unknown error"}</p>;
+  }
+
+  return (
+    <>
+      <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
+        <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
+          <p className="sm:min-w-[400px] cursor-default	">Muokkaa merkintää</p>
+          <button
+            onClick={onClose}
+            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
           >
-            <div className="flex flex-col items-center w-full p-1">
-              <div className="flex flex-row gap-12 justify-between">
-                <button
-                  type="button"
-                  onClick={() => entryTypeChangeHandler("2")}
-                  className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
+            <FiArrowLeft />
+          </button>
+        </div>
+        <form
+          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
+          onSubmit={editJournalEntryHandler}
+        >
+          <div className="flex flex-col items-center w-full p-1">
+            <div className="flex flex-row gap-12 justify-between">
+              <button
+                type="button"
+                onClick={() => entryTypeChangeHandler("2")}
+                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
               border-2 ${journalEntryData.entry_type === "2" ? "border-bgRest bg-bgRest" : "border-bgRest bg-bgSecondary hover:bg-bgRest hover:bg-opacity-40"}
               `}
-                >
-                  Lepopäivä
-                </button>
+              >
+                Lepopäivä
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => entryTypeChangeHandler("3")}
-                  className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
+              <button
+                type="button"
+                onClick={() => entryTypeChangeHandler("3")}
+                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
               border-2 ${journalEntryData.entry_type === "3" ? "border-bgSick bg-bgSick" : "border-bgSick bg-bgSecondary hover:bg-bgSick hover:bg-opacity-40"}
               `}
-                >
-                  Sairauspäivä
-                </button>
-              </div>
+              >
+                Sairauspäivä
+              </button>
             </div>
+          </div>
 
-            <div className={`${inputContainer} px-2.5`}>
-              <label className={inputLabel} htmlFor="date-picker">
-                Päivämäärä
+          <div className={`${inputContainer} px-2.5`}>
+            <label className={inputLabel} htmlFor="date-picker">
+              Päivämäärä
+            </label>
+            <input
+              className={`text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b p-1 ${errors.date ? "border-red-500" : "border-borderPrimary"} text-center`}
+              type="date"
+              name="date"
+              value={journalEntryData.date}
+              onChange={changeHandler}
+              id="date-picker"
+            />
+          </div>
+
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.length_in_minutes ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel} htmlFor="length_in_minutes">
+                Kesto: {convertTime(journalEntryData.length_in_minutes)}
               </label>
-              <input
-                className={`text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b p-1 ${errors.date ? "border-red-500" : "border-borderPrimary"} text-center`}
-                type="date"
-                name="date"
-                value={journalEntryData.date}
-                onChange={changeHandler}
-                id="date-picker"
-              />
+              <div className="w-full p-1">
+                <input
+                  className="bg-bgPrimary w-full"
+                  type="range"
+                  min="30"
+                  max="195"
+                  value={journalEntryData.length_in_minutes}
+                  step="15"
+                  id="length_in_minutes"
+                  onChange={changeHandler}
+                  name="length_in_minutes"
+                />
+              </div>
             </div>
-
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.length_in_minutes ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel} htmlFor="length_in_minutes">
-                  Kesto: {convertTime(journalEntryData.length_in_minutes)}
-                </label>
-                <div className="w-full p-1">
-                  <input
-                    className="bg-bgPrimary w-full"
-                    type="range"
-                    min="30"
-                    max="180"
-                    value={journalEntryData.length_in_minutes}
-                    step="15"
-                    id="length_in_minutes"
-                    onChange={changeHandler}
-                    name="length_in_minutes"
-                  />
-                </div>
-              </div>
-            )}
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.time_of_day ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel}>Ajankohta</label>
-                <div className={optionContainer}>
-                  {optionsData.time_of_day.map((time) =>
-                    renderRadioButton(
-                      "time_of_day",
-                      time.id.toString(),
-                      time.name,
-                      changeHandler
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel}>Harjoitustyyppi</label>
-                <div className={optionContainer}>
-                  {optionsData.workout_types.map((type) =>
-                    renderRadioButton(
-                      "workout_type",
-                      type.id.toString(),
-                      type.name,
-                      workoutTypeChangeHandler
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            {journalEntryData.entry_type === "1" &&
-              journalEntryData.workout_type === "3" && (
-                <div
-                  className={`${inputContainer} px-2.5 ${errors.workout_category ? "shadow-error" : ""}`}
-                >
-                  <label className={inputLabel} htmlFor="workout-category">
-                    Harjoituskategoria
-                  </label>
-                  <select
-                    className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
-                    id="workoutCategory"
-                    name="workout_category"
-                    value={journalEntryData.workout_category}
-                    onChange={changeHandler}
-                    disabled={journalEntryData.workout_type != "3"}
-                  >
-                    {optionsData.workout_categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-            {journalEntryData.entry_type === "1" && (
-              <div
-                className={`${inputContainer} ${errors.workout_intensity ? "shadow-error" : ""}`}
-              >
-                <label className={inputLabel}>Rankkuus</label>
-                <div className={optionContainer}>
-                  {console.log(optionsData.workout_intensities[0].id)}
-                  {optionsData.workout_intensities.map((intensity) =>
-                    renderRadioButton(
-                      "workout_intensity",
-                      intensity.id.toString(),
-                      intensity.name,
-                      changeHandler
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className={inputContainer}>
-              <label
-                className={`${inputLabel} cursor-pointer flex items-center gap-1 hover:text-primaryColor hover:cursor-pointer`}
-                htmlFor="details-textarea"
-                onClick={() => setShowDetails((prevState) => !prevState)}
-              >
-                Lisätiedot{" "}
-                {(showDetails && <FiChevronUp className="text-lg" />) || (
-                  <FiChevronDown className="text-lg" />
+          )}
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.time_of_day ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel}>Ajankohta</label>
+              <div className={optionContainer}>
+                {optionsData.time_of_day.map((time) =>
+                  renderRadioButton(
+                    "time_of_day",
+                    time.id.toString(),
+                    time.name,
+                    changeHandler
+                  )
                 )}
-              </label>
-              {showDetails && (
+              </div>
+            </div>
+          )}
+
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.workout_type ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel}>Harjoitustyyppi</label>
+              <div className={optionContainer}>
+                {optionsData.workout_types.map((type) =>
+                  renderRadioButton(
+                    "workout_type",
+                    type.id.toString(),
+                    type.name,
+                    workoutTypeChangeHandler
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
+          {journalEntryData.entry_type === "1" &&
+            journalEntryData.workout_type === "3" && (
+              <div
+                className={`${inputContainer} px-2.5 ${errors.workout_category ? "shadow-error" : ""}`}
+              >
+                <label className={inputLabel} htmlFor="workout-category">
+                  Harjoituskategoria
+                </label>
+                <select
+                  className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
+                  id="workoutCategory"
+                  name="workout_category"
+                  value={journalEntryData.workout_category}
+                  onChange={changeHandler}
+                  disabled={journalEntryData.workout_type != "3"}
+                >
+                  {optionsData.workout_categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.id === 1
+                        ? studentData.sport_name
+                        : category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+          {journalEntryData.entry_type === "1" && (
+            <div
+              className={`${inputContainer} ${errors.intensity ? "shadow-error" : ""}`}
+            >
+              <label className={inputLabel}>Rankkuus</label>
+              <div className={optionContainer}>
+                {console.log(optionsData.workout_intensities[0].id)}
+                {optionsData.workout_intensities.map((intensity) =>
+                  renderRadioButton(
+                    "intensity",
+                    intensity.id.toString(),
+                    intensity.name,
+                    changeHandler
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className={inputContainer}>
+            <label
+              className={`${inputLabel} cursor-pointer flex items-center gap-1 hover:text-primaryColor hover:cursor-pointer`}
+              htmlFor="details-textarea"
+              onClick={() => setShowDetails((prevState) => !prevState)}
+            >
+              Lisätiedot{" "}
+              {(showDetails && <FiChevronUp className="text-lg" />) || (
+                <FiChevronDown className="text-lg" />
+              )}
+            </label>
+            {showDetails && (
+              <div className="relative w-full">
                 <textarea
-                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
                   onChange={changeHandler}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
@@ -616,26 +671,53 @@ const NewJournalEntryPage = ({ onClose, entryId }) => {
                   name="details"
                   id="details-textarea"
                   value={journalEntryData.details}
-                />
-              )}
-            </div>
+                  rows={2}
+                  maxLength={200}
+                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  required
+                ></textarea>
+                <p
+                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${journalEntryData.details.length === 200 ? "100" : "40"} ${
+                    journalEntryData.details.length === 200
+                      ? "text-red-500 bg-bgPrimary z-10"
+                      : "text-textPrimary"
+                  }`}
+                  style={{ pointerEvents: "none" }} // Make sure it doesn't interfere with textarea interactions
+                >
+                  {journalEntryData.details.length}/200
+                </p>
+              </div>
+            )}
+          </div>
 
-            <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
-              {conflict.messageShort && <p>{conflict.messageShort}</p>}
-              <button
-                className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
-    ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
-                type="submit"
-                disabled={submitButtonIsDisabled}
-              >
-                {getSubmitButtonText(journalEntryData.entry_type)}
-              </button>
+          <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
+            {conflict.messageShort && <p>{conflict.messageShort}</p>}
+            <div className="flex w-full">
+              <div className="flex-1"></div>
+              <div>
+                <button
+                  className={`min-w-[160px] text-white mx-6 px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary
+      ${submitButtonIsDisabled ? "bg-gray-400 opacity-20 text-gray border-gray-300 cursor-not-allowed" : "cursor-pointer"}`}
+                  type="submit"
+                  disabled={submitButtonIsDisabled}
+                >
+                  {getSubmitButtonText(journalEntryData.entry_type)}
+                </button>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <button
+                  className="hover:cursor-pointer hover:bg-bgGray rounded m-1.5 p-2"
+                  onClick={deleteJournalEntryHandler}
+                >
+                  <FiTrash2 className="text-2xl" />
+                </button>
+              </div>
             </div>
-          </form>
-        </div>
-      </>
-    );
-  }
+          </div>
+        </form>
+      </div>
+    </>
+  );
 };
 
-export default NewJournalEntryPage;
+export default EditJournalEntryPage;

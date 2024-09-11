@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import trainingService from "../services/trainingService";
 
 const MainContext = createContext();
 

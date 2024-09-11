@@ -1,11 +1,10 @@
-import { useState, useLayoutEffect, useMemo } from "react";
-import trainingService from "../../../services/trainingService.js";
+import { useState, useEffect, useLayoutEffect, useMemo } from "react";
+import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "../../../components/confirm-modal/confirmModal.jsx";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import { FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import dayjs from "dayjs";
-import userService from "../../../services/userService.js";
+import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
@@ -13,10 +12,11 @@ const inputContainer =
 const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
-const NewJournalEntryPage = ({ onClose, date }) => {
+const NewJournalEntryPage = ({ onClose, studentData, date }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
+  const { openConfirmModal } = useConfirmModal();
 
   const [newJournalEntryData, setNewJournalEntryData] = useState({
     entry_type: "1",
@@ -29,7 +29,8 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     details: "",
   });
 
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const studentDataLoading = false;
+
   const [errors, setErrors] = useState({});
   const [showDetails, setShowDetails] = useState(false);
   const [conflict, setConflict] = useState({
@@ -40,66 +41,81 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => trainingService.postJournalEntry(newJournalEntryData),
-    // If the mutation fails, roll back to the previous value
+    mutationFn: () =>  journalService.postJournalEntry(newJournalEntryData),
     onError: (error) => {
-      console.error("Error adding journal entry:", error);
-      addToast("Virhe lisättäessä merkintää", { style: "error" });
+      console.error("Error posting new journal entry:", error);
+
+      let errorMessage = "Virhe tallentaessa uutta merkintää.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage =
+              "Virheellinen pyyntö. Tarkista tiedot ja yritä uudelleen.";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelinvirhe. Yritä myöhemmin uudelleen. Ongelman jatkuessa ota yhteyttä ylläpitäjään.";
+            break;
+          default:
+            errorMessage = "Tuntematon virhe tapahtui. Yritä uudelleen.";
+        }
+      }
+      addToast(errorMessage, { style: "error" });
     },
-    // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      queryClient.invalidateQueries(["studentJournal"]);
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      queryClient.refetchQueries(["studentData"], { exact: true });
       addToast("Merkintä lisätty", { style: "success" });
       onClose();
     },
   });
 
-  // Journal data for matching
-  const {
-    data: journalEntriesData,
-    isLoading: journalEntriesDataLoading,
-    isError: journalEntriesDataError,
-  } = useQuery({
-    queryKey: ["studentData"],
-    queryFn: () => userService.getStudentData(),
-    staleTime: 15 * 60 * 1000,
-  });
-
   // Options data for dropdowns
   const {
     data: optionsData,
-    isLoading: optionsLoading,
+    isFetching: optionsLoading,
     isError: optionsError,
     error,
   } = useQuery({
-    queryKey: ["sportCategoryOptions"],
-    queryFn: () => trainingService.getJournalEntryOptions(),
+    queryKey: ["options"],
+    queryFn: () => journalService.getJournalEntryOptions(),
   });
 
   // get all journal entries for the selected date from cache
   const entriesForSelectedDate = useMemo(() => {
     const filteredEntries =
-      journalEntriesData.journal_entries
+      studentData.journal_entries
         ?.map((entry) => ({
           ...entry,
           date: formatDateString(entry.date),
         }))
         .filter((entry) => entry.date === newJournalEntryData.date) || [];
     return filteredEntries;
-  }, [journalEntriesData, newJournalEntryData.date]);
+  }, [studentData, newJournalEntryData.date]);
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
-    checkForConflicts(
-      newJournalEntryData.entry_type,
-      newJournalEntryData.date,
-      entriesForSelectedDate
-    );
+      checkForConflicts(
+        newJournalEntryData.entry_type,
+        newJournalEntryData.date,
+        entriesForSelectedDate
+      );
   }, [
     entriesForSelectedDate,
     newJournalEntryData.entry_type,
     newJournalEntryData.date,
   ]);
+
+  useEffect(() => {
+    console.log("entriesForSelectedDate changed:", entriesForSelectedDate);
+  }, [entriesForSelectedDate]);
+  
+  useEffect(() => {
+    console.log("newJournalEntryData changed:", newJournalEntryData);
+  }, [newJournalEntryData]);
+  
+  
 
   const newJournalEntryHandler = async (e) => {
     e.preventDefault();
@@ -109,19 +125,24 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
 
     if (conflict.value) {
-      setShowConfirmModal(true);
-      return; // Open modal for conflicts and wait for user decision
+      openConfirmModal({
+        text: conflict.message,
+        agreeButtonText: "Jatka",
+        declineButtonText: "Peruuta",
+        onAgree: handleUserConfirmation,
+        closeOnOutsideClick: false,
+      });
+      return;
     }
 
     try {
-      await addJournalEntry.mutate({ newJournalEntryData });
+      addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
       console.error("Error adding journal entry:", error);
     }
   };
 
   const handleUserConfirmation = async () => {
-    setShowConfirmModal(false);
     try {
       await addJournalEntry.mutate({ newJournalEntryData });
     } catch (error) {
@@ -340,14 +361,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
           checked={newJournalEntryData[name] === value}
           id={`${name}-${value}`}
           onChange={onChangeHandler}
-          className="absolute opacity-0 w-0 h-0 peer"
+          className="absolute w-0 h-0 opacity-0 peer"
           tabIndex="0" // Make sure it's focusable
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="peer-checked:border-primaryColor  peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgSecondary
-          peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor p-1 block rounded border border-borderPrimary text-textPrimary text-center cursor-pointer
-          active:scale-95 transition-transform duration-75 hover:border-primaryColor hover:text-primaryColor"
+          className="block p-1 text-center transition-transform duration-75 border rounded cursor-pointer peer-checked:border-primaryColor peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgSecondary peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor border-borderPrimary text-textPrimary active:scale-95 hover:border-primaryColor hover:text-primaryColor"
         >
           {label}
         </label>
@@ -356,6 +375,9 @@ const NewJournalEntryPage = ({ onClose, date }) => {
   };
 
   function convertTime(totalMinutes) {
+    if (totalMinutes == 195) {
+      return "yli 3h";
+    }
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     if (hours === 0) {
@@ -380,12 +402,12 @@ const NewJournalEntryPage = ({ onClose, date }) => {
     }
   }
 
-  if (optionsLoading || journalEntriesDataLoading) {
+  if (optionsLoading || studentDataLoading) {
     console.log("is loading");
     return <p>Loading...</p>;
   }
 
-  if (optionsError || journalEntriesDataError) {
+  if (optionsError) {
     console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
@@ -405,31 +427,22 @@ const NewJournalEntryPage = ({ onClose, date }) => {
 
   return (
     <>
-      <ConfirmModal
-        isOpen={showConfirmModal}
-        onDecline={() => setShowConfirmModal(false)}
-        onAgree={handleUserConfirmation}
-        text={conflict.message}
-        agreeButton="Jatka"
-        declineButton="Peruuta"
-        closeOnOutsideClick={false}
-      />
-      <div className="flex flex-col h-full sm:rounded-md overflow-auto hide-scrollbar transition-transform duration-300 ">
-        <div className="relative bg-primaryColor p-3 sm:p-4 text-center text-white text-xl shadow-md sm:rounded-t-md">
+      <div className="flex flex-col h-full overflow-auto transition-transform duration-300 sm:rounded-md hide-scrollbar ">
+        <div className="relative p-3 text-xl text-center text-white shadow-md bg-primaryColor sm:p-4 sm:rounded-t-md">
           <p className="sm:min-w-[400px] cursor-default	">Uusi merkintä</p>
           <button
             onClick={onClose}
-            className="absolute bottom-1/2 translate-y-1/2 left-5 text-2xl hover:scale-125 transition-transform duration-150"
+            className="absolute text-2xl transition-transform duration-150 translate-y-1/2 bottom-1/2 left-5 hover:scale-125"
           >
             <FiArrowLeft />
           </button>
         </div>
         <form
-          className="flex flex-col items-center gap-1 sm:gap-2 p-4 sm:px-8 bg-bgSecondary sm:rounded-b-md flex-grow"
+          className="flex flex-col items-center flex-grow gap-1 p-4 sm:gap-2 sm:px-8 bg-bgSecondary sm:rounded-b-md"
           onSubmit={newJournalEntryHandler}
         >
           <div className="flex flex-col items-center w-full p-1">
-            <div className="flex flex-row gap-12 justify-between">
+            <div className="flex flex-row justify-between gap-12">
               <button
                 type="button"
                 onClick={() => entryTypeChangeHandler("2")}
@@ -475,10 +488,10 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               </label>
               <div className="w-full p-1">
                 <input
-                  className="bg-bgPrimary w-full"
+                  className="w-full bg-bgPrimary"
                   type="range"
                   min="30"
-                  max="180"
+                  max="195"
                   value={newJournalEntryData.length_in_minutes}
                   step="15"
                   id="length_in_minutes"
@@ -543,7 +556,7 @@ const NewJournalEntryPage = ({ onClose, date }) => {
                   {optionsData.workout_categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.id === 1
-                        ? journalEntriesData.sport_name
+                        ? studentData.sport_name
                         : category.name}
                     </option>
                   ))}
@@ -581,23 +594,39 @@ const NewJournalEntryPage = ({ onClose, date }) => {
               )}
             </label>
             {showDetails && (
-              <textarea
-                className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-2 text-textPrimary"
-                onChange={changeHandler}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.stopPropagation();
-                  }
-                }}
-                type="text"
-                name="details"
-                id="details-textarea"
-                value={newJournalEntryData.details}
-              />
+              <div className="relative w-full">
+                <textarea
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
+                  onChange={changeHandler}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.stopPropagation();
+                    }
+                  }}
+                  type="text"
+                  name="details"
+                  id="details-textarea"
+                  value={newJournalEntryData.details}
+                  rows={2}
+                  maxLength={200}
+                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  required
+                ></textarea>
+                <p
+                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? "100" : "40"} ${
+                    newJournalEntryData.details.length === 200
+                      ? "text-red-500 bg-bgPrimary z-10"
+                      : "text-textPrimary"
+                  }`}
+                  style={{ pointerEvents: "none" }} // Make sure it doesn't interfere with textarea interactions
+                >
+                  {newJournalEntryData.details.length}/200
+                </p>
+              </div>
             )}
           </div>
 
-          <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
+          <div className="flex flex-col items-center w-full gap-4 p-4 mt-auto text-center text-red-400">
             {conflict.messageShort && <p>{conflict.messageShort}</p>}
             <button
               className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary

@@ -1,76 +1,36 @@
-import axios from "axios";
+import apiClient from "./apiClient";
 
-const getToken = () => {
-  const userJson = localStorage.getItem("user");
-  if (userJson) {
-    const user = JSON.parse(userJson);
-    return user.token;
-  }
-  return null;
-};
+// Login
 
-// make authorization header
-const makeHeader = () => {
-  let header = { headers: { Authorization: `bearer ${getToken()}` } };
-  return header;
-};
-
-// ................................................................................
-
-const login = async (email, password) => {
-  const response = await axios.post("/user/login", {
+const login = async (email, password, stayLoggedIn) => {
+  const response = await apiClient.post("/auth/login", {
     email: email,
     password: password,
+    stayLoggedIn: stayLoggedIn,
   });
   return response.data;
 };
 
-const register = async (
-  email,
-  password,
-  firstName,
-  lastName,
-  sportId,
-  groupId,
-  campusId
-) => {
-  const response = await axios.post("user/register", {
-    email: email,
-    password: password,
-    first_name: firstName,
-    last_name: lastName,
-    sport_id: sportId,
-    group_id: groupId,
-    campus_id: campusId,
-  });
+const logout = async () => {
+  const response = await apiClient.post("/auth/logout");
   return response.data;
-};
+}
 
-const createEmailVerificationOTP = async () => {
-  const response = await axios.post(
-    "/user/new-email-verification",
-    null,
-    makeHeader()
-  );
+const logoutAll = async () => {
+  const response = await apiClient.post("/auth/logout/all");
   return response.data;
-};
+}
 
-const sendEmailVerificationOTP = async (otp) => {
-  const response = await axios.post(
-    "/user/verify-email",
-    { otp },
-    makeHeader()
-  );
-  return response.data;
-};
-
+// Password Reset -------------------------------------------------------------------
 const requestPasswordReset = async (email) => {
-  const response = await axios.post("/user/request-password-reset", { email });
+  const response = await apiClient.post("/user/request-password-reset", {
+    email,
+  });
   return response.data;
 };
 
 const verifyPasswordResetOTP = async (email, otp) => {
-  const response = await axios.post("/user/verify-password-reset", {
+  const response = await apiClient.post("/user/verify-password-reset", {
     email,
     otp,
   });
@@ -78,74 +38,56 @@ const verifyPasswordResetOTP = async (email, otp) => {
 };
 
 const resetPassword = async (email, resetToken, newPassword) => {
-  const response = await axios.post("/user/reset-password", {
+  const response = await apiClient.post("/user/reset-password", {
     email,
     resetToken,
-    newPassword,
+    password: newPassword,
   });
   return response.data;
 };
 
-// User Controls -------------------------------------------------------------------
+const changePassword = async (oldPassword, newPassword) => {
+  const response = await apiClient.put("/user/change-password", {
+    oldPassword,
+    password: newPassword,
+  });
+  return response.data;
+}
 
-const deleteUser = async (id) => {
-  const response = await axios.delete(`/user/${id}`, makeHeader());
+const verifyPassword = async (password) => {
+  const response = await apiClient.post(
+    "/user/verify-password",
+    { password }
+  );
+  if (response.status === 200) {
+    return true;
+  }
+};
+
+// Delete user -------------------------------------------------------------------
+const deleteUserSelf = async (password) => {
+  const response = await apiClient.post(
+    "/user/delete/self",
+    { password }
+  );
   return response.data;
 };
 
-// Unverified users -------------------------------------------------------------------
-
-const getAllUnverified = async () => {
-  const response = await axios.get("/user/unverified", makeHeader());
-  return response.data;
-};
-
-const verifyUser = async (userid) => {
-  const response = await axios.put(`/user/verify/${userid}`, {}, makeHeader());
-  return response.data;
-};
-
-// Stundent Management -------------------------------------------------------------------
-
-const getStudents = async () => {
-  const response = await axios.get("/students", makeHeader());
-  return response.data;
-};
-
-const getStudentData = async (userId) => {
-  const response = await axios.get(`/students/data/${userId}`, makeHeader());
-  return response.data;
-};
-const getStudentsAndEntries = async () => {
-  const response = await axios.get("/students/entries", makeHeader());
-  return response.data;
-};
-
-const getArchivedStudents = async () => {
-  const response = await axios.get("/students/archived", makeHeader());
-  return response.data;
-};
-
-const toggleStudentArchive = async (id) => {
-  const response = await axios.put(`/students/archive/${id}`, {}, makeHeader());
+// Profile Data -------------------------------------------------------------------
+const getProfileData = async () => {
+  const response = await apiClient.get(`/user/profile`);
   return response.data;
 };
 
 export default {
   login,
-  register,
-  getAllUnverified,
-  verifyUser,
-  deleteUser,
-  getStudents,
-  getStudentsAndEntries,
-  toggleStudentArchive,
-  getArchivedStudents,
-  createEmailVerificationOTP,
-  sendEmailVerificationOTP,
   requestPasswordReset,
   verifyPasswordResetOTP,
+  changePassword,
   resetPassword,
-  getStudentData,
+  verifyPassword,
+  deleteUserSelf,
+  getProfileData,
+  logout,
+  logoutAll,
 };
-// Path: frontEnd/src/services/userService.js

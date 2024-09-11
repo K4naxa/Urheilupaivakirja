@@ -4,39 +4,52 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-var { isAuthenticated } = require("./middleware/auth");
 
-var indexRouter = require("./routes/index");
-var loginRouter = require("./routes/user/loginRouter.js");
 var registerRouter = require("./routes/user/registerRouter.js");
-var journalRouter = require("./routes/journalRouter.js");
-var sportsRouter = require("./routes/sportsRouter.js");
-var unverifiedRouter = require("./routes/user/unverifiedRouter.js");
-var verifyRouter = require("./routes/user/verifyRouter.js");
 var userRouter = require("./routes/user/userRouter.js");
-var publicRouter = require("./routes/publicRouter.js");
-var journalEntryRouter = require("./routes/journalEntryRouter.js");
-var studentRouter = require("./routes/user/studentRouter.js");
+var authRouter = require("./routes/user/authRouter.js");
+
+var studentRouter = require("./routes/role/studentRouter.js");
+var spectatorRouter = require("./routes/role/spectatorRouter.js");
+var teacherRouter = require("./routes/role/teacherRouter.js");
+
+var publicRouter = require("./routes/misc/publicRouter.js");
+var campusRouter = require("./routes/misc/campusRouter.js");
+var groupRouter = require("./routes/misc/groupRouter.js");
+var newsRouter = require("./routes/misc/newsRouter.js");
+var journalRouter = require("./routes/misc/journalRouter.js");
+var sportRouter = require("./routes/misc/sportRouter.js");
+var courseRouter = require("./routes/misc/courseRouter.js");
+var statisticsRouter = require("./routes/misc/statisticsRouter.js");
+var unverifiedRouter = require("./routes/misc/unverifiedRouter.js");
+
 var app = express();
 
 app.use(logger("dev"));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "build")));
 
+
+app.use("/spectator", spectatorRouter);
+app.use("/auth", authRouter);
+app.use("/campus", campusRouter);
+app.use("/group", groupRouter);
+app.use("/news", newsRouter);
+app.use("/sport", sportRouter);
+app.use("/journal", journalRouter);
+app.use("/course", courseRouter);
+app.use("/statistics", statisticsRouter);
+app.use("/unverified", unverifiedRouter);
 app.use("/user", userRouter);
-app.use("/user/verify", isAuthenticated, verifyRouter);
-app.use("/user/login", loginRouter);
-app.use("/user/register", registerRouter);
-app.use("/user/unverified", isAuthenticated, unverifiedRouter);
-app.use("/students", isAuthenticated, studentRouter);
-app.use("/students/archived", isAuthenticated, studentRouter);
-app.use("/journal", isAuthenticated, journalRouter);
-app.use("/sports", isAuthenticated, sportsRouter);
+app.use("/register", registerRouter);
+app.use("/student", studentRouter);
+app.use("/teacher", teacherRouter);
 app.use("/public", publicRouter);
-app.use("/public/groups", isAuthenticated, publicRouter);
-app.use("/journal_entry", isAuthenticated, journalEntryRouter);
+
+
+
 
 app.get("/*", function (req, res) {
   res.sendFile(path.join(__dirname, "build/index.html"), function (err) {

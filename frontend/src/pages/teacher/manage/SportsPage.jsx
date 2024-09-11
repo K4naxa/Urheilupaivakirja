@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
-import trainingService from "../../../services/trainingService";
+import sportService from "../../../services/sportService";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import cc from "../../../utils/cc";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../../../hooks/toast-messages/useToast";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
+import { TbArrowMergeAltRight } from "react-icons/tb";
+import { useMutation } from "@tanstack/react-query";
 
 // renders a container for a sport while checking if it is being edited
-function CreateSportContainer({ sport, sports, setSports }) {
-  const queryclient = useQueryClient();
-
+function CreateSportContainer({ sport, sports, setSports, queryclient }) {
+  const { openConfirmModal } = useConfirmModal();
+  const { addToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedSport, setEditedSport] = useState(sport.name);
   const [cellError, setCellError] = useState(false);
@@ -42,15 +46,11 @@ function CreateSportContainer({ sport, sports, setSports }) {
       student_count: sport.student_count,
       name: editedSport,
     };
-    trainingService
+    sportService
       .editSport(newSport)
       .then(() => {
-        setSports((prevSports) =>
-          prevSports.map((prevSport) =>
-            prevSport.id === sport.id ? newSport : prevSport
-          )
-        );
-        queryclient.invalidateQueries("sports");
+        queryclient.invalidateQueries({ queryKey: ["sports"] });
+        addToast("Lajin nimi vaihdettu", { style: "success" });
         setIsEditing(false);
       })
       .catch((error) => {
@@ -59,19 +59,51 @@ function CreateSportContainer({ sport, sports, setSports }) {
       });
   };
 
+  const mergeSports = useMutation({
+    mutationFn: (mergeFromId, mergeToId) => sportService.mergeSports(mergeFromId, mergeToId),
+    onError: (error) => {
+      addToast("Virhe yhdistettäessä lajeja", { style: "error" });
+    },
+    onSuccess: (res) => {
+      addToast(`${res.count} oppilasta siirrettiin lajista ${res.mergeFrom} lajiin ${res.mergeTo}`, { style: "success" });
+      queryclient.invalidateQueries({ queryKey: ["sports"] });
+    },
+  })
+
   // deletes the sport from the server and updates the state
   const handleDelete = () => {
-    trainingService
-      .deleteSport(sport.id)
-      .then(() => {
-        queryclient.invalidateQueries("sports");
-      })
-      .catch((error) => {
-        setCellError(error.response.data.error);
-      });
+    const handleUserConfirmation = () => {
+      sportService
+        .deleteSport(sport.id)
+        .then(() => {
+          addToast("Laji poistettu", { style: "success" });
+          queryclient.invalidateQueries({ queryKey: ["sports"] });
+        })
+        .catch((error) => {
+          addToast("Virhe poistettaessa lajia", { style: "error" });
+          setCellError(error.response.data.error);
+        });
+    };
+
+    const modalText = (
+      <span>
+        Haluatko varmasti poistaa ryhmän
+        <br />
+        <strong>{sport.name}?</strong>
+        <br />
+      </span>
+    );
+
+    openConfirmModal({
+      onAgree: () => handleUserConfirmation(),
+      text: modalText,
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      useTimer: true,
+    });
   };
 
-  // sets the sport's "isEditing" property to "true"
   const handleEdit = () => {
     if (isEditing) {
       setEditedSport(sport.name);
@@ -79,6 +111,42 @@ function CreateSportContainer({ sport, sports, setSports }) {
     } else if (!isEditing) {
       setIsEditing(true);
     }
+  };
+
+  const handleMerge = () => {
+    const handleFinalMerge = (selectedOptionId) => {
+      selectedOptionId = Number(selectedOptionId);
+      sport.id = Number(sport.id);
+      mergeSports.mutate({mergeFromId: sport.id, mergeToId: selectedOptionId});
+    };
+
+    console.log("That merges: ", sport);
+    console.log("Merged to options: ", sports);
+    const typeTextNominative = "laji";
+    const typeTextGenitive = "lajin";
+    const typeTextIllative = "lajiin";
+
+    const modalText = (
+      <span>
+        Valitse {typeTextNominative}, johon {typeTextGenitive}
+        <br />
+        <strong>{sport.name}</strong>
+        <br />
+        opiskelijat siirretään.
+      </span>
+    );
+
+    openConfirmModal({
+      type: "merge",
+      text: modalText,
+      thatMerges: sport,
+      typeTextNominative: typeTextNominative,
+      typeTextIllative: typeTextIllative,
+      onAgree: handleFinalMerge,
+      mergeToOptions: sports,
+      agreeButtonText: "Seuraava",
+      declineButtonText: "Peruuta",
+    });
   };
 
   if (isEditing) {
@@ -137,17 +205,28 @@ function CreateSportContainer({ sport, sports, setSports }) {
         >
           <p>{sport.name}</p>
           <p className="text-center">{sport.student_count}</p>
+
           <div className="flex gap-4">
             <button
               id="editBtn"
-              className="IconButton text-iconGray"
+              title="Muokkaa"
+              className="IconButton text-iconGray hover:text-primaryColor"
               onClick={() => handleEdit()}
             >
               <FiEdit3 size={20} />
             </button>
             <button
-              className="IconButton text-iconRed "
+              id="editBtn"
+              title="Yhdistä"
+              className="IconButton text-iconGray hover:text-primaryColor"
+              onClick={() => handleMerge()}
+            >
+              <TbArrowMergeAltRight size={20} className="rotate-90" />
+            </button>
+            <button
+              className="IconButton text-iconRed hover:text-red-700 "
               id="deleteBtn"
+              title="Poista"
               onClick={() => handleDelete()}
             >
               <FiTrash2 size={20} />
@@ -168,7 +247,6 @@ function CreateSportContainer({ sport, sports, setSports }) {
 
 const SportsPage = () => {
   const queryclient = useQueryClient();
-
   const [sortedSports, setSortedSports] = useState([]);
   const [newSport, setNewSport] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -183,18 +261,19 @@ const SportsPage = () => {
     isLoading: sportsLoading,
   } = useQuery({
     queryKey: ["sports"],
-    queryFn: trainingService.getSports,
+    queryFn: sportService.getSports,
   });
 
   useEffect(() => {
     if (sports) {
       setSortedSports(sports);
     }
-    [sports];
+    [sports, sortedSports];
   });
 
   // logic behind creating a new sport
-  const handleNewSport = () => {
+  const handleNewSport = (e) => {
+    e.preventDefault();
     if (newSport === "") return;
     if (
       sports.find(
@@ -205,11 +284,11 @@ const SportsPage = () => {
       return;
     }
 
-    trainingService
+    sportService
       .addSport({ name: newSport })
       .then(() => {
-        queryclient.invalidateQueries("sports");
-
+        queryclient.invalidateQueries({ queryKey: ["sports"] });
+        addToast("Uusi laji lisätty", { style: "success" });
         setNewSport("");
         setErrorMessage("");
       })
@@ -273,7 +352,7 @@ const SportsPage = () => {
       {/* header for mobile*/}
       <div
         className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
-       rounded-b-md shadow-md"
+        shadow-md"
       >
         Lajit
       </div>
@@ -304,30 +383,24 @@ const SportsPage = () => {
             border border-borderPrimary rounded-md"
         >
           {/* New Sport input */}
-          <div className=" flex justify-center mt-4">
+          <form onSubmit={handleNewSport} className=" flex justify-center mt-4">
             <input
               className="text-textPrimary bg-bgGray p-1 
                   border border-borderPrimary rounded-l-md
                     focus-visible:outline-none"
               type="text"
               data-testid="newSportInput"
-              placeholder="Luo laji"
+              placeholder="Uusi laji"
               value={newSport}
               onChange={(e) => setNewSport(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleNewSport();
-                }
-              }}
             />
-            <p
-              onClick={() => handleNewSport()}
+            <button
               className="py-2 px-4 rounded-r-md bg-primaryColor text-white
                    hover:bg-hoverPrimary active:scale-95 duration-75 select-none"
             >
               +
-            </p>
-          </div>
+            </button>
+          </form>
 
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-controlpanel3 px-2 text-textSecondary items-center ">
@@ -362,6 +435,7 @@ const SportsPage = () => {
             >
               {sortedSports.map((sport) => (
                 <CreateSportContainer
+                  queryclient = {queryclient}
                   sport={sport}
                   setSports={setSortedSports}
                   sports={sortedSports}

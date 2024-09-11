@@ -6,7 +6,10 @@
 */.gitignore
 .git
 .aws
-*/database
+/database/seeds/development/
 */docker-compose.yml
 Docker
 */readme.md
+*/env_local-template
+backend/tests/
+.env

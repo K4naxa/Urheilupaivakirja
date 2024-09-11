@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import publicService from "../services/publicService";
+import newsService from "../services/newsService";
 
-// Assuming publicService is accessible and has the relevant methods
 const UnreadNewsIndicator = ({ type }) => {
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -16,7 +15,7 @@ const UnreadNewsIndicator = ({ type }) => {
     isLoading,
   } = useQuery({
     queryKey: ["checkUnreadNews"],
-    queryFn: publicService.checkUnreadNews,
+    queryFn: newsService.checkUnreadNews,
     refetchInterval: 1000 * 60 * 5,
   });
 
@@ -28,16 +27,17 @@ const UnreadNewsIndicator = ({ type }) => {
   }, [isSuccess]);
 
   const updateNewsLastViewedAtMutation = useMutation({
-    mutationFn: publicService.updateNewsLastViewedAt,
+    mutationFn: newsService.updateNewsLastViewedAt,
     onSuccess: () => {},
   });
 
   // update news_last_viewed_at and mark news as read when students visits the news page
   useEffect(() => {
     if (location.pathname === "/tiedotteet/") {
+      console.log("update news last viewed at");
       updateNewsLastViewedAtMutation.mutate();
       setHasUnreadNews(false);
-      queryClient.invalidateQueries(["checkUnreadNews"]);
+      queryClient.invalidateQueries({queryKey: ["checkUnreadNews"]});
     }
   }, [location]);
 
@@ -45,12 +45,12 @@ const UnreadNewsIndicator = ({ type }) => {
     return null;
   }
 
-  const size = type === "phone" ? "w-2 h-2" : "w-1.5 h-1.5";
+  const size = type === "phone" ? "w-2 h-2" : "w-2 h-2";
 
   const position =
     type === "phone"
       ? "top-neg-one right-neg-one"
-      : "top-2.5 right-neg-one-point-five";
+      : "top-1 right-5";
 
   return (
     hasUnreadNews && (
