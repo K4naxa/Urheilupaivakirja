@@ -14,10 +14,10 @@ const { isAuthenticated } = require("../../utils/authMiddleware");
 const otpGenerator = require("otp-generator");
 const sendEmail = require("../../utils/email/sendEmail");
 const { validationResult } = require("express-validator");
-const { email, newPassword } = require("../../utils/validation");
+const { email, newPassword, first_name, last_name } = require("../../utils/validation");
 
 // Register a new student
-router.post("/", [email, newPassword], async (req, res, next) => {
+router.post("/", [email, newPassword, first_name, last_name], async (req, res, next) => {
   const {
     email,
     password,
@@ -35,17 +35,15 @@ router.post("/", [email, newPassword], async (req, res, next) => {
 
   try {
     await knex.transaction(async (trx) => {
-    // Check if the email already exists
-      const existingUser = await trx("users")
-      .where({ email: email })
-      .first();
+      // Check if the email already exists
+      const existingUser = await trx("users").where({ email: email }).first();
 
-    if (existingUser) {
-      // If the email exists, respond with 409 Conflict
-      return res.status(409).json({
-        error: "An account with this email already exists",
-      });
-    }
+      if (existingUser) {
+        // If the email exists, respond with 409 Conflict
+        return res.status(409).json({
+          error: "An account with this email already exists",
+        });
+      }
 
       // Hash the password
       const passwordHash = await bcrypt.hash(password, Number(saltRounds));
@@ -80,10 +78,25 @@ router.post("/", [email, newPassword], async (req, res, next) => {
             return existingName.id;
           }
 
+          function formatNewInsert(id) {
+            if (typeof id !== "string") {
+              return id;
+            }
+            let trimmed = id.trim();
+
+            // Replace multiple spaces with a single space
+            trimmed = trimmed.replace(/\s+/g, " ");
+
+            // Capitalize the first letter if it's a letter, including locale-specific characters
+            trimmed =
+              trimmed.charAt(0).toLocaleUpperCase("fi-FI") + trimmed.slice(1);
+            return trimmed;
+          }
+
           // "id" is in reality a name, so format it to handle commas
-          trimmedName = formatNameWithCommas(id);
+          trimmedName = formatNewInsert(id);
           const [newId] = await trx(tableName).insert({
-            name: id, // Insert the "id" as the "name" in the table
+            name: trimmedName, // Insert the "id" as the "name" in the table
             created_by: first_name + " " + last_name,
           });
 
