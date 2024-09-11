@@ -2,7 +2,7 @@
 require("dotenv").config();
 
 module.exports = {
-  development: {
+  production: {
     client: process.env.DB_TYPE,
     connection: {
       user: process.env.DB_USER,
