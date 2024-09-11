@@ -134,7 +134,6 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                                     ? "Oma laji"
                                     : "Unspecified"}{" "}
                             </span>
-
                             {/* Updated row with length and intensity */}
                             <div className="flex justify-center space-x-1">
                               <span className="text-sm text-textPrimary">
@@ -153,6 +152,7 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                               </span>
                             </div>
                           </div>
+                          
 
                           {user.role === 3 && (
                             <button
