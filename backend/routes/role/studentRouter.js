@@ -32,6 +32,7 @@ router.get("/", isAuthenticated, isTeacherOrSpectator, async (req, res) => {
       )
       .from("students")
       .where("archived", false)
+      .andWhere("verified", true)
       .leftJoin("sports", "students.sport_id", "sports.id")
       .leftJoin("student_groups", "students.group_id", "student_groups.id")
       .leftJoin("campuses", "students.campus_id", "campuses.id");

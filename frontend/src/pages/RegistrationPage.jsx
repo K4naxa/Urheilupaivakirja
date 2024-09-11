@@ -10,6 +10,7 @@ import GroupSelect from "../components/registration/RegistrationGroupSelect";
 import CampusSelect from "../components/registration/RegistrationCampusSelect";
 import SportSelect from "../components/registration/RegistrationSportSelect";
 import userService from "../services/userService";
+import { useNavigate } from "react-router-dom";
 
 const RegistrationPage = () => {
   const [registrationData, setRegistrationData] = useState({
@@ -30,6 +31,7 @@ const RegistrationPage = () => {
   const [errors, setErrors] = useState({});
   const { addToast } = useToast();
   const { login } = useAuth();
+  const navigate = useNavigate();
   //inputRef = useRef(null);
 
   // fetch options for registration form
@@ -152,26 +154,12 @@ const RegistrationPage = () => {
       // If registration is successful, show a success message
       addToast("Käyttäjätunnus luotu", { style: "success" });
 
-      // Attempt to log in the user
-      try {
-        const user = await userService.login(
-          registrationData.email,
-          registrationData.password
-        );
-        login(user);
-      } catch (loginError) {
-        addToast("Kirjautuminen epäonnistui", {
-          style: "error",
-          autoDismiss: false,
-        });
-        console.error("Error logging in:", loginError);
-      }
+      navigate("/kirjaudu");
     } catch (registrationError) {
       addToast("Rekisteröityminen epäonnistui", {
         style: "error",
         autoDismiss: false,
       });
-      console.error("Error registering:", registrationError);
     }
   };
 
@@ -223,9 +211,9 @@ const RegistrationPage = () => {
   const errorCheckPassword = () => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-  
+
       const password = registrationData.password;
-  
+
       // Check if password is empty
       if (password.length < 1) {
         newErrors.password = {
@@ -236,7 +224,7 @@ const RegistrationPage = () => {
         const lengthCheck = /.{8,}/; // At least 8 characters
         const capitalLetterCheck = /[A-Z]/; // At least one uppercase letter
         const numberCheck = /[0-9]/; // At least one number
-  
+
         // Check if the password meets the required conditions
         if (
           !lengthCheck.test(password) ||
@@ -246,7 +234,7 @@ const RegistrationPage = () => {
           newErrors.password = {
             value: "error",
             message:
-              "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron", 
+              "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron",
           };
         } else {
           newErrors.password = {
@@ -254,7 +242,7 @@ const RegistrationPage = () => {
           };
         }
       }
-  
+
       // Revalidate passwordAgain if present
       if (registrationData.passwordAgain) {
         if (registrationData.password !== registrationData.passwordAgain) {
@@ -270,18 +258,17 @@ const RegistrationPage = () => {
       } else {
         delete newErrors.passwordAgain;
       }
-  
+
       return newErrors;
     });
   };
-  
 
   const errorCheckPasswordAgain = () => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-  
+
       const passwordAgain = registrationData.passwordAgain;
-  
+
       if (passwordAgain.length < 1) {
         newErrors.passwordAgain = {
           value: "error",
@@ -296,7 +283,7 @@ const RegistrationPage = () => {
           value: "success",
         };
       }
-  
+
       // Ensure that password validation is in sync
       if (!registrationData.password || registrationData.password.length < 1) {
         newErrors.password = {
@@ -306,11 +293,10 @@ const RegistrationPage = () => {
         // Clear password error if already validated
         delete newErrors.password;
       }
-  
+
       return newErrors;
     });
   };
-  
 
   const errorCheckDropdown = (fieldValue, fieldName) => {
     setErrors((prevErrors) => {
@@ -344,12 +330,13 @@ const RegistrationPage = () => {
   };
 
   const containerClass = "flex flex-col gap-1 relative";
-  const dropdownContainerClass = "flex flex-col gap-1 mb-4 sm:mb-0 relative bg-bgSecondary ";
+  const dropdownContainerClass =
+    "flex flex-col gap-1 mb-4 sm:mb-0 relative bg-bgSecondary ";
 
   //add absolute to errorClass to make it look better, but
   //beware long error messages (minimum password length etc) will overlap
   //with the input field below the it.
-  const errorClass = "text-red-500 mt-1"; 
+  const errorClass = "text-red-500 mt-1";
 
   const inputClass =
     "text-lg text-textPrimary border-borderPrimary h-10 w-full r border-b p-1 pl-0 bg-bgSecondary focus-visible:outline-none focus-visible:border-primaryColor";
@@ -519,7 +506,7 @@ const RegistrationPage = () => {
               options={options}
               handleDropdownChange={(event) => handleDropdownChange(event)}
             />
-            
+
             {/* example error messages for group, campus and sport. */}
             {/* 
             errors.sportId && errors.sportId.message && (
