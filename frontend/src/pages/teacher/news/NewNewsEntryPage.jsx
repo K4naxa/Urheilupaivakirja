@@ -25,9 +25,9 @@ const NewNewsEntryPage = ({ onClose }) => {
   };
 
   const addNews = useMutation({
-    mutationFn: () => {
-      newsService.postNews(newNewsEntryData);
-    },
+    mutationFn: () => 
+      newsService.postNews(newNewsEntryData)
+    ,
     onError: (error) => {
       console.error("Error posting news entry:", error);
 
@@ -52,7 +52,7 @@ const NewNewsEntryPage = ({ onClose }) => {
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
       addToast("Uutinen lisätty", { style: "success" });
-      queryClient.invalidateQueries(["news"]);
+      queryClient.invalidateQueries({ queryKey: ["news"] });
       onClose();
     },
   });
@@ -79,7 +79,7 @@ const NewNewsEntryPage = ({ onClose }) => {
         ...prevData,
         date: today,
       }));
-      addToast("Et voi julkaista tiedotetta tulevaisuuteen", "error");
+      addToast("Et voi julkaista tiedotetta tulevaisuuteen", { style: "error" });
       return;
     }
 
@@ -182,7 +182,7 @@ const NewNewsEntryPage = ({ onClose }) => {
         {/* Pinned */}
         <div className="w-full flex items-center justify-between">
           <label className="block text-sm font-medium text-textPrimary">
-          Kiinnitetty
+            Kiinnitetty
           </label>
           <input
             type="checkbox"

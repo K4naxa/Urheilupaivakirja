@@ -13,7 +13,6 @@ const inputLabel = "text-textPrimary font-medium";
 const optionContainer = "flex justify-between w-full p-2";
 
 const NewJournalEntryPage = ({ onClose, studentData, date }) => {
-  console.log("Student Data:", studentData);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const initialDate = date || dayjs(new Date()).format("YYYY-MM-DD");
@@ -42,7 +41,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () => {  journalService.postJournalEntry(newJournalEntryData)},
+    mutationFn: () =>  journalService.postJournalEntry(newJournalEntryData),
     onError: (error) => {
       console.error("Error posting new journal entry:", error);
 
@@ -64,10 +63,10 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
       }
       addToast(errorMessage, { style: "error" });
     },
-    // Invalidate and refetch the query after the mutation
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["studentData"] });
+      queryClient.refetchQueries(["studentData"], { exact: true });
       addToast("Merkintä lisätty", { style: "success" });
-      queryClient.invalidateQueries(["studentData"]);
       onClose();
     },
   });

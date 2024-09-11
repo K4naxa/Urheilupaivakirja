@@ -2,19 +2,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiTrash2 } from "react-icons/fi";
 import newsService from "../../../services/newsService";
 
 const EditNewsEntryPage = ({ onClose, entryId }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const initialDate = dayjs(new Date()).format("YYYY-MM-DD");
 
   const [editNewsEntryData, setEditNewsEntryData] = useState({
     id: "",
     title: "",
     content: "",
-    date: initialDate,
+    date: "",
     public: true,
     pinned: false,
     categories: [],
@@ -36,7 +35,7 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
         id: newsEntry.id,
         title: newsEntry.title,
         content: newsEntry.content,
-        date: newsEntry.date,
+        date: dayjs(newsEntry.date).format("YYYY-MM-DD"),
         public: newsEntry.public,
         pinned: newsEntry.pinned,
         categories: newsEntry.categories,
@@ -44,9 +43,8 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
     }
   }, [newsEntry]);
 
-
   const editNews = useMutation({
-    mutationFn: () => { newsService.putNews(editNewsEntryData)},
+    mutationFn: () => newsService.putNews(editNewsEntryData),
     onError: (error) => {
       console.error("Error posting news entry:", error);
 
@@ -71,11 +69,25 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
       addToast("Muutokset tallennettu", { style: "success" });
-      queryClient.invalidateQueries(["news"]);
+      queryClient.invalidateQueries({ queryKey: ["news"] });
       onClose();
     },
   });
 
+
+
+  const deleteNews = useMutation({
+    mutationFn: () => newsService.deleteNews(editNewsEntryData.entry_id),
+    onError: (error) => {
+      console.error("Error deleting journal entry:", error);
+      addToast("Virhe poistettaessa tiedotetta", { style: "error" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["news"] });
+      addToast("Tiedote poistettu", { style: "success" });
+      onClose();
+    },
+  });
 
   const submitButtonIsDisabled = false;
 
@@ -87,19 +99,41 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
     }));
   };
 
+  const deleteNewsHandler = async (e) => {
+    e.preventDefault();
+
+    const onConfirmDelete = async () => {
+      try {
+        deleteNews.mutate();
+        console.log("News deleted successfully");
+      } catch (error) {
+        console.error("Error deleting news entry:", error);
+      }
+    };
+
+    openConfirmModal({
+      text: "Tiedote poistetaan pysyvästi",
+      agreeButtonText: "Poista",
+      agreeStyle: "red",
+      declineButtonText: "Peruuta",
+      onAgree: onConfirmDelete,
+      closeOnOutsideClick: false,
+    });
+  };
+
   const editNewsEntryHandler = async (event) => {
     event.preventDefault();
-  
+
     // Check if the selected date is in the future
-    const today = dayjs().startOf('day');
+    const today = dayjs().startOf("day");
     const selectedDate = dayjs(editNewsEntryData.date);
-  
+
     if (selectedDate.isAfter(today)) {
       setEditNewsEntryData((prevData) => ({
         ...prevData,
-        date: today, 
+        date: today,
       }));
-      addToast("Tiedotteen päivämäärä ei voi olla tulevaisuudessa", "error");
+      addToast("Tiedotteen päivämäärä ei voi olla tulevaisuudessa", { style: "error" });
       return;
     }
 
@@ -113,7 +147,6 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
     textarea.style.height = `${textarea.scrollHeight}px`;
     handleInputChange(e);
   };
-  
 
   const handleContentTextareaChange = (e) => {
     const textarea = e.target;
@@ -205,8 +238,8 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
           />
         </div>
 
-                {/* Pinned Toggle */}
-                <div className="w-full flex items-center justify-between">
+        {/* Pinned Toggle */}
+        <div className="w-full flex items-center justify-between">
           <label className="block text-sm font-medium text-textPrimary">
             Pinned
           </label>
@@ -243,19 +276,30 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
         </div>
 
         {/* Conflict Message and Submit Button */}
-        <div className="flex flex-col text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
+        <div className="flex text-red-400 text-center items-center gap-4 w-full p-4 mt-auto">
           {conflict.messageShort && <p>{conflict.messageShort}</p>}
-          <button
-            className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary ${
-              submitButtonIsDisabled
-                ? "bg-gray-400 opacity-20 text-gray border-borderPrimary cursor-not-allowed"
-                : "cursor-pointer"
-            }`}
-            type="submit"
-            disabled={submitButtonIsDisabled}
-          >
-            Tallenna
-          </button>
+          <div></div>
+          <div>
+            <button
+              className={`min-w-[160px] text-white px-4 py-4 rounded-md bg-primaryColor border-borderPrimary active:scale-95 transition-transform duration-75 hover:bg-hoverPrimary ${
+                submitButtonIsDisabled
+                  ? "bg-gray-400 opacity-20 text-gray border-borderPrimary cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              type="submit"
+              disabled={submitButtonIsDisabled}
+            >
+              Tallenna
+            </button>
+          </div>
+          <div className="flex-1 flex justify-center">
+            <button
+              className="hover:cursor-pointer hover:bg-bgGray rounded m-1.5 p-2"
+              onClick={deleteNewsHandler}
+            >
+              <FiTrash2 className="text-2xl" />
+            </button>
+          </div>
         </div>
       </form>
     </div>

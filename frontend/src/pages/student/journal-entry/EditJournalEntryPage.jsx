@@ -62,7 +62,6 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
 
   const editJournalEntry = useMutation({
     mutationFn: () => journalService.editJournalEntry(journalEntryData),
-    // If the mutation fails, roll back to the previous value
     onError: (error) => {
       console.error("Error updating journal entry:", error);
 
@@ -93,14 +92,10 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
     },
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
-      console.log("Invalidating studentData query");
-
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
       queryClient.refetchQueries(["studentData"], { exact: true });
-      console.log("adding toast");
 
       addToast("Merkintä päivitetty", { style: "success" });
-      console.log("closing modal");
 
       onClose();
     },
@@ -119,7 +114,6 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
       onClose();
     },
   });
-
 
   // Options data for dropdowns
   const {

@@ -16,7 +16,7 @@ const StudentHeatmapTooltip = ({ studentData }) => {
   const { openBigModal } = useBigModal();
   const { user } = useAuth();
   const { tooltipContent, tooltipUser, tooltipDate } = useHeatmapContext();
-
+  
   const TooltipContent = React.memo(({ user, openBigModal }) => {
     const [expandedEntry, setExpandedEntry] = useState(null);
     const dayEntries = tooltipContent;
@@ -79,6 +79,9 @@ const StudentHeatmapTooltip = ({ studentData }) => {
         ?.slice()
         .sort((a, b) => a.time_of_day_id - b.time_of_day_id);
     }, [dayEntries]);
+
+    console.log("SortedEntries", sortedDayEntries);
+    console.log("TooltipContent", tooltipContent)
 
     return (
       <>
