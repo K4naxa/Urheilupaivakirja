@@ -43,9 +43,15 @@
     --color-modal-bg-primary: 75 75 75;
 
     /* Heat map exercise colors */
-    --color-heatmap-exercise1: 144 238 144;
-    --color-heatmap-exercise2: 72 183 72;
-    --color-heatmap-exercise3: 0 107 0;
+    --color-heatmap-exercise1: 80 200 80;
+    --color-heatmap-exercise2: 60 160 60;
+    --color-heatmap-exercise3: 30 125 30;
+    --color-heatmap-exercise4: 0 95 0;
+    --color-heatmap-exercise5: 0 60 0; /* Used for border color only (border color is one darker than background)*/
+
+    --color-border-rest: 160 170 215;
+    --color-border-sick: 200 120 50;
+    
   }
 
   :root[data-theme="dark"] {

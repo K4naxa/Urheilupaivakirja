@@ -66,8 +66,9 @@ export const BigModalProvider = ({ children }) => {
   };
 
   const closeBigModal = () => {
-    setBigModalOpen(false);
     setBigModalContent(null);
+    setBigModalOpen(false);
+
     if (window.history.state?.modalOpen) {
       window.history.back();
     } else {

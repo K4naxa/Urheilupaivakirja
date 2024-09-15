@@ -33,6 +33,9 @@ export default {
         textRest: "rgb(var(--color-text-rest) / <alpha-value>)",
         textSick: "rgb(var(--color-text-sick) / <alpha-value>)",
 
+        borderSick: "rgb(var(--color-border-sick) / <alpha-value>)",
+        borderRest: "rgb(var(--color-border-rest) / <alpha-value>)",
+
         // Border colors
         borderPrimary: "rgb(var(--color-border-primary) / <alpha-value>)",
 
@@ -49,6 +52,9 @@ export default {
         heatmapExercise1: "rgb(var(--color-heatmap-exercise1) / <alpha-value>)",
         heatmapExercise2: "rgb(var(--color-heatmap-exercise2) / <alpha-value>)",
         heatmapExercise3: "rgb(var(--color-heatmap-exercise3) / <alpha-value>)",
+        heatmapExercise4: "rgb(var(--color-heatmap-exercise4) / <alpha-value>)",
+        heatmapExercise5: "rgb(var(--color-heatmap-exercise5) / <alpha-value>)",
+
 
         // Modal colors
         modalPrimary: "rgb(var(--color-modal-bg-primary) / <alpha-value>)",

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const HeatmapTooltipContext = createContext();
 
@@ -7,14 +7,22 @@ export const HeatmapTooltipContextProvider = ({ children }) => {
     const [tooltipContent, setTooltipContent] = useState(null);
     const [tooltipUser, setTooltipUser] = useState(null);
 
+    const clearTooltipContent = () => {
+        setTooltipContent("");
+    };
+
     const value = {
         tooltipDate,
         setTooltipDate,
         tooltipContent,
         setTooltipContent,
         tooltipUser,
-        setTooltipUser
+        setTooltipUser,
+        clearTooltipContent
     }; 
+
+    useEffect(() => {
+    }, [tooltipContent]);
 
     return (
         <HeatmapTooltipContext.Provider value={value}>
@@ -23,4 +31,5 @@ export const HeatmapTooltipContextProvider = ({ children }) => {
     );
 };
 
+// Custom hook to use the Heatmap context
 export const useHeatmapContext = () => useContext(HeatmapTooltipContext);

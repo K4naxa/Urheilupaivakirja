@@ -54,7 +54,6 @@ function CreateSportContainer({ sport, sports, setSports, queryclient }) {
         setIsEditing(false);
       })
       .catch((error) => {
-        console.log(error);
         setCellError(error.response.data.error);
       });
   };
@@ -120,8 +119,7 @@ function CreateSportContainer({ sport, sports, setSports, queryclient }) {
       mergeSports.mutate({mergeFromId: sport.id, mergeToId: selectedOptionId});
     };
 
-    console.log("That merges: ", sport);
-    console.log("Merged to options: ", sports);
+
     const typeTextNominative = "laji";
     const typeTextGenitive = "lajin";
     const typeTextIllative = "lajiin";
@@ -351,7 +349,7 @@ const SportsPage = () => {
     <div className="w-full items-center bg-bgSecondary rounded-md ">
       {/* header for mobile*/}
       <div
-        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
+        className="md:hidden text-2xl text-white text-center py-4 bg-primaryColor w-full
         shadow-md"
       >
         Lajit

@@ -31,23 +31,31 @@ import courseService from "../../services/courseService";
 import { useParams } from "react-router-dom";
 import studentService from "../../services/studentService";
 import cc from "../../utils/cc";
-import { useState } from "react";
+import { useState, useEffect} from "react";
+import { useHeatmapContext } from "../../hooks/useHeatmapContext";
 
 function StudentHome() {
   const { id } = useParams();
   const { showDate, setShowDate } = useMainContext();
-  const [tooltipContent, setTooltipContent] = useState(null);
+  const { clearTooltipContent } = useHeatmapContext();
+  const [progressionBarTooltipContent, setProgressionBarTooltipContent] = useState(null);
 
-  console.log(id);
+  useEffect(() => {
+    clearTooltipContent();
+    return () => {
+      clearTooltipContent();
+    };
+  }, []);
+
+
   const {
     data: studentData,
     isLoading: studentDataLoading,
     error: studentDataError,
   } = useQuery({
-    queryKey: ["singleStudentData", id],
+    queryKey: ["singleStudentData"],
     queryFn: () => studentService.getStudentDataWithId(id),
     staleTime: 15 * 60 * 1000,
-    enabled: !!id,
   });
 
   const { data: courseSegments } = useQuery({
@@ -118,8 +126,8 @@ function StudentHome() {
                 "h-full segment hover:cursor-pointer border border-borderPrimary rounded-xl clickableCourseSegment bg-bgGray"
               )}
               style={{ width: `${segmentLength}%` }}
-              onClick={() => setTooltipContent(TooltipInfo)}
-              onMouseLeave={() => setTooltipContent(null)}
+              onClick={() => setProgressionBarTooltipContent(TooltipInfo)}
+              onMouseLeave={() => setProgressionBarTooltipContent(null)}
             >
               <div
                 className={cc(
@@ -136,15 +144,14 @@ function StudentHome() {
   };
 
   const getSegmentTooltipContent = () => {
-    console.log(tooltipContent);
     return (
       <>
         <div className="flex flex-col gap-2 p-2 w-42">
-          <h3 className="font-bold text-center">{tooltipContent.name}</h3>
-          <span>Suoritettu: {tooltipContent.progression}%</span>
+          <h3 className="font-bold text-center">{progressionBarTooltipContent.name}</h3>
+          <span>Suoritettu: {progressionBarTooltipContent.progression}%</span>
           <span className="">
-            Merkinnät: {tooltipContent.unUsedEntires} /{" "}
-            {tooltipContent.requirement}
+            Merkinnät: {progressionBarTooltipContent.unUsedEntires} /{" "}
+            {progressionBarTooltipContent.requirement}
           </span>
         </div>
       </>
@@ -325,7 +332,7 @@ function StudentHome() {
           padding: "0.5rem",
         }}
       >
-        {tooltipContent && getSegmentTooltipContent()}
+        {progressionBarTooltipContent && getSegmentTooltipContent()}
       </Tooltip>
     </div>
   );

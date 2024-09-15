@@ -6,7 +6,6 @@ RUN cd front && npm install --silent && npm run build --silent && cd ..
 RUN cp -r front/dist build && rm -r front
 COPY backend .
 COPY database/migrations migrations
-COPY database/seeds/production seeds
 COPY knexfile_env.js knexfile.js
 RUN npm install
-CMD npx knex migrate:latest --env production && npx knex seed:run --env production && node ./bin/www
+CMD node ./bin/www

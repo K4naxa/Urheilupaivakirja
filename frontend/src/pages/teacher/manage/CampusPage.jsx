@@ -88,8 +88,6 @@ const CreateCampusContainer = ({
       });
     };
 
-    console.log("That merges: ", campus);
-    console.log("Merged to options: ", campuses);
     const typeTextNominative = "toimipaikka";
     const typeTextGenitive = "toimipaikan";
     const typeTextIllative = "toimipaikkaan";
@@ -285,7 +283,6 @@ const CampusPage = () => {
         setErrorMessage("");
       })
       .catch((error) => {
-        console.log(error.response.data);
         return;
       });
   };
@@ -340,7 +337,7 @@ const CampusPage = () => {
   return (
     <div className="items-center w-full rounded-md bg-bgSecondary">
       {/* header for mobile*/}
-      <div className="w-full py-4 text-2xl text-center shadow-md md:hidden bg-primaryColor">
+      <div className="w-full py-4 text-2xl text-white  text-center shadow-md md:hidden bg-primaryColor">
         Toimipaikat
       </div>
       {/* Error Header */}

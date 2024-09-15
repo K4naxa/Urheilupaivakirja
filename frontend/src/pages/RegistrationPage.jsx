@@ -48,10 +48,6 @@ const RegistrationPage = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log("Errors changed: ", errors);
-  }, [errors]);
-
   const changeHandler = (e) => {
     const { name, value } = e.target;
     setRegistrationData({
@@ -154,7 +150,19 @@ const RegistrationPage = () => {
       // If registration is successful, show a success message
       addToast("Käyttäjätunnus luotu", { style: "success" });
 
-      navigate("/kirjaudu");
+      try {
+        const user = await userService.login(
+          registrationData.email,
+          registrationData.password
+        );
+        login(user);
+      } catch (loginError) {
+        addToast("Kirjautuminen epäonnistui", {
+          style: "error",
+          autoDismiss: false,
+        });
+        console.error("Error logging in:", loginError);
+      }
     } catch (registrationError) {
       addToast("Rekisteröityminen epäonnistui", {
         style: "error",

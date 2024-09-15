@@ -93,7 +93,7 @@ router.post("/login", [email, password], async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 5 * 60 * 1000,
+      maxAge: 15 * 60 * 1000, //15 minutes
     });
     } else {
       refreshToken = createShortRefreshToken(tempUser);
@@ -110,7 +110,7 @@ router.post("/login", [email, password], async (req, res, next) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
-        maxAge: 5 * 60 * 1000,
+        maxAge: 15 * 60 * 1000, //15 minutes
       });
     }
 
@@ -206,7 +206,8 @@ router.post("/refresh-access-token", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true in production
       sameSite: "Strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 15 * 60 * 1000, //15 minutes
+
     });
 
     res.json({ accessToken });

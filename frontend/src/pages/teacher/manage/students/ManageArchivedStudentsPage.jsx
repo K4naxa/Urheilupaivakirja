@@ -224,7 +224,6 @@ const ManageArchivedStudentsPage = () => {
   //useEffect for sorting and filtering students
   useEffect(() => {
     let newFiltered = [...state.students];
-    console.log(newFiltered);
 
     // Check for sorting settings
     if (sorting.name === 1) {

@@ -40,10 +40,6 @@ const TeacherRegistrationPage = () => {
     },
   });
 
-  useEffect(() => {
-    console.log("Errors changed: ", errors);
-  }, [errors]);
-
   const changeHandler = (e) => {
     const { name, value } = e.target;
     setRegistrationData({

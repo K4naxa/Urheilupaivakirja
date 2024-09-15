@@ -305,7 +305,7 @@ router.put(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
-        maxAge: 5 * 60 * 1000, // 5 minutes
+        maxAge: 15 * 60 * 1000, //15 minutes
       });
 
       // Send success response

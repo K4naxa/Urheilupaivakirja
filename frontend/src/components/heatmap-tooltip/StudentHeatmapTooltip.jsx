@@ -16,8 +16,8 @@ const StudentHeatmapTooltip = ({ studentData }) => {
   const { openBigModal } = useBigModal();
   const { user } = useAuth();
   const { tooltipContent, tooltipUser, tooltipDate } = useHeatmapContext();
-  
-  const TooltipContent = React.memo(({ user, openBigModal }) => {
+
+  const TooltipContent = ({ user, openBigModal }) => {
     const [expandedEntry, setExpandedEntry] = useState(null);
     const dayEntries = tooltipContent;
     const day = tooltipDate;
@@ -80,9 +80,6 @@ const StudentHeatmapTooltip = ({ studentData }) => {
         .sort((a, b) => a.time_of_day_id - b.time_of_day_id);
     }, [dayEntries]);
 
-    console.log("SortedEntries", sortedDayEntries);
-    console.log("TooltipContent", tooltipContent)
-
     return (
       <>
         <div className="flex flex-col gap-1 text-textPrimary">
@@ -118,12 +115,20 @@ const StudentHeatmapTooltip = ({ studentData }) => {
                                 ) {
                                   return entry.workout_type_name;
                                 }
+                                if (
+                                  entry.workout_category_id === 3 &&
+                                  (user.role === 1 || user.role === 2)
+                                ) {
+                                  return "Oma Laji";
+                                }
                                 if (entry.workout_category_id === 1) {
                                   return user.sport;
                                 }
+
                                 if (entry.workout_type_id === 3) {
                                   return entry.workout_category_name;
                                 }
+
                                 return null;
                               })()}
                             </span>
@@ -162,7 +167,7 @@ const StudentHeatmapTooltip = ({ studentData }) => {
                         {expandedEntry === entry.id && (
                           <div className="space-y-3 pt-1 text-center">
                             <div className="flex justify-center">
-                              <p className="text-textSecondary text-center">
+                              <p className="text-textSecondary max-w-[200px] break-words text-center">
                                 {entry.details
                                   ? entry.details
                                   : "Ei lisätietoja"}
@@ -176,13 +181,19 @@ const StudentHeatmapTooltip = ({ studentData }) => {
                 </div>
               ) : (
                 sortedDayEntries.map((entry) => (
-                  <div key={entry.id} className="text-center pt-2 border-t border-borderPrimary">
-                    <p>
+                  <div
+                    key={entry.id}
+                    className="flex flex-col justify-center items-center w-full px-2 py-1 border-t border-borderPrimary"
+                  >
+                    <p className="font-semibold">
                       {entry.entry_type_id === 3
                         ? "Sairauspäivä"
                         : entry.entry_type_id === 2
                           ? "Lepopäivä"
                           : "Jotain meni vikaan!"}
+                    </p>
+                    <p className="text-textSecondary max-w-[200px] text-center break-words">
+                      {entry.details}
                     </p>
                   </div>
                 ))
@@ -243,7 +254,7 @@ const StudentHeatmapTooltip = ({ studentData }) => {
         </div>
       </>
     );
-  });
+  };
   return (
     <Tooltip
       anchorSelect=".clickableCalendarDay"
