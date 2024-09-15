@@ -132,7 +132,6 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
         }
       }
 
-  
 
       // Respond with success and user details
       res.status(201).json({
