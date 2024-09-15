@@ -7,7 +7,7 @@ import {
 } from "react-icons/fi";
 import dayjs from "dayjs";
 import { Tooltip } from "react-tooltip";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useBigModal } from "../../hooks/useBigModal";
 import { useAuth } from "../../hooks/useAuth";
 import { useHeatmapContext } from "../../hooks/useHeatmapContext";
@@ -29,7 +29,7 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
     queryFn: () => journalService.getJournalEntryOptions(),
   });
 
-  const TooltipContent = React.memo(({ user, openBigModal }) => {
+  const TooltipContent = ({ user, openBigModal }) => {
     const [expandedEntry, setExpandedEntry] = useState(null);
     const dayEntries = tooltipContent;
     const day = tooltipDate;
@@ -94,10 +94,6 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
 
     if (optionsLoading) return <div></div>;
 
-    console.log("SortedEntries", sortedDayEntries);
-    console.log("TooltipContent", tooltipContent);
-    console.log("OptionsData:", optionsData);
-
     return (
       <>
         <div className="flex flex-col gap-1 text-textPrimary">
@@ -124,7 +120,7 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                             {renderTimeOfDayIcon(entry.time_of_day_id)}
                           </div>
                           {/* Main content (centered) */}
-                          <div className="flex flex-col justify-center items-center w-full px-1">
+                          <div className="flex flex-col justify-center items-center w-full pl-1 pr-2">
                             <span className="text font-semibold text-textPrimary">
                               {entry.workout_type_id === 1
                                 ? optionsData.workout_types[0].name
@@ -132,7 +128,7 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                                   ? optionsData.workout_types[1].name
                                   : entry.workout_type_id === 3
                                     ? "Oma laji"
-                                    : "Unspecified"}{" "}
+                                    : "Määrittelemätön (virhe)"}
                             </span>
                             {/* Updated row with length and intensity */}
                             <div className="flex justify-center space-x-1">
@@ -152,7 +148,6 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                               </span>
                             </div>
                           </div>
-                          
 
                           {user.role === 3 && (
                             <button
@@ -175,7 +170,7 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                         {expandedEntry === entry.id && (
                           <div className="space-y-3 pt-1 text-center">
                             <div className="flex justify-center">
-                              <p className="text-textSecondary text-center">
+                              <p className="text-textSecondary max-w-[200px] break-words text-center">
                                 {entry.details
                                   ? entry.details
                                   : "Ei lisätietoja"}
@@ -189,77 +184,35 @@ const TeacherHeatmapTooltip = ({ studentData }) => {
                 </div>
               ) : (
                 sortedDayEntries.map((entry) => (
+                  
                   <div
                     key={entry.id}
-                    className="text-center pt-2 border-t border-borderPrimary"
+                    className="flex flex-col justify-center items-center w-full px-2 py-1 border-t border-borderPrimary"
                   >
-                    <p>
+                    <p className="font-semibold">
                       {entry.entry_type_id === 3
                         ? "Sairauspäivä"
                         : entry.entry_type_id === 2
                           ? "Lepopäivä"
                           : "Jotain meni vikaan!"}
                     </p>
+                    <p className="text-textSecondary max-w-[200px] text-center break-words">
+                      {entry.details}
+                    </p>
                   </div>
                 ))
               )}
             </>
           )}
-
-          <div className="flex justify-center gap-2 py-1">
-            {user.role === 3 &&
-              (sortedDayEntries?.length > 0 ? (
-                allEntriesAreExercises ? (
-                  <>
-                    <button
-                      className="flex items-center p-2  text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
-                      onClick={() => {
-                        openBigModal("newJournalEntry", {
-                          date: dayjs(day).format("YYYY-MM-DD"),
-                          studentData,
-                        });
-                        simulateClickOutside();
-                      }}
-                    >
-                      <FiPlusCircle className="text-xl" />
-                      <p className="ml-2 text-sm">Uusi merkintä</p>
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className="flex items-center p-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
-                    onClick={() => {
-                      openBigModal("editJournalEntry", {
-                        entryId: sortedDayEntries[0].id,
-                        studentData,
-                      });
-                      simulateClickOutside();
-                    }}
-                  >
-                    <FiEdit3 className="text-xl" />
-                    <p className="ml-2 text-sm">Muokkaa</p>
-                  </button>
-                )
-              ) : (
-                <button
-                  className="flex items-center p-2 text-white rounded cursor-pointer bg-primaryColor hover:bg-hoverPrimary"
-                  onClick={() => {
-                    openBigModal("newJournalEntry", {
-                      date: dayjs(day).format("YYYY-MM-DD"),
-                      studentData,
-                    });
-                    simulateClickOutside();
-                  }}
-                >
-                  <FiPlusCircle className="text-xl" />
-                  <p className="ml-2 text-sm">Uusi merkintä</p>
-                </button>
-              ))}
-          </div>
+          {sortedDayEntries?.length === 0 && (
+            <div className="text-center text-textSecondary">
+              <p>Ei merkintöjä</p>
+            </div>
+          )}
         </div>
       </>
     );
-  });
+  };
   return (
     <Tooltip
       anchorSelect=".clickableCalendarDay"

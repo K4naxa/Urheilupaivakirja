@@ -17,10 +17,6 @@ const ForgottenPasswordNewPasswordPage = () => {
   const resetToken = location.state?.resetToken;
   const email = location.state?.email;
 
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
-
   const {
     mutate: resetPassword,
     isError,

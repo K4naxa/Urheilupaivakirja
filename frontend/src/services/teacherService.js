@@ -37,10 +37,13 @@ const deleteTeacher = async (userId) => {
   return response.data;
 };
 
-const revokeInvitationToken = async () => {
-  const response = await apiClient.post("/teacher/revoke/:id");
+const revokeInvitationToken = async (id) => {
+  const response = await apiClient.delete(
+    `/teacher/revoke/${id}`,
+    {}
+  );
   return response.data;
-};
+}
 
 const deleteTeacherUserSelf = async (password) => {
   const response = await apiClient.post("/user/delete/teacher/self/", {

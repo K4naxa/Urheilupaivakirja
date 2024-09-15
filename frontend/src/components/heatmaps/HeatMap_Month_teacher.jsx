@@ -75,16 +75,18 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
     if (!journal) return;
 
     if (minutes > 1 && minutes <= 60)
-      return "bg-heatmapExercise1 border-heatmapExercise1 text-textExercise";
+      return "bg-heatmapExercise1 border-heatmapExercise2 text-black";
     if (minutes > 60 && minutes <= 120)
-      return "bg-heatmapExercise2 border-heatmapExercise2 text-textExercise";
-    if (minutes > 120)
-      return "bg-heatmapExercise3 border-heatmapExercise3  text-textExercise";
+      return "bg-heatmapExercise2 border-heatmapExercise3 text-black";
+      if (minutes > 120 && minutes <= 180)
+      return "bg-heatmapExercise3 border-heatmapExercise4 text-white";
+    if (minutes > 180)
+      return "bg-heatmapExercise4 border-heatmapExercise5 text-white";
 
     if (journal[0]?.entry_type_id === 2)
-      return "bg-bgRest border-bgRest text-textRest";
+      return "bg-bgRest border-borderRest text-black";
     if (journal[0]?.entry_type_id === 3)
-      return "bg-bgSick border-bgSick text-textSick";
+      return "bg-bgSick border-borderSick text-black";
 
     return null;
   }

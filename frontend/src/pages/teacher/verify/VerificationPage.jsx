@@ -22,7 +22,10 @@ const VerificationPage = () => {
     students: unverifiedStudents = [],
     sports: unverifiedSports = [],
     student_groups: unverifiedStudentGroupes = [],
+    email_not_verified_students: emailNotVerifiedStudents = [],
   } = unverifiedData || {};
+
+  console.log("emailNotVerifiedStudents", emailNotVerifiedStudents);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -122,6 +125,33 @@ const VerificationPage = () => {
           )}
         </div>
       </div>
+      {emailNotVerifiedStudents.length > 0 && (
+        <div className="flex flex-col col-span-2 bg-bgSecondary rounded-md border border-borderPrimary min-w-96">
+          <div className="w-full py-2 rounded-t-md border-b border-borderPrimary text-xl text-center">
+            <h2>Oppilaat, jotka eivät ole varmistaneet sähköpostiaan:</h2>
+          </div>
+          <div className="w-full py-2">
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <LoadingScreen />
+              </div>
+            ) : error ? (
+              <div className="text-center w-full text-red-500">
+                Error: {error.message}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4 p-2 bg-bgSecondary">
+                {emailNotVerifiedStudents.map((student) => (
+                  <CreateEmailNotVerifiedStudentContainer
+                    key={student.user_id} // Use student.user_id as the unique key
+                    student={student}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -206,6 +236,62 @@ function CreateStudentContainer({ student }) {
   );
 }
 
+function CreateEmailNotVerifiedStudentContainer({ student }) {
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
+
+  const deleteStudentMutation = useMutation({
+    mutationFn: () => studentService.deleteStudent(student.user_id),
+    onSuccess: () => {
+      addToast("Oppilas poistettu", { style: "success" });
+      queryClient.invalidateQueries({
+        queryKey: ["unverifiedStudentsSportsCampuses"],
+      });
+    },
+    onError: (error) => {
+      addToast("Virhe poistettaessa oppilasta", { style: "error" });
+      console.error("Error deleting student:", error);
+    },
+  });
+
+  return (
+    <div
+      key={student.id}
+      className="flex flex-col hover:bg-hoverDefault p-4 rounded-md gap-2
+      border border-borderPrimary"
+    >
+      {/* User title */}
+      <div className="text-center text-xl">
+        {student.first_name} {student.last_name}
+      </div>
+      <div className="flex gap-1">
+        <p className="text-textSecondary w-20">Email:</p> <p>{student.email}</p>
+      </div>
+      <div className="flex gap-1">
+        <p className="text-textSecondary w-20">Laji:</p> <p>{student.sport}</p>
+      </div>
+
+      <div className="flex gap-1">
+        <p className="text-textSecondary w-20">Ryhmä:</p> <p>{student.group}</p>
+      </div>
+      <div className="flex gap-1">
+        <p className="text-textSecondary w-20">Toimipiste:</p>{" "}
+        <p>{student.campus}</p>
+      </div>
+
+      {/* buttons */}
+      <div className="flex gap-4 justify-center">
+        <button
+          className="text-iconRed p-1 hover:scale-110 rounded-md"
+          onClick={() => deleteStudentMutation.mutate()}
+        >
+          <FiTrash2 size={20} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const CreateStudentGroupContainer = ({ student_group }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -231,8 +317,14 @@ const CreateStudentGroupContainer = ({ student_group }) => {
         queryKey: ["unverifiedStudentsSportsCampuses"],
       });
     },
-    onError: () => {
-      addToast("Virhe poistettaessa ryhmää", { style: "error" });
+    onError: (error) => {
+      if (error.response?.status === 409) {
+        addToast("Poisto epäonnistui, koska ryhmässä on opiskelijoita.", {
+          style: "error",
+        });
+      } else {
+        addToast("Virhe poistettaessa ryhmää", { style: "error" });
+      }
     },
   });
 
@@ -243,7 +335,16 @@ const CreateStudentGroupContainer = ({ student_group }) => {
       border border-borderPrimary"
     >
       {/* StudentGroup title */}
-      <div className="text-center text-xl">{student_group.name}</div>
+      <div className="text-center flex items-end gap-2">
+        <div>
+          <p className="text-xl m-0">{student_group.name}</p>
+        </div>
+        <div>
+          <p className="text-textSecondary text-sm  m-0.5">
+            Luonut: {student_group.created_by}
+          </p>
+        </div>
+      </div>
 
       {/* buttons */}
       <div className="flex gap-4 justify-center">
@@ -290,8 +391,14 @@ const CreateSportContainer = ({ sport }) => {
         queryKey: ["unverifiedStudentsSportsCampuses"],
       });
     },
-    onError: () => {
-      addToast("Virhe poistettaessa lajia", { style: "error" });
+    onError: (error) => {
+      if (error.response?.status === 409) {
+        addToast("Poisto epäonnistui, koska lajilla on opiskelijoita.", {
+          style: "error",
+        });
+      } else {
+        addToast("Virhe poistettaessa lajia", { style: "error" });
+      }
     },
   });
 
@@ -302,7 +409,16 @@ const CreateSportContainer = ({ sport }) => {
       border border-borderPrimary"
     >
       {/* Sport title */}
-      <div className="text-center text-xl">{sport.name}</div>
+      <div className="text-center flex items-end gap-2">
+        <div>
+          <p className="text-xl m-0">{sport.name}</p>
+        </div>
+        <div>
+          <p className="text-textSecondary text-sm  m-0.5">
+            Luonut: {sport.created_by}
+          </p>
+        </div>
+      </div>
 
       {/* buttons */}
       <div className="flex gap-4 justify-center">

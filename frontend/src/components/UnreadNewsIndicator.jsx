@@ -6,9 +6,8 @@ import newsService from "../services/newsService";
 const UnreadNewsIndicator = ({ type }) => {
   const location = useLocation();
   const queryClient = useQueryClient();
-  const [hasUnreadNews, setHasUnreadNews] = useState(false);
 
-  // check unread news every 5 minutes
+  // Fetch unread news every 10 minutes
   const {
     data: unreadNews,
     isSuccess,
@@ -16,44 +15,44 @@ const UnreadNewsIndicator = ({ type }) => {
   } = useQuery({
     queryKey: ["checkUnreadNews"],
     queryFn: newsService.checkUnreadNews,
-    refetchInterval: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60 * 10,
   });
-
-  // onSuccess
-  useEffect(() => {
-    if (isSuccess) {
-      setHasUnreadNews(unreadNews.hasUnreadNews);
-    }
-  }, [isSuccess]);
 
   const updateNewsLastViewedAtMutation = useMutation({
     mutationFn: newsService.updateNewsLastViewedAt,
     onSuccess: () => {},
   });
 
-  // update news_last_viewed_at and mark news as read when students visits the news page
+  // Update news_last_viewed_at and mark news as read when the user visits the news page
   useEffect(() => {
     if (location.pathname === "/tiedotteet/") {
       console.log("update news last viewed at");
       updateNewsLastViewedAtMutation.mutate();
-      setHasUnreadNews(false);
-      queryClient.invalidateQueries({queryKey: ["checkUnreadNews"]});
+
+      // Update the query data directly to avoid unnecessary refetch
+      queryClient.setQueryData(["checkUnreadNews"], (oldData) => {
+        if (oldData) {
+          return { ...oldData, hasUnreadNews: false };
+        } else {
+          return oldData;
+        }
+      });
     }
-  }, [location]);
+  }, [location.pathname]);
+
+
+  
 
   if (isLoading) {
     return null;
   }
 
   const size = type === "phone" ? "w-2 h-2" : "w-2 h-2";
-
   const position =
-    type === "phone"
-      ? "top-neg-one right-neg-one"
-      : "top-1 right-5";
+    type === "phone" ? "top-neg-one right-neg-one" : "top-1 right-5";
 
   return (
-    hasUnreadNews && (
+    unreadNews?.hasUnreadNews && (
       <div className={`absolute ${position}`}>
         <span className={`block ${size} bg-red-500 rounded-full`}></span>
       </div>

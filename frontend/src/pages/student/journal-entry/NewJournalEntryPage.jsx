@@ -65,7 +65,6 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
-      queryClient.refetchQueries(["studentData"], { exact: true });
       addToast("Merkintä lisätty", { style: "success" });
       onClose();
     },
@@ -106,16 +105,6 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
     newJournalEntryData.entry_type,
     newJournalEntryData.date,
   ]);
-
-  useEffect(() => {
-    console.log("entriesForSelectedDate changed:", entriesForSelectedDate);
-  }, [entriesForSelectedDate]);
-  
-  useEffect(() => {
-    console.log("newJournalEntryData changed:", newJournalEntryData);
-  }, [newJournalEntryData]);
-  
-  
 
   const newJournalEntryHandler = async (e) => {
     e.preventDefault();
@@ -347,7 +336,6 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
         message: conflictData.message,
         messageShort: conflictData.messageShort,
       });
-      console.log("Conflict detected:", conflictData.message);
     }
   };
 
@@ -403,13 +391,10 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
   }
 
   if (optionsLoading || studentDataLoading) {
-    console.log("is loading");
     return <p>Loading...</p>;
   }
 
   if (optionsError) {
-    console.log("is erroring");
-    console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 

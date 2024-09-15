@@ -266,11 +266,8 @@ router.get(
 );
 
 // Get unread news count
-router.get("/unread", isAuthenticated, async (req, res, next) => {
+router.get("/unread", isAuthenticated, isStudent, async (req, res, next) => {
   const user_id = req.user.user_id;
-  if (!user_id) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
 
   try {
     const student = await knex("students")
@@ -384,24 +381,30 @@ router.get("/", isAuthenticated, async (req, res, next) => {
 
     const newsIds = newsRows.map((news) => news.id);
 
-    const campuses = await knex("news_campuses")
-      .select("news_id", "name")
-      .join("campuses", "news_campuses.campus_id", "campuses.id")
-      .whereIn("news_id", newsIds);
+    let campuses = [];
+    let sports = [];
+    let studentGroups = [];
 
-    const sports = await knex("news_sports")
-      .select("news_id", "name")
-      .join("sports", "news_sports.sport_id", "sports.id")
-      .whereIn("news_id", newsIds);
+    if (newsIds.length > 0) {
+      campuses = await knex("news_campuses")
+        .select("news_id", "name")
+        .join("campuses", "news_campuses.campus_id", "campuses.id")
+        .whereIn("news_id", newsIds);
 
-    const studentGroups = await knex("news_student_groups")
-      .select("news_id", "name")
-      .join(
-        "student_groups",
-        "news_student_groups.student_group_id",
-        "student_groups.id"
-      )
-      .whereIn("news_id", newsIds);
+      sports = await knex("news_sports")
+        .select("news_id", "name")
+        .join("sports", "news_sports.sport_id", "sports.id")
+        .whereIn("news_id", newsIds);
+
+      studentGroups = await knex("news_student_groups")
+        .select("news_id", "name")
+        .join(
+          "student_groups",
+          "news_student_groups.student_group_id",
+          "student_groups.id"
+        )
+        .whereIn("news_id", newsIds);
+    }
 
     const newsWithDetails = newsRows.map((newsItem) => ({
       ...newsItem,
@@ -418,11 +421,12 @@ router.get("/", isAuthenticated, async (req, res, next) => {
 
     res.json(newsWithDetails);
   } catch (err) {
-    console.log("Error fetching news data", err);
+    console.error("Error fetching news data:", err);
     res
       .status(500)
       .json({ error: "An error occurred while fetching news data" });
   }
 });
+
 
 module.exports = router;

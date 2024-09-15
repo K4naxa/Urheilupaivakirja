@@ -51,26 +51,39 @@ function TeacherHome() {
   const HeatMap_Year_Memoized = React.memo(HeatMap_Year);
 
   // all States for the component to reduce the amount of rerenders on multiple state changes
-  const [state, setState] = useState({
-    viewDataHandled: false,
-    showWeeks: true,
-    showMonths: false,
-    showYears: false,
-    showMobileFilters: false,
-    showDate: new Date(),
-    filteredStudents: [],
-    selectedStudents: [],
-    selectedSports: [],
-    selectedCampuses: [],
-    selectedGroups: [],
-    selectedSorting: "default",
-    page: 1,
-    studentsPerPage: 28,
-    totalPages: 0,
-    viewableStudents: [],
-    viewableJournals: [],
+  const [state, setState] = useState(() => {
+    const savedView = localStorage.getItem("teacherHomeShow") || "months";
+    return {
+      viewDataHandled: false,
+      showWeeks: savedView === "weeks",
+      showMonths: savedView === "months",
+      showYears: savedView === "years",
+      showMobileFilters: false,
+      showDate: new Date(),
+      filteredStudents: [],
+      selectedStudents: [],
+      selectedSports: [],
+      selectedCampuses: [],
+      selectedGroups: [],
+      selectedSorting: "default",
+      page: 1,
+      studentsPerPage: 28,
+      totalPages: 0,
+      viewableStudents: [],
+      viewableJournals: [],
+    };
   });
-   
+
+  const handleViewChange = (view) => {
+    setState((prevState) => ({
+      ...prevState,
+      showWeeks: view === "weeks",
+      showMonths: view === "months",
+      showYears: view === "years",
+    }));
+    localStorage.setItem("teacherHomeShow", view);
+  };
+
   // get all students
   const { data: StudentsList, isPending: StudentsListLoading } = useQuery({
     queryKey: ["StudentsList"],
@@ -85,11 +98,12 @@ function TeacherHome() {
   });
 
   // Only pinned students where the user id == pinner_user_id
-  const { data: pinnedStudentsData, isPending: pinnedStudentsLoading  } = useQuery({
-    queryKey: ["pinnedStudents"],
-    queryFn: () => studentService.getPinnedStudents(),
-    staleTime: 30 * 60 * 1000, //30 minutes
-  });
+  const { data: pinnedStudentsData, isPending: pinnedStudentsLoading } =
+    useQuery({
+      queryKey: ["pinnedStudents"],
+      queryFn: () => studentService.getPinnedStudents(),
+      staleTime: 30 * 60 * 1000, //30 minutes
+    });
 
   // all  sports / campuses / student groups for filtering
   const { data: optionsData, isPending: optionsDataLoading } = useQuery({
@@ -113,7 +127,6 @@ function TeacherHome() {
   // every new state change that effects the view is passed through this function
   const handleViewUpdate = (newStates) => {
     if (!StudentsList || !pinnedStudentsData) return;
-    console.log(newStates);
 
     let newFilteredStudents = [...StudentsList];
 
@@ -415,7 +428,7 @@ function TeacherHome() {
           );
           if (segmentProgression < 0) segmentProgression = 0;
 
-          const tooltipContent = `
+          const progressionBarTooltipContent = `
           <div class="flex flex-col gap-2 p-2 w-42">
             <h3 class="font-bold text-center">${segment.name}</h3>
             <span>Suoritettu: ${segmentProgression}%</span>
@@ -434,7 +447,7 @@ function TeacherHome() {
               className={cc(
                 "bottom-0 h-1 clickableCourseSegment rounded-xl hover:cursor-pointer"
               )}
-              data-tooltip-html={tooltipContent}
+              data-tooltip-html={progressionBarTooltipContent}
               style={{ width: `${segmentLength}%` }}
             >
               <div
@@ -765,7 +778,7 @@ function TeacherHome() {
   } else
     return (
       <div className="flex flex-col gap-8 lg:m-8 text-textPrimary">
-        <TeacherHeatmapTooltip/>
+        <TeacherHeatmapTooltip />
 
         {/* filtering controls */}
         <div className="flex flex-col items-center justify-around w-full gap-8 p-4 mx-auto border rounded-md bg-bgSecondary border-borderPrimary">
@@ -773,40 +786,19 @@ function TeacherHome() {
           <div className="relative flex justify-center w-full text-sm">
             <div className="relative flex justify-center text-sm text-textSecondary">
               <p
-                onClick={() => {
-                  setState({
-                    ...state,
-                    showWeeks: true,
-                    showMonths: false,
-                    showYears: false,
-                  });
-                }}
+                onClick={() => handleViewChange("weeks")}
                 className={`cursor-pointer mx-2 ${state.showWeeks && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Viikko
               </p>
               <p
-                onClick={() => {
-                  setState({
-                    ...state,
-                    showWeeks: false,
-                    showMonths: true,
-                    showYears: false,
-                  });
-                }}
+                onClick={() => handleViewChange("months")}
                 className={`cursor-pointer mx-2 ${state.showMonths && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Kuukausi
               </p>
               <p
-                onClick={() => {
-                  setState({
-                    ...state,
-                    showWeeks: false,
-                    showMonths: false,
-                    showYears: true,
-                  });
-                }}
+                onClick={() => handleViewChange("years")}
                 className={`cursor-pointer mx-2 ${state.showYears && "text-primaryColor border-b border-primaryColor"}`}
               >
                 Vuosi

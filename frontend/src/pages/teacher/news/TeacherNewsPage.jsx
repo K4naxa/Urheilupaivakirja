@@ -6,12 +6,12 @@ import LoadingScreen from "../../../components/LoadingScreen";
 import { format } from "date-fns";
 import { FiEdit3 } from "react-icons/fi";
 import { useBigModal } from "../../../hooks/useBigModal";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
 
 const RenderSingleNews = ({ news }) => {
   const [opened, setOpened] = useState(false);
   const toggleOpen = () => setOpened(!opened);
   const { openBigModal } = useBigModal();
-  console.log(news);
   return (
     <div
       className="bg-bgSecondary p-4 rounded-md md:max-w-96 border border-borderPrimary cursor-pointer hover:bg-bgPrimary"
@@ -103,9 +103,9 @@ const TeacherNewsPage = () => {
 
   return (
     <div className="flex w-full h-full justify-center">
-      <div className="flex w-full md:w-fit flex-col gap-4 p-4 bg-bgSecondary rounded-md border border-borderPrimary">
-        <header className="w-full py-4 text-xl text-textPrimary text-center border-b border-borderPrimary ">
-          Tiedotteet
+    <div className="flex w-full md:w-fit  md:min-w-[760px] flex-col gap-4 bg-bgSecondary ">
+      <header className="w-full py-4 relative text-2xl text-center border-b border-borderPrimary md:text-textPrimary md:bg-bgSecondary bg-primaryColor text-white ">
+          Tiedotteet 
         </header>
         <div className="flex justify-around gap-4 flex-wrap items-end">
           {/*

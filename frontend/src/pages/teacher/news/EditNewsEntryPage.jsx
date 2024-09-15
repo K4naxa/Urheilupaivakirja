@@ -4,10 +4,12 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { FiArrowLeft, FiTrash2 } from "react-icons/fi";
 import newsService from "../../../services/newsService";
+import { useConfirmModal } from "../../../hooks/useConfirmModal";
 
 const EditNewsEntryPage = ({ onClose, entryId }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
+  const { openConfirmModal } = useConfirmModal();
 
   const [editNewsEntryData, setEditNewsEntryData] = useState({
     id: "",
@@ -77,7 +79,7 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
 
 
   const deleteNews = useMutation({
-    mutationFn: () => newsService.deleteNews(editNewsEntryData.entry_id),
+    mutationFn: () => newsService.deleteNews(editNewsEntryData.id),
     onError: (error) => {
       console.error("Error deleting journal entry:", error);
       addToast("Virhe poistettaessa tiedotetta", { style: "error" });
@@ -105,7 +107,6 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
     const onConfirmDelete = async () => {
       try {
         deleteNews.mutate();
-        console.log("News deleted successfully");
       } catch (error) {
         console.error("Error deleting news entry:", error);
       }
@@ -240,8 +241,8 @@ const EditNewsEntryPage = ({ onClose, entryId }) => {
 
         {/* Pinned Toggle */}
         <div className="w-full flex items-center justify-between">
-          <label className="block text-sm font-medium text-textPrimary">
-            Pinned
+          <label title="" className="block text-sm font-medium text-textPrimary">
+            Kiinnitetty
           </label>
           <input
             type="checkbox"

@@ -105,21 +105,22 @@ function CalendarDay({ day, journal, month, showDate, onClick }) {
     if (!isSameYear(day, showDate)) return;
     if (!journal) return;
 
-    if (minutes > 1 && minutes <= 60)
-      return "bg-heatmapExercise1 border-heatmapExercise1";
-    if (minutes > 60 && minutes <= 120)
-      return "bg-heatmapExercise2 text-white border-heatmapExercise2";
-    if (minutes > 120)
-      return "bg-heatmapExercise3 text-white border-heatmapExercise3";
-
-    if (journal[0]?.entry_type_id === 2)
-      return "bg-bgRest text-white border-bgRest";
-    if (journal[0]?.entry_type_id === 3)
-      return "bg-bgSick text-white border-bgSick";
-
-    return null;
-  }
-
+      if (minutes > 1 && minutes <= 60)
+        return "bg-heatmapExercise1 border-heatmapExercise1 text-black";
+      if (minutes > 60 && minutes <= 120)
+        return "bg-heatmapExercise2 border-heatmapExercise2 text-black";
+        if (minutes > 120 && minutes <= 180)
+        return "bg-heatmapExercise3 border-heatmapExercise3 text-white";
+      if (minutes > 180)
+        return "bg-heatmapExercise4 border-heatmapExercise4 text-white";
+  
+      if (journal[0]?.entry_type_id === 2)
+        return "bg-bgRest border-bgRest text-black";
+      if (journal[0]?.entry_type_id === 3)
+        return "bg-bgSick border-bgSick text-black";
+  
+      return null;
+    }
   return (
     <div
       className={cc(

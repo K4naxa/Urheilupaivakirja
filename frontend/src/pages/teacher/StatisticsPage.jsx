@@ -62,13 +62,6 @@ function StatisticsPage() {
     },
   });
 
-  useEffect(() => {
-    if (!NewStudentsLoading) {
-      console.log(EntriesData);
-      console.log(newStudentsData);
-    }
-  }, [newStudentsData, NewStudentsLoading, selectedTime, chartShowDate]);
-
   // -----------------------------------------------------------------------------------------
 
 

@@ -11,7 +11,7 @@ const createAccessToken = (user) => {
   };
 
   return jwt.sign(userForToken, config.SECRET, {
-    expiresIn: '5m', // expires in 5 minutes
+    expiresIn: '15m', // expires in 15 minutes
   });
 };
 

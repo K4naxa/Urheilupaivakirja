@@ -47,7 +47,7 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
     error: journalEntryError,
     isFetching: journalEntryisFetching,
   } = useQuery({
-    queryKey: ["journalEntry", EntryIdForQuery],
+    queryKey: ["journalEntry"],
     queryFn: () => journalService.getJournalEntryForForm(EntryIdForQuery),
   });
 
@@ -58,7 +58,7 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
       }
       setJournalEntryData(journalEntry);
     }
-  }, [journalEntryisFetching, journalEntry]);
+  }, [journalEntry]);
 
   const editJournalEntry = useMutation({
     mutationFn: () => journalService.editJournalEntry(journalEntryData),
@@ -93,7 +93,6 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
     // Invalidate and refetch the query after the mutation
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["studentData"] });
-      queryClient.refetchQueries(["studentData"], { exact: true });
 
       addToast("Merkintä päivitetty", { style: "success" });
 
@@ -197,7 +196,6 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
     const onConfirmDelete = async () => {
       try {
         deleteEntry.mutate({ journalEntryData });
-        console.log("Journal entry deleted successfully");
       } catch (error) {
         console.error("Error deleting journal entry:", error);
       }
@@ -415,7 +413,6 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
         message: conflictData.message,
         messageShort: conflictData.messageShort,
       });
-      console.log("Conflict detected:", conflictData.message);
     }
   };
 
@@ -473,13 +470,11 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
   }
 
   if (optionsError) {
-    console.log("is erroring");
     console.error("Error:", error);
     return <p>Error: {error?.message || "Unknown error"}</p>;
   }
 
   if (optionsLoading || journalEntryisFetching) {
-    console.log("is loading");
     return <p>Loading...</p>;
   }
 
@@ -633,7 +628,6 @@ const EditJournalEntryPage = ({ onClose, studentData, entryId }) => {
             >
               <label className={inputLabel}>Rankkuus</label>
               <div className={optionContainer}>
-                {console.log(optionsData.workout_intensities[0].id)}
                 {optionsData.workout_intensities.map((intensity) =>
                   renderRadioButton(
                     "intensity",
