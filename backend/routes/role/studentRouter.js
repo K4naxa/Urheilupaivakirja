@@ -101,7 +101,6 @@ router.put("/archive/:id", isAuthenticated, isTeacher, async (req, res) => {
 // Get student and journal data as a student
 router.get("/data", isAuthenticated, isStudent, async (req, res) => {
   const userId = req.user.user_id; // ensure 'const' for scope safety
-  console.log("fetching student/data/")
   try {
     // Fetch student data and journal entries in parallel
     const [student, journalSummary, journals] = await Promise.all([
@@ -177,16 +176,12 @@ router.get("/data", isAuthenticated, isStudent, async (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    console.log("Got the data, now combining it")
-
     // Combine student and journal data into a single response object
     const studentData = {
       ...student,
       journal_entries: journals,
       ...journalSummary, // Spread the summary data directly into studentData
     };
-
-    console.log("Sending the data")
 
     res.json(studentData);
   } catch (error) {

@@ -42,10 +42,8 @@ const SpectatorsPage = () => {
 
   const handleDelete = (spectator) => {
     const spectatorId = spectator.id;
-    console.log("Saved id", spectatorId);
 
     const handleUserConfirmation = (id) => {
-      console.log("Deleting spectator", id);
       deleteSpectator.mutate(id);
     };
 

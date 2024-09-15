@@ -163,8 +163,6 @@ const RecentJournalEntries = ({ studentData }) => {
     };
   }, []);
 
-  console.log("user", user);
-
   let journal;
   if (studentData.journal_entries) journal = studentData.journal_entries;
 
@@ -191,8 +189,6 @@ const RecentJournalEntries = ({ studentData }) => {
       setFilteredJournal(filteredJournal);
     }
   }, [journal, selectedTime, showDate]);
-
-  console.log(scrollbarWidth);
 
   return (
     <div className="p-4 border rounded-md border-borderPrimary">

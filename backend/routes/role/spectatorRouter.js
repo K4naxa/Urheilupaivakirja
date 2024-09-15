@@ -15,7 +15,7 @@ const sendEmail = require("../../utils/email/sendEmail");
 const { isAuthenticated, isTeacher } = require("../../utils/authMiddleware");
 const { email, newPassword, first_name, last_name } = require("../../utils/validation");
 const { validationResult } = require("express-validator");
-const { refreshToken, accessToken } = require("../../utils/token");
+const { createShortRefreshToken, createAccessToken } = require("../../utils/token");
 
 // Get all spectators
 router.get("/", isAuthenticated, isTeacher, async (req, res) => {
@@ -193,25 +193,34 @@ router.post(
         // delete used invitation token
         await trx("invited_spectators").where({ email: spectator.email }).del();
 
+        const userForToken = await trx("users").where({ id: userId }).first();
+
+  
+        // Generate tokens with the new token payload
+        const refreshToken = createShortRefreshToken(userForToken);
+        const accessToken = createAccessToken(userForToken);
+  
+        // Set the cookies with the generated tokens
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "Strict",
-          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+          maxAge: 12 * 60 * 60 * 1000, // 12 hours
         });
-
+  
         res.cookie("accessToken", accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "Strict",
-          maxAge: 5 * 60 * 1000,
+          maxAge: 15 * 60 * 1000, // 15 minutes
         });
-
+  
+        // Respond with success and user details
         res.status(201).json({
-          user_id: userId,
-          email_verified: newUser.email_verified,
-          email: newUser.email,
-          role: newUser.role_id,
+          user_id: userForToken.id,
+          email_verified: userForToken.email_verified,
+          email: userForToken.email,
+          role: userForToken.role_id,
           sport: null,
         });
       });

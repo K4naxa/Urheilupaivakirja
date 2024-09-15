@@ -4,7 +4,7 @@ const ManageStaffLayout = () => {
   return (
     <div className="flex flex-col gap-4 w-full rounded-md md:p-4">
       <div
-        className="md:hidden text-2xl text-center py-4 bg-primaryColor w-full
+        className="md:hidden text-2xl text-white  text-center py-4 bg-primaryColor w-full
         shadow-md"
       >
         Henkilökunta

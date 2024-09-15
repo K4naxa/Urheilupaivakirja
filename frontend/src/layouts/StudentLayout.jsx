@@ -20,11 +20,13 @@ import studentService from "../services/studentService";
 
 import siteLogo from "/pwa-192x192.png";
 import cc from "../utils/cc";
+import useMediaQuery from '../hooks/useMediaQuery';
 
 const StudentLayout = () => {
   const { logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { openBigModal } = useBigModal();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   const {
     data: studentData,
@@ -35,19 +37,24 @@ const StudentLayout = () => {
     queryFn: () => studentService.getStudentData(),
     staleTime: 15 * 60 * 1000,
   });
+  
+
+  console.log("rerenders")
+
 
   const linkClass =
     "flex border-t-2 border-bgPrimary flex-col items-center text-textPrimary py-2 text-xl active:text-primaryColor";
   const linkTextClass = "items-center text-[12px] leading-none mt-2 ";
   return (
     <div className="text-textPrimary">
+      {isDesktop && (
       <div className="z-10 border border-b-2 bg-bgSecondary border-borderPrimary fixed-header">
         <header className="hidden px-4 py-2 md:flex max-w-[1600px] m-auto justify-between">
           <Link to={"/"} className="flex items-center gap-2 text-xl">
             <img src={siteLogo} alt="site logo" className="w-8 h-8" />
             Urheilupäiväkirja
           </Link>
-
+          
           <div className="flex items-center gap-2">
             <div className="mr-4">
               <ThemeSwitcher />
@@ -127,8 +134,9 @@ const StudentLayout = () => {
           </div>
         </header>
       </div>
+      )}
       {/* header for mobile */}
-
+      { !isDesktop && (                    
       <header
         className={`bg-bgPrimary shadow-upper-shadow fixed left-0 px-2 bottom-0 flex 
         h-16 py-8 w-full items-center text-xl md:hidden z-10`}
@@ -244,6 +252,7 @@ const StudentLayout = () => {
           )}
         </div>
       </header>
+       )}
       <div className="box-content flex w-full md:mt-24">
         <main className="flex w-full mx-auto max-w-[1480px] pb-16 md:pb-0">
           <Outlet

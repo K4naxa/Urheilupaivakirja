@@ -81,8 +81,6 @@ function CreateGroupContainer({ group, setGroups, groups, queryclient }) {
       });
     };
 
-    console.log("That merges: ", group);
-    console.log("Merged to options: ", groups);
     const typeTextNominative = "ryhmä";
     const typeTextGenitive = "ryhmän";
     const typeTextIllative = "ryhmään";
@@ -357,7 +355,7 @@ const GroupsPage = () => {
   return (
     <div className="items-center w-full rounded-md bg-bgSecondary">
       {/* header for mobile*/}
-      <div className="w-full py-4 text-2xl text-center shadow-md md:hidden bg-primaryColor round">
+      <div className="w-full py-4 text-2xl text-white text-center shadow-md md:hidden bg-primaryColor round">
         Ryhmät
       </div>
       {/* Error Header */}

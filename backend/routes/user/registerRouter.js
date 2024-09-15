@@ -17,6 +17,7 @@ const { validationResult } = require("express-validator");
 const { email, newPassword, first_name, last_name } = require("../../utils/validation");
 
 // Register a new student
+// Register a new student
 router.post("/", [email, newPassword, first_name, last_name], async (req, res, next) => {
   const {
     email,
@@ -58,7 +59,6 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
       };
 
       async function checkIfNew(tableName, id) {
-        // Check if the ID already exists in the table
         const existingId = await trx
           .select("id")
           .from(tableName)
@@ -66,14 +66,12 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
           .first();
 
         if (!existingId) {
-          // Check if the name matches any existing entry
           const existingName = await trx
             .select("id")
             .from(tableName)
-            .where("name", id) // Assume "id" is the name being checked
+            .where("name", id)
             .first();
 
-          // If a matching name exists, return the corresponding ID
           if (existingName) {
             return existingName.id;
           }
@@ -83,34 +81,28 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
               return id;
             }
             let trimmed = id.trim();
-
-            // Replace multiple spaces with a single space
             trimmed = trimmed.replace(/\s+/g, " ");
-
-            // Capitalize the first letter if it's a letter, including locale-specific characters
-            trimmed =
-              trimmed.charAt(0).toLocaleUpperCase("fi-FI") + trimmed.slice(1);
+            trimmed = trimmed.charAt(0).toLocaleUpperCase("fi-FI") + trimmed.slice(1);
             return trimmed;
           }
 
-          // "id" is in reality a name, so format it to handle commas
           trimmedName = formatNewInsert(id);
           const [newId] = await trx(tableName).insert({
-            name: trimmedName, // Insert the "id" as the "name" in the table
+            name: trimmedName,
             created_by: first_name + " " + last_name,
           });
 
           return newId;
         }
 
-        // If the ID exists, return the existing ID
         return id;
       }
 
       // Insert the new user and get the id of the inserted user
       const [userId] = await trx("users").insert(newUser);
 
-      // Check and insert sport, and student group if value/id is new
+      const userForToken = await trx("users").where({ id: userId }).first();
+
       const sportId = await checkIfNew("sports", sport_id);
       const groupId = await checkIfNew("student_groups", group_id);
 
@@ -125,7 +117,6 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
         created_at: new Date(),
       };
 
-      // Insert the new student
       await trx("students").insert(newStudent);
 
       let sportName = null;
@@ -133,7 +124,7 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
         const sportData = await trx("students")
           .join("sports", "students.sport_id", "sports.id")
           .select("sports.name as sport_name")
-          .where("students.user_id", "=", userId) // Use userId instead of newUser.id
+          .where("students.user_id", "=", userId)
           .first();
 
         if (sportData) {
@@ -141,28 +132,13 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
         }
       }
 
-      refreshToken = createShortRefreshToken(newUser);
-      accessToken = createAccessToken(newUser);
 
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-        maxAge: 12 * 60 * 60 * 1000, // 12 hours
-      });
-
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-        maxAge: 5 * 60 * 1000,
-      });
-
+      // Respond with success and user details
       res.status(201).json({
-        user_id: newUser.id,
-        email_verified: newUser.email_verified,
-        email: newUser.email,
-        role: newUser.role_id,
+        user_id: userForToken.id,
+        email_verified: userForToken.email_verified,
+        email: userForToken.email,
+        role: userForToken.role_id,
         sport: sportName,
       });
     });
@@ -174,6 +150,7 @@ router.post("/", [email, newPassword, first_name, last_name], async (req, res, n
     });
   }
 });
+
 
 router.post("/new-email-verification", isAuthenticated, async (req, res) => {
   const user_id = req.user.user_id;
@@ -330,7 +307,7 @@ router.post("/verify-email", isAuthenticated, async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 5 * 60 * 1000, // 5 minutes
+      maxAge: 15 * 60 * 1000, //15 minutes
     });
 
     res.json({

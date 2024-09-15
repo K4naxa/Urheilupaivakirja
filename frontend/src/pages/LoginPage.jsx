@@ -72,7 +72,6 @@ function LoginPage() {
       setPassword("");
       login(user);
     } catch (error) {
-      console.log(error);
       setErrors({ ...errors, errorMessage: "Sähköposti tai salasana väärin" });
       setPassword("");
       return;

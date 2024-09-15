@@ -40,27 +40,68 @@ router.get("/", isAuthenticated, isTeacher, async (req, res) => {
       );
   };
 
+  // get students with unverified emails
+  const getEmailNotVerifiedStudents = () => {
+    return knex("students as s")
+      .select(
+        "s.first_name",
+        "s.last_name",
+        "s.user_id",
+        "sg.name as group",
+        "sg.is_verified as group_verified",
+        "c.name as campus",
+        "sp.name as sport",
+        "sp.is_verified as sport_verified",
+        "u.email"
+      )
+      .leftJoin("users as u", "s.user_id", "u.id")
+      .leftJoin("student_groups as sg", "s.group_id", "sg.id")
+      .leftJoin("campuses as c", "s.campus_id", "c.id")
+      .leftJoin("sports as sp", "s.sport_id", "sp.id")
+      .where("u.email_verified", false) // only include students with unverified email
+      .groupBy(
+        "s.user_id",
+        "u.email",
+        "s.first_name",
+        "s.last_name",
+        "sg.name",
+        "sg.is_verified",
+        "c.name",
+        "sp.name",
+        "sp.is_verified"
+      );
+  };
+
   // get unverified sports
   const getUnverifiedSports = () => {
-    return knex("sports").select("id", "name").where("is_verified", false);
+    return knex("sports")
+      .select("id", "name", "created_by")
+      .where("is_verified", false);
   };
 
   // get unverified student_groups
   const getUnverifiedStudentGroups = () => {
     return knex("student_groups")
-      .select("id", "name")
+      .select("id", "name", "created_by")
       .where("is_verified", false);
   };
 
   try {
-    const [students, sports, student_groups] = await Promise.all([
+    const [
+      students,
+      emailNotVerifiedStudents,
+      sports,
+      student_groups,
+    ] = await Promise.all([
       getUnverifiedStudents(),
+      getEmailNotVerifiedStudents(),
       getUnverifiedSports(),
       getUnverifiedStudentGroups(),
     ]);
 
     res.status(200).json({
       students,
+      email_not_verified_students: emailNotVerifiedStudents,
       sports,
       student_groups,
     });

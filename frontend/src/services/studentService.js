@@ -21,9 +21,7 @@ const getStudentData = async () => {
 };
 
 const getStudentDataWithId = async (userId) => {
-  console.log("Trying to get student data with id: ", userId);  
   const response = await apiClient.get(`/student/data/${userId}`);
-  console.log("Response: ", response);
   return response.data;
 };
 

@@ -38,7 +38,6 @@ function StudentHome() {
   const { studentData, studentDataLoading, studentDataError } = useOutletContext();
   const { openBigModal } = useBigModal();
   const [tooltipContent, setTooltipContent] = useState(null);
-  console.log(studentData);
 
   const { data: courseSegments, error: courseSegmentsError } = useQuery({
     queryKey: ["courseSegments"],
@@ -53,6 +52,7 @@ function StudentHome() {
       </div>
     );
   }
+  
 
   const formatHelloMessage = () => {
     const date = new Date();
@@ -138,7 +138,6 @@ function StudentHome() {
   };
 
   const getSegmentTooltipContent = () => {
-    console.log(tooltipContent);
     return (
       <>
         <div className="flex flex-col gap-2 p-2 w-42">

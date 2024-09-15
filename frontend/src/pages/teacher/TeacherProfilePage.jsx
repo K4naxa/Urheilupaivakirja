@@ -158,7 +158,6 @@ function TeacherProfilePage() {
     // Check if current password is empty
     if (currentPassword.length === 0) {
       passwordError = "Nykyinen salasana ei voi olla tyhjä";
-      console.log("Password Error:", passwordError);
     } else {
       setPasswordError("");
     }
@@ -166,11 +165,9 @@ function TeacherProfilePage() {
     // Check if new passwords are empty
     if (newPassword.length === 0 || confirmPassword.length === 0) {
       newPasswordError = "Salasanat eivät voi olla tyhjiä";
-      console.log("New Password Error:", newPasswordError);
     } else if (newPassword !== confirmPassword) {
       // Check if new passwords match
       newPasswordError = "Salasanat eivät täsmää";
-      console.log("New Password Error:", newPasswordError);
     } else if (
       !lengthCheck.test(newPassword) ||
       !capitalLetterCheck.test(newPassword) ||
@@ -179,20 +176,16 @@ function TeacherProfilePage() {
       // Check if the new password meets the criteria
       newPasswordError =
         "Salasanan tulee olla vähintään 8 merkkiä pitkä ja sisältää vähintään yhden ison kirjaimen sekä numeron";
-      console.log("New Password Error:", newPasswordError);
     }
 
     // If there are any errors, set them and return false
     if (passwordError.length > 0 || newPasswordError.length > 0) {
       setPasswordError(passwordError);
       setNewPasswordError(newPasswordError);
-      console.log("Validation failed with errors:");
-      console.log("Password Error:", passwordError);
-      console.log("New Password Error:", newPasswordError);
+
       return false;
     }
 
-    console.log("Validation passed");
     return true;
   };
 
@@ -320,7 +313,6 @@ function TeacherProfilePage() {
       {
         eventName: "onPointerDown",
         handler: ({ nativeEvent: event }) => {
-          console.log(event.target);
           if (
             !event.isPrimary ||
             event.button !== 0 ||

@@ -44,10 +44,8 @@ const TeachersPage = () => {
 
   const handleDelete = (teacher) => {
     const teacherId = teacher.id;
-    console.log("Saved id", teacherId);
 
     const handleUserConfirmation = (id) => {
-      console.log("Deleting teacher", id);
       deleteTeacher.mutate(id);
     };
 
@@ -105,7 +103,7 @@ const TeachersPage = () => {
       console.error("Error inviting teacher:", error);
       addToast("Virhe kutsuttaessa opettajaa", { style: "error" });
     },
-    onSuccess: (user) => {
+    onSuccess: () => {
       addToast("Opettajakutsu lähetetty", { style: "success" });
       queryClient.invalidateQueries({ queryKey: ["invitedTeachers"] });
     },
