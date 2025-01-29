@@ -60,4 +60,4 @@ const generateFakeUsers = (count) => {
   return users;
 };
 
-module.exports = { generateFakeUsers };
+module.exports = { generateFakeUsers, generateFakeJournal_entries };
