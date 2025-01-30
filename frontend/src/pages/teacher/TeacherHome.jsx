@@ -663,7 +663,7 @@ function TeacherHome() {
                     />
                   }
                   <Link
-                    to={`/opettaja/opiskelijat/${journal.user_id}`}
+                    to={`opiskelijat/${journal.user_id}`}
                     className="flex flex-col pt-2 "
                   >
                     <p className="text-lg text-center hover:cursor-pointer hover:underline">
@@ -748,7 +748,7 @@ function TeacherHome() {
                   }
                   <div className="flex flex-wrap items-end gap-4 p-2 leading-none">
                     <Link
-                      to={`/opettaja/opiskelijat/${journal.user_id}`}
+                      to={`opiskelijat/${journal.user_id}`}
                       className="text-lg leading-none text-center hover:cursor-pointer hover:underline"
                     >
                       {journal.first_name} {journal.last_name}
