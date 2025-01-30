@@ -1,19 +1,18 @@
-version: '3.1'
-
 services:
-  urheilurelease_1:
-    image: release1.0
+  urheilupaivakirja-demo:
+    container_name: urheilupaivakirja-demo
+    image: urheilupaivakirja-demo
     environment:
-      DB_HOST:
-      DB_USER:
-      DB_PASS:
-      DB_DATABASE:
+      DB_HOST: host.docker.internal
+      DB_USER: root
+      DB_PASS: root
+      DB_DATABASE: urheilu_testi
       DB_TYPE: mysql2
       DB_PORT: 3306
       PORT: 3001
-      SECRET:
-      FRONTEND_URL:
-      BCRYPTSALT:
+      SECRET: salainensalasanainen
+      FRONTEND_URL: http://localhost:5173
+      BCRYPTSALT: 10
       EMAIL_USERNAME:
       EMAIL_PASSWORD:
       EMAIL_HOST:

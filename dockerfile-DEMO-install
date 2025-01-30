@@ -1,0 +1,20 @@
+FROM node:20
+WORKDIR /mydir  
+
+# Copy frontend files and build
+COPY frontend front
+RUN cd front && npm install --silent && npm run build --silent && cd ..
+RUN cp -r front/dist build && rm -r front
+
+# Copy backend, database migrations, seeds, and knex file
+COPY backend .
+COPY database/migrations migrations
+COPY database/seeds/demo seeds
+COPY knexfile_env.js knexfile.js
+
+# Install dependencies including fakerjs
+RUN npm install
+RUN npm install @faker-js/faker --save
+
+RUN npm install
+CMD npx knex migrate:rollback --all && npx knex migrate:latest --env production && npx knex seed:run --env production && node ./bin/www
