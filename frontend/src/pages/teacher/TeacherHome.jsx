@@ -451,11 +451,11 @@ function TeacherHome() {
               style={{ width: `${segmentLength}%` }}
             >
               <div
-                className={cc(
-                  "h-full bg-primaryColor relative rounded-xl",
-                  segmentProgression === 100 && "bg-green-500"
-                )}
-                style={{ width: `${segmentProgression}%` }}
+                className={cc("h-full bg-primaryColor relative rounded-xl")}
+                style={{
+                  backgroundColor: segmentProgression === 100 ? "#22c55e" : "",
+                  width: `${segmentProgression}%`,
+                }}
               ></div>
             </div>
           );
