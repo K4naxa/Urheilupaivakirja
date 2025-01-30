@@ -539,7 +539,10 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl">{getWeek(state.showDate)}</p>
+              <span className="text-xl flex gap-2 items-center">
+                <p className="">viikko</p>
+                {getWeek(state.showDate)}
+              </span>
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
