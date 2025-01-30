@@ -44,7 +44,7 @@ accountability and motivation.
 
 ## 🔖 Screenshots
 
-```
+
 
 
 ## Login page
@@ -73,8 +73,6 @@ accountability and motivation.
 
 
 
-
-```
 
 ## 📥 Setup Guide
 
