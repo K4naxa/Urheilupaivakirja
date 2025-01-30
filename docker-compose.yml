@@ -4,23 +4,21 @@ services:
   urheilurelease_1:
     image: release1.0
     environment:
-      DB_HOST: juhvas20.treok.io
-      DB_USER: juhvas20_upktest
-      DB_PASS: 3OgpLLf%ZV81
-      DB_DATABASE: juhvas20_upktest
+      DB_HOST:
+      DB_USER:
+      DB_PASS:
+      DB_DATABASE:
       DB_TYPE: mysql2
       DB_PORT: 3306
       PORT: 3001
-      SECRET: tositosisikasalainensalasanaonmullajuu
-      FRONTEND_URL: http://localhost:3001
-      BCRYPTSALT: 10
-      EMAIL_USERNAME: upk_noreply@juhvas20.treok.io
-      EMAIL_PASSWORD: ts%p(QKi[*+5RHZ$U@
-      EMAIL_HOST: mail.juhvas20.treok.io
-      FROM_EMAIL: upk_noreply@juhvas20.treok.io
+      SECRET:
+      FRONTEND_URL:
+      BCRYPTSALT:
+      EMAIL_USERNAME:
+      EMAIL_PASSWORD:
+      EMAIL_HOST:
+      FROM_EMAIL:
       EMAIL_PORT: 465
       NODE_ENV: production
     ports:
-      - 3001:3001
-
-
+    - 3001:3001
