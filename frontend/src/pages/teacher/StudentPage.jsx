@@ -131,10 +131,12 @@ function StudentHome() {
             >
               <div
                 className={cc(
-                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md",
-                  segmentProgression === 100 && "bg-green-500"
+                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md"
                 )}
-                style={{ width: `${segmentProgression}%` }}
+                style={{
+                  backgroundColor: segmentProgression === 100 ? "#22c55e" : "",
+                  width: `${segmentProgression}%`,
+                }}
               ></div>
             </div>
           );
