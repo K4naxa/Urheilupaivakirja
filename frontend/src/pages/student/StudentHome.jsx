@@ -35,7 +35,8 @@ import cc from "../../utils/cc";
 
 function StudentHome() {
   const { showDate, setShowDate } = useMainContext();
-  const { studentData, studentDataLoading, studentDataError } = useOutletContext();
+  const { studentData, studentDataLoading, studentDataError } =
+    useOutletContext();
   const { openBigModal } = useBigModal();
   const [tooltipContent, setTooltipContent] = useState(null);
 
@@ -52,7 +53,6 @@ function StudentHome() {
       </div>
     );
   }
-  
 
   const formatHelloMessage = () => {
     const date = new Date();
@@ -97,9 +97,8 @@ function StudentHome() {
       <div className="flex w-full h-5 gap-1">
         {courseSegments.map((segment, index) => {
           const segmentLength = (segment.value / total_requirement) * 100;
-          let segmentProgression = Math.min(
-            (unUsedEntires / segment.value) * 100,
-            100
+          let segmentProgression = Math.floor(
+            Math.min((unUsedEntires / segment.value) * 100, 100)
           );
 
           if (segmentProgression < 0) segmentProgression = 0;
@@ -125,10 +124,12 @@ function StudentHome() {
             >
               <div
                 className={cc(
-                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md",
-                  segmentProgression === 100 && "bg-green-500"
+                  "h-full bg-primaryColor flex justify-center relative rounded-xl shadow-md"
                 )}
-                style={{ width: `${segmentProgression}%` }}
+                style={{
+                  backgroundColor: segmentProgression === 100 ? "#22c55e" : "",
+                  width: `${segmentProgression}%`,
+                }}
               ></div>
             </div>
           );
