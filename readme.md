@@ -44,37 +44,35 @@ accountability and motivation.
 
 ## 🔖 Screenshots
 
-```
 
 
-## Login page
+
+#### Login page
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/login.png)
 
-## Login page (dark theme)
+#### Login page (dark theme)
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/login-dark.png)
 
-## Student home
+#### Student home
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/studenthome.png)
 
-## Student home (dark theme)
+#### Student home (dark theme)
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/studenthome-dark.png)
 
-## Teacher home
+#### Teacher home
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/teacherhome.png)
 
-## Teacher home (dark theme)
+#### Teacher home (dark theme)
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/teacherhome-dark.png)
 
-## Teachers view of students page
+#### Teachers view of students page
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/studentpage.png)
 
-## Teachers view of students page (dark theme)
+#### Teachers view of students page (dark theme)
 ![Loginpage light theme](https://github.com/tredu/urheilupaivakirja-2-0-urheilupaivakirja2024/blob/main/screenshots/studentpage-dark.png)
 
 
 
-
-```
 
 ## 📥 Setup Guide
 
