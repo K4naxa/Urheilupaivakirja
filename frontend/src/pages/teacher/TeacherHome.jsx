@@ -422,9 +422,8 @@ function TeacherHome() {
           const segmentLength = (segment.value / total_requirement) * 100;
 
           // Calculate the progression for this segment
-          let segmentProgression = Math.min(
-            (unUsedEntires / segment.value) * 100,
-            100
+          let segmentProgression = Math.floor(
+            Math.min((unUsedEntires / segment.value) * 100, 100)
           );
           if (segmentProgression < 0) segmentProgression = 0;
 
