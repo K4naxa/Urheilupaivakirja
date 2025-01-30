@@ -422,9 +422,8 @@ function TeacherHome() {
           const segmentLength = (segment.value / total_requirement) * 100;
 
           // Calculate the progression for this segment
-          let segmentProgression = Math.min(
-            (unUsedEntires / segment.value) * 100,
-            100
+          let segmentProgression = Math.floor(
+            Math.min((unUsedEntires / segment.value) * 100, 100)
           );
           if (segmentProgression < 0) segmentProgression = 0;
 
@@ -451,11 +450,11 @@ function TeacherHome() {
               style={{ width: `${segmentLength}%` }}
             >
               <div
-                className={cc(
-                  "h-full bg-primaryColor relative rounded-xl",
-                  segmentProgression === 100 && "bg-green-500"
-                )}
-                style={{ width: `${segmentProgression}%` }}
+                className={cc("h-full bg-primaryColor relative rounded-xl")}
+                style={{
+                  backgroundColor: segmentProgression === 100 ? "#22c55e" : "",
+                  width: `${segmentProgression}%`,
+                }}
               ></div>
             </div>
           );
@@ -540,7 +539,10 @@ function TeacherHome() {
                   <FiChevronLeft />
                 </IconContext.Provider>
               </button>
-              <p className="text-xl">{getWeek(state.showDate)}</p>
+              <span className="text-xl flex gap-2 items-center">
+                <p className="">viikko</p>
+                {getWeek(state.showDate)}
+              </span>
               <button
                 className="hover:text-primaryColor"
                 onClick={() => {
@@ -661,7 +663,7 @@ function TeacherHome() {
                     />
                   }
                   <Link
-                    to={`/opettaja/opiskelijat/${journal.user_id}`}
+                    to={`opiskelijat/${journal.user_id}`}
                     className="flex flex-col pt-2 "
                   >
                     <p className="text-lg text-center hover:cursor-pointer hover:underline">
@@ -746,7 +748,7 @@ function TeacherHome() {
                   }
                   <div className="flex flex-wrap items-end gap-4 p-2 leading-none">
                     <Link
-                      to={`/opettaja/opiskelijat/${journal.user_id}`}
+                      to={`opiskelijat/${journal.user_id}`}
                       className="text-lg leading-none text-center hover:cursor-pointer hover:underline"
                     >
                       {journal.first_name} {journal.last_name}

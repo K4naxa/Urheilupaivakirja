@@ -51,7 +51,6 @@ import ForgottenPasswordNewPasswordPage from "./pages/misc/forgotten-password/Fo
 import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentTrophyPage from "./pages/student/StudentTrophyPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
-import StatisticsPage from "./pages/teacher/StatisticsPage";
 import SpectatorLayout from "./layouts/SpectatorLayout";
 import SpectatorProfilePage from "./pages/spectator/SpectatorProfilePage";
 import VerificationPage from "./pages/teacher/verify/VerificationPage";
