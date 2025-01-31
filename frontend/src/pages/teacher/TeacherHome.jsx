@@ -736,7 +736,7 @@ function TeacherHome() {
               return (
                 <div
                   key={journal.user_id}
-                  className="relative flex flex-col gap-2 p-4 overflow-hidden border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
+                  className="relative flex flex-col gap-2 p-4 border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
                   {
