@@ -37,7 +37,7 @@ function LoginPage() {
     let passwordError = "";
 
     if (!password) {
-      passwordError = "Sähköposti on pakollinen";
+      passwordError = "Salasana on pakollinen";
     } else if (password.length < 8) {
       passwordError = "Salasanan pituus on vähintään 8 merkkiä";
     }
