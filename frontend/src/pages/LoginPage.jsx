@@ -131,8 +131,8 @@ function LoginPage() {
               {errors.errorMessage}
             </div>
           )}
-          <div className="flex  items-center gap-2 bg-primaryColor bg-opacity-10 p-4 rounded-md text-primaryColor text-sm">
-            DEMO Logins:{" "}
+          <div className="flex  items-center gap-2 bg-primaryColor bg-opacity-10 p-4 rounded-md text-primaryColor text-xs">
+            Demo Logins:{" "}
             {DemoLoginTypes.map((type) => (
               <button
                 key={type}
