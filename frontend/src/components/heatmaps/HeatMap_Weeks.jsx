@@ -93,7 +93,7 @@ function CalendarDay({ day, journal, onClick }) {
       return "bg-heatmapExercise1 border-heatmapExercise2 text-black";
     if (minutes > 60 && minutes <= 120)
       return "bg-heatmapExercise2 border-heatmapExercise3 text-black";
-      if (minutes > 120 && minutes <= 180)
+    if (minutes > 120 && minutes <= 180)
       return "bg-heatmapExercise3 border-heatmapExercise4 text-white";
     if (minutes > 180)
       return "bg-heatmapExercise4 border-heatmapExercise5 text-white";
@@ -109,7 +109,7 @@ function CalendarDay({ day, journal, onClick }) {
   return (
     <div
       className={cc(
-        "MonthDate border-borderPrimary border w-5 sm:w-7 clickableCalendarDay",
+        "MonthDate border-borderPrimary border w-full clickableCalendarDay",
         user.role === 1 && "bg-bgPrimary border-bgPrimary",
         isToday(day) && "border  border-primaryColor",
         memoizedColor

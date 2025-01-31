@@ -562,7 +562,7 @@ function TeacherHome() {
             {renderSortingSelect()}
           </div>
           {/* Student list */}
-          <div className="grid grid-cols-1 gap-4 justify-items-center lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 justify-items-center [@media(min-width:1100px)]:grid-cols-2 [@media(min-width:1480px)]:grid-cols-3">
             {journals?.map((journal) => {
               return (
                 <div
