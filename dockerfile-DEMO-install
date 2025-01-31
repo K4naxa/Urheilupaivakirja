@@ -17,4 +17,4 @@ RUN npm install
 RUN npm install @faker-js/faker --save
 
 RUN npm install
-CMD npx knex migrate:rollback --all && npx knex migrate:latest --env production && npx knex seed:run --env production && node ./bin/www
+CMD npx knex migrate:rollback --all && npx knex migrate:latest --env production && npx knex seed:run --env demo && node ./bin/www
