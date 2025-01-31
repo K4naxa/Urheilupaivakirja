@@ -73,6 +73,52 @@ function LoginPage() {
     }
   };
 
+  const DemoLoginTypes = ["teacher", "spectator", "student", "student2"];
+  const DemoLogin = async (userType) => {
+    try {
+      let user = {};
+      switch (userType) {
+        case "teacher":
+          user = await userService.login(
+            "teacher@example.com",
+            "salasana",
+            stayLoggedIn
+          );
+          break;
+
+        case "spectator":
+          user = await userService.login(
+            "spectator@example.com",
+            "salasana",
+            stayLoggedIn
+          );
+          break;
+
+        case "student":
+          user = await userService.login(
+            "student@example.com",
+            "salasana",
+            stayLoggedIn
+          );
+          break;
+
+        case "student2":
+          user = await userService.login(
+            "student2@example.com",
+            "salasana",
+            stayLoggedIn
+          );
+          break;
+      }
+      login(user);
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        errorMessage: "Jotain meni väärin. Yritä uudelleen.",
+      }));
+    }
+  };
+
   return (
     <div className="bg-bgPrimary text-textPrimary grid place-items-center min-h-screen w-screen">
       <div className="bg-bgSecondary border-borderPrimary flex h-full w-full sm:max-w-[500px] flex-col self-center sm:border shadow-md min-h-max sm:h-[max-content] sm:rounded-md overflow-y-auto">
@@ -85,6 +131,18 @@ function LoginPage() {
               {errors.errorMessage}
             </div>
           )}
+          <div className="flex  items-center gap-2 bg-primaryColor bg-opacity-10 p-4 rounded-md text-primaryColor text-sm">
+            DEMO Logins:{" "}
+            {DemoLoginTypes.map((type) => (
+              <button
+                key={type}
+                className="border px-2 py-1 rounded-md border-primaryColor hover:bg-primaryColor hover:text-white duration-100 transition-colors"
+                onClick={() => DemoLogin(type)}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
+            ))}
+          </div>
           <div className="flex w-full flex-col gap-1 relative">
             <input
               type="email"
