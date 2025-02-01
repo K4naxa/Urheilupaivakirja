@@ -80,14 +80,14 @@ accountability and motivation.
 
 
 
-- Build Docker image
+1. Build Docker image
 
 ```bash
 docker build -t urheilupaivakirja -f dockerfile-clean-install .
 ```
-- Update docker-compose.yml with your database and email service information
+2. Update docker-compose.yml with your database and email service information
 
-- Start the application
+3. Start the application
 
 ```bash
 docker compose up -d
