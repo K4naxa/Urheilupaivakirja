@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo } from "react";
+import { useState, useLayoutEffect, useMemo } from "react";
 import journalService from "../../../services/journalService.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/toast-messages/useToast.jsx";
@@ -8,9 +8,9 @@ import { useConfirmModal } from "../../../hooks/useConfirmModal.jsx";
 
 //const headerContainer = "bg-primaryColor border-borderPrimary border-b p-5 text-center text-xl shadow-md sm:rounded-t-md";
 const inputContainer =
-  "flex flex-col items-center gap-0.5 sm:gap-1 w-full max-w-[370px] p-1";
-const inputLabel = "text-textPrimary font-medium";
-const optionContainer = "flex justify-between w-full p-2";
+  "flex flex-col p-2 gap-0.5 sm:gap-1 w-full max-w-[370px] p-1";
+const inputLabel = "block text-sm font-medium text-textSecondary text-left";
+const optionContainer = "grid grid-cols-3 gap-3 justify-between w-full py-1";
 
 const NewJournalEntryPage = ({ onClose, studentData, date }) => {
   const queryClient = useQueryClient();
@@ -41,7 +41,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
   const [submitButtonIsDisabled, setSubmitButtonIsDisabled] = useState(false);
 
   const addJournalEntry = useMutation({
-    mutationFn: () =>  journalService.postJournalEntry(newJournalEntryData),
+    mutationFn: () => journalService.postJournalEntry(newJournalEntryData),
     onError: (error) => {
       console.error("Error posting new journal entry:", error);
 
@@ -95,11 +95,11 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
 
   // check for conflicts when the selected date or entry type changes
   useLayoutEffect(() => {
-      checkForConflicts(
-        newJournalEntryData.entry_type,
-        newJournalEntryData.date,
-        entriesForSelectedDate
-      );
+    checkForConflicts(
+      newJournalEntryData.entry_type,
+      newJournalEntryData.date,
+      entriesForSelectedDate
+    );
   }, [
     entriesForSelectedDate,
     newJournalEntryData.entry_type,
@@ -341,7 +341,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
 
   const renderRadioButton = (name, value, label, onChangeHandler) => {
     return (
-      <div className="relative w-24" key={`${name}-${value}`}>
+      <div className="relative w-full" key={`${name}-${value}`}>
         <input
           type="radio"
           name={name}
@@ -354,7 +354,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
         />
         <label
           htmlFor={`${name}-${value}`}
-          className="block p-1 text-center transition-transform duration-75 border rounded cursor-pointer peer-checked:border-primaryColor peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgSecondary peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor border-borderPrimary text-textPrimary active:scale-95 hover:border-primaryColor hover:text-primaryColor"
+          className="block p-2 text-center transition-transform duration-75 border-2 rounded-md cursor-pointer peer-checked:border-primaryColor peer-checked:text-bgSecondary peer-checked:bg-primaryColor bg-bgPrimary peer-focus-visible:ring-2 peer-focus-visible:ring-secondaryColor border-borderPrimary text-textPrimary active:scale-95 hover:border-primaryColor hover:text-primaryColor"
         >
           {label}
         </label>
@@ -423,39 +423,41 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
           </button>
         </div>
         <form
-          className="flex flex-col items-center flex-grow gap-1 p-4 sm:gap-2 sm:px-8 bg-bgSecondary sm:rounded-b-md"
+          className="flex flex-col items-center flex-grow gap-2 p-4 md:px-8 bg-bgSecondary sm:rounded-b-md"
           onSubmit={newJournalEntryHandler}
         >
-          <div className="flex flex-col items-center w-full p-1">
-            <div className="flex flex-row justify-between gap-12">
+          {/* Entry Type Selection */}
+          <div className="flex flex-row justify-centerw-full mt-2 max-w-md gap-8">
+            {[
+              {
+                type: "2",
+                label: "Lepopäivä",
+                color: "bg-bgRest border-bgRest",
+              },
+              {
+                type: "3",
+                label: "Sairauspäivä",
+                color: "bg-bgSick border-bgSick",
+              },
+            ].map(({ type, label, color }) => (
               <button
+                key={type}
                 type="button"
-                onClick={() => entryTypeChangeHandler("2")}
-                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "2" ? "border-bgRest bg-bgRest" : "border-bgRest bg-bgSecondary hover:bg-bgRest hover:bg-opacity-40"}
-              `}
+                onClick={() => entryTypeChangeHandler(type)}
+                className={`w-36 py-2 text-sm font-medium text-textPrimary rounded-xl border-2 bg-bgPrimary transition-all duration-150 ${newJournalEntryData.entry_type === type ? `${color}` : " border-borderPrimary"} hover:bg-opacity-20 hover:border-opacity-50 hover:${color} hover:text-textPrimary`}
               >
-                Lepopäivä
+                {label}
               </button>
-
-              <button
-                type="button"
-                onClick={() => entryTypeChangeHandler("3")}
-                className={`w-32 block rounded-xl text-textPrimary cursor-pointer active:scale-95 transition-transform duration-75
-              border-2 ${newJournalEntryData.entry_type === "3" ? "border-bgSick bg-bgSick" : "border-bgSick bg-bgSecondary hover:bg-bgSick hover:bg-opacity-40"}
-              `}
-              >
-                Sairauspäivä
-              </button>
-            </div>
+            ))}
           </div>
 
+          {/* Date Picker */}
           <div className={`${inputContainer} px-2.5`}>
             <label className={inputLabel} htmlFor="date-picker">
               Päivämäärä
             </label>
             <input
-              className={`text-textPrimary border-borderPrimary h-9 w-full bg-bgSecondary focus-visible:outline-none border-b p-1 ${errors.date ? "border-red-500" : "border-borderPrimary"} text-center`}
+              className={`w-full px-3 py-2 mt-1 text-center border-2 border-borderPrimary  rounded-md bg-bgPrimary text-textPrimary focus:outline-none color dark:[color-scheme:dark] focus:ring-2 focus:ring-primaryColor ${errors.date ? "border-red-500" : ""}`}
               type="date"
               name="date"
               value={newJournalEntryData.date}
@@ -464,6 +466,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
             />
           </div>
 
+          {/* Workout Details */}
           {newJournalEntryData.entry_type === "1" && (
             <div
               className={`${inputContainer} ${errors.length_in_minutes ? "shadow-error" : ""}`}
@@ -471,9 +474,9 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
               <label className={inputLabel} htmlFor="length_in_minutes">
                 Kesto: {convertTime(newJournalEntryData.length_in_minutes)}
               </label>
-              <div className="w-full p-1">
+              <div className="w-full  relative mb-2">
                 <input
-                  className="w-full bg-bgPrimary"
+                  className="w-full h-4 bg-bgPrimary border-2 border-borderPrimary rounded-lg appearance-none  cursor-pointer"
                   type="range"
                   min="30"
                   max="195"
@@ -483,6 +486,15 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
                   onChange={changeHandler}
                   name="length_in_minutes"
                 />
+                <span className="text-sm text-textSecondary absolute start-[18%] -bottom-4">
+                  1h
+                </span>
+                <span className="text-sm text-textSecondary absolute start-[55%] -translate-x-1/2 rtl:translate-x-1/2 -bottom-4">
+                  2h
+                </span>
+                <span className="text-sm text-textSecondary absolute start-[87%] -bottom-4">
+                  3h
+                </span>
               </div>
             </div>
           )}
@@ -531,7 +543,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
                   Harjoituskategoria
                 </label>
                 <select
-                  className={`text-md text-textPrimary bg-bgSecondary h-9 w-full  border-b p-1 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
+                  className={`text-md text-textPrimary rounded-md bg-bgPrimary w-full  border-2 p-2 ${errors.workout_category ? "border-red-500" : "border-borderPrimary"} text-center`}
                   id="workoutCategory"
                   name="workout_category"
                   value={newJournalEntryData.workout_category}
@@ -567,6 +579,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
             </div>
           )}
 
+          {/* Additional Details */}
           <div className={inputContainer}>
             <label
               className={`${inputLabel} cursor-pointer flex items-center gap-1 hover:text-primaryColor hover:cursor-pointer`}
@@ -581,7 +594,7 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
             {showDetails && (
               <div className="relative w-full">
                 <textarea
-                  className="w-full h-18 border-borderPrimary bg-bgPrimary border rounded-md p-1 text-textPrimary"
+                  className="w-full h-18 border-borderPrimary bg-bgPrimary border-2 rounded-md p-2 pb-4 text-textPrimary ring-2 focus:outline-none ring-transparent focus:ring-2 focus:ring-primaryColor"
                   onChange={changeHandler}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
@@ -594,11 +607,11 @@ const NewJournalEntryPage = ({ onClose, studentData, date }) => {
                   value={newJournalEntryData.details}
                   rows={2}
                   maxLength={200}
-                  style={{ resize: "none", overflowY: "hidden" }} // Prevent manual resizing and hide scrollbar initially
+                  style={{ resize: "none", overflowY: "auto" }} // Prevent manual resizing and hide scrollbar initially
                   required
                 ></textarea>
                 <p
-                  className={`absolute bottom-1 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? "100" : "40"} ${
+                  className={`absolute bottom-2 rounded right-2 text-sm text-opacity-${newJournalEntryData.details.length === 200 ? "100" : "40"} ${
                     newJournalEntryData.details.length === 200
                       ? "text-red-500 bg-bgPrimary z-10"
                       : "text-textPrimary"
