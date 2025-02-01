@@ -78,18 +78,21 @@ accountability and motivation.
 
 ### Production Deployment
 
+
+
+- Build Docker image
+
 ```bash
-
-# Build Docker image
 docker build -t urheilupaivakirja -f dockerfile-clean-install .
-
-# Update docker-compose.yml with your database and email service information
-
-# Start the application
-
-docker compose up -d
-
 ```
+- Update docker-compose.yml with your database and email service information
+
+- Start the application
+
+```bash
+docker compose up -d
+```
+
 
 The app will have 1 default teacher account:
 
@@ -102,6 +105,8 @@ You can update the account details in the profile page.
 ---
 
 ### Demo Deployment
+
+Clone the DEMO branch
 
 ```bash
 
