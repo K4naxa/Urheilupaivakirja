@@ -106,19 +106,22 @@ You can update the account details in the profile page.
 
 ### Demo Deployment
 
-Clone the DEMO branch
+- Clone the DEMO branch
+
+
+-  Build Docker image for the demo
 
 ```bash
-
-# Build Docker image for demo version
 docker  build  -t  urheilupaivakirja-demo  -f  dockerfile-DEMO-install  .
-
-# Update docker-compose.yml with correct information
-
-# Start the application
-docker  compose  up  -d
-
 ```
+- Update docker-compose.yml with correct information
+- Start the application
+
+```bash
+docker  compose  up  -d
+```
+
+
 
 The demo version includes:
 
@@ -130,11 +133,11 @@ The demo version includes:
 
 ### Local Development Setup
 
-1. Create a database in your local MySQL instance.
 
-2. In `backend/`, fill the `.env` file with correct information.
 
-3. Install dependencies:
+- In `backend/`, fill the `.env` file with correct information.
+
+- Install dependencies:
 
 ```bash
 
@@ -142,7 +145,7 @@ cd backend && npm  install
 
 ```
 
-4. Set up the database:
+- Set up the database:
 
 - Copy `knexfile.example.js` to `knexfile.js` in the `database/` directory and update it with your MySQL credentials.
 
@@ -156,7 +159,7 @@ npx knex migrate:latest --env development && npx  knex  seed:run  --env  develop
 
 ```
 
-5. Start the backend:
+- Start the backend in its own terminal:
 
 ```bash
 
@@ -164,7 +167,7 @@ cd backend && npm  run  start
 
 ```
 
-6. Start the frontend:
+- Start the frontend in its own terminal:
 
 ```bash
 
