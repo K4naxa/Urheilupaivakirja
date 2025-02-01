@@ -52,7 +52,7 @@ function HeatMap_Month({ journal }) {
   return (
     <div
       {...handlers}
-      className="MonthGrid max-w-[600px] w-full h-full pt-6 gap-1"
+      className="MonthGrid max-w-[400px] w-full h-full pt-6 gap-1"
     >
       {calendarDays.map((day, index) => {
         const dayJournal = journal?.filter((journalEntry) => {
@@ -88,7 +88,6 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
     [day, journal, minutes]
   );
 
-
   function handleColor(minutes) {
     if (!isSameMonth(day, showDate)) return;
     if (!journal) return;
@@ -97,7 +96,7 @@ function CalendarDay({ day, showWeekName, journal, showDate, onClick }) {
       return "bg-heatmapExercise1 border-heatmapExercise2 text-black";
     if (minutes > 60 && minutes <= 120)
       return "bg-heatmapExercise2 border-heatmapExercise3 text-black";
-      if (minutes > 120 && minutes <= 180)
+    if (minutes > 120 && minutes <= 180)
       return "bg-heatmapExercise3 border-heatmapExercise4 text-white";
     if (minutes > 180)
       return "bg-heatmapExercise4 border-heatmapExercise5 text-white";

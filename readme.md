@@ -78,18 +78,19 @@ accountability and motivation.
 
 ### Production Deployment
 
+
+1. Clone Release branch  
+2. Build Docker image
 ```bash
-
-# Build Docker image
 docker build -t urheilupaivakirja -f dockerfile-clean-install .
-
-# Update docker-compose.yml with your database and email service information
-
-# Start the application
-
-docker compose up -d
-
 ```
+3. Update docker-compose.yml with your database and email service information
+4. Start the application
+```bash
+docker compose up -d
+```
+5. Login with the default teacher account, invite yourself as new teacher from `Hallinta` > `Henkilökunta` >  `Opettaja`
+6. Register your account and delete the default teacher account. 
 
 The app will have 1 default teacher account:
 
@@ -103,20 +104,18 @@ You can update the account details in the profile page.
 
 ### Demo Deployment
 
+1. Clone the DEMO branch
+2. Build Docker image for the demo
 ```bash
-
-# Build Docker image for demo version
 docker  build  -t  urheilupaivakirja-demo  -f  dockerfile-DEMO-install  .
-
-# Update docker-compose.yml with correct information
-
-# Start the application
+```
+3. Update docker-compose.yml with correct information
+4. Start the application
+```bash
 docker  compose  up  -d
-
 ```
 
 The demo version includes:
-
 - Sample teachers, spectators and students
 - Randomized student journal entries
 - Seed news articles
@@ -124,53 +123,29 @@ The demo version includes:
 ---
 
 ### Local Development Setup
-
-1. Create a database in your local MySQL instance.
-
-2. In `backend/`, fill the `.env` file with correct information.
-
-3. Install dependencies:
-
+1. In `backend/`, fill the `.env` file with correct information.
+2. Install dependencies:
 ```bash
-
 cd backend && npm  install
-
 ```
-
-4. Set up the database:
-
+3. Set up the database:
 - Copy `knexfile.example.js` to `knexfile.js` in the `database/` directory and update it with your MySQL credentials.
-
 - Run migrations and seeds:
-
 ```bash
-
 cd database && npm  install
-
 npx knex migrate:latest --env development && npx  knex  seed:run  --env  development
-
 ```
-
-5. Start the backend:
-
+4. Start the backend in its own terminal:
 ```bash
-
 cd backend && npm  run  start
-
 ```
-
-6. Start the frontend:
-
+5. Start the frontend in its own terminal:
 ```bash
-
 cd frontend && npm  run  dev
-
 ```
 
 The app will have 1 default teacher account:
-
 - Email: `teacher@example.com`
-
 - Password: `salasana`
 
 You can update the account details in the profile page.

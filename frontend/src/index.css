@@ -51,7 +51,6 @@
 
     --color-border-rest: 160 170 215;
     --color-border-sick: 200 120 50;
-    
   }
 
   :root[data-theme="dark"] {
@@ -155,7 +154,8 @@
 
   .YearMonthGrid {
     display: grid;
-    min-width: 95px;
+    min-width: 60px;
+    gap: 0.1rem;
     grid-template-rows: repeat(7, auto);
     grid-template-columns: repeat(6, 1fr);
     grid-auto-flow: column;
@@ -210,9 +210,17 @@ a.active {
   height: 10px;
 }
 
+/* Media query for smaller screens */
+@media (max-width: 850px) {
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+}
+
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgb(var(--color-bg-secondary));
+  background: rgba(44, 114, 245, 0.1); /* Use rgba for transparency */
   border-radius: 5px;
 }
 
@@ -260,5 +268,5 @@ a.active {
 }
 
 .disabledStyle {
-  opacity: 0.4; 
+  opacity: 0.4;
 }

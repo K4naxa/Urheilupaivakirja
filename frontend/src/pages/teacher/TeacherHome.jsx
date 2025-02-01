@@ -562,7 +562,7 @@ function TeacherHome() {
             {renderSortingSelect()}
           </div>
           {/* Student list */}
-          <div className="grid grid-cols-1 gap-4 justify-items-center lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 justify-items-center [@media(min-width:1100px)]:grid-cols-2 [@media(min-width:1480px)]:grid-cols-3">
             {journals?.map((journal) => {
               return (
                 <div
@@ -647,12 +647,12 @@ function TeacherHome() {
             </div>
             {renderSortingSelect()}
           </div>
-          <div className="flex flex-wrap justify-center gap-4 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 justify-items-center lg:grid-cols-4 gap-6 lg:gap-8">
             {journals.map((journal) => {
               return (
                 <div
                   key={journal.user_id}
-                  className="relative flex flex-col w-64 gap-2 p-4 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
+                  className="relative flex flex-col w-full h-fit max-w-sm gap-2 p-4 overflow-hidden border rounded-md border-borderPrimary hover:bg-hoverDefault group/studentCard"
                   id="studentCard"
                 >
                   {
@@ -736,7 +736,7 @@ function TeacherHome() {
               return (
                 <div
                   key={journal.user_id}
-                  className="relative flex flex-col gap-2 p-4 overflow-hidden border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
+                  className="relative flex flex-col gap-2 p-4 border rounded-md group/studentCard border-borderPrimary hover:bg-hoverDefault"
                   id="studentCard"
                 >
                   {
